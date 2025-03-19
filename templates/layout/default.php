@@ -17,17 +17,18 @@
 $cakeDescription = 'CakePHP: the rapid development php framework';
 ?>
 <!DOCTYPE html>
+<html>
 <head>
     <?= $this->Html->charset() ?>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>
-        <?= $cakeDescription ?>:
+        <?= $this->request->getAttribute('identity') ? 'Admin Dashboard - ' : '' ?>
         <?= $this->fetch('title') ?>
     </title>
     <?= $this->Html->meta('icon') ?>
 
     <?= $this->Html->css('/landing-detail/css/styles.css') ?>
-    <?= $this->Html->css(['fonts', 'cake' , 'custom']) ?>
+    <?= $this->Html->css(['fonts', 'cake', 'custom']) ?>
 
     <?= $this->fetch('meta') ?>
     <?= $this->fetch('css') ?>
@@ -38,28 +39,50 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top py-3" id="mainNav" style="background-color: #121211;">
         <div class="container px-4 px-lg-5">
-            <a class="navbar-brand" href="/#page-top">ChicCharm</a>
-            <button class="navbar-toggler navbar-toggler-right" type="button" da ta-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <?php if ($this->request->getAttribute('identity')): ?>
+                <a class="navbar-brand" href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'index']) ?>">ChicCharm Admin</a>
+            <?php else: ?>
+                <a class="navbar-brand" href="/#page-top">ChicCharm</a>
+            <?php endif; ?>
+            
+            <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav ms-auto my-2 my-lg-0">
-                    <li class="nav-item"><a class="nav-link" href="/#about">About</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/#services">Services</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/#portfolio">Portfolio</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/contact-us') ?>">Contact Us</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/login') ?>">Login</a></li>
+                    <?php if ($this->request->getAttribute('identity')): ?>
+                        <!-- Admin Navigation -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'index']) ?>">Contact List</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'logout']) ?>">Logout</a>
+                        </li>
+                    <?php else: ?>
+                        <!-- Public Navigation -->
+                        <li class="nav-item"><a class="nav-link" href="/#about">About</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/#services">Services</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/#portfolio">Portfolio</a></li>
+                        <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/contact-us') ?>">Contact Us</a></li>
+                        <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/admins/login') ?>">Login</a></li>
+                    <?php endif; ?>
                 </ul>
             </div>
         </div>
     </nav>
 
     <!-- Main Content Area -->
-    <main class="content">
-        <?= $this->Flash->render() ?>
-        <?= $this->fetch('content') ?>
+    <main class="main">
+        <div class="container">
+            <?= $this->Flash->render() ?>
+            <?= $this->fetch('content') ?>
+        </div>
     </main>
 </div>
 
-<!-- Footer -->
+<?php if (!$this->request->getAttribute('identity')): ?>
+<!-- Footer - Only show for public pages -->
 <footer class="footer bg-black text-white py-5">
     <div class="container text-center">
         <div class="row justify-content-center">
@@ -116,6 +139,11 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
         </div>
     </div>
 </footer>
+<?php endif; ?>
+
+<!-- Bootstrap core JS-->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+</html>
 
 
