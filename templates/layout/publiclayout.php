@@ -28,13 +28,8 @@ $titleDescription = "Landing Page";
                 <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
                 <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
                 <li class="nav-item"><a class="nav-link" href="#portfolio">Portfolio</a></li>
-                <li class="nav-item">
-                    <a class="nav-link" href="<?= $this->Url->build('/contact-us') ?>">Contact Us</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="<?= $this->Url->build('/login') ?>">Login</a>
-                </li>
-
+                <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/contact-us') ?>">Contact Us</a></li>
+                <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/admins/login') ?>">Login</a></li>
             </ul>
         </div>
     </div>
