@@ -1,0 +1,123 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    justify-content: space-between;
+}
+
+.content {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+}
+
+.form-actions {
+    padding-top: 10px;
+}
+
+.contacts.index.content {
+    padding: 20px;
+}
+
+.contacts.index.content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.contacts.index.content th, .contacts.index.content td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.contacts.index.content th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+.contacts.index.content tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.contacts.index.content tr:hover {
+    background-color: #f1f1f1;
+}
+
+.contacts.index.content .actions {
+    text-align: center;
+}
+
+.contacts.index.content h3 {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.contacts.index.content .paginator {
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Paginator styling */
+.paginator {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.paginator ul.pagination {
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.paginator ul.pagination li {
+    display: inline;
+    margin: 0 5px;
+}
+
+.paginator ul.pagination li a {
+    text-decoration: none;
+    color: #0073e6;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f5f7fa;
+    transition: background-color 0.3s ease;
+}
+
+.paginator ul.pagination li a:hover {
+    background-color: #0073e6;
+    color: #fff;
+}
+
+.paginator ul.pagination li span {
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #ddd;
+}
+
+.paginator p {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #333;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.left-button {
+    align-self: flex-start;
+}
+
+.right-button {
+    margin-left: auto;
+}
+

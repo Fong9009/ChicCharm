@@ -5,8 +5,7 @@
  */
 ?>
 <div class="contacts index content">
-    <?= $this->Html->link(__('New Contact'), ['action' => 'add'], ['class' => 'button float-right']) ?>
-    <h3><?= __('Contacts') ?></h3>
+    <h3><?= __('Contacts') ?></h3> 
     <div class="table-responsive">
         <table>
             <thead>
@@ -16,6 +15,7 @@
                     <th><?= $this->Paginator->sort('last_name') ?></th>
                     <th><?= $this->Paginator->sort('email') ?></th>
                     <th><?= $this->Paginator->sort('phone_number') ?></th>
+                    <th><?= $this->Paginator->sort('message') ?></th>
                     <th class="actions"><?= __('Actions') ?></th>
                 </tr>
             </thead>
@@ -27,17 +27,11 @@
                     <td><?= h($contact->last_name) ?></td>
                     <td><?= h($contact->email) ?></td>
                     <td><?= h($contact->phone_number) ?></td>
+                    <td><?= h($contact->message) ?></td>
                     <td class="actions">
-                        <?= $this->Html->link(__('View'), ['action' => 'view', $contact->id]) ?>
-                        <?= $this->Html->link(__('Edit'), ['action' => 'edit', $contact->id]) ?>
-                        <?= $this->Form->postLink(
-                            __('Delete'),
-                            ['action' => 'delete', $contact->id],
-                            [
-                                'method' => 'delete',
-                                'confirm' => __('Are you sure you want to delete # {0}?', $contact->id),
-                            ]
-                        ) ?>
+                        <?= $this->Html->link(__('View'), ['action' => 'view', $contact->id], ['class' => 'button']) ?>
+                        <?= $this->Html->link(__('Edit'), ['action' => 'edit', $contact->id], ['class' => 'button']) ?>
+                        <?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $contact->id], ['confirm' => __('Are you sure you want to delete # {0}?', $contact->id), 'class' => 'button']) ?>
                     </td>
                 </tr>
                 <?php endforeach; ?>
