@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use Cake\Controller\Controller;
+use Cake\Event\EventInterface;
 
 /**
  * Application Controller
@@ -42,11 +43,41 @@ class AppController extends Controller
         parent::initialize();
 
         $this->loadComponent('Flash');
+        $this->loadComponent('Authentication.Authentication');
 
         /*
          * Enable the following component for recommended CakePHP form protection settings.
          * see https://book.cakephp.org/5/en/controllers/components/form-protection.html
          */
         //$this->loadComponent('FormProtection');
+    }
+
+    public function beforeFilter(EventInterface $event)
+    {
+        parent::beforeFilter($event);
+        
+        $result = $this->Authentication->getResult();
+        
+        $controller = $this->request->getParam('controller');
+        $action = $this->request->getParam('action');
+
+        // Check if user is not authenticated and trying to access protected areas
+        if (!$result->isValid()) {
+            // Allow access to public routes
+            if ($controller === 'Pages' && $action === 'display') {
+                return;
+            }
+            if ($controller === 'Contacts' && $action === 'add') {
+                return;
+            }
+            if ($controller === 'Admins' && $action === 'login') {
+                return;
+            }
+
+            // Redirect to login for all other routes
+            if (!($controller === 'Admins' && $action === 'login')) {
+                return $this->redirect(['controller' => 'Admins', 'action' => 'login']);
+            }
+        }
     }
 }

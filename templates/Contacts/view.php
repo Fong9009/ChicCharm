@@ -11,12 +11,11 @@
             <?= $this->Html->link(__('Edit Contact'), ['action' => 'edit', $contact->id], ['class' => 'side-nav-item']) ?>
             <?= $this->Form->postLink(__('Delete Contact'), ['action' => 'delete', $contact->id], ['confirm' => __('Are you sure you want to delete # {0}?', $contact->id), 'class' => 'side-nav-item']) ?>
             <?= $this->Html->link(__('List Contacts'), ['action' => 'index'], ['class' => 'side-nav-item']) ?>
-            <?= $this->Html->link(__('New Contact'), ['action' => 'add'], ['class' => 'side-nav-item']) ?>
         </div>
     </aside>
     <div class="column column-80">
         <div class="contacts view content">
-            <h3><?= h($contact->first_name) ?></h3>
+            <h3><?= h($contact->first_name . ' ' . $contact->last_name) ?></h3>
             <table>
                 <tr>
                     <th><?= __('First Name') ?></th>
@@ -38,13 +37,11 @@
                     <th><?= __('Id') ?></th>
                     <td><?= $this->Number->format($contact->id) ?></td>
                 </tr>
+                <tr>
+                    <th><?= __('Message') ?></th>
+                    <td><?= h($contact->message) ?></td>
+                </tr>
             </table>
-            <div class="text">
-                <strong><?= __('Message') ?></strong>
-                <blockquote>
-                    <?= $this->Text->autoParagraph(h($contact->message)); ?>
-                </blockquote>
-            </div>
         </div>
     </div>
 </div>

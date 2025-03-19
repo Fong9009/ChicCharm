@@ -7,18 +7,21 @@
 
 .content {
     flex: 1;
+    padding: 20px;
+    margin-top: 60px; /* Add space for the fixed navbar */
+}
+
+/* Specific styling for contact form */
+.form-container .content {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 0;
-    margin: 0;
-}
-
-.form-actions {
-    padding-top: 10px;
 }
 
 .contacts.index.content {
+    width: 100%;
+    max-width: 1200px;
+    margin: 80px auto 20px;
     padding: 20px;
 }
 
@@ -82,11 +85,12 @@
 .paginator ul.pagination li a {
     text-decoration: none;
     color: #0073e6;
-    padding: 10px 15px;
+    padding: 5px 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
     background-color: #f5f7fa;
     transition: background-color 0.3s ease;
+    font-size: 14px;
 }
 
 .paginator ul.pagination li a:hover {
@@ -95,15 +99,16 @@
 }
 
 .paginator ul.pagination li span {
-    padding: 10px 15px;
+    padding: 5px 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
     background-color: #ddd;
+    font-size: 14px;
 }
 
 .paginator p {
     margin-top: 10px;
-    font-size: 14px;
+    font-size: 12px;
     color: #333;
 }
 
@@ -119,5 +124,805 @@
 
 .right-button {
     margin-left: auto;
+}
+
+.contacts.index.content .actions .button {
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 0 3px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.contacts.index.content .actions .button:first-child {
+    background-color: #28a745;
+    color: white;
+    border: 1px solid #28a745;
+}
+
+.contacts.index.content .actions .button:nth-child(2) {
+    background-color: #007bff;
+    color: white;
+    border: 1px solid #007bff;
+}
+
+.contacts.index.content .actions .button:last-child {
+    background-color: #dc3545;
+    color: white;
+    border: 1px solid #dc3545;
+}
+
+.contacts.index.content .actions .button:hover {
+    opacity: 0.8;
+    transform: translateY(-1px);
+}
+
+/* Login Form Styling */
+.login-form {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 80px;
+}
+
+.login-form h2 {
+    color: white;
+    background: #121211;
+    margin: -30px -30px 30px -30px;
+    padding: 20px;
+    border-radius: 15px 15px 0 0;
+    text-align: center;
+    font-weight: normal;
+}
+
+.login-form .form-control {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 20px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.login-form label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-size: 16px;
+}
+
+.login-form .submit-button {
+    background: #121211;
+    color: white;
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+.login-form .submit-button:hover {
+    background: #2a2a29;
+}
+
+/* Remove the default form field containers that CakePHP adds */
+.login-form div.input {
+    margin-bottom: 20px;
+}
+
+.login-form div.input label {
+    font-weight: normal;
+}
+
+/* Remove old login form styling */
+.form-container {
+    margin-top: 0;
+    box-shadow: none;
+    border-radius: 0;
+    overflow: visible;
+}
+
+.form-container .card-header,
+.form-container .card-body,
+.form-container .form-group,
+.form-container .form-control,
+.form-container label,
+.form-container .btn-primary,
+.form-container .form-actions {
+    all: revert;
+}
+
+/* Flash Messages Styling */
+.message {
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.message.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+/* Enquiry Form Styling */
+.enquiry-form {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 80px;
+}
+
+.enquiry-form h2 {
+    color: white;
+    background: #121211;
+    margin: -30px -30px 30px -30px;
+    padding: 20px;
+    border-radius: 15px 15px 0 0;
+    text-align: center;
+    font-weight: normal;
+}
+
+.enquiry-form .form-control {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 20px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.enquiry-form label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-size: 16px;
+}
+
+.enquiry-form textarea.form-control {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.enquiry-form .submit-button {
+    background: #121211;
+    color: white;
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.enquiry-form .submit-button:hover {
+    background: #2a2a29;
+}
+
+/* Remove the default form field containers that CakePHP adds */
+.enquiry-form div.input {
+    margin-bottom: 20px;
+}
+
+.enquiry-form div.input label {
+    font-weight: normal;
+}
+
+/* Admin Layout Styling */
+body {
+    padding-top: 76px;  /* Account for fixed navbar */
+    background-color: #f8f9fa;
+}
+
+.navbar-dark .navbar-brand {
+    color: #ffffff;
+    font-weight: 500;
+}
+
+.navbar-dark .nav-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+    padding: 0.5rem 1rem !important;
+    transition: color 0.3s ease;
+}
+
+.navbar-dark .nav-link:hover {
+    color: #ffffff !important;
+}
+
+/* Admin Content Styling */
+.main {
+    padding: 20px 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* Table Styling for Admin Pages */
+.table-responsive {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.table {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+    padding: 12px;
+}
+
+.table td {
+    padding: 12px;
+    vertical-align: middle;
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* Admin Page Headers */
+.content-header {
+    margin-bottom: 20px;
+}
+
+.content-header h3 {
+    margin: 0;
+    font-size: 24px;
+    color: #333;
+}
+
+/* Admin Buttons */
+.button-primary {
+    background-color: #121211;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.button-primary:hover {
+    background-color: #2a2a29;
+    color: white;
+    text-decoration: none;
+}
+
+.button-secondary {
+    background-color: #6c757d;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.button-secondary:hover {
+    background-color: #5a6268;
+    color: white;
+    text-decoration: none;
+}
+
+/* Contacts View Styling */
+.contacts.index.content {
+    padding: 20px 0;
+}
+
+.contacts.index.content h1 {
+    color: #333;
+    margin-bottom: 30px;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+/* Table Styling */
+.contacts.index.content table {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.contacts.index.content table th {
+    background-color: #f8f9fa;
+    color: #495057;
+    font-weight: 600;
+    padding: 12px 15px;
+    border-bottom: 2px solid #dee2e6;
+    text-align: left;
+}
+
+.contacts.index.content table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #dee2e6;
+    color: #333;
+}
+
+.contacts.index.content table tr:last-child td {
+    border-bottom: none;
+}
+
+.contacts.index.content table tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Action Buttons */
+.contacts.index.content .actions {
+    display: flex;
+    gap: 8px;
+}
+
+.contacts.index.content .actions .button {
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 80px;
+}
+
+.contacts.index.content .actions .button:first-child {
+    background-color: #28a745;
+    color: white;
+    border: 1px solid #28a745;
+}
+
+.contacts.index.content .actions .button:nth-child(2) {
+    background-color: #007bff;
+    color: white;
+    border: 1px solid #007bff;
+}
+
+.contacts.index.content .actions .button:last-child {
+    background-color: #dc3545;
+    color: white;
+    border: 1px solid #dc3545;
+}
+
+.contacts.index.content .actions .button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* Add Button */
+.contacts.index.content .actions a.button {
+    background-color: #28a745;
+    color: white;
+    border: 1px solid #28a745;
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    display: inline-block;
+    margin-bottom: 20px;
+    transition: all 0.2s ease;
+}
+
+.contacts.index.content .actions a.button:hover {
+    background-color: #218838;
+    transform: translateY(-1px);
+}
+
+/* Paginator Styling */
+.contacts.index.content .paginator {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.contacts.index.content .paginator ul.pagination {
+    display: inline-flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    gap: 5px;
+}
+
+.contacts.index.content .paginator ul.pagination li a,
+.contacts.index.content .paginator ul.pagination li span {
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    color: #007bff;
+    text-decoration: none;
+    background-color: white;
+    transition: all 0.2s ease;
+}
+
+.contacts.index.content .paginator ul.pagination li span {
+    background-color: #e9ecef;
+    color: #6c757d;
+    border-color: #dee2e6;
+}
+
+.contacts.index.content .paginator ul.pagination li a:hover {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .contacts.index.content table {
+        display: block;
+        overflow-x: auto;
+    }
+    
+    .contacts.index.content .actions {
+        flex-wrap: wrap;
+    }
+    
+    .contacts.index.content .actions .button {
+        min-width: 70px;
+        padding: 4px 8px;
+    }
+}
+
+/* Contact View Page Styling */
+.contacts.view.content {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-top: 20px;
+}
+
+.contacts.view.content h3 {
+    color: #333;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.contacts.view.content table {
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+.contacts.view.content table tr {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.contacts.view.content table tr:last-child {
+    border-bottom: none;
+}
+
+.contacts.view.content table th {
+    width: 200px;
+    padding: 15px 0;
+    color: #666;
+    font-weight: 500;
+    text-align: left;
+}
+
+.contacts.view.content table td {
+    padding: 15px 0;
+    color: #333;
+    font-size: 16px;
+}
+
+/* Side Navigation Styling */
+.side-nav {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-top: 20px;
+}
+
+.side-nav h4 {
+    color: #333;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.side-nav-item {
+    display: block;
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    color: #007bff;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.side-nav-item:hover {
+    background-color: #f8f9fa;
+    color: #0056b3;
+}
+
+/* Row and Column Layout */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -15px;
+}
+
+.column {
+    padding: 0 15px;
+}
+
+.column-80 {
+    flex: 0 0 80%;
+    max-width: 80%;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .column-80 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    
+    .contacts.view.content {
+        padding: 20px;
+    }
+    
+    .contacts.view.content table th {
+        width: 150px;
+    }
+}
+
+/* Contact Edit Form Styling */
+.contacts.form.content {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-top: 20px;
+}
+
+.contacts.form.content fieldset {
+    border: none;
+    padding: 0;
+    margin: 0 0 30px 0;
+}
+
+.contacts.form.content legend {
+    color: #333;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+/* Form Fields Styling */
+.contacts.form.content .input {
+    margin-bottom: 20px;
+}
+
+.contacts.form.content label {
+    display: block;
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.contacts.form.content input[type="text"],
+.contacts.form.content input[type="email"],
+.contacts.form.content input[type="tel"],
+.contacts.form.content textarea {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    color: #333;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+}
+
+.contacts.form.content input[type="text"]:focus,
+.contacts.form.content input[type="email"]:focus,
+.contacts.form.content input[type="tel"]:focus,
+.contacts.form.content textarea:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
+.contacts.form.content textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* Submit Button Styling */
+.contacts.form.content .submit {
+    margin-top: 20px;
+}
+
+.contacts.form.content .submit button {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.contacts.form.content .submit button:hover {
+    background-color: #218838;
+    transform: translateY(-1px);
+}
+
+/* Error Messages */
+.contacts.form.content .error-message {
+    color: #dc3545;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .contacts.form.content {
+        padding: 20px;
+    }
+    
+    .contacts.form.content legend {
+        font-size: 20px;
+    }
+}
+
+/* Button Styling */
+.button,
+button,
+input[type="submit"] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    min-width: 100px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Primary Button */
+.button.primary,
+button.primary,
+input[type="submit"].primary {
+    background-color: #28a745;
+    color: white;
+}
+
+.button.primary:hover,
+button.primary:hover,
+input[type="submit"].primary:hover {
+    background-color: #218838;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.2);
+}
+
+/* Secondary Button */
+.button.secondary,
+button.secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.button.secondary:hover,
+button.secondary:hover {
+    background-color: #5a6268;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.2);
+}
+
+/* Danger Button */
+.button.danger,
+button.danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.button.danger:hover,
+button.danger:hover {
+    background-color: #c82333;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.2);
+}
+
+/* Action Buttons in Tables */
+.contacts.index.content .actions .button {
+    padding: 6px 12px;
+    min-width: 80px;
+    font-size: 13px;
+}
+
+/* Side Navigation Buttons */
+.side-nav-item {
+    display: block;
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    color: #007bff;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+}
+
+.side-nav-item:hover {
+    background-color: #e9ecef;
+    color: #0056b3;
+    transform: translateX(5px);
+}
+
+/* Form Submit Button */
+.contacts.form.content .submit button {
+    background-color: #28a745;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 120px;
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.1);
+}
+
+.contacts.form.content .submit button:hover {
+    background-color: #218838;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.2);
+}
+
+/* Button Groups */
+.button-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Responsive Button Adjustments */
+@media (max-width: 768px) {
+    .button,
+    button,
+    input[type="submit"] {
+        padding: 8px 16px;
+        min-width: 90px;
+    }
+    
+    .contacts.index.content .actions .button {
+        padding: 4px 8px;
+        min-width: 70px;
+        font-size: 12px;
+    }
 }
 
