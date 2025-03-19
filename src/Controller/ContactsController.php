@@ -47,9 +47,9 @@ class ContactsController extends AppController
         if ($this->request->is('post')) {
             $contact = $this->Contacts->patchEntity($contact, $this->request->getData());
             if ($this->Contacts->save($contact)) {
-                $this->Flash->success(__('The contact has been saved.'));
+                $this->Flash->success(__('Thank you for your interest. We will get back to you as soon as possible.'));
 
-                return $this->redirect(['action' => 'index']);
+                return $this->redirect(['action' => 'add']);
             }
             $this->Flash->error(__('The contact could not be saved. Please, try again.'));
         }
@@ -71,7 +71,7 @@ class ContactsController extends AppController
             if ($this->Contacts->save($contact)) {
                 $this->Flash->success(__('The contact has been saved.'));
 
-                return $this->redirect(['action' => 'index']);
+                return $this->redirect(['action' => 'edit']);
             }
             $this->Flash->error(__('The contact could not be saved. Please, try again.'));
         }
@@ -95,6 +95,6 @@ class ContactsController extends AppController
             $this->Flash->error(__('The contact could not be deleted. Please, try again.'));
         }
 
-        return $this->redirect(['action' => 'index']);
+        return $this->redirect(['action' => 'delete']);
     }
 }

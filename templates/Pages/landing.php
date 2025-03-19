@@ -188,16 +188,7 @@ $this->layout = 'publiclayout';
                 </div>
             </div>
         </div>
-        <!-- Call to action-->
-        <section class="page-section bg-dark text-white">
-            <div class="container px-4 px-lg-5 text-center">
-                <h2 class="mb-4">Free Download at Start Bootstrap!</h2>
-                <a class="btn btn-light btn-xl" href="https://startbootstrap.com/theme/creative/">Download Now!</a>
-            </div>
-        </section>
-        <!-- Contact TO DO REMOVE LATER-->
-        <section class="page-section" id="contact">
-        </section>
+
         <?= $this->Html->script('https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js') ?>
         <?= $this->Html->script('https://cdnjs.cloudflare.com/ajax/libs/SimpleLightbox/2.1.0/simpleLightbox.min.js') ?>
         <?= $this->Html->script('/landing-detail/js/scripts.js') ?>
