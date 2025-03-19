@@ -42,7 +42,7 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
             <?php if ($this->request->getAttribute('identity')): ?>
                 <a class="navbar-brand" href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'index']) ?>">ChicCharm Admin</a>
             <?php else: ?>
-                <a class="navbar-brand" href="/#page-top">ChicCharm</a>
+                <a class="navbar-brand" href="<?= $this->Url->build('/') ?>">ChicCharm</a>
             <?php endif; ?>
 
             <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,10 +61,11 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
                         </li>
                     <?php else: ?>
                         <!-- Public Navigation -->
-                        <li class="nav-item"><a class="nav-link" href="/#about">About</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/#services">Services</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/#portfolio">Portfolio</a></li>
-                        <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/contact-us') ?>">Contact Us</a></li>
+                        <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a></li>
+                        <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a></li>
+                        <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a></li>
+
+                        <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/contacts/add') ?>">Contact Us</a></li>
                         <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/admins/login') ?>">Login</a></li>
                     <?php endif; ?>
                 </ul>
