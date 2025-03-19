@@ -84,8 +84,9 @@ $this->layout = 'publiclayout';
                         </p>
                         <hr class="flex-grow-1 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
                     </div>
+                    <!--class="col-md-4 col-sm-6 mb-2 order-lg-2"-->
                     <div class="col-lg-3 mb-2 order-lg-2">
-                        <img src="<?= $this->Url->image('Michonne.jpg')?>" alt="Image Description" style="width: auto; height: 500px;">
+                        <img src="<?= $this->Url->image('Michonne.jpg')?>" alt="Image Description" style="width: auto; height: 400px;">
                     </div>
                 </div>
             </div>
@@ -95,35 +96,49 @@ $this->layout = 'publiclayout';
             <div class="container px-4 px-lg-5">
                 <h2 class="text-center mt-0">ChicCharm At Your Service</h2>
                 <hr class="divider" />
+                <h3 class="text-center mt-0">ChicCharm is dedicated to provide your show with the finest of artisens who are masters of their craft.
+                    They will make sure that your models or stars of the show will shine brighter than ever.</h3>
+                <hr class="divider" />
                 <div class="row gx-4 gx-lg-5">
-                    <div class="col-lg-3 col-md-6 text-center">
-                        <div class="mt-5">
-                            <div class="mb-2"><i class="bi-gem fs-1 text-primary"></i></div>
-                            <h3 class="h4 mb-2">Sturdy Themes</h3>
-                            <p class="text-muted mb-0">Our themes are updated regularly to keep them bug free!</p>
-                        </div>
+                    <div class="col-lg-3 col-md-5 text-center">
+                        <h4>Makeup Artistry</h4>
+                        <p>ChicCharm can make sure your stars of the show shine.</p>
+                        <hr class="flex-grow-1 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
+                        <img src="<?= $this->Url->image('services/makeup.jpg')?>" alt="Makeup Artistry" class="img-fluid">
                     </div>
-                    <div class="col-lg-3 col-md-6 text-center">
-                        <div class="mt-5">
-                            <div class="mb-2"><i class="bi-laptop fs-1 text-primary"></i></div>
-                            <h3 class="h4 mb-2">Up to Date</h3>
-                            <p class="text-muted mb-0">All dependencies are kept current to keep things fresh.</p>
-                        </div>
+                    <div class="col-lg-3 col-md-5 text-center">
+                        <h4>Wig Styling</h4>
+                        <p>ChicCharm can design custom wigs for all your needs.</p>
+                        <hr class="flex-grow-1 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
+                        <img src="<?= $this->Url->image('services/wigstyling.jpg')?>" alt="Wig Styling" class="img-fluid">
                     </div>
-                    <div class="col-lg-3 col-md-6 text-center">
-                        <div class="mt-5">
-                            <div class="mb-2"><i class="bi-globe fs-1 text-primary"></i></div>
-                            <h3 class="h4 mb-2">Ready to Publish</h3>
-                            <p class="text-muted mb-0">You can use this design as is, or you can make changes!</p>
-                        </div>
+                    <div class="col-lg-3 col-md-5 text-center">
+                        <h4>Fashion Design</h4>
+                        <p>ChicCharm can design custom clothes for all your theatre needs.</p>
+                        <hr class="flex-grow-1 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
+                        <img src="<?= $this->Url->image('services/fashiondesign.jpg')?>" alt="Fashion Design" class="img-fluid">
                     </div>
-                    <div class="col-lg-3 col-md-6 text-center">
-                        <div class="mt-5">
-                            <div class="mb-2"><i class="bi-heart fs-1 text-primary"></i></div>
-                            <h3 class="h4 mb-2">Made with Love</h3>
-                            <p class="text-muted mb-0">Is it really open source if it's not made with love?</p>
-                        </div>
+                    <div class="col-lg-3 col-md-5 text-center">
+                        <h4>Hair Styling</h4>
+                        <p>ChicCharm can make sure your stars hairs are stunning and fabulous.</p>
+                        <hr class="flex-grow-1 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
+                        <img src="<?= $this->Url->image('services/hairstyling.jpg')?>" alt="Hair Styling" class="img-fluid">
                     </div>
+                </div>
+                <hr class="flex-grow-1 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
+                <div class="row gx-4 gx-lg-5">
+                    <div class="d-flex justify-content-center mb-4">
+                        <a class="btn btn-primary btn-xl" href="#about">Make a Booking with ChicCharm</a>
+                    </div>
+                </div>
+            </div>
+            <div class="container px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5">
+                    <h2 class="text-center mt-0">Some of ChicCharms latest works</h2>
+                    <hr class="divider" />
+                    <h3 class="text-center mt-0">ChicCharm is dedicated to helping make sure that your show is ready on the stage or a model show,
+                    Our Business is nothing without our fabulous customers who continue to work with us</h3>
+                    <hr class="divider" />
                 </div>
             </div>
         </section>
@@ -132,56 +147,29 @@ $this->layout = 'publiclayout';
             <div class="container-fluid p-0">
                 <div class="row g-0">
                     <div class="col-lg-4 col-sm-6">
-                        <a class="portfolio-box" href="<?= $this->Url->image('portfolio/fullsize/1.jpg')?>" title="Project Name">
-                            <img class="img-fluid" src="<?= $this->Url->image('portfolio/thumbnails/1.jpg')?>" alt="..." />
+                        <a class="portfolio-box" href="<?= $this->Url->image('portfolio/fullsize/hair.jpg')?>" title="Hair Styling">
+                            <img class="img-fluid" src="<?= $this->Url->image('portfolio/thumbnails/hair.jpg')?>" alt="..." />
                             <div class="portfolio-box-caption">
-                                <div class="project-category text-white-50">Category</div>
-                                <div class="project-name">Project Name</div>
+                                <div class="project-category text-white-50">Hair Styling</div>
+                                <div class="project-name">Styling for next show</div>
                             </div>
                         </a>
                     </div>
                     <div class="col-lg-4 col-sm-6">
-                        <a class="portfolio-box" href="<?= $this->Url->image('portfolio/fullsize/2.jpg')?>" title="Project Name">
-                            <img class="img-fluid" src="<?= $this->Url->image('portfolio/thumbnails/2.jpg')?>" alt="..." />
+                        <a class="portfolio-box" href="<?= $this->Url->image('portfolio/fullsize/make.jpg')?>" title="Makeup">
+                            <img class="img-fluid" src="<?= $this->Url->image('portfolio/thumbnails/make.jpg')?>" alt="..." />
                             <div class="portfolio-box-caption">
-                                <div class="project-category text-white-50">Category</div>
-                                <div class="project-name">Project Name</div>
+                                <div class="project-category text-white-50">Makeup</div>
+                                <div class="project-name">Makeup for next show</div>
                             </div>
                         </a>
                     </div>
                     <div class="col-lg-4 col-sm-6">
-                        <a class="portfolio-box" href="<?= $this->Url->image('portfolio/fullsize/3.jpg')?>" title="Project Name">
-                            <img class="img-fluid" src="<?= $this->Url->image('portfolio/thumbnails/3.jpg')?>" alt="..." />
+                        <a class="portfolio-box" href="<?= $this->Url->image('portfolio/fullsize/stage.jpg')?>" title="Stage Show">
+                            <img class="img-fluid" src="<?= $this->Url->image('portfolio/thumbnails/stage.jpg')?>" alt="..." />
                             <div class="portfolio-box-caption">
-                                <div class="project-category text-white-50">Category</div>
-                                <div class="project-name">Project Name</div>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="col-lg-4 col-sm-6">
-                        <a class="portfolio-box" href="<?= $this->Url->image('portfolio/fullsize/4.jpg')?>" title="Project Name">
-                            <img class="img-fluid" src="<?= $this->Url->image('portfolio/thumbnails/4.jpg')?>" alt="..." />
-                            <div class="portfolio-box-caption">
-                                <div class="project-category text-white-50">Category</div>
-                                <div class="project-name">Project Name</div>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="col-lg-4 col-sm-6">
-                        <a class="portfolio-box" href="<?= $this->Url->image('portfolio/fullsize/5.jpg')?>" title="Project Name">
-                            <img class="img-fluid" src="<?= $this->Url->image('portfolio/thumbnails/5.jpg')?>" alt="..." />
-                            <div class="portfolio-box-caption">
-                                <div class="project-category text-white-50">Category</div>
-                                <div class="project-name">Project Name</div>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="col-lg-4 col-sm-6">
-                        <a class="portfolio-box" href="<?= $this->Url->image('portfolio/fullsize/6.jpg')?>" title="Project Name">
-                            <img class="img-fluid" src="<?= $this->Url->image('portfolio/thumbnails/6.jpg')?>" alt="..." />
-                            <div class="portfolio-box-caption p-3">
-                                <div class="project-category text-white-50">Category</div>
-                                <div class="project-name">Project Name</div>
+                                <div class="project-category text-white-50">Stage Shows</div>
+                                <div class="project-name">Stage show of dance</div>
                             </div>
                         </a>
                     </div>
