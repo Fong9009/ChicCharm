@@ -1,7 +1,8 @@
 <?php
 $titleDescription = "Landing Page";
 ?>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <?= $this->Html->charset() ?>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,9 +10,13 @@ $titleDescription = "Landing Page";
         <?= $titleDescription ?>:
         <?= $this->fetch('title') ?>
     </title>
+    <!-- Google fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Merriweather+Sans:400,700" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic" rel="stylesheet" type="text/css" />
+
     <?= $this->Html->meta('icon') ?>
     <?= $this->Html->css('/landing-detail/css/styles.css') ?>
-    <?= $this->Html->css(['fonts', 'cake']) ?>
+    <?= $this->Html->css(['fonts', 'cake','custom']) ?>
 
     <?= $this->fetch('meta') ?>
     <?= $this->fetch('css') ?>
@@ -97,6 +102,8 @@ $titleDescription = "Landing Page";
         </div>
     </div>
 </footer>
-
+<?= $this->Html->script('https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js') ?>
+<?= $this->Html->script('https://cdnjs.cloudflare.com/ajax/libs/SimpleLightbox/2.1.0/simpleLightbox.min.js') ?>
+<?= $this->Html->script('/landing-detail/js/scripts.js') ?>
 </body>
-
+</html>
