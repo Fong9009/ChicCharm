@@ -68,6 +68,19 @@ return [
     ],
 
     /*
+     * Recaptcha
+     *
+     */
+    'Recaptcha' => [
+        'enable' => true,
+        'sitekey' => '6LfcV_sqAAAAAHYWC0mYh1visjKpM9T2GgTyohUZ',
+        'secret' => '6LfcV_sqAAAAAJlsYM6Vm8b9pGiPdL9x28j_dTr5',
+        'type' => 'image',
+        'theme' => 'light',
+        'lang' => 'en',
+        'size' => 'normal',
+    ],
+    /*
      * Security and encryption configuration
      *
      * - salt - A random string used in security hashing methods.

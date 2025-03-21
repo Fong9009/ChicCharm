@@ -17,7 +17,7 @@
 $cakeDescription = 'CakePHP: the rapid development php framework';
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <?= $this->Html->charset() ?>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -25,8 +25,11 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
         <?= $this->request->getAttribute('identity') ? 'Admin Dashboard - ' : '' ?>
         <?= $this->fetch('title') ?>
     </title>
-    <?= $this->Html->meta('icon') ?>
+    <!-- Google fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Merriweather+Sans:400,700" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic" rel="stylesheet" type="text/css" />
 
+    <?= $this->Html->meta('icon') ?>
     <?= $this->Html->css('/landing-detail/css/styles.css') ?>
     <?= $this->Html->css(['fonts', 'cake', 'custom']) ?>
 
@@ -143,7 +146,7 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
 <?php endif; ?>
 
 <!-- Bootstrap core JS-->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<?= $this->Html->script('https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js') ?>
 </body>
 </html>
 

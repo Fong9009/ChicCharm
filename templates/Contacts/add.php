@@ -36,9 +36,12 @@
                     'required' => true,
                     'rows' => 5
                 ]) ?>
+                <?= $this->Recaptcha->display(['class' => 'mb-3'])?>
                 <?= $this->Form->button(__('Submit'), ['class' => 'submit-button']) ?>
                 <?= $this->Form->end() ?>
             </div>
         </div>
     </div>
 </div>
+
+
