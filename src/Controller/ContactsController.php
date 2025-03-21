@@ -12,6 +12,15 @@ use Cake\Event\EventInterface;
  */
 class ContactsController extends AppController
 {
+   public function initialize(): void
+   {
+        parent::initialize();
+        $this->loadComponent('Recaptcha.Recaptcha');
+   }
+
+
+
+
     public function beforeFilter(EventInterface $event)
     {
         parent::beforeFilter($event);
@@ -54,10 +63,15 @@ class ContactsController extends AppController
     {
         $contact = $this->Contacts->newEmptyEntity();
         if ($this->request->is('post')) {
-            $contact = $this->Contacts->patchEntity($contact, $this->request->getData());
-            if ($this->Contacts->save($contact)) {
-                $this->Flash->success(__('Thank you for your interest. We will get back to you as soon as possible.'));
-                return $this->redirect(['action' => 'add']);
+            if($this->Recaptcha->verify()){
+                $contact = $this->Contacts->patchEntity($contact, $this->request->getData());
+                if ($this->Contacts->save($contact)) {
+                    $this->Flash->success(__('Thank you for your interest. We will get back to you as soon as possible.'));
+                    return $this->redirect(['action' => 'add']);
+                }
+            }
+            if(!$this->Recaptcha->verify()){
+                $this->Flash->error(__('Please confirm that you are not a bot.'));
             }
             $this->Flash->error(__('The contact could not be saved. Please, try again.'));
         }

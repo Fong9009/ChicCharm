@@ -11,9 +11,6 @@ $this->layout = 'publiclayout';
         <title>Creative - Start Bootstrap Theme</title>
         <!-- Favicon-->
         <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
-        <!-- Google fonts-->
-        <link href="https://fonts.googleapis.com/css?family=Merriweather+Sans:400,700" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic" rel="stylesheet" type="text/css" />
 
 
         <?= $this->Html->css('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css', ['rel' => 'stylesheet']); ?>
@@ -24,14 +21,6 @@ $this->layout = 'publiclayout';
         <title>
             <?= $this->fetch('title') ?>
         </title>
-        <?= $this->Html->meta('icon') ?>
-        <!-- Core theme CSS (includes Bootstrap)-->
-        <?= $this->Html->css('/landing-detail/css/styles.css') ?>
-        <?= $this->Html->css(['fonts', 'cake']) ?>
-
-        <?= $this->fetch('meta') ?>
-        <?= $this->fetch('css') ?>
-        <?= $this->fetch('script') ?>
     </head>
     <body id="page-top">
         <!-- Masthead-->
@@ -176,10 +165,5 @@ $this->layout = 'publiclayout';
                 </div>
             </div>
         </div>
-
-        <?= $this->Html->script('https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js') ?>
-        <?= $this->Html->script('https://cdnjs.cloudflare.com/ajax/libs/SimpleLightbox/2.1.0/simpleLightbox.min.js') ?>
-        <?= $this->Html->script('/landing-detail/js/scripts.js') ?>
-
     </body>
 </html>
