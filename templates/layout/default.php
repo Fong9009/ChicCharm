@@ -15,6 +15,7 @@
  */
 
 $cakeDescription = 'CakePHP: the rapid development php framework';
+$isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->request->getParam('action') === 'add';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -42,34 +43,32 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top py-3" id="mainNav" style="background-color: #121211;">
         <div class="container px-4 px-lg-5">
-            <?php if ($this->request->getAttribute('identity')): ?>
-                <a class="navbar-brand" href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'index']) ?>">ChicCharm Admin</a>
-            <?php else: ?>
-                <a class="navbar-brand" href="<?= $this->Url->build('/') ?>">ChicCharm</a>
-            <?php endif; ?>
-
+            <a class="navbar-brand" href="<?= $this->Url->build('/') ?>">ChicCharm</a>
             <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav ms-auto my-2 my-lg-0">
-                    <?php if ($this->request->getAttribute('identity')): ?>
-                        <!-- Admin Navigation -->
-                        <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'index']) ?>">Contact List</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build(['controller' => 'Auth', 'action' => 'logout']) ?>">Logout</a>
-                        </li>
-                    <?php else: ?>
+                    <?php if ($isPublicPage): ?>
                         <!-- Public Navigation -->
                         <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a></li>
                         <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a></li>
                         <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a></li>
-
                         <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/contacts/add') ?>">Contact Us</a></li>
                         <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/auth/login') ?>">Login</a></li>
+                    <?php else: ?>
+                        <!-- Admin Navigation -->
+                        <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'index']) ?>">Contact List</a></li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Admin
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'index']) ?>">Admin List</a></li>
+                                <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'add']) ?>">Add New Admin</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build(['controller' => 'Auth', 'action' => 'logout']) ?>" onclick="return confirmLogout()">Logout</a></li>
                     <?php endif; ?>
                 </ul>
             </div>
@@ -149,6 +148,20 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
 <?= $this->Html->script('https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js') ?>
 <?= $this->Html->script('https://cdnjs.cloudflare.com/ajax/libs/SimpleLightbox/2.1.0/simpleLightbox.min.js') ?>
 <?= $this->Html->script('/landing-detail/js/scripts.js') ?>
+
+<!-- Show dropdown on hover -->
+<style>
+.nav-item.dropdown:hover .dropdown-menu {
+    display: block;
+    margin-top: 0; /* Adjust if needed */
+}
+</style>
+
+<script>
+function confirmLogout() {
+    return confirm('Are you sure you want to logout?');
+}
+</script>
 </body>
 </html>
 

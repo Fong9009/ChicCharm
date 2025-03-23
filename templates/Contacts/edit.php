@@ -13,7 +13,7 @@
                 ['action' => 'delete', $contact->id],
                 ['confirm' => __('Are you sure you want to delete # {0}?', $contact->id), 'class' => 'side-nav-item']
             ) ?>
-            <?= $this->Html->link(__('List Contacts'), ['action' => 'index'], ['class' => 'side-nav-item']) ?>
+            <?= $this->Html->link(__('Contacts List'), ['action' => 'index'], ['class' => 'side-nav-item']) ?>
         </div>
     </aside>
     <div class="column column-80">
@@ -27,10 +27,14 @@
                     echo $this->Form->control('email');
                     echo $this->Form->control('phone_number');
                     echo $this->Form->control('message');
-                    echo $this->Form->control('replied', ['type' => 'checkbox', 'label' => 'Replied']);
+                    echo $this->Form->control('replied', [
+                        'type' => 'checkbox',
+                        'label' => 'Replied',
+                        'checked' => $contact->replied
+                    ]);
                 ?>
             </fieldset>
-            <?= $this->Form->button(__('Submit')) ?>
+            <?= $this->Form->button(__('Submit'), ['class' => 'btn btn-primary']) ?>
             <?= $this->Form->end() ?>
         </div>
     </div>

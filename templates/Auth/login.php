@@ -28,11 +28,6 @@ $this->assign('title', 'Admin Login');
                     <?= $this->Html->link('Forgot password?', ['action' => 'forgetPassword'], ['class' => 'btn btn-link']) ?>
                 </div>
                 <?= $this->Form->end() ?>
-                <hr class="hr-between-buttons">
-                <div class="d-flex justify-content-between">
-                    <?= $this->Html->link('Register new admin', ['controller' => 'Auth', 'action' => 'register'], ['class' => 'btn btn-secondary']) ?>
-                    <?= $this->Html->link('Go to Homepage', '/', ['class' => 'btn btn-secondary']) ?>
-                </div>
             </div>
         </div>
     </div>

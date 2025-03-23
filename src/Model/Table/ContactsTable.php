@@ -78,6 +78,10 @@ class ContactsTable extends Table
             ->requirePresence('message', 'create')
             ->notEmptyString('message');
 
+        $validator
+            ->boolean('replied')
+            ->allowEmptyString('replied');
+
         return $validator;
     }
 }

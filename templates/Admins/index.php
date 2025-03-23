@@ -4,9 +4,10 @@
  * @var iterable<\App\Model\Entity\Admin> $admins
  */
 ?>
-<div class="admins index content">
-    <?= $this->Html->link(__('New Admin'), ['action' => 'add'], ['class' => 'button float-right']) ?>
-    <h3><?= __('Admins') ?></h3>
+<div class="contacts index content">
+    <h3>
+        <?= __('Admins List') ?>
+    </h3>
     <div class="table-responsive">
         <table>
             <thead>
@@ -26,14 +27,15 @@
                     <td><?= h($admin->last_name) ?></td>
                     <td><?= h($admin->email) ?></td>
                     <td class="actions">
-                        <?= $this->Html->link(__('View'), ['action' => 'view', $admin->id]) ?>
-                        <?= $this->Html->link(__('Edit'), ['action' => 'edit', $admin->id]) ?>
+                        <?= $this->Html->link(__('View'), ['action' => 'view', $admin->id], ['class' => 'button']) ?>
+                        <?= $this->Html->link(__('Edit'), ['action' => 'edit', $admin->id], ['class' => 'button']) ?>
                         <?= $this->Form->postLink(
                             __('Delete'),
                             ['action' => 'delete', $admin->id],
                             [
                                 'method' => 'delete',
                                 'confirm' => __('Are you sure you want to delete # {0}?', $admin->id),
+                                'class' => 'button'
                             ]
                         ) ?>
                     </td>
@@ -41,6 +43,7 @@
                 <?php endforeach; ?>
             </tbody>
         </table>
+        <?= $this->Html->link(__('New Admin'), ['action' => 'add'], ['class' => 'btn btn-primary']) ?>
     </div>
     <div class="paginator">
         <ul class="pagination">

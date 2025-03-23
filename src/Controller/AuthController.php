@@ -35,7 +35,7 @@ class AuthController extends AppController
 
         // By default, CakePHP will (sensibly) default to preventing users from accessing any actions on a controller.
         // These actions, however, are typically required for users who have not yet logged in.
-        $this->Authentication->allowUnauthenticated(['login', 'register', 'forgetPassword', 'resetPassword']);
+        $this->Authentication->allowUnauthenticated(['login', 'forgetPassword', 'resetPassword']);
 
         // CakePHP loads the model with the same name as the controller by default.
         // Since we don't have an Auth model, we'll need to load "Admins" model when starting the controller manually.

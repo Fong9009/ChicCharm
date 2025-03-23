@@ -13,22 +13,28 @@
                 ['action' => 'delete', $admin->id],
                 ['confirm' => __('Are you sure you want to delete # {0}?', $admin->id), 'class' => 'side-nav-item']
             ) ?>
-            <?= $this->Html->link(__('List Admins'), ['action' => 'index'], ['class' => 'side-nav-item']) ?>
+            <?= $this->Html->link(__('Admins List'), ['action' => 'index'], ['class' => 'side-nav-item']) ?>
         </div>
     </aside>
     <div class="column column-80">
-        <div class="admins form content">
+        <div class="contacts form content">
             <?= $this->Form->create($admin) ?>
             <fieldset>
                 <legend><?= __('Edit Admin') ?></legend>
-                <?php
-                    echo $this->Form->control('first_name');
-                    echo $this->Form->control('last_name');
-                    echo $this->Form->control('email');
-                    echo $this->Form->control('password');
-                ?>
+                <div class="form-group">
+                    <?= $this->Form->control('first_name', ['label' => 'First Name', 'class' => 'form-control']) ?>
+                </div>
+                <div class="form-group">
+                    <?= $this->Form->control('last_name', ['label' => 'Last Name', 'class' => 'form-control']) ?>
+                </div>
+                <div class="form-group">
+                    <?= $this->Form->control('email', ['label' => 'Email', 'class' => 'form-control']) ?>
+                </div>
+                <div class="form-group">
+                    <?= $this->Form->control('password', ['label' => 'Password', 'class' => 'form-control']) ?>
+                </div>
             </fieldset>
-            <?= $this->Form->button(__('Submit')) ?>
+            <?= $this->Form->button(__('Submit'), ['class' => 'btn btn-primary']) ?>
             <?= $this->Form->end() ?>
         </div>
     </div>
