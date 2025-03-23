@@ -5,6 +5,9 @@ namespace App\Controller;
 
 use Cake\Event\EventInterface;
 use Authentication\PasswordHasher\DefaultPasswordHasher;
+use Cake\Routing\Router;
+use Cake\Http\Exception\NotFoundException;
+use Cake\Mailer\Mailer;
 
 /**
  * Admins Controller
@@ -13,13 +16,7 @@ use Authentication\PasswordHasher\DefaultPasswordHasher;
  */
 class AdminsController extends AppController
 {
-    public function beforeFilter(EventInterface $event)
-    {
-        parent::beforeFilter($event);
-        // Only allow login to be accessed without authentication
-        $this->Authentication->allowUnauthenticated(['login']);
-    }
-
+ 
     /**
      * Index method
      *
@@ -54,17 +51,10 @@ class AdminsController extends AppController
     {
         $admin = $this->Admins->newEmptyEntity();
         if ($this->request->is('post')) {
-            $data = $this->request->getData();
-            
-            // Hash the password before saving
-            if (!empty($data['password'])) {
-                $hasher = new DefaultPasswordHasher();
-                $data['password'] = $hasher->hash($data['password']);
-            }
-            
-            $admin = $this->Admins->patchEntity($admin, $data);
+            $admin = $this->Admins->patchEntity($admin, $this->request->getData());
             if ($this->Admins->save($admin)) {
                 $this->Flash->success(__('The admin has been saved.'));
+
                 return $this->redirect(['action' => 'index']);
             }
             $this->Flash->error(__('The admin could not be saved. Please, try again.'));
@@ -81,21 +71,12 @@ class AdminsController extends AppController
      */
     public function edit($id = null)
     {
-        $admin = $this->Admins->get($id);
+        $admin = $this->Admins->get($id, contain: []);
         if ($this->request->is(['patch', 'post', 'put'])) {
-            $data = $this->request->getData();
-            
-            // Only hash the password if a new one is provided
-            if (empty($data['password'])) {
-                unset($data['password']);
-            } else {
-                $hasher = new DefaultPasswordHasher();
-                $data['password'] = $hasher->hash($data['password']);
-            }
-            
-            $admin = $this->Admins->patchEntity($admin, $data);
+            $admin = $this->Admins->patchEntity($admin, $this->request->getData());
             if ($this->Admins->save($admin)) {
                 $this->Flash->success(__('The admin has been saved.'));
+
                 return $this->redirect(['action' => 'index']);
             }
             $this->Flash->error(__('The admin could not be saved. Please, try again.'));
@@ -120,22 +101,5 @@ class AdminsController extends AppController
             $this->Flash->error(__('The admin could not be deleted. Please, try again.'));
         }
         return $this->redirect(['action' => 'index']);
-    }
-
-    public function login()
-    {
-        $result = $this->Authentication->getResult();
-        if ($result->isValid()) {
-            return $this->redirect(['controller' => 'Contacts', 'action' => 'index']);
-        }
-        if ($this->request->is('post') && !$result->isValid()) {
-            $this->Flash->error('Invalid username or password');
-        }
-    }
-
-    public function logout()
-    {
-        $this->Authentication->logout();
-        return $this->redirect(['controller' => 'Admins', 'action' => 'login']);
     }
 }
