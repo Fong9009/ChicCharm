@@ -32,11 +32,12 @@ use Cake\Event\EventInterface;
  */
 class PagesController extends AppController
 {
-    public function beforeFilter(EventInterface $event)
+    public function initialize(): void
     {
-        parent::beforeFilter($event);
-        // Allow public access to all page displays
-        $this->Authentication->addUnauthenticatedActions(['display']);
+        parent::initialize();
+
+        $this->loadComponent('Authentication.Authentication');
+        $this->Authentication->allowUnauthenticated(['display']);
     }
 
     /**

@@ -16,7 +16,8 @@
                     <th><?= $this->Paginator->sort('email') ?></th>
                     <th><?= $this->Paginator->sort('phone_number') ?></th>
                     <th><?= $this->Paginator->sort('message') ?></th>
-                    <th class="actions"><?= __('Actions') ?></th>
+                    <th><?= __('Replied') ?></th>
+                    <th><?= __('Actions') ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -28,6 +29,7 @@
                     <td><?= h($contact->email) ?></td>
                     <td><?= h($contact->phone_number) ?></td>
                     <td><?= h($contact->message) ?></td>
+                    <td><?= h($contact->replied) ?></td>
                     <td class="actions">
                         <?= $this->Html->link(__('View'), ['action' => 'view', $contact->id], ['class' => 'button']) ?>
                         <?= $this->Html->link(__('Edit'), ['action' => 'edit', $contact->id], ['class' => 'button']) ?>
