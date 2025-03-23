@@ -60,7 +60,7 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
                             <a class="nav-link" href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'index']) ?>">Contact List</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'logout']) ?>">Logout</a>
+                            <a class="nav-link" href="<?= $this->Url->build(['controller' => 'Auth', 'action' => 'logout']) ?>">Logout</a>
                         </li>
                     <?php else: ?>
                         <!-- Public Navigation -->
@@ -69,7 +69,7 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
                         <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a></li>
 
                         <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/contacts/add') ?>">Contact Us</a></li>
-                        <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/admins/login') ?>">Login</a></li>
+                        <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/auth/login') ?>">Login</a></li>
                     <?php endif; ?>
                 </ul>
             </div>
@@ -147,6 +147,8 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
 
 <!-- Bootstrap core JS-->
 <?= $this->Html->script('https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js') ?>
+<?= $this->Html->script('https://cdnjs.cloudflare.com/ajax/libs/SimpleLightbox/2.1.0/simpleLightbox.min.js') ?>
+<?= $this->Html->script('/landing-detail/js/scripts.js') ?>
 </body>
 </html>
 

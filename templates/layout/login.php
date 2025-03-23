@@ -1,22 +1,30 @@
 <?php
-$titleDescription = "Landing Page";
+/**
+ * Login layout
+ *
+ * This layout comes with no navigation bar and Flash renderer placeholder. Usually used for login page or similar.
+ *
+ * @var \App\View\AppView $this
+ */
+
+use Cake\Core\Configure;
+
+$appLocale = Configure::read('App.defaultLocale');
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?= $appLocale ?>">
 <head>
     <?= $this->Html->charset() ?>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>
-        <?= $titleDescription ?>:
-        <?= $this->fetch('title') ?>
+        <?= $this->fetch('title') ?> - Cake CMS/Auth Sample
     </title>
-    <!-- Google fonts-->
-    <link href="https://fonts.googleapis.com/css?family=Merriweather+Sans:400,700" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic" rel="stylesheet" type="text/css" />
-
     <?= $this->Html->meta('icon') ?>
+
+    <link href="https://fonts.googleapis.com/css?family=Raleway:400,700" rel="stylesheet">
+
     <?= $this->Html->css('/landing-detail/css/styles.css') ?>
-    <?= $this->Html->css(['fonts', 'cake','custom']) ?>
+    <?= $this->Html->css(['fonts', 'cake', 'custom']) ?>
 
     <?= $this->fetch('meta') ?>
     <?= $this->fetch('css') ?>
@@ -40,9 +48,8 @@ $titleDescription = "Landing Page";
     </div>
 </nav>
 
-<main>
-        <?= $this->Flash->render() ?>
-        <?= $this->fetch('content') ?>
+<main class="main">
+    <?= $this->fetch('content') ?>
 </main>
 
 <!-- Footer-->

@@ -41,6 +41,10 @@
                     <th><?= __('Message') ?></th>
                     <td><?= h($contact->message) ?></td>
                 </tr>
+                <tr>
+                    <th><?= __('Replied') ?></th>
+                    <td><?= $contact->replied ? __('Yes') : __('No') ?></td>
+                </tr>
             </table>
         </div>
     </div>
