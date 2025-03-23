@@ -6,10 +6,11 @@
     "homepage": "https://cakephp.org",
     "require": {
         "php": ">=8.1",
-        "cakephp/authentication": "^3.0",
+        "cakephp/authentication": "^3.2",
         "cakephp/cakephp": "5.1.*",
         "cakephp/migrations": "^4.0.0",
         "cakephp/plugin-installer": "^2.0",
+        "crabstudio/recaptcha": "^4.1",
         "mobiledetect/mobiledetectlib": "^4.8.03",
         "twbs/bootstrap": "^5.3"
     },
