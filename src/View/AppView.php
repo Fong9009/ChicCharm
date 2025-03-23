@@ -38,5 +38,6 @@ class AppView extends View
     public function initialize(): void
     {
         $this->loadHelper('Recaptcha.Recaptcha');
+        $this->loadHelper('Authentication.Identity');
     }
 }

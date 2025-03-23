@@ -40,6 +40,7 @@ class AdminsTable extends Table
         $this->setTable('admins');
         $this->setDisplayField('first_name');
         $this->setPrimaryKey('id');
+        $this->addBehavior('CanAuthenticate');
     }
 
     /**
@@ -72,6 +73,27 @@ class AdminsTable extends Table
             ->maxLength('password', 255)
             ->requirePresence('password', 'create')
             ->notEmptyString('password');
+
+        $validator
+            ->scalar('password_confirm')
+            ->maxLength('password_confirm', 255)
+            ->requirePresence('password_confirm', 'create')
+            ->notEmptyString('password_confirm');
+
+        $validator
+            ->scalar('avatar')
+            ->maxLength('avatar', 255)
+            ->allowEmptyString('avatar');
+
+        $validator
+            ->scalar('nonce')
+            ->maxLength('nonce', 128)
+            ->allowEmptyString('nonce');
+
+        $validator
+            ->scalar('nonce_expiry')
+            ->maxLength('nonce_expiry', 128)
+            ->allowEmptyString('nonce_expiry');
 
         return $validator;
     }

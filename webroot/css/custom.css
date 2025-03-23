@@ -35,6 +35,7 @@
     border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
+    box-sizing: border-box;
 }
 
 .contacts.index.content th {
@@ -112,12 +113,6 @@
     color: #333;
 }
 
-.action-buttons {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-}
-
 .left-button {
     align-self: flex-start;
 }
@@ -126,15 +121,6 @@
     margin-left: auto;
 }
 
-.contacts.index.content .actions .button {
-    display: inline-block;
-    padding: 5px 10px;
-    margin: 0 3px;
-    border-radius: 4px;
-    text-decoration: none;
-    font-size: 14px;
-    transition: all 0.3s ease;
-}
 
 .contacts.index.content .actions .button:first-child {
     background-color: #28a745;
@@ -467,12 +453,8 @@ body {
 }
 
 /* Action Buttons */
-.contacts.index.content .actions {
-    display: flex;
-    gap: 8px;
-}
-
 .contacts.index.content .actions .button {
+    border: none;
     padding: 6px 12px;
     border-radius: 4px;
     font-size: 14px;
@@ -856,12 +838,6 @@ button.danger:hover {
     box-shadow: 0 4px 8px rgba(220, 53, 69, 0.2);
 }
 
-/* Action Buttons in Tables */
-.contacts.index.content .actions .button {
-    padding: 6px 12px;
-    min-width: 80px;
-    font-size: 13px;
-}
 
 /* Side Navigation Buttons */
 .side-nav-item {
@@ -926,3 +902,20 @@ button.danger:hover {
     }
 }
 
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+footer {
+    margin-top: auto;
+}

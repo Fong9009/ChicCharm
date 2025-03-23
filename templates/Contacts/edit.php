@@ -27,6 +27,7 @@
                     echo $this->Form->control('email');
                     echo $this->Form->control('phone_number');
                     echo $this->Form->control('message');
+                    echo $this->Form->control('replied', ['type' => 'checkbox', 'label' => 'Replied']);
                 ?>
             </fieldset>
             <?= $this->Form->button(__('Submit')) ?>

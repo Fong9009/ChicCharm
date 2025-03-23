@@ -16,17 +16,9 @@ class ContactsController extends AppController
    {
         parent::initialize();
         $this->loadComponent('Recaptcha.Recaptcha');
-   }
-
-
-
-
-    public function beforeFilter(EventInterface $event)
-    {
-        parent::beforeFilter($event);
-        // Only allow the add action (contact form) to be accessed without authentication
+        $this->loadComponent('Authentication.Authentication');
         $this->Authentication->allowUnauthenticated(['add']);
-    }
+   }
 
     /**
      * Index method
