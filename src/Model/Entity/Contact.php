@@ -14,6 +14,7 @@ use Cake\ORM\Entity;
  * @property string $email
  * @property string $phone_number
  * @property string $message
+ * @property bool $replied
  */
 class Contact extends Entity
 {
@@ -32,5 +33,6 @@ class Contact extends Entity
         'email' => true,
         'phone_number' => true,
         'message' => true,
+        'replied' => true,
     ];
 }

@@ -346,7 +346,6 @@ body {
     background: white;
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .table {
@@ -444,16 +443,15 @@ body {
     color: #333;
 }
 
-.contacts.index.content table tr:last-child td {
-    border-bottom: none;
-}
-
 .contacts.index.content table tr:hover {
     background-color: #f8f9fa;
 }
 
 /* Action Buttons */
 .contacts.index.content .actions .button {
+    background-color: white;
+    color: black;
+    border: 1px solid #ccc;
     border: none;
     padding: 6px 12px;
     border-radius: 4px;
@@ -464,24 +462,6 @@ body {
     align-items: center;
     justify-content: center;
     min-width: 80px;
-}
-
-.contacts.index.content .actions .button:first-child {
-    background-color: #28a745;
-    color: white;
-    border: 1px solid #28a745;
-}
-
-.contacts.index.content .actions .button:nth-child(2) {
-    background-color: #007bff;
-    color: white;
-    border: 1px solid #007bff;
-}
-
-.contacts.index.content .actions .button:last-child {
-    background-color: #dc3545;
-    color: white;
-    border: 1px solid #dc3545;
 }
 
 .contacts.index.content .actions .button:hover {
@@ -676,7 +656,7 @@ body {
     background: white;
     padding: 30px;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     margin-top: 20px;
 }
 
@@ -838,6 +818,9 @@ button.danger:hover {
     box-shadow: 0 4px 8px rgba(220, 53, 69, 0.2);
 }
 
+.admin-view th, .admin-view td {
+    padding: 10px;
+}
 
 /* Side Navigation Buttons */
 .side-nav-item {
@@ -902,6 +885,11 @@ button.danger:hover {
     }
 }
 
+.nav-item.dropdown:hover .dropdown-menu {
+    display: block;
+    margin-top: 0; 
+}
+
 html, body {
     height: 100%;
     margin: 0;
@@ -919,3 +907,35 @@ main {
 footer {
     margin-top: auto;
 }
+
+/* Admin View Table Styling */
+.admins.view.content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.admins.view.content th, .admins.view.content td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #dee2e6;
+    text-align: left;
+    color: #333;
+}
+
+.admins.view.content th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.form-control {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 15px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
