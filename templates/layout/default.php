@@ -39,53 +39,52 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
     <?= $this->fetch('script') ?>
 </head>
 <body>
-<div class="wrapper">
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light fixed-top py-3" id="mainNav" style="background-color: #121211;">
-        <div class="container px-4 px-lg-5">
-            <a class="navbar-brand" href="<?= $this->Url->build('/') ?>">ChicCharm</a>
-            <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarResponsive">
-                <ul class="navbar-nav ms-auto my-2 my-lg-0">
-                    <?php if ($isPublicPage): ?>
-                        <!-- Public Navigation -->
-                        <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a></li>
-                        <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a></li>
-                        <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a></li>
-                        <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/contacts/add') ?>">Contact Us</a></li>
-                        <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/auth/login') ?>">Login</a></li>
-                    <?php else: ?>
-                        <!-- Admin Navigation -->
-                        <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'index']) ?>">Contact List</a></li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Admin
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="adminDropdown">
-                                <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'index']) ?>">Admin List</a></li>
-                                <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'add']) ?>">Add New Admin</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build(['controller' => 'Auth', 'action' => 'logout']) ?>" onclick="return confirmLogout()">Logout</a></li>
-                    <?php endif; ?>
-                </ul>
-            </div>
-        </div>
-    </nav>
 
-    <!-- Main Content Area -->
-    <main class="main">
-        <div class="container">
-            <?= $this->Flash->render() ?>
-            <?= $this->fetch('content') ?>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light fixed-top py-3" id="mainNav" style="background-color: #121211;">
+    <div class="container px-4 px-lg-5">
+        <a class="navbar-brand" href="<?= $this->Url->build('/') ?>">ChicCharm</a>
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ms-auto my-2 my-lg-0">
+                <?php if ($isPublicPage): ?>
+                    <!-- Public Navigation -->
+                    <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/contacts/add') ?>">Contact Us</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/auth/login') ?>">Login</a></li>
+                <?php else: ?>
+                    <!-- Admin Navigation -->
+                    <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'index']) ?>">Contact List</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Admin
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                            <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'index']) ?>">Admin List</a></li>
+                            <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'add']) ?>">Add New Admin</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build(['controller' => 'Auth', 'action' => 'logout']) ?>" onclick="return confirmLogout()">Logout</a></li>
+                <?php endif; ?>
+            </ul>
         </div>
-    </main>
-</div>
+    </div>
+</nav>
 
-<?php if (!$this->request->getAttribute('identity')): ?>
-<!-- Footer - Only show for public pages -->
+<!-- Main Content Area -->
+<main class="main">
+    <div class="container">
+        <?= $this->Flash->render() ?>
+        <?= $this->fetch('content') ?>
+    </div>
+</main>
+
+<!-- Footer -->
+<?php if ($isPublicPage): ?>
 <footer class="footer bg-black text-white py-5">
     <div class="container text-center">
         <div class="row justify-content-center">
