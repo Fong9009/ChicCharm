@@ -197,18 +197,21 @@ class AuthController extends AppController
         $this->request->allowMethod(['get', 'post']);
         $result = $this->Authentication->getResult();
 
-        // if admin passes authentication, grant access to the system
         if ($result && $result->isValid()) {
-            // set a fallback location in case admin logged in without triggering 'unauthenticatedRedirect'
-            $fallbackLocation = ['controller' => 'Admins', 'action' => 'index'];
+            $user = $result->getData();
+            
+            // Check user type and redirect accordingly
+            if ($user->type === 'admin') {
+                $fallbackLocation = ['controller' => 'Admins', 'action' => 'index'];
+            } else {
+                $fallbackLocation = ['controller' => 'Customers', 'action' => 'dashboard'];
+            }
 
-            // and redirect admin to the location they're trying to access
             return $this->redirect($this->Authentication->getLoginRedirect() ?? $fallbackLocation);
         }
 
-        // display error if admin submitted their credentials but authentication failed
         if ($this->request->is('post') && !$result->isValid()) {
-            $this->Flash->error('Email address and/or Password is incorrect. Please try again. ');
+            $this->Flash->error('Email address and/or Password is incorrect. Please try again.');
         }
     }
 
@@ -219,7 +222,6 @@ class AuthController extends AppController
      */
     public function logout()
     {
-        // We only need to log out an admin when they're logged in
         $result = $this->Authentication->getResult();
         if ($result && $result->isValid()) {
             $this->Authentication->logout();
@@ -227,7 +229,6 @@ class AuthController extends AppController
             $this->Flash->success('You have been logged out successfully. ');
         }
 
-        // Otherwise just send them to the login page
         return $this->redirect(['controller' => 'Auth', 'action' => 'login']);
     }
 }

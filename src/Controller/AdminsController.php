@@ -51,7 +51,9 @@ class AdminsController extends AppController
     {
         $admin = $this->Admins->newEmptyEntity();
         if ($this->request->is('post')) {
-            $admin = $this->Admins->patchEntity($admin, $this->request->getData());
+            $data = $this->request->getData();
+            $data['type'] = 'admin';
+            $admin = $this->Admins->patchEntity($admin, $data);
             if ($this->Admins->save($admin)) {
                 $this->Flash->success(__('The admin has been saved.'));
 

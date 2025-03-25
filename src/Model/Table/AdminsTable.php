@@ -65,8 +65,12 @@ class AdminsTable extends Table
 
         $validator
             ->email('email')
-            ->requirePresence('email', 'create')
-            ->notEmptyString('email');
+            ->notEmptyString('email', 'Email is required')
+            ->add('email', 'unique', [
+                'rule' => 'validateUnique',
+                'provider' => 'table',
+                'message' => 'This email is already in use.'
+            ]);
 
         $validator
             ->scalar('password')

@@ -210,7 +210,7 @@
 .form-container {
     margin-top: 0;
     box-shadow: none;
-    border-radius: 0;
+    border-radius: 0; 
     overflow: visible;
 }
 
@@ -938,5 +938,73 @@ footer {
     box-sizing: border-box;
 }
 
+.login-form .btn.btn-link {
+    padding: 0;
+    text-decoration: none;
+    color: #FF6B35; 
+    margin: 0;
+    border: none;
+    background: none;
+}
 
+.login-form .btn.btn-link:hover {
+    text-decoration: underline;
+}
 
+.login-form .form-group.d-flex {
+    margin-top: 10px;
+    padding: 0;
+}
+
+.login-form .align-left {
+    text-align: left;
+    margin-right: auto;
+}
+
+.login-form .align-right {
+    text-align: right;
+    margin-left: auto;
+}
+
+.invalid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+    color: #dc3545;
+}
+
+.form-control.is-invalid {
+    border-color: #dc3545;
+}
+
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: none;
+    border-radius: 0.5rem;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    padding: 1rem;
+}
+
+.card-title {
+    margin-bottom: 0;
+    font-size: 1.25rem;
+}
+
+.list-group-item-action:hover {  
+    background-color: #f8f9fa;
+}
+
+.btn-primary {
+    background-color: #FF6B35;
+    border-color: #FF6B35;
+}
+
+.btn-primary:hover {
+    background-color: #e85f2d;
+    border-color: #e85f2d;
+}
