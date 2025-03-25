@@ -17,7 +17,7 @@ class ContactsController extends AppController
         parent::initialize();
         $this->loadComponent('Recaptcha.Recaptcha');
         $this->loadComponent('Authentication.Authentication');
-        $this->Authentication->allowUnauthenticated(['add']);
+        $this->Authentication->allowUnauthenticated(['enquiry']);
    }
 
     /**
@@ -47,25 +47,27 @@ class ContactsController extends AppController
     }
 
     /**
-     * Add method
+     * Enquiry method
      *
-     * @return \Cake\Http\Response|null|void Redirects on successful add, renders view otherwise.
+     * @return \Cake\Http\Response|null|void Redirects on successful enquiry submission, renders view otherwise.
      */
-    public function add()
+    public function enquiry()
     {
+        $this->viewBuilder()->setLayout('login');
+        
         $contact = $this->Contacts->newEmptyEntity();
         if ($this->request->is('post')) {
             if($this->Recaptcha->verify()){
                 $contact = $this->Contacts->patchEntity($contact, $this->request->getData());
                 if ($this->Contacts->save($contact)) {
                     $this->Flash->success(__('Thank you for your interest. We will get back to you as soon as possible.'));
-                    return $this->redirect(['action' => 'add']);
+                    return $this->redirect(['action' => 'enquiry']);
                 }
             }
             if(!$this->Recaptcha->verify()){
                 $this->Flash->error(__('Please confirm that you are not a bot.'));
             }
-            $this->Flash->error(__('The contact could not be saved. Please, try again.'));
+            $this->Flash->error(__('The enquiry could not be sent. Please, try again.'));
         }
         $this->set(compact('contact'));
     }

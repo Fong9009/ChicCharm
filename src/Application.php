@@ -128,21 +128,28 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
             AbstractIdentifier::CREDENTIAL_PASSWORD => 'password',
         ];
 
-        // Load identifiers, ensure we check email and password fields
+        $userModel = 'Customers'; 
+        if ($request->is('post')) {
+            $email = $request->getData('email');
+            if ($email) {
+                $adminsTable = \Cake\ORM\TableRegistry::getTableLocator()->get('Admins');
+                $admin = $adminsTable->find()->where(['email' => $email])->first();
+                if ($admin) {
+                    $userModel = 'Admins';
+                }
+            }
+        }
+
         $authenticationService->loadIdentifier('Authentication.Password', [
-            'fields' => [
-                'username' => 'email',
-                'password' => 'your_app_password',
-            ],
+            'fields' => $authentication_fields,
             'resolver' => [
                 'className' => 'Authentication.Orm',
-                'userModel' => 'Admins',
+                'userModel' => $userModel,
             ],
         ]);
 
-        // Load the authenticators, you want session first
         $authenticationService->loadAuthenticator('Authentication.Session');
-        // Configure form data check to pick email and password
+
         $authenticationService->loadAuthenticator('Authentication.Form', [
             'fields' => $authentication_fields,
             'loginUrl' => Router::url([
@@ -155,6 +162,8 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
 
         return $authenticationService;
     }
+
+
 
     /**
      * Register application container services.

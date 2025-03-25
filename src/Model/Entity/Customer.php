@@ -7,15 +7,19 @@ use Cake\ORM\Entity;
 use Authentication\PasswordHasher\DefaultPasswordHasher;
 
 /**
- * Admin Entity
+ * Customer Entity
  *
  * @property int $id
  * @property string $first_name
  * @property string $last_name
  * @property string $email
  * @property string $password
+ * @property string|null $nonce
+ * @property \Cake\I18n\DateTime|null $nonce_expiry
+ * @property \Cake\I18n\DateTime|null $created
+ * @property \Cake\I18n\DateTime|null $modified
  */
-class Admin extends Entity
+class Customer extends Entity
 {
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
@@ -30,12 +34,12 @@ class Admin extends Entity
         'first_name' => true,
         'last_name' => true,
         'email' => true,
-        'password' => true, 
+        'password' => true,
         'password_confirm' => true,
-        'created' => false,
-        'modified' => false,
-        'nonce' => false, 
-        'nonce_expiry' => false,
+        'nonce' => true,
+        'nonce_expiry' => true,
+        'created' => true,
+        'modified' => true,
         'type' => true,
     ];
 

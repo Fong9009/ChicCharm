@@ -42,7 +42,7 @@ $appLocale = Configure::read('App.defaultLocale');
                 <li class="nav-item"><a class="nav-link" href="/#about">About</a></li>
                 <li class="nav-item"><a class="nav-link" href="/#services">Services</a></li>
                 <li class="nav-item"><a class="nav-link" href="/#portfolio">Portfolio</a></li>
-                <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'add']) ?>">Contact Us</a></li>
+                <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'enquiry']) ?>">Contact Us</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build(['controller' => 'Auth', 'action' => 'login']) ?>">Login</a></li>
             </ul>
         </div>
