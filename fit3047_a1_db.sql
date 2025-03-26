@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Mar 26, 2025 at 11:13 AM
+-- Generation Time: Mar 26, 2025 at 11:59 AM
 -- Server version: 9.0.1
 -- PHP Version: 8.3.12
 
@@ -60,15 +60,17 @@ CREATE TABLE `contacts` (
   `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `phone_number` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `replied` tinyint(1) DEFAULT '0'
+  `replied` tinyint(1) DEFAULT '0',
+  `created` datetime DEFAULT CURRENT_TIMESTAMP,
+  `modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `contacts`
 --
 
-INSERT INTO `contacts` (`id`, `first_name`, `last_name`, `email`, `phone_number`, `message`, `replied`) VALUES
-(2, 'John', 'Wick ', 'boogeyman69@gmail.com', '0987654321', 'what is this', 0);
+INSERT INTO `contacts` (`id`, `first_name`, `last_name`, `email`, `phone_number`, `message`, `replied`, `created`, `modified`) VALUES
+(2, 'John', 'Wick ', 'boogeyman69@gmail.com', '0987654321', 'what is this', 0, '2025-03-26 22:58:46', '2025-03-26 22:58:46');
 
 -- --------------------------------------------------------
 

@@ -590,14 +590,15 @@ body {
 .side-nav {
     background: white;
     padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     margin-top: 20px;
+    margin-bottom: 20px;
 }
 
-.side-nav h4 {
+.side-nav .heading {
     color: #333;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 600;
     margin-bottom: 20px;
     padding-bottom: 10px;
@@ -607,17 +608,20 @@ body {
 .side-nav-item {
     display: block;
     padding: 10px 15px;
-    margin-bottom: 8px;
-    color: #007bff;
+    margin-bottom: 10px;
+    color: #333;
     text-decoration: none;
-    border-radius: 4px;
+    border-radius: 6px;
     transition: all 0.2s ease;
-    font-size: 14px;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
 }
 
 .side-nav-item:hover {
-    background-color: #f8f9fa;
-    color: #0056b3;
+    background-color: #f4623a;
+    color: white;
+    transform: translateX(5px);
+    text-decoration: none;
 }
 
 /* Row and Column Layout */
@@ -656,7 +660,7 @@ body {
 .contacts.form.content {
     background: white;
     padding: 30px;
-    border-radius: 8px;
+    border-radius: 15px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     margin-top: 20px;
 }
@@ -677,7 +681,8 @@ body {
 }
 
 /* Form Fields Styling */
-.contacts.form.content .input {
+.contacts.form.content .input,
+.contacts.form.content .form-group {
     margin-bottom: 20px;
 }
 
@@ -691,8 +696,9 @@ body {
 
 .contacts.form.content input[type="text"],
 .contacts.form.content input[type="email"],
-.contacts.form.content input[type="tel"],
-.contacts.form.content textarea {
+.contacts.form.content input[type="password"],
+.contacts.form.content input[type="date"],
+.contacts.form.content input[type="datetime-local"] {
     width: 100%;
     padding: 10px 15px;
     border: 1px solid #ddd;
@@ -705,11 +711,12 @@ body {
 
 .contacts.form.content input[type="text"]:focus,
 .contacts.form.content input[type="email"]:focus,
-.contacts.form.content input[type="tel"]:focus,
-.contacts.form.content textarea:focus {
-    border-color: #007bff;
+.contacts.form.content input[type="password"]:focus,
+.contacts.form.content input[type="date"]:focus,
+.contacts.form.content input[type="datetime-local"]:focus {
+    border-color: #f4623a;
     outline: none;
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+    box-shadow: 0 0 0 2px rgba(244, 98, 58, 0.1);
 }
 
 .contacts.form.content textarea {
@@ -718,24 +725,26 @@ body {
 }
 
 /* Submit Button Styling */
-.contacts.form.content .submit {
-    margin-top: 20px;
-}
-
-.contacts.form.content .submit button {
-    background-color: #28a745;
+.contacts.form.content .btn,
+.contacts.form.content button {
+    background-color: #121211;
     color: white;
-    padding: 10px 20px;
+    padding: 12px 24px;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     font-size: 16px;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
+    min-width: 120px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.contacts.form.content .submit button:hover {
-    background-color: #218838;
+.contacts.form.content .btn:hover,
+.contacts.form.content button:hover {
+    background-color: #f4623a;
     transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(244, 98, 58, 0.2);
 }
 
 /* Error Messages */
@@ -753,6 +762,10 @@ body {
     
     .contacts.form.content legend {
         font-size: 20px;
+    }
+    
+    .side-nav {
+        margin-bottom: 20px;
     }
 }
 
@@ -1097,5 +1110,106 @@ footer {
   
   #mainNav .navbar-nav .nav-item:last-child .nav-link {
     padding-right: 0 !important;
+  }
+}
+
+/* Customer Edit Form Styling */
+.customers.form.content {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+.customers.form.content fieldset {
+  border: none;
+  padding: 0;
+  margin: 0 0 30px 0;
+}
+
+.customers.form.content legend {
+  color: #333;
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+/* Form Fields Styling */
+.customers.form.content .input {
+  margin-bottom: 20px;
+}
+
+.customers.form.content label {
+  display: block;
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.customers.form.content input[type="text"],
+.customers.form.content input[type="email"],
+.customers.form.content input[type="password"],
+.customers.form.content input[type="date"],
+.customers.form.content input[type="datetime-local"] {
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  color: #333;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.customers.form.content input[type="text"]:focus,
+.customers.form.content input[type="email"]:focus,
+.customers.form.content input[type="password"]:focus,
+.customers.form.content input[type="date"]:focus,
+.customers.form.content input[type="datetime-local"]:focus {
+  border-color: #f4623a;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(244, 98, 58, 0.1);
+}
+
+/* Submit Button Styling */
+.customers.form.content button {
+  background-color: #121211;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.customers.form.content button:hover {
+  background-color: #f4623a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(244, 98, 58, 0.2);
+}
+
+/* Error Messages */
+.customers.form.content .error-message {
+  color: #dc3545;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .customers.form.content {
+    padding: 20px;
+  }
+  
+  .customers.form.content legend {
+    font-size: 20px;
   }
 }
