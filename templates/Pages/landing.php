@@ -52,7 +52,7 @@ $this->layout = 'publiclayout';
                         <hr class="divider divider-light" />
                     </div>
                     <div class="col-lg-8 d-flex justify-content-center">
-                    <img src="<?= $this->Url->image('model.png')?>" alt="Image Description" style="width: 1000px; height: auto;">
+                    <img src="<?= $this->Url->image('model.jpg')?>" alt="Image Description" style="width: 1000px; height: auto;">
                     </div>
                 </div>
             </div>
