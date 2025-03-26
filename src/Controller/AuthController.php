@@ -167,24 +167,63 @@ class AuthController extends AppController
     /**
      * Change Password method
      *
-     * @param string|null $id Admin id.
+     * @param string|null $id User id.
      * @return \Cake\Http\Response|null|void Redirects on successful edit, renders view otherwise.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
     public function changePassword(?string $id = null)
     {
-        $admin = $this->Admins->get($id, ['contain' => []]);
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            // Used a different validation set in Model/Table file to ensure both fields are filled
-            $admin = $this->Admins->patchEntity($admin, $this->request->getData(), ['validate' => 'resetPassword']);
-            if ($this->Admins->save($admin)) {
-                $this->Flash->success('The admin has been saved.');
-
-                return $this->redirect(['controller' => 'Admins', 'action' => 'index']);
-            }
-            $this->Flash->error('The admin could not be saved. Please, try again.');
+        $user = $this->Authentication->getIdentity();
+        
+        // If no ID provided, use the current user's ID
+        if (!$id) {
+            $id = $user->id;
         }
-        $this->set(compact('admin'));
+        
+        // Only allow users to change their own password unless they're an admin
+        if ($user->type !== 'admin' && $user->id != $id) {
+            $this->Flash->error('Access denied. You can only change your own password.');
+            return $this->redirect(['action' => 'login']);
+        }
+
+        // Get the appropriate model based on user type
+        if ($user->type === 'admin') {
+            $model = $this->Admins;
+            $entity = $model->get($id, ['contain' => []]);
+        } else {
+            $model = $this->Customers;
+            $entity = $model->get($id, ['contain' => []]);
+        }
+
+        if ($this->request->is(['patch', 'post', 'put'])) {
+            $data = $this->request->getData();
+            
+            // Verify current password
+            if (!password_verify($data['current_password'], $entity->password)) {
+                $this->Flash->error('Current password is incorrect.');
+                return $this->render();
+            }
+            
+            // Update password
+            $entity = $model->patchEntity($entity, [
+                'password' => $data['password'],
+                'password_confirm' => $data['password_confirm']
+            ], ['validate' => 'resetPassword']);
+            
+            if ($model->save($entity)) {
+                $this->Flash->success('Your password has been updated successfully.');
+                
+                // Redirect based on user type
+                if ($user->type === 'admin') {
+                    return $this->redirect(['controller' => 'Admins', 'action' => 'index']);
+                } else {
+                    return $this->redirect(['controller' => 'Customers', 'action' => 'dashboard']);
+                }
+            }
+            $this->Flash->error('The password could not be updated. Please, try again.');
+        }
+        
+        $this->set(compact('entity'));
     }
 
     /**
