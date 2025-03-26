@@ -55,6 +55,9 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
                     // User is logged in
                     if ($identity->get('type') === 'admin') {
                         // Admin Navigation ?>
+                        <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a></li>
+                        <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a></li>
+                        <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a></li>
                         <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'index']) ?>">Contact List</a></li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -67,6 +70,9 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
                         </li>
                     <?php } elseif ($identity->get('type') === 'customer') {
                         // Customer Navigation ?>
+                        <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a></li>
+                        <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a></li>
+                        <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a></li>
                         <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build(['controller' => 'Customers', 'action' => 'dashboard']) ?>">Dashboard</a></li>
                         <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build(['controller' => 'Customers', 'action' => 'edit', $identity->get('id')]) ?>">My Profile</a></li>
                         <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'enquiry']) ?>">Contact Us</a></li>
