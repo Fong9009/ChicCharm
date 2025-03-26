@@ -16,6 +16,8 @@
                     <th><?= $this->Paginator->sort('email') ?></th>
                     <th><?= $this->Paginator->sort('phone_number') ?></th>
                     <th><?= $this->Paginator->sort('message') ?></th>
+                    <th><?= $this->Paginator->sort('created') ?></th>
+                    <th><?= $this->Paginator->sort('modified') ?></th>
                     <th><?= $this->Paginator->sort('replied') ?></th>
                     <th><?= __('Actions') ?></th>
                 </tr>
@@ -29,6 +31,8 @@
                     <td><?= h($contact->email) ?></td>
                     <td><?= h($contact->phone_number) ?></td>
                     <td><?= h($contact->message) ?></td>
+                    <td><?= h($contact->created) ?></td>
+                    <td><?= h($contact->modified) ?></td>
                     <td><?= $contact->replied ? __('Yes') : __('No') ?></td>
                     <td class="actions">
                         <?= $this->Html->link(__('View'), ['action' => 'view', $contact->id], ['class' => 'button']) ?>

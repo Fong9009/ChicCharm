@@ -41,6 +41,8 @@ class AdminsTable extends Table
         $this->setDisplayField('first_name');
         $this->setPrimaryKey('id');
         $this->addBehavior('CanAuthenticate');
+        
+        $this->addBehavior('Timestamp');
     }
 
     /**
@@ -98,7 +100,7 @@ class AdminsTable extends Table
             ->scalar('nonce_expiry')
             ->maxLength('nonce_expiry', 128)
             ->allowEmptyString('nonce_expiry');
-
+            
         return $validator;
     }
 }

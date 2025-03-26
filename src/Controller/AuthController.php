@@ -70,58 +70,136 @@ class AuthController extends AppController
     public function forgetPassword()
     {
         if ($this->request->is('post')) {
-            // Retrieve the admin entity by provided email address
-            $admin = $this->Admins->findByEmail($this->request->getData('email'))->first();
+            $email = $this->request->getData('email');
+            
+            // First check for admin account
+            $admin = $this->Admins->findByEmail($email)->first();
+            
+            // If admin exists, process admin password reset
             if ($admin) {
                 // Set nonce and expiry date
                 $admin->nonce = Security::randomString(128);
                 $admin->nonce_expiry = new DateTime('7 days');
                 if ($this->Admins->save($admin)) {
-                    // Now let's send the password reset email
-                    $mailer = new Mailer('default');
+                    // Send password reset email
+                    try {
+                        $mailer = new Mailer('default');
+                        
+                        // Debug information
+                        $this->log("Email settings - From address: " . env('EMAIL_FROM_ADDRESS', 'not-set'), 'debug');
+                        $this->log("Email settings - Username: " . env('EMAIL_TRANSPORT_DEFAULT_USERNAME', 'not-set'), 'debug'); 
+                        $this->log("Email settings - Port: " . env('EMAIL_TRANSPORT_DEFAULT_PORT', '465'), 'debug');
+                        $this->log("Email settings - SSL: enabled", 'debug');
+                        
+                        // Set from address for delivery
+                        $mailer->setFrom(env('EMAIL_FROM_ADDRESS', 'chayfong9009@gmail.com'), env('EMAIL_FROM_NAME', 'ChicCharm'));
+                        
+                        $mailer
+                            ->setEmailFormat('both')
+                            ->setTo($admin->email)
+                            ->setSubject('Reset your account password');
 
-                    // email basic config
-                    $mailer
-                        ->setEmailFormat('both')
-                        ->setTo($admin->email)
-                        ->setSubject('Reset your account password');
+                        $mailer
+                            ->viewBuilder()
+                            ->setTemplate('reset_password');
 
-                    // select email template
-                    $mailer
-                        ->viewBuilder()
-                        ->setTemplate('reset_password');
+                        $mailer
+                            ->setViewVars([
+                                'first_name' => $admin->first_name,
+                                'last_name' => $admin->last_name,
+                                'nonce' => $admin->nonce,
+                                'email' => $admin->email,
+                                'userType' => 'admin'
+                            ]);
 
-                    // transfer required view variables to email template
-                    $mailer
-                        ->setViewVars([
-                            'first_name' => $admin->first_name,
-                            'last_name' => $admin->last_name,
-                            'nonce' => $admin->nonce,
-                            'email' => $admin->email,
-                        ]);
+                        // Debug the reset link that would be in the email
+                        $resetLink = 'http://' . $_SERVER['HTTP_HOST'] . '/auth/reset-password/' . $admin->nonce . '/admin';
+                        $this->log("Reset link: " . $resetLink, 'debug');
 
-                    //Send email
-                    if (!$mailer->deliver()) {
-                        // Just in case something goes wrong when sending emails
-                        $this->Flash->error('We have encountered an issue when sending you emails. Please try again. ');
-
-                        return $this->render(); // Skip the rest of the controller and render the view
+                        $result = $mailer->deliver();
+                        if (!$result) {
+                            // Log the error but don't tell the user for security reasons
+                            $this->log("Failed to send password reset email to admin: {$admin->email}", 'error');
+                        } else {
+                            $this->log("Successfully sent password reset email to admin: {$admin->email}", 'info');
+                        }
+                    } catch (\Exception $e) {
+                        // Log the detailed exception message for debugging
+                        $this->log("Exception sending email: " . $e->getMessage(), 'error');
                     }
                 } else {
-                    // Just in case something goes wrong when saving nonce and expiry
-                    $this->Flash->error('We are having issue to reset your password. Please try again. ');
+                    // Log the error but don't tell the user for security reasons
+                    $this->log("Failed to save nonce for admin: {$admin->email}", 'error');
+                }
+            } else {
+                // Check for customer account
+                $this->Customers = $this->fetchTable('Customers');
+                $customer = $this->Customers->findByEmail($email)->first();
+                
+                if ($customer) {
+                    // Set nonce and expiry date
+                    $customer->nonce = Security::randomString(128);
+                    $customer->nonce_expiry = new DateTime('7 days');
+                    if ($this->Customers->save($customer)) {
+                        // Send password reset email
+                        try {
+                            $mailer = new Mailer('default');
+                            
+                            // Debug information
+                            $this->log("Email settings - From address: " . env('EMAIL_FROM_ADDRESS', 'not-set'), 'debug');
+                            $this->log("Email settings - Username: " . env('EMAIL_TRANSPORT_DEFAULT_USERNAME', 'not-set'), 'debug'); 
+                            $this->log("Email settings - Port: " . env('EMAIL_TRANSPORT_DEFAULT_PORT', '465'), 'debug');
+                            $this->log("Email settings - SSL: enabled", 'debug');
+                            
+                            // Set from address for delivery
+                            $mailer->setFrom(env('EMAIL_FROM_ADDRESS', 'chayfong9009@gmail.com'), env('EMAIL_FROM_NAME', 'ChicCharm'));
+                            
+                            $mailer
+                                ->setEmailFormat('both')
+                                ->setTo($customer->email)
+                                ->setSubject('Reset your account password');
 
-                    return $this->render(); // Skip the rest of the controller and render the view
+                            $mailer
+                                ->viewBuilder()
+                                ->setTemplate('reset_password');
+
+                            $mailer
+                                ->setViewVars([
+                                    'first_name' => $customer->first_name,
+                                    'last_name' => $customer->last_name,
+                                    'nonce' => $customer->nonce,
+                                    'email' => $customer->email,
+                                    'userType' => 'customer'
+                                ]);
+
+                            $result = $mailer->deliver();
+                            if (!$result) {
+                                // Log the error but don't tell the user for security reasons
+                                $this->log("Failed to send password reset email to customer: {$customer->email}", 'error');
+                            } else {
+                                $this->log("Successfully sent password reset email to customer: {$customer->email}", 'info');
+                            }
+                        } catch (\Exception $e) {
+                            // Log the detailed exception message for debugging
+                            $this->log("Exception sending email: " . $e->getMessage(), 'error');
+                        }
+                    } else {
+                        // Log the error but don't tell the user for security reasons
+                        $this->log("Failed to save nonce for customer: {$customer->email}", 'error');
+                    }
+                } else {
+                    // No user found with this email, log it but don't tell the user
+                    $this->log("Password reset requested for non-existent email: {$email}", 'notice');
                 }
             }
 
             /*
-             * **This is a bit of a special design**
-             * We don't tell the user if their account exists, or if the email has been sent,
-             * because it may be used by someone with malicious intent. We only need to tell
-             * the user that they'll get an email.
+             * Always show success message regardless of result for security reasons
+             * to prevent email enumeration attacks
              */
-            $this->Flash->success('Please check your inbox (or spam folder) for an email regarding how to reset your account password. ');
+            $this->Flash->success('Please check your inbox (or spam folder) for an email regarding how to reset your account password.');
+            $this->log(env('EMAIL_TRANSPORT_DEFAULT_USERNAME'), 'debug');
+            $this->log(env('EMAIL_TRANSPORT_DEFAULT_PASSWORD'), 'debug');
 
             return $this->redirect(['action' => 'login']);
         }
@@ -131,37 +209,45 @@ class AuthController extends AppController
      * Reset Password method
      *
      * @param string|null $nonce Reset password nonce
+     * @param string|null $type User type (admin or customer)
      * @return \Cake\Http\Response|null|void Redirects on successful password reset, renders view otherwise.
      */
-    public function resetPassword(?string $nonce = null)
+    public function resetPassword(?string $nonce = null, ?string $type = null)
     {
-        $admin = $this->Admins->findByNonce($nonce)->first();
+        // Determine which model to use based on user type
+        if ($type === 'customer') {
+            $this->Customers = $this->fetchTable('Customers');
+            $user = $this->Customers->findByNonce($nonce)->first();
+            $model = $this->Customers;
+        } else {
+            // Default to admin if type not specified or is 'admin'
+            $user = $this->Admins->findByNonce($nonce)->first();
+            $model = $this->Admins;
+        }
 
-        // If nonce cannot find the admin, or nonce is expired, prompt for re-reset password
-        if (!$admin || $admin->nonce_expiry < DateTime::now()) {
+        // If nonce cannot find the user, or nonce is expired, prompt for re-reset password
+        if (!$user || $user->nonce_expiry < DateTime::now()) {
             $this->Flash->error('Your link is invalid or expired. Please try again.');
-
             return $this->redirect(['action' => 'forgetPassword']);
         }
 
         if ($this->request->is(['patch', 'post', 'put'])) {
             // Used a different validation set in Model/Table file to ensure both fields are filled
-            $admin = $this->Admins->patchEntity($admin, $this->request->getData(), ['validate' => 'resetPassword']);
+            $user = $model->patchEntity($user, $this->request->getData(), ['validate' => 'resetPassword']);
 
             // Also clear the nonce-related fields on successful password resets.
             // This ensures that the reset link can't be used a second time.
-            $admin->nonce = null;
-            $admin->nonce_expiry = null;
+            $user->nonce = null;
+            $user->nonce_expiry = null;
 
-            if ($this->Admins->save($admin)) {
-                $this->Flash->success('Your password has been successfully reset. Please login with new password. ');
-
+            if ($model->save($user)) {
+                $this->Flash->success('Your password has been successfully reset. Please login with your new password.');
                 return $this->redirect(['action' => 'login']);
             }
             $this->Flash->error('The password cannot be reset. Please try again.');
         }
 
-        $this->set(compact('admin'));
+        $this->set(compact('user', 'type'));
     }
 
     /**
@@ -265,9 +351,12 @@ class AuthController extends AppController
         if ($result && $result->isValid()) {
             $this->Authentication->logout();
 
+            $this->getRequest()->getSession()->destroy();
+
             $this->Flash->success('You have been logged out successfully. ');
         }
 
         return $this->redirect(['controller' => 'Auth', 'action' => 'login']);
     }
+
 }

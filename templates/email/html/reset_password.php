@@ -7,6 +7,7 @@
  * @var string $last_name email recipient's last name
  * @var string $email email recipient's email address
  * @var string $nonce nonce used to reset the password
+ * @var string $userType type of user (admin or customer)
  */
 ?>
 <div class="content">
@@ -20,7 +21,7 @@
                         <td>
                             <h3>Reset your account password</h3>
                             <p>Hi <?= h($first_name) ?>, </p>
-                            <p>Thank you for your request to reset the password of your account on <b>Cake CMS/Auth Sample</b>. </p>
+                            <p>Thank you for your request to reset the password of your account on <b>ChicCharm</b>. </p>
                             <p></p>
                             <p>To reset your account password, use the button below to access the reset password page: </p>
                             <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
@@ -30,7 +31,7 @@
                                         <table role="presentation" border="0" cellpadding="0" cellspacing="0">
                                             <tbody>
                                             <tr>
-                                                <td><a href="<?= $this->Url->build(['controller' => 'Auth', 'action' => 'resetPassword', $nonce], ['fullBase' => true]) ?>" target="_blank">Reset account password</a></td>
+                                                <td><a href="<?= $this->Url->build(['controller' => 'Auth', 'action' => 'resetPassword', $nonce, $userType], ['fullBase' => true]) ?>" target="_blank">Reset account password</a></td>
                                             </tr>
                                             </tbody>
                                         </table>
@@ -39,7 +40,11 @@
                                 </tbody>
                             </table>
                             <p>or use the following link: <br>
-                                <?= $this->Html->link($this->Url->build(['controller' => 'Auth', 'action' => 'resetPassword', $nonce], ['fullBase' => true]), ['controller' => 'Users', 'action' => 'resetPassword', $nonce], ['fullBase' => true, 'style' => 'word-break:break-all']) ?></p>
+                                <?= $this->Html->link($this->Url->build(['controller' => 'Auth', 'action' => 'resetPassword', $nonce, $userType], ['fullBase' => true]), ['controller' => 'Auth', 'action' => 'resetPassword', $nonce, $userType], ['fullBase' => true, 'style' => 'word-break:break-all']) ?></p>
+                            
+                            <p>This link will expire in 7 days for security reasons.</p>
+                            
+                            <p>If you did not request this password reset, please ignore this email or contact support if you have concerns about your account security.</p>
                         </td>
                     </tr>
                 </table>
@@ -57,7 +62,7 @@
                     Please discard this email if it not meant for you
                     <br>
                     <br>
-                    Copyright &copy; <?= date("Y"); ?> Monash FIT Industry Experience
+                    Copyright &copy; <?= date("Y"); ?> ChicCharm
                 </td>
             </tr>
         </table>

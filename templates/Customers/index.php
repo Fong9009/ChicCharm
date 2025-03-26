@@ -4,9 +4,10 @@
  * @var iterable<\App\Model\Entity\Customer> $customers
  */
 ?>
-<div class="customers index content">
-    <?= $this->Html->link(__('New Customer'), ['action' => 'add'], ['class' => 'button float-right']) ?>
-    <h3><?= __('Customers') ?></h3>
+<div class="contacts index content">
+    <h3>
+        <?= __('Customers List') ?>
+    </h3>
     <div class="table-responsive">
         <table>
             <thead>
@@ -15,8 +16,6 @@
                     <th><?= $this->Paginator->sort('first_name') ?></th>
                     <th><?= $this->Paginator->sort('last_name') ?></th>
                     <th><?= $this->Paginator->sort('email') ?></th>
-                    <th><?= $this->Paginator->sort('nonce') ?></th>
-                    <th><?= $this->Paginator->sort('nonce_expiry') ?></th>
                     <th><?= $this->Paginator->sort('created') ?></th>
                     <th><?= $this->Paginator->sort('modified') ?></th>
                     <th class="actions"><?= __('Actions') ?></th>
@@ -29,19 +28,18 @@
                     <td><?= h($customer->first_name) ?></td>
                     <td><?= h($customer->last_name) ?></td>
                     <td><?= h($customer->email) ?></td>
-                    <td><?= h($customer->nonce) ?></td>
-                    <td><?= h($customer->nonce_expiry) ?></td>
                     <td><?= h($customer->created) ?></td>
                     <td><?= h($customer->modified) ?></td>
                     <td class="actions">
-                        <?= $this->Html->link(__('View'), ['action' => 'view', $customer->id]) ?>
-                        <?= $this->Html->link(__('Edit'), ['action' => 'edit', $customer->id]) ?>
+                        <?= $this->Html->link(__('View'), ['action' => 'view', $customer->id], ['class' => 'button']) ?>
+                        <?= $this->Html->link(__('Edit'), ['action' => 'edit', $customer->id], ['class' => 'button']) ?>
                         <?= $this->Form->postLink(
                             __('Delete'),
                             ['action' => 'delete', $customer->id],
                             [
                                 'method' => 'delete',
                                 'confirm' => __('Are you sure you want to delete # {0}?', $customer->id),
+                                'class' => 'button'
                             ]
                         ) ?>
                     </td>
@@ -49,6 +47,7 @@
                 <?php endforeach; ?>
             </tbody>
         </table>
+        <?= $this->Html->link(__('New Customer'), ['action' => 'add'], ['class' => 'btn btn-primary']) ?>
     </div>
     <div class="paginator">
         <ul class="pagination">

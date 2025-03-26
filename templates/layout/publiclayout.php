@@ -42,12 +42,13 @@ $titleDescription = "Landing Page";
                         <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a></li>
                         <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a></li>
                         <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'index']) ?>">Contact List</a></li>
+                        <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build(['controller' => 'Customers', 'action' => 'index']) ?>">Customers List</a></li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Admin
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="adminDropdown">
-                                <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'index']) ?>">Admin List</a></li>
+                                <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'index']) ?>">Admins List</a></li>
                                 <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'add']) ?>">Add New Admin</a></li>
                             </ul>
                         </li>
@@ -56,9 +57,9 @@ $titleDescription = "Landing Page";
                         <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a></li>
                         <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a></li>
                         <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a></li>
+                        <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'enquiry']) ?>">Contact Us</a></li>
                         <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build(['controller' => 'Customers', 'action' => 'dashboard']) ?>">Dashboard</a></li>
                         <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build(['controller' => 'Customers', 'action' => 'edit', $identity->get('id')]) ?>">My Profile</a></li>
-                        <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'enquiry']) ?>">Contact Us</a></li>
                     <?php }
                     // Logout button for both admin and customer ?>
                     <li class="nav-item"><a class="nav-link" href="<?= $this->Url->build(['controller' => 'Auth', 'action' => 'logout']) ?>" onclick="return confirmLogout()">Logout</a></li>

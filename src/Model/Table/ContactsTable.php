@@ -40,6 +40,8 @@ class ContactsTable extends Table
         $this->setTable('contacts');
         $this->setDisplayField('first_name');
         $this->setPrimaryKey('id');
+
+        $this->addBehavior('Timestamp');
     }
 
     /**

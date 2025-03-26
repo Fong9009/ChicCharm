@@ -16,6 +16,8 @@
                     <th><?= $this->Paginator->sort('first_name') ?></th>
                     <th><?= $this->Paginator->sort('last_name') ?></th>
                     <th><?= $this->Paginator->sort('email') ?></th>
+                    <th><?= $this->Paginator->sort('created') ?></th>
+                    <th><?= $this->Paginator->sort('modified') ?></th>
                     <th class="actions"><?= __('Actions') ?></th>
                 </tr>
             </thead>
@@ -26,6 +28,8 @@
                     <td><?= h($admin->first_name) ?></td>
                     <td><?= h($admin->last_name) ?></td>
                     <td><?= h($admin->email) ?></td>
+                    <td><?= h($admin->created) ?></td>
+                    <td><?= h($admin->modified) ?></td>
                     <td class="actions">
                         <?= $this->Html->link(__('View'), ['action' => 'view', $admin->id], ['class' => 'button']) ?>
                         <?= $this->Html->link(__('Edit'), ['action' => 'edit', $admin->id], ['class' => 'button']) ?>
