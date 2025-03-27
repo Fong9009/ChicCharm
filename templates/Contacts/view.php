@@ -34,10 +34,6 @@
                     <td><?= h($contact->phone_number) ?></td>
                 </tr>
                 <tr>
-                    <th><?= __('Id') ?></th>
-                    <td><?= $this->Number->format($contact->id) ?></td>
-                </tr>
-                <tr>
                     <th><?= __('Message') ?></th>
                     <td><?= h($contact->message) ?></td>
                 </tr>

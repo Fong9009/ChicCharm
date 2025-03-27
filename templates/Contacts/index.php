@@ -10,7 +10,6 @@
         <table>
             <thead>
                 <tr>
-                    <th><?= $this->Paginator->sort('id') ?></th>
                     <th><?= $this->Paginator->sort('first_name') ?></th>
                     <th><?= $this->Paginator->sort('last_name') ?></th>
                     <th><?= $this->Paginator->sort('email') ?></th>
@@ -25,7 +24,6 @@
             <tbody>
                 <?php foreach ($contacts as $contact): ?>
                 <tr>
-                    <td><?= $this->Number->format($contact->id) ?></td>
                     <td><?= h($contact->first_name) ?></td>
                     <td><?= h($contact->last_name) ?></td>
                     <td><?= h($contact->email) ?></td>

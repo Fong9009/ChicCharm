@@ -12,7 +12,6 @@
         <table>
             <thead>
                 <tr>
-                    <th><?= $this->Paginator->sort('id') ?></th>
                     <th><?= $this->Paginator->sort('first_name') ?></th>
                     <th><?= $this->Paginator->sort('last_name') ?></th>
                     <th><?= $this->Paginator->sort('email') ?></th>
@@ -24,7 +23,6 @@
             <tbody>
                 <?php foreach ($customers as $customer): ?>
                 <tr>
-                    <td><?= $this->Number->format($customer->id) ?></td>
                     <td><?= h($customer->first_name) ?></td>
                     <td><?= h($customer->last_name) ?></td>
                     <td><?= h($customer->email) ?></td>

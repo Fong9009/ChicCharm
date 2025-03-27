@@ -29,10 +29,6 @@
                     <th><?= __('Email') ?></th>
                     <td><?= h($admin->email) ?></td>
                 </tr>
-                <tr>
-                    <th><?= __('Id') ?></th>
-                    <td><?= $this->Number->format($admin->id) ?></td>
-                </tr>
             </table>
         </div>
     </div>
