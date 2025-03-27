@@ -63,11 +63,13 @@ class ContactsController extends AppController
                     $this->Flash->success(__('Thank you for your interest. We will get back to you as soon as possible.'));
                     return $this->redirect(['action' => 'enquiry']);
                 }
-            }
-            if(!$this->Recaptcha->verify()){
+            } else {
                 $this->Flash->error(__('Please confirm that you are not a bot.'));
             }
-            $this->Flash->error(__('The enquiry could not be sent. Please, try again.'));
+            
+            if($contact->getErrors()) {
+                $this->Flash->error(__('The enquiry could not be sent. Please check the form and try again.'));
+            }
         }
         $this->set(compact('contact'));
     }
@@ -114,3 +116,4 @@ class ContactsController extends AppController
         return $this->redirect(['action' => 'index']);
     }
 }
+

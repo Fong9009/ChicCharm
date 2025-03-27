@@ -88,6 +88,9 @@ $appLocale = Configure::read('App.defaultLocale');
 </nav>
 
 <main class="main">
+    <div class="container mt-4">
+        <?= $this->Flash->render() ?>
+    </div>
     <?= $this->fetch('content') ?>
 </main>
 
