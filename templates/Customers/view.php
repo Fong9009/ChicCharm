@@ -35,10 +35,6 @@
                     <td><?= h($customer->nonce) ?></td>
                 </tr>
                 <tr>
-                    <th><?= __('Id') ?></th>
-                    <td><?= $this->Number->format($customer->id) ?></td>
-                </tr>
-                <tr>
                     <th><?= __('Nonce Expiry') ?></th>
                     <td><?= h($customer->nonce_expiry) ?></td>
                 </tr>

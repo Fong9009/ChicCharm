@@ -83,12 +83,22 @@ return [
      */
     'EmailTransport' => [
         'default' => [
-            'host' => 'localhost',
-            'port' => 25,
-            'username' => null,
-            'password' => null,
+            'className' => 'Smtp',
+            'host' => 'smtp.gmail.com',
+            'port' => 587,
+            'timeout' => 30,
+            'username' => 'nemobyte071@gmail.com',
+            'password' => 'wgoghwyqdnhovhud',
             'client' => null,
-            'url' => env('EMAIL_TRANSPORT_DEFAULT_URL', null),
+            'tls' => true,
+        ],
+    ],
+    'Email' => [
+        'default' => [
+            'transport' => 'default',
+            'from' => ['nemobyte071@gmail.com' => 'ChicCharm'],
+            'charset' => 'utf-8',
+            'headerCharset' => 'utf-8',
         ],
     ],
 ];

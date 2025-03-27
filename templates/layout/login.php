@@ -23,6 +23,8 @@ $appLocale = Configure::read('App.defaultLocale');
 
     <link href="https://fonts.googleapis.com/css?family=Merriweather+Sans:400,700" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic" rel="stylesheet" type="text/css" />
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
     <?= $this->Html->css('/landing-detail/css/styles.css') ?>
     <?= $this->Html->css(['fonts', 'cake', 'custom']) ?>
