@@ -15,7 +15,7 @@ $this->assign('title', 'Reset Password');
                 
                 <?= $this->Flash->render() ?>
                 
-                <?= $this->Form->create($admin, ['class' => 'mt-4']) ?>
+                <?= $this->Form->create($user, ['class' => 'needs-confirmation mt-4']) ?>
                 
                 <div class="mb-4">
                     <?= $this->Form->control('password', [

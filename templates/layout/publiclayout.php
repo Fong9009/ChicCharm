@@ -80,8 +80,10 @@ $titleDescription = "Landing Page";
 </nav>
 
 <main>
+    <div class="container mt-4">
         <?= $this->Flash->render() ?>
-        <?= $this->fetch('content') ?>
+    </div>
+    <?= $this->fetch('content') ?>
 </main>
 
 <!-- Footer-->
