@@ -1,0 +1,75 @@
+.customer-card-header {
+    background-color: #e51c1c;
+    border:none;
+}
+.customer-card-body {
+    background-color: #e51c1c;
+}
+.customer-card-footer {
+    background-color: #be1616;
+    color: white;
+}
+.customer-button {
+    background-color: #be1616;
+    color: white;
+    display: flex;
+    justify-content: center; /* Center the content horizontally */
+}
+.customer-card-h4 {
+    font-size: 48px;
+    font-weight: bold;
+    color: white;
+}
+.customer-card-h3 {
+    font-weight: bold;
+    color: white;
+}
+.customer-card-count {
+    font-size: 28px;
+    font-weight: bold;
+    color: white;
+}
+.customer-icon {
+    color: white; /* Customize icon color */
+    margin-left: auto; /* Move the icon to the right */
+    margin-top: -10px; /* Adjust if necessary */
+}
+
+
+.admin-card-header {
+    background-color: #ff9900;
+    border:none;
+}
+.admin-card-body {
+    background-color: #ff9900;
+}
+.admin-card-footer {
+    background-color: #ef8f00;
+    color: white;
+}
+.admin-button {
+    background-color: #ef8f00;
+    color: white;
+    display: flex;
+    justify-content: center; /* Center the content horizontally */
+}
+.admin-card-h4 {
+    font-size: 48px;
+    font-weight: bold;
+    color: white;
+}
+.admin-card-h3 {
+    font-weight: bold;
+    color: white;
+}
+.admin-card-count {
+    font-size: 28px;
+    font-weight: bold;
+    color: white;
+}
+.admin-icon {
+    color: white; /* Customize icon color */
+    margin-left: auto; /* Move the icon to the right */
+    margin-top: -10px; /* Adjust if necessary */
+}
+
