@@ -16,7 +16,7 @@ use Cake\Mailer\Mailer;
  */
 class AdminsController extends AppController
 {
- 
+
     /**
      * Index method
      *
@@ -103,5 +103,35 @@ class AdminsController extends AppController
             $this->Flash->error(__('The admin could not be deleted. Please, try again.'));
         }
         return $this->redirect(['action' => 'index']);
+    }
+
+    public function dashboard(){
+        //Provides Admin Name
+        $admin = $this->Authentication->getIdentity();
+        $adminName = $admin ? $admin->first_name : 'User';
+
+        //Provides Customer Count
+        $customersTable = $this->fetchTable('Customers');
+        $custCount = $customersTable->find()->count();
+
+        //Provides Admin Count
+        $adminsTable = $this->fetchTable('Admins');
+        $adminCount = $adminsTable->find()->count();
+
+        //Provides Contacts Count
+        $contactsTable = $this->fetchTable('Contacts');
+        $contactCount = $contactsTable->find()->count();
+
+        //Provides Contractor Count
+        //$contractorsTable = $this->fetchTable('Contractors');
+        //$contractorCount = $contractorsTable->find()->count();
+
+        //Provides Booking Count
+        //$bookingsTable = $this->fetchTable('Bookings');
+        //$bookingCount = $bookingsTable->find()->count();
+
+
+
+        $this->set(compact('custCount', 'adminName','adminCount','contactCount'));
     }
 }
