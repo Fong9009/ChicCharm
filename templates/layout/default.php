@@ -49,7 +49,7 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
         </button>
         <div class="collapse navbar-collapse" id="navbarResponsive">
             <ul class="navbar-nav ms-auto my-2 my-lg-0">
-                <?php 
+                <?php
                 $identity = $this->request->getAttribute('identity');
                 if ($identity) {
                     // User is logged in
@@ -65,6 +65,7 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
                                 Admin
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'dashboard']) ?>">Admin Dashboard</a></li>
                                 <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'index']) ?>">Admins List</a></li>
                                 <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'add']) ?>">Add New Admin</a></li>
                             </ul>

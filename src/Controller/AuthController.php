@@ -71,10 +71,10 @@ class AuthController extends AppController
     {
         if ($this->request->is('post')) {
             $email = $this->request->getData('email');
-            
+
             // First check for admin account
             $admin = $this->Admins->findByEmail($email)->first();
-            
+
             // If admin exists, process admin password reset
             if ($admin) {
                 // Set nonce and expiry date
@@ -84,16 +84,16 @@ class AuthController extends AppController
                     // Send password reset email
                     try {
                         $mailer = new Mailer('default');
-                        
+
                         // Debug information
                         $this->log("Email settings - From address: " . env('EMAIL_FROM_ADDRESS', 'not-set'), 'debug');
-                        $this->log("Email settings - Username: " . env('EMAIL_TRANSPORT_DEFAULT_USERNAME', 'not-set'), 'debug'); 
+                        $this->log("Email settings - Username: " . env('EMAIL_TRANSPORT_DEFAULT_USERNAME', 'not-set'), 'debug');
                         $this->log("Email settings - Port: " . env('EMAIL_TRANSPORT_DEFAULT_PORT', '465'), 'debug');
                         $this->log("Email settings - SSL: enabled", 'debug');
-                        
+
                         // Set from address for delivery
                         $mailer->setFrom(env('EMAIL_FROM_ADDRESS', 'chayfong9009@gmail.com'), env('EMAIL_FROM_NAME', 'ChicCharm'));
-                        
+
                         $mailer
                             ->setEmailFormat('both')
                             ->setTo($admin->email)
@@ -135,7 +135,7 @@ class AuthController extends AppController
                 // Check for customer account
                 $this->Customers = $this->fetchTable('Customers');
                 $customer = $this->Customers->findByEmail($email)->first();
-                
+
                 if ($customer) {
                     // Set nonce and expiry date
                     $customer->nonce = Security::randomString(128);
@@ -144,16 +144,16 @@ class AuthController extends AppController
                         // Send password reset email
                         try {
                             $mailer = new Mailer('default');
-                            
+
                             // Debug information
                             $this->log("Email settings - From address: " . env('EMAIL_FROM_ADDRESS', 'not-set'), 'debug');
-                            $this->log("Email settings - Username: " . env('EMAIL_TRANSPORT_DEFAULT_USERNAME', 'not-set'), 'debug'); 
+                            $this->log("Email settings - Username: " . env('EMAIL_TRANSPORT_DEFAULT_USERNAME', 'not-set'), 'debug');
                             $this->log("Email settings - Port: " . env('EMAIL_TRANSPORT_DEFAULT_PORT', '465'), 'debug');
                             $this->log("Email settings - SSL: enabled", 'debug');
-                            
+
                             // Set from address for delivery
                             $mailer->setFrom(env('EMAIL_FROM_ADDRESS', 'chayfong9009@gmail.com'), env('EMAIL_FROM_NAME', 'ChicCharm'));
-                            
+
                             $mailer
                                 ->setEmailFormat('both')
                                 ->setTo($customer->email)
@@ -260,12 +260,12 @@ class AuthController extends AppController
     public function changePassword(?string $id = null)
     {
         $user = $this->Authentication->getIdentity();
-        
+
         // If no ID provided, use the current user's ID
         if (!$id) {
             $id = $user->id;
         }
-        
+
         // Only allow users to change their own password unless they're an admin
         if ($user->type !== 'admin' && $user->id != $id) {
             $this->Flash->error('Access denied. You can only change your own password.');
@@ -283,22 +283,22 @@ class AuthController extends AppController
 
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
-            
+
             // Verify current password
             if (!password_verify($data['current_password'], $entity->password)) {
                 $this->Flash->error('Current password is incorrect.');
                 return $this->render();
             }
-            
+
             // Update password
             $entity = $model->patchEntity($entity, [
                 'password' => $data['password'],
                 'password_confirm' => $data['password_confirm']
             ], ['validate' => 'resetPassword']);
-            
+
             if ($model->save($entity)) {
                 $this->Flash->success('Your password has been updated successfully.');
-                
+
                 // Redirect based on user type
                 if ($user->type === 'admin') {
                     return $this->redirect(['controller' => 'Admins', 'action' => 'index']);
@@ -308,7 +308,7 @@ class AuthController extends AppController
             }
             $this->Flash->error('The password could not be updated. Please, try again.');
         }
-        
+
         $this->set(compact('entity'));
     }
 
@@ -324,10 +324,10 @@ class AuthController extends AppController
 
         if ($result && $result->isValid()) {
             $user = $result->getData();
-            
+
             // Check user type and redirect accordingly
             if ($user->type === 'admin') {
-                $fallbackLocation = ['controller' => 'Admins', 'action' => 'index'];
+                $fallbackLocation = ['controller' => 'Admins', 'action' => 'dashboard'];
             } else {
                 $fallbackLocation = ['controller' => 'Customers', 'action' => 'dashboard'];
             }
