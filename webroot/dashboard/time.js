@@ -6,6 +6,9 @@ function timeUpdater(){
     var afternoon = "PM";
 
 
+    // Makes sure there are two digits in minutes
+    if (minutes < 10) minutes = '0' + minutes;
+
     if (hours === 12) {
         timeString = "The time is: " + hours + ":" + minutes + " " + afternoon;
     }
