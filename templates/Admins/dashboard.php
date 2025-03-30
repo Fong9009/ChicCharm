@@ -3,6 +3,7 @@ $this->layout = 'default';
 ?>
 <?= $this->Html->css('/dashboard/dash.css') ?>
 <?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
+<?= $this->Html->script('/dashboard/time.js') ?>
 <head>
     <title>Dashboard</title>
 </head>
@@ -14,6 +15,10 @@ $this->layout = 'default';
             <h1>Welcome back, <?= h($adminName)?></h1>
         </div>
         <div class="row">
+            <h1 id="timeValue"></h1>
+        </div>
+        <div class="row mt-4">
+            <!--Customers Card-->
             <div class="col-xl-6 col-sm-12 mb-xl-0 mb-4">
                 <div class="card">
                     <div class="card-header customer-card-header p-3 pt-2 d-flex justify-content-between align-items-center">
@@ -38,14 +43,14 @@ $this->layout = 'default';
                     </div>
                 </div>
             </div>
-
+            <!--Admins Card-->
             <div class="col-xl-6 col-sm-12 mb-xl-0 mb-4">
                 <div class="card">
                     <div class="card-header admin-card-header p-3 pt-2 d-flex justify-content-between align-items-center">
                         <div class="text-left">
                             <h4 class="mb-0 admin-card-h4">Admins</h4>
                         </div>
-                        <i class="material-icons admin-icon">person</i>
+                        <i class="material-icons admin-icon">engineering</i>
                     </div>
                     <div class="card-body admin-card-body text-left">
                         <h3 class="customer-card-h3">Total Admins</h3>
@@ -63,67 +68,111 @@ $this->layout = 'default';
                     </div>
                 </div>
             </div>
-
-            <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+        </div>
+        <div class="row mt-4">
+            <!--Contractor Card-->
+            <div class="col-xl-6 col-sm-12 mb-xl-0 mb-4">
                 <div class="card">
-                    <div class="card-header p-3 pt-2">
-                        <div class="text-center py-5">
-                            <h4 class="mb-0">Contractors</h4>
+                    <div class="card-header contractor-card-header p-3 pt-2 d-flex justify-content-between align-items-center">
+                        <div class="text-left">
+                            <h4 class="mb-0 contractor-card-h4">Contractors</h4>
+                        </div>
+                        <i class="material-icons contractor-icon">group</i>
+                    </div>
+                    <div class="card-body contractor-card-body text-left">
+                        <h3 class="customer-card-h3">Total Contractors</h3>
+                        <div class="total-value-container">
+                            <p class="total-value contractor-card-count"><?= h($adminCount) ?></p>
                         </div>
                     </div>
                     <hr class="dark horizontal my-0">
-                    <div class="card-footer p-3">
+                    <div class="card-footer contractor-card-footer p-3">
                         <?= $this->Html->link(
-                            'To Contractor Lists',
-                            ['controller' => 'Contractors', 'action' => 'index'],
-                            ['class' => 'btn btn-warning w-100', 'escape' => false]
+                            'View Contractor Lists  <i class="material-icons">visibility</i>',
+                            ['controller' => 'Admins', 'action' => 'dashboard'],
+                            ['class' => 'btn contractor-button w-100', 'escape' => false]
                         ) ?>
                     </div>
                 </div>
             </div>
-
-            <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+            <!--Contact Card-->
+            <div class="col-xl-6 col-sm-12 mb-xl-0 mb-4">
                 <div class="card">
-                    <div class="card-header p-3 pt-2">
-                        <div class="text-center py-5">
-                            <h4 class="mb-0">Contacts</h4>
+                    <div class="card-header contact-card-header p-3 pt-2 d-flex justify-content-between align-items-center">
+                        <div class="text-left">
+                            <h4 class="mb-0 contact-card-h4">Contacts</h4>
+                        </div>
+                        <i class="material-icons contact-icon">chat</i>
+                    </div>
+                    <div class="card-body contact-card-body text-left">
+                        <h3 class="customer-card-h3">Total Contacts</h3>
+                        <div class="total-value-container">
+                            <p class="total-value contractor-card-count"><?= h($contactCount) ?></p>
                         </div>
                     </div>
-                    <div class="card-body text-center">
-                        <h3>Total Contacts</h3>
-                        <p><?= h($contactCount)?></p>
-                    </div>
                     <hr class="dark horizontal my-0">
-                    <div class="card-footer p-3">
+                    <div class="card-footer contact-card-footer p-3">
                         <?= $this->Html->link(
-                            'To Contact Lists',
-                            ['controller' => 'Contacts', 'action' => 'index'],
-                            ['class' => 'btn btn-warning w-100', 'escape' => false]
+                            'View Contact Lists  <i class="material-icons">visibility</i>',
+                            ['controller' => 'Admins', 'action' => 'index'],
+                            ['class' => 'btn contact-button w-100', 'escape' => false]
                         ) ?>
                     </div>
                 </div>
             </div>
         </div>
         <div class="row mt-4">
-            <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+            <!--Bookings Card-->
+            <div class="col-xl-6 col-sm-12 mb-xl-0 mb-4">
                 <div class="card">
-                    <div class="card-header p-3 pt-2">
-                        <div class="text-center py-5">
-                            <h4 class="mb-0">Bookings</h4>
+                    <div class="card-header booking-card-header p-3 pt-2 d-flex justify-content-between align-items-center">
+                        <div class="text-left">
+                            <h4 class="mb-0 booking-card-h4">Bookings</h4>
+                        </div>
+                        <i class="material-icons booking-icon">chat</i>
+                    </div>
+                    <div class="card-body booking-card-body text-left">
+                        <h3 class="customer-card-h3">Total Bookings</h3>
+                        <div class="total-value-container">
+                            <p class="total-value booking-card-count"><?= h($contactCount) ?></p>
                         </div>
                     </div>
                     <hr class="dark horizontal my-0">
-                    <div class="card-footer p-3">
+                    <div class="card-footer booking-card-footer p-3">
                         <?= $this->Html->link(
-                            'To Booking Lists',
-                            ['controller' => 'Bookings', 'action' => 'index'],
-                            ['class' => 'btn btn-warning w-100', 'escape' => false]
+                            'View Booking Lists  <i class="material-icons">visibility</i>',
+                            ['controller' => 'Admins', 'action' => 'dashboard'],
+                            ['class' => 'btn booking-button w-100', 'escape' => false]
+                        ) ?>
+                    </div>
+                </div>
+            </div>
+            <!--Payments Card-->
+            <div class="col-xl-6 col-sm-12 mb-xl-0 mb-4">
+                <div class="card">
+                    <div class="card-header payment-card-header p-3 pt-2 d-flex justify-content-between align-items-center">
+                        <div class="text-left">
+                            <h4 class="mb-0 payment-card-h4">Payments</h4>
+                        </div>
+                        <i class="material-icons payment-icon">payments</i>
+                    </div>
+                    <div class="card-body payment-card-body text-left">
+                        <h3 class="customer-card-h3">Total Payments</h3>
+                        <div class="total-value-container">
+                            <p class="total-value payment-card-count"><?= h($contactCount) ?></p>
+                        </div>
+                    </div>
+                    <hr class="dark horizontal my-0">
+                    <div class="card-footer payment-card-footer p-3">
+                        <?= $this->Html->link(
+                            'View Payment Lists  <i class="material-icons">visibility</i>',
+                            ['controller' => 'Admins', 'action' => 'dashboard'],
+                            ['class' => 'btn payment-button w-100', 'escape' => false]
                         ) ?>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
     <footer class="footer py-4  ">
         <div class="container-fluid">
