@@ -95,17 +95,24 @@ $appLocale = Configure::read('App.defaultLocale');
 </main>
 
 <!-- Footer-->
-<footer class="footer bg-black text-white py-5">
+<footer id="footer" class="footer bg-black text-white py-5">
     <div class="container text-center">
         <div class="row justify-content-center">
             <!-- Newsletter Signup -->
             <div class="col-md-3">
                 <h5 class="text-light fw-bold">Sign Up for Our Newsletter</h5>
-                <form method="post" action="form-control" id="ContactFooter">
+                <form method="post" action="<?= $this->Url->build(['controller' => 'Newsletter', 'action' => 'subscribe']); ?>" id="ContactFooter" class="needs-confirmation">
+                    <?= $this->Form->hidden('_csrfToken', ['value' => $this->request->getAttribute('csrfToken')]) ?>
                     <div class="input-group">
-                        <input type="email" class="form-control" name="contact[email]" placeholder="Enter your email" required>
+                        <input type="email" class="form-control" name="email" placeholder="Enter your email" required>
                         <button type="submit" class="btn btn-primary">Subscribe</button>
                     </div>
+                    <?php if ($this->request->getSession()->read('newsletter_success')): ?>
+                        <div class="newsletter-success text-light mt-2">
+                            <small>Thank you for subscribing!</small>
+                            <?php $this->request->getSession()->delete('newsletter_success'); ?>
+                        </div>
+                    <?php endif; ?>
                 </form>
             </div>
 
