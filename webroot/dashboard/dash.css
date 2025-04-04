@@ -2,6 +2,7 @@
     font-size: 38px; /* Make the text bigger */
 }
 
+/*ADMIN DASHBOARD CSS*/
 .customer-card-header {
     background-color: #e51c1c;
     border:none;
@@ -110,9 +111,9 @@
     color: white;
 }
 .contractor-icon {
-    color: white; /* Customize icon color */
-    margin-left: auto; /* Move the icon to the right */
-    margin-top: -10px; /* Adjust if necessary */
+    color: white;
+    margin-left: auto;
+    margin-top: -10px;
 }
 
 .contact-card-header {
@@ -147,9 +148,9 @@
     color: white;
 }
 .contact-icon {
-    color: white; /* Customize icon color */
-    margin-left: auto; /* Move the icon to the right */
-    margin-top: -10px; /* Adjust if necessary */
+    color: white;
+    margin-left: auto;
+    margin-top: -10px;
 }
 
 
@@ -168,7 +169,7 @@
     background-color: #7803ab;
     color: white;
     display: flex;
-    justify-content: center; /* Center the content horizontally */
+    justify-content: center;
 }
 .booking-card-h4 {
     font-size: 48px;
@@ -185,9 +186,9 @@
     color: white;
 }
 .booking-icon {
-    color: white; /* Customize icon color */
-    margin-left: auto; /* Move the icon to the right */
-    margin-top: -10px; /* Adjust if necessary */
+    color: white;
+    margin-left: auto;
+    margin-top: -10px;
 }
 
 
@@ -223,7 +224,9 @@
     color: white;
 }
 .payment-icon {
-    color: white; /* Customize icon color */
-    margin-left: auto; /* Move the icon to the right */
-    margin-top: -10px; /* Adjust if necessary */
+    color: white;
+    margin-left: auto;
+    margin-top: -10px;
 }
+
+
