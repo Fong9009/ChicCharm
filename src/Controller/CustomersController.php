@@ -164,9 +164,9 @@ class CustomersController extends AppController
 
                 //Delete old Image if there is one
                 if ($customer->profile_picture != null) {
-                    $oldpath = WWW_ROOT . 'img/profile/' . $customer->profile_picture;
-                    if (file_exists($oldpath)) {
-                        unlink($oldpath);
+                    $oldPath = WWW_ROOT . 'img/profile/' . $customer->profile_picture;
+                    if (file_exists($oldPath)) {
+                        unlink($oldPath);
                     }
                 }
                 //Stores file in directory
