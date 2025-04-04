@@ -115,5 +115,61 @@ class ContactsController extends AppController
 
         return $this->redirect(['action' => 'index']);
     }
+
+    public function reply($id = null)
+    {
+        $contact = $this->Contacts->get($id, contain: []);
+        $this->set(compact('contact'));
+    }
+
+    /**
+     * Send reply method
+     *
+     * @param string|null $id Contact id.
+     * @return \Cake\Http\Response|null|void Redirects on successful reply, renders view otherwise.
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     */
+    public function sendReply($id = null)
+    {
+        $contact = $this->Contacts->get($id, contain: []);
+        
+        if ($this->request->is('post')) {
+            $data = $this->request->getData();
+            
+            try {
+                $mailer = new \Cake\Mailer\Mailer('default');
+                
+                $mailer
+                    ->setEmailFormat('both')
+                    ->setTo($contact->email)
+                    ->setSubject($data['subject'])
+                    ->setFrom(env('EMAIL_FROM_ADDRESS', 'nemobyte071@gmail.com'), env('EMAIL_FROM_NAME', 'ChicCharm'));
+
+                $mailer
+                    ->viewBuilder()
+                    ->setTemplate('contact_reply');
+
+                $mailer
+                    ->setViewVars([
+                        'first_name' => $contact->first_name,
+                        'last_name' => $contact->last_name,
+                        'message' => $data['message']
+                    ]);
+
+                if ($mailer->deliver()) {
+                    $contact->replied = true;
+                    if ($this->Contacts->save($contact)) {
+                        $this->Flash->success(__('The reply has been sent successfully.'));
+                        return $this->redirect(['action' => 'index']);
+                    }
+                }
+            } catch (\Exception $e) {
+                $this->log('Failed to send reply email: ' . $e->getMessage(), 'error');
+                $this->Flash->error(__('The reply could not be sent. Please try again.'));
+            }
+        }
+        
+        return $this->redirect(['action' => 'reply', $id]);
+    }
 }
 
