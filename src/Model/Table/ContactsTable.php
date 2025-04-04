@@ -73,7 +73,11 @@ class ContactsTable extends Table
             ->scalar('phone_number')
             ->maxLength('phone_number', 10)
             ->requirePresence('phone_number', 'create')
-            ->notEmptyString('phone_number');
+            ->notEmptyString('phone_number')
+            ->add('phone_number', 'validFormat', [
+                'rule' => ['custom', '/^[0-9]{10}$/'],
+                'message' => 'Please enter a valid 10-digit phone number'
+            ]);
 
         $validator
             ->scalar('message')
