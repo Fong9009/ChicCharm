@@ -23,7 +23,7 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
     <?= $this->Html->charset() ?>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>
-        <?= $this->request->getAttribute('identity') ? 'Admin Dashboard - ' : '' ?>
+        <?= $this->request->getAttribute('identity')->type == 'Admin' ? 'Admin - ' : 'Customer -' ?>
         <?= $this->fetch('title') ?>
     </title>
     <!-- Google fonts-->
