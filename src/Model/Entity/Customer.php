@@ -15,6 +15,7 @@ use Authentication\PasswordHasher\DefaultPasswordHasher;
  * @property string $email
  * @property string $password
  * @property string|null $nonce
+ * @property string|null $profile_picture
  * @property \Cake\I18n\DateTime|null $nonce_expiry
  * @property \Cake\I18n\DateTime|null $created
  * @property \Cake\I18n\DateTime|null $modified
@@ -41,6 +42,7 @@ class Customer extends Entity
         'created' => true,
         'modified' => true,
         'type' => true,
+        'profile_picture' => true,
     ];
 
     /**
@@ -49,7 +51,7 @@ class Customer extends Entity
      * @var list<string>
      */
     protected array $_hidden = [
-        'password', 
+        'password',
         'password_confirm',
     ];
 
