@@ -22,7 +22,7 @@ $this->layout = 'default';
                     </div>
                     <div class="row">
                         <div class="col-md-12 text-center">
-                            <?php if (!empty($customer->profile_picture)): ?>
+                            <?php if (!empty($customer->profile_picture)) : ?>
                                 <img src="<?= $this->Url->image('profile/' . $customer->profile_picture) ?>"
                                      alt="Profile Picture"
                                      style="width: 300px; height: 300px; padding: 10px">
@@ -58,11 +58,18 @@ $this->layout = 'default';
                 <div class="card h-100">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h3 class="card-title mb-0">Current Bookings</h3>
-                        <?= $this->Html->link(
-                            'Create Booking',
-                            ['action' => 'edit', $customer->id],
-                            ['class' => 'btn btn-primary']
-                        ) ?>
+                        <div class="align-items-end">
+                            <?= $this->Html->link(
+                                'Create Booking',
+                                ['action' => 'edit', $customer->id],
+                                ['class' => 'btn btn-primary']
+                            ) ?>
+                            <?= $this->Html->link(
+                                'View All Bookings',
+                                ['action' => 'edit', $customer->id],
+                                ['class' => 'btn btn-primary']
+                            ) ?>
+                        </div>
                     </div>
                     <div class="card-body">
                     </div>
@@ -75,6 +82,13 @@ $this->layout = 'default';
                 <div class="card h-100">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h3 class="card-title mb-0">Past Bookings</h3>
+                        <div class="align-items-end">
+                            <?= $this->Html->link(
+                                'View all Previous Bookings',
+                                ['action' => 'edit', $customer->id],
+                                ['class' => 'btn btn-primary']
+                            ) ?>
+                        </div>
                     </div>
                     <div class="card-body">
                     </div>
@@ -87,6 +101,13 @@ $this->layout = 'default';
                 <div class="card h-100">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h3 class="card-title mb-0">Past Invoices</h3>
+                        <div class="align-items-end">
+                            <?= $this->Html->link(
+                                'View all Previous Invoices',
+                                ['action' => 'edit', $customer->id],
+                                ['class' => 'btn btn-primary']
+                            ) ?>
+                        </div>
                     </div>
                     <div class="card-body">
                     </div>
