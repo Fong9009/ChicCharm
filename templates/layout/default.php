@@ -38,7 +38,6 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
     <?= $this->fetch('css') ?>
     <?= $this->fetch('script') ?>
 </head>
-<body>
 
 <!-- Navigation -->
 <nav class="navbar navbar-expand-lg navbar-light fixed-top py-3" id="mainNav" style="background-color: #121211;">
@@ -93,7 +92,7 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
         </div>
     </div>
 </nav>
-
+<body>
 <!-- Main Content Area -->
 <main class="main">
     <div class="container">

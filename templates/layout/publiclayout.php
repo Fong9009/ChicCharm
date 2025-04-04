@@ -23,19 +23,18 @@ $titleDescription = "Landing Page";
     <?= $this->fetch('meta') ?>
     <?= $this->fetch('css') ?>
     <?= $this->fetch('script') ?>
-    
+
 </head>
-<body>
 <!-- Navigation-->
-<nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav" style="background-color: #121211;">
-    <div class="container">
+<nav class="navbar navbar-expand-lg navbar-light fixed-top py-3" id="mainNav" style="background-color: #121211;">
+    <div class="container px-4 px-lg-5">
         <a class="navbar-brand" href="<?= $this->Url->build('/') ?>">ChicCharm</a>
         <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarResponsive">
             <ul class="navbar-nav ms-auto my-2 my-lg-0">
-                <?php 
+                <?php
                 $identity = $this->request->getAttribute('identity');
                 if ($identity) {
                     // User is logged in
@@ -51,6 +50,7 @@ $titleDescription = "Landing Page";
                                 Admin
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'dashboard']) ?>">Admin Dashboard</a></li>
                                 <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'index']) ?>">Admins List</a></li>
                                 <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'add']) ?>">Add New Admin</a></li>
                             </ul>
@@ -78,7 +78,7 @@ $titleDescription = "Landing Page";
         </div>
     </div>
 </nav>
-
+<body>
 <main>
     <div class="container mt-4">
         <?= $this->Flash->render() ?>
