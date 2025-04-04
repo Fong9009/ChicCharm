@@ -35,7 +35,7 @@ $titleDescription = "Landing Page";
         <div class="collapse navbar-collapse" id="navbarResponsive">
             <ul class="navbar-nav ms-auto my-2 my-lg-0">
                 <?php
-                $identity = $this->request->getAttribute('identity')->type == 'Admin' ? 'Admin - ' : 'Customer -';
+                $identity = $this->request->getAttribute('identity');
                 if ($identity) {
                     // User is logged in
                     if ($identity->get('type') === 'admin') {

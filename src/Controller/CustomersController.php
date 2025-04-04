@@ -135,14 +135,20 @@ class CustomersController extends AppController
 
         $customer = $this->Customers->get($id, contain: []);
         if ($this->request->is(['patch', 'post', 'put'])) {
-            $customer = $this->Customers->patchEntity($customer, $this->request->getData());
+            $data = $this->request->getData();
+
+
+            $password = $this->request->getData('password');
+            if($password !== null) {
+                $data['password'] = $customer->password;
+            }
 
             //Profile Picture Upload
             $profile = $this->request->getData('profile_picture');
             if($profile && $profile->getClientFilename()) {
                 //Max Size to prevent massive files from being inserted
-                //This is measured in MB so max = 2MB
-                $maxSize = 2 * 1024 * 1024;
+                //This is measured in MB so max = 4MB
+                $maxSize = 4 * 1024 * 1024;
                 if($profile->getSize() > $maxSize) {
                     $this->Flash->error(__('The profile picture is too big please use something smaller than 2MB.'));
                 }
@@ -154,18 +160,28 @@ class CustomersController extends AppController
                 }
 
                 //Delete old Image if there is one
-                if($customer->profile_picture) {
-                    $oldpath = WWW_ROOT . 'img/profile' . $customer->profile_picture;
+                if($customer->profile_picture != null) {
+                    $oldpath = WWW_ROOT . 'img/profile/' . $customer->profile_picture;
                     if(file_exists($oldpath)) {
                         unlink($oldpath);
                     }
+                    //Stores file in directory
+                    $filename = rand(10000, 99999) . '_' . $profile->getClientFilename();
+                    $profile->moveTo(WWW_ROOT.'img/profile/'.$filename);
+                    $data['profile_picture'] = $filename;
+                } else {
+                    //Stores file in directory
+                    $filename = rand(10000, 99999) . '_' . $profile->getClientFilename();
+                    $profile->moveTo(WWW_ROOT.'img/profile/'.$filename);
+                    $data['profile_picture'] = $filename;
                 }
 
-                //Stores file in directory
-                $filename = rand(10000, 99999) . '_' . $profile->getClientFilename();
-                $profile->moveTo(WWW_ROOT.'img/profile/'.$filename);
-                $data['profile_picture'] = $filename;
+            } else {
+                unset($data['profile_picture']);
             }
+
+            // Patch the entity with the data
+            $customer = $this->Customers->patchEntity($customer, $data);
 
             if ($this->Customers->save($customer)) {
                 $this->Flash->success(__('Your profile has been updated.'));
