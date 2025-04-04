@@ -16,6 +16,7 @@
                         'label' => 'Email', 
                         'class' => 'form-control',
                         'required' => true,
+                        'placeholder' => 'Enter your email',
                         'error' => ['class' => 'invalid-feedback']
                     ]) ?>
                 </div>
@@ -24,6 +25,7 @@
                         'label' => 'First Name', 
                         'class' => 'form-control',
                         'required' => true,
+                        'placeholder' => 'Enter your first name',
                         'error' => ['class' => 'invalid-feedback']
                     ]) ?>
                 </div>
@@ -32,6 +34,7 @@
                         'label' => 'Last Name', 
                         'class' => 'form-control',
                         'required' => true,
+                        'placeholder' => 'Enter your last name',
                         'error' => ['class' => 'invalid-feedback']
                     ]) ?>
                 </div>
@@ -40,6 +43,7 @@
                         'label' => 'Password', 
                         'class' => 'form-control',
                         'required' => true,
+                        'placeholder' => 'Enter your password',
                         'error' => ['class' => 'invalid-feedback']
                     ]) ?>
                     <small class="form-text text-muted">Password must be at least 8 characters long.</small>
@@ -50,6 +54,7 @@
                         'label' => 'Confirm Password', 
                         'class' => 'form-control',
                         'required' => true,
+                        'placeholder' => 'Confirm your password',
                         'error' => ['class' => 'invalid-feedback']
                     ]) ?>
                 </div>

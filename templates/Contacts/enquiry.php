@@ -13,28 +13,35 @@
                 <?= $this->Form->control('first_name', [
                     'label' => 'First Name',
                     'class' => 'form-control',
-                    'required' => true
+                    'required' => true,
+                    'placeholder' => 'Enter your first name',
                 ]) ?>
                 <?= $this->Form->control('last_name', [
                     'label' => 'Last Name',
                     'class' => 'form-control',
-                    'required' => true
+                    'required' => true,
+                    'placeholder' => 'Enter your last name',
                 ]) ?>
                 <?= $this->Form->control('email', [
                     'label' => 'Email',
                     'class' => 'form-control',
-                    'required' => true
+                    'required' => true,
+                    'placeholder' => 'Enter your email',
                 ]) ?>
                 <?= $this->Form->control('phone_number', [
                     'label' => 'Phone Number',
                     'class' => 'form-control',
-                    'required' => true
+                    'required' => true,
+                    'pattern' => '[0-9]{10}',
+                    'title' => 'Please enter a valid 10-digit phone number',
+                    'placeholder' => 'Enter your 10-digit phone number',
                 ]) ?>
                 <?= $this->Form->control('message', [
                     'label' => 'Message',
                     'class' => 'form-control',
                     'required' => true,
-                    'rows' => 5
+                    'rows' => 5,
+                    'placeholder' => 'Enter your message',
                 ]) ?>
                 <?= $this->Recaptcha->display(['class' => 'mb-3'])?>
                 <?= $this->Form->button(__('Submit'), ['class' => 'submit-button']) ?>
