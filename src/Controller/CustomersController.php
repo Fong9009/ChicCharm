@@ -130,6 +130,7 @@ class CustomersController extends AppController
         // Only admins can edit profiles
         if ($user->type !== 'admin' && $user->id != $id) {
             $this->Flash->error('Access denied. You can only edit your own profile.');
+
             return $this->redirect(['action' => 'dashboard']);
         }
 
@@ -139,47 +140,43 @@ class CustomersController extends AppController
 
 
             $password = $this->request->getData('password');
-            if($password !== null) {
+            if ($password == null || $password == '') {
                 $data['password'] = $customer->password;
+            } else {
+                $data['password'] = $password;
             }
 
             //Profile Picture Upload
             $profile = $this->request->getData('profile_picture');
-            if($profile && $profile->getClientFilename()) {
+            if ($profile && $profile->getClientFilename()) {
                 //Max Size to prevent massive files from being inserted
                 //This is measured in MB so max = 4MB
                 $maxSize = 4 * 1024 * 1024;
-                if($profile->getSize() > $maxSize) {
+                if ($profile->getSize() > $maxSize) {
                     $this->Flash->error(__('The profile picture is too big please use something smaller than 2MB.'));
                 }
 
                 //Check Filetype
                 $allowedFileTypes = ['image/jpeg', 'image/png','image/jpg'];
-                if(!in_array($profile->getClientMediaType(), $allowedFileTypes)) {
+                if (!in_array($profile->getClientMediaType(), $allowedFileTypes)) {
                     $this->Flash->error(__('The profile picture must be a jpeg/jpg or png format.'));
                 }
 
                 //Delete old Image if there is one
-                if($customer->profile_picture != null) {
+                if ($customer->profile_picture != null) {
                     $oldpath = WWW_ROOT . 'img/profile/' . $customer->profile_picture;
-                    if(file_exists($oldpath)) {
+                    if (file_exists($oldpath)) {
                         unlink($oldpath);
                     }
-                    //Stores file in directory
-                    $filename = rand(10000, 99999) . '_' . $profile->getClientFilename();
-                    $profile->moveTo(WWW_ROOT.'img/profile/'.$filename);
-                    $data['profile_picture'] = $filename;
-                } else {
-                    //Stores file in directory
-                    $filename = rand(10000, 99999) . '_' . $profile->getClientFilename();
-                    $profile->moveTo(WWW_ROOT.'img/profile/'.$filename);
-                    $data['profile_picture'] = $filename;
                 }
-
+                //Stores file in directory
+                $filename = rand(10000, 99999) . '_' . $profile->getClientFilename();
+                $profile->moveTo(WWW_ROOT . 'img/profile/' . $filename);
+                $data['profile_picture'] = $filename;
             } else {
                 unset($data['profile_picture']);
             }
-
+            $data['nonce'] = null;
             // Patch the entity with the data
             $customer = $this->Customers->patchEntity($customer, $data);
 
