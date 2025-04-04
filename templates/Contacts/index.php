@@ -35,6 +35,7 @@
                     <td class="actions">
                         <?= $this->Html->link(__('View'), ['action' => 'view', $contact->id], ['class' => 'button']) ?>
                         <?= $this->Html->link(__('Edit'), ['action' => 'edit', $contact->id], ['class' => 'button']) ?>
+                        <?= $this->Html->link(__('Email'), ['action' => 'reply', $contact->id], ['class' => 'button']) ?>
                         <?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $contact->id], ['confirm' => __('Are you sure you want to delete # {0}?', $contact->id), 'class' => 'button']) ?>
                     </td>
                 </tr>
