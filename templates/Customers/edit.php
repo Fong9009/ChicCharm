@@ -32,21 +32,36 @@ $this->assign('title', 'Edit Profile');
                         </div>
                     </div>
                 </div>
-                
+                <!-- Profile Picture Preview -->
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <?php if (!empty($customer->profile_picture)): ?>
+                            <img src="<?= $this->Url->image('uploads/' . $customer->profile_picture) ?>"
+                                 alt="Profile Picture"
+                                 style="width: 150px; height: 150px; border-radius: 50%;">
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <!-- File Upload Location -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <label for="profile_picture">Upload New Profile Picture</label>
+                        <?= $this->Form->file('profile_picture', ['class' => 'form-control']) ?>
+                    </div>
+                </div>
+
+
                 <?php
                     echo $this->Form->control('nonce', ['type' => 'hidden']);
                     echo $this->Form->control('nonce_expiry', ['type' => 'hidden', 'empty' => true]);
                 ?>
             </fieldset>
-            
+
             <div class="text-center mt-4">
                 <?= $this->Form->button(__('Update Profile'), ['class' => 'btn']) ?>
             </div>
             <?= $this->Form->end() ?>
-            
-            <div class="text-center mt-4">
-                <p>Want to change your password? <a href="<?= $this->Url->build(['controller' => 'Auth', 'action' => 'changePassword']) ?>">Click here</a></p>
-            </div>
+
         </div>
     </div>
 </div>

@@ -70,7 +70,7 @@ class CustomersTable extends Table
             ->email('email')
             ->notEmptyString('email')
             ->add('email', 'unique', [
-                'rule' => 'validateUnique', 
+                'rule' => 'validateUnique',
                 'provider' => 'table',
                 'message' => 'This email is already in use.'
             ]);
@@ -93,6 +93,11 @@ class CustomersTable extends Table
             ->scalar('nonce')
             ->maxLength('nonce', 255)
             ->allowEmptyString('nonce');
+
+        $validator
+            ->scalar('profile_picture')
+            ->maxLength('profile_picture', 255)
+            ->allowEmptyString('profile_picture');
 
         $validator
             ->dateTime('nonce_expiry')

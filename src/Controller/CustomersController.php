@@ -59,10 +59,10 @@ class CustomersController extends AppController
     public function dashboard()
     {
         $customerId = $this->Authentication->getIdentity()->getIdentifier();
-        
+
         $customer = $this->Customers->get($customerId);
         $this->set(compact('customer'));
-        
+
         // Use the default layout which includes the navigation
         $this->viewBuilder()->setLayout('default');
     }
@@ -106,7 +106,7 @@ class CustomersController extends AppController
         if ($this->request->is('post')) {
             $customer = $this->Customers->patchEntity($customer, $this->request->getData());
             $customer->type = 'customer';
-            
+
             if ($this->Customers->save($customer)) {
                 $this->Flash->success(__('Registration successful! Please login with your credentials.'));
                 return $this->redirect(['controller' => 'Auth', 'action' =>  'login']);
@@ -126,7 +126,7 @@ class CustomersController extends AppController
     public function edit($id = null)
     {
         $user = $this->Authentication->getIdentity();
-        
+
         // Only admins can edit profiles
         if ($user->type !== 'admin' && $user->id != $id) {
             $this->Flash->error('Access denied. You can only edit your own profile.');
@@ -136,6 +136,37 @@ class CustomersController extends AppController
         $customer = $this->Customers->get($id, contain: []);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $customer = $this->Customers->patchEntity($customer, $this->request->getData());
+
+            //Profile Picture Upload
+            $profile = $this->request->getData('profile_picture');
+            if($profile && $profile->getClientFilename()) {
+                //Max Size to prevent massive files from being inserted
+                //This is measured in MB so max = 2MB
+                $maxSize = 2 * 1024 * 1024;
+                if($profile->getSize() > $maxSize) {
+                    $this->Flash->error(__('The profile picture is too big please use something smaller than 2MB.'));
+                }
+
+                //Check Filetype
+                $allowedFileTypes = ['image/jpeg', 'image/png','image/jpg'];
+                if(!in_array($profile->getClientMediaType(), $allowedFileTypes)) {
+                    $this->Flash->error(__('The profile picture must be a jpeg/jpg or png format.'));
+                }
+
+                //Delete old Image if there is one
+                if($customer->profile_picture) {
+                    $oldpath = WWW_ROOT . 'img/profile' . $customer->profile_picture;
+                    if(file_exists($oldpath)) {
+                        unlink($oldpath);
+                    }
+                }
+
+                //Stores file in directory
+                $filename = rand(10000, 99999) . '_' . $profile->getClientFilename();
+                $profile->moveTo(WWW_ROOT.'img/profile/'.$filename);
+                $data['profile_picture'] = $filename;
+            }
+
             if ($this->Customers->save($customer)) {
                 $this->Flash->success(__('Your profile has been updated.'));
 
@@ -156,7 +187,7 @@ class CustomersController extends AppController
     public function delete($id = null)
     {
         $user = $this->Authentication->getIdentity();
-        
+
         // Only admins can delete accounts
         if ($user->type !== 'admin') {
             $this->Flash->error('Access denied. Only administrators can delete accounts.');
@@ -173,4 +204,6 @@ class CustomersController extends AppController
 
         return $this->redirect(['action' => 'index']);
     }
+
 }
+
