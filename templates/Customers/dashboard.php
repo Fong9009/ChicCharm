@@ -15,24 +15,26 @@ $this->layout = 'default';
         </div>
         <!--Profile Picture-->
         <div class="row">
-            <div class="col-md-12 mb-4">
+            <div class="col-md-6 mb-4">
                 <div class="card h-100">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h3 class="card-title mb-0">Profile Picture</h3>
-                        <?= $this->Html->link(
-                            'Edit Profile Picture',
-                            ['action' => 'edit', $customer->id],
-                            ['class' => 'btn btn-primary']
-                        ) ?>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 text-center">
+                            <?php if (!empty($customer->profile_picture)): ?>
+                                <img src="<?= $this->Url->image('profile/' . $customer->profile_picture) ?>"
+                                     alt="Profile Picture"
+                                     style="width: 300px; height: 300px; padding: 10px">
+                            <?php endif; ?>
+                        </div>
                     </div>
                     <div class="card-body">
                     </div>
                 </div>
             </div>
-        </div>
-        <!--Account Details-->
-        <div class="row">
-            <div class="col-md-12 mb-4">
+            <!--Account Details-->
+            <div class="col-md-6 mb-4">
                 <div class="card h-100">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h3 class="card-title mb-0">Profile Summary</h3>

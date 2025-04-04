@@ -8,7 +8,7 @@ $this->assign('title', 'Edit Profile');
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="customers form content">
-            <?= $this->Form->create($customer) ?>
+            <?= $this->Form->create($customer, ['type' => 'file']) ?>
             <fieldset>
                 <legend><?= __('Edit Your Profile') ?></legend>
                 <div class="row">
@@ -36,7 +36,7 @@ $this->assign('title', 'Edit Profile');
                 <div class="row">
                     <div class="col-md-12 text-center">
                         <?php if (!empty($customer->profile_picture)): ?>
-                            <img src="<?= $this->Url->image('uploads/' . $customer->profile_picture) ?>"
+                            <img src="<?= $this->Url->image('profile/' . $customer->profile_picture) ?>"
                                  alt="Profile Picture"
                                  style="width: 150px; height: 150px; border-radius: 50%;">
                         <?php endif; ?>
@@ -46,13 +46,13 @@ $this->assign('title', 'Edit Profile');
                 <div class="row">
                     <div class="col-md-12">
                         <label for="profile_picture">Upload New Profile Picture</label>
-                        <?= $this->Form->file('profile_picture', ['class' => 'form-control']) ?>
+                        <?= $this->Form->Control('profile_picture', ['type' => 'file','class' => 'form-control','required' => false]) ?>
                     </div>
                 </div>
 
 
                 <?php
-                    echo $this->Form->control('nonce', ['type' => 'hidden']);
+                    echo $this->Form->control('nonce', ['type' => 'hidden', 'empty' => true]);
                     echo $this->Form->control('nonce_expiry', ['type' => 'hidden', 'empty' => true]);
                 ?>
             </fieldset>
