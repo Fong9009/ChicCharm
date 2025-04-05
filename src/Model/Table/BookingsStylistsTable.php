@@ -63,6 +63,11 @@ class BookingsStylistsTable extends Table
     public function validationDefault(Validator $validator): Validator
     {
         $validator
+            ->date('stylist_date')
+            ->requirePresence('stylist_date', 'create')
+            ->notEmptyDate('stylist_date');
+
+        $validator
             ->time('start_time')
             ->requirePresence('start_time', 'create')
             ->notEmptyTime('start_time');

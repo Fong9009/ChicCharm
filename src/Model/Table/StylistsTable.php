@@ -58,6 +58,10 @@ class StylistsTable extends Table
             'targetForeignKey' => 'service_id',
             'joinTable' => 'stylists_services',
         ]);
+
+        $this->hasMany('BookingsStylists', [
+            'foreignKey' => 'stylist_id',
+        ]);
     }
 
     /**

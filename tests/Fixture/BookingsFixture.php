@@ -21,7 +21,7 @@ class BookingsFixture extends TestFixture
             [
                 'id' => 1,
                 'booking_name' => 'Lorem ipsum dolor sit amet',
-                'booking_date' => '2025-04-05 06:47:28',
+                'booking_date' => '2025-04-05',
                 'total_cost' => 1.5,
                 'remaining_cost' => 1.5,
                 'customer_id' => 1,

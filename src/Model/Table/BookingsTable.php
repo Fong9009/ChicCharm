@@ -68,9 +68,9 @@ class BookingsTable extends Table
             ->allowEmptyString('booking_name');
 
         $validator
-            ->dateTime('booking_date')
+            ->date('booking_date')
             ->requirePresence('booking_date', 'create')
-            ->notEmptyDateTime('booking_date');
+            ->notEmptyDate('booking_date');
 
         $validator
             ->decimal('total_cost')
