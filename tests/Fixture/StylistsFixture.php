@@ -6,9 +6,9 @@ namespace App\Test\Fixture;
 use Cake\TestSuite\Fixture\TestFixture;
 
 /**
- * CustomersFixture
+ * StylistsFixture
  */
-class CustomersFixture extends TestFixture
+class StylistsFixture extends TestFixture
 {
     /**
      * Init method
@@ -24,10 +24,10 @@ class CustomersFixture extends TestFixture
                 'last_name' => 'Lorem ipsum dolor sit amet',
                 'email' => 'Lorem ipsum dolor sit amet',
                 'password' => 'your_app_password',
-                'nonce' => 'Lorem ipsum dolor sit amet',
-                'nonce_expiry' => '2025-04-05 02:13:11',
-                'created' => '2025-04-05 02:13:11',
-                'modified' => '2025-04-05 02:13:11',
+                'nonce' => '2025-04-05 01:53:57',
+                'nonce_expiry' => '2025-04-05 01:53:57',
+                'created' => '2025-04-05 01:53:57',
+                'modified' => '2025-04-05 01:53:57',
                 'type' => 'Lorem ipsum dolor sit amet',
                 'profile_picture' => 'Lorem ipsum dolor sit amet',
             ],
