@@ -44,6 +44,10 @@ class CustomersTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
+
+        $this->hasMany('Bookings', [
+            'foreignKey' => 'customer_id',
+        ]);
     }
 
     /**
@@ -66,13 +70,14 @@ class CustomersTable extends Table
             ->requirePresence('last_name', 'create')
             ->notEmptyString('last_name');
 
+
         $validator
             ->email('email')
             ->notEmptyString('email')
             ->add('email', 'unique', [
                 'rule' => 'validateUnique',
                 'provider' => 'table',
-                'message' => 'This email is already in use.'
+                'message' => 'This email is already in use.',
             ]);
 
         $validator
@@ -81,6 +86,7 @@ class CustomersTable extends Table
             ->requirePresence('password', 'create')
             ->notEmptyString('password')
             ->minLength('password', 8, 'Password must be at least 8 characters long');
+
 
         $validator
             ->scalar('password_confirm')
@@ -95,14 +101,28 @@ class CustomersTable extends Table
             ->allowEmptyString('nonce');
 
         $validator
+            ->dateTime('nonce_expiry')
+            ->allowEmptyDateTime('nonce_expiry');
+
+        $validator
             ->scalar('profile_picture')
             ->maxLength('profile_picture', 255)
             ->allowEmptyString('profile_picture');
 
-        $validator
-            ->dateTime('nonce_expiry')
-            ->allowEmptyDateTime('nonce_expiry');
-
         return $validator;
+    }
+
+    /**
+     * Returns a rules checker object that will be used for validating
+     * application integrity.
+     *
+     * @param \Cake\ORM\RulesChecker $rules The rules object to be modified.
+     * @return \Cake\ORM\RulesChecker
+     */
+    public function buildRules(RulesChecker $rules): RulesChecker
+    {
+        $rules->add($rules->isUnique(['email']), ['errorField' => 'email']);
+
+        return $rules;
     }
 }
