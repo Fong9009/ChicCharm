@@ -20,7 +20,8 @@ class BookingsFixture extends TestFixture
         $this->records = [
             [
                 'id' => 1,
-                'booking_date' => '2025-04-05 02:07:11',
+                'booking_name' => 'Lorem ipsum dolor sit amet',
+                'booking_date' => '2025-04-05 06:47:28',
                 'total_cost' => 1.5,
                 'remaining_cost' => 1.5,
                 'customer_id' => 1,

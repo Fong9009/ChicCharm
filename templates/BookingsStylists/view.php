@@ -31,12 +31,16 @@
                     <td><?= $this->Number->format($bookingsStylist->id) ?></td>
                 </tr>
                 <tr>
-                    <th><?= __('Duration') ?></th>
-                    <td><?= $this->Number->format($bookingsStylist->duration) ?></td>
-                </tr>
-                <tr>
                     <th><?= __('Selected Cost') ?></th>
                     <td><?= $this->Number->format($bookingsStylist->selected_cost) ?></td>
+                </tr>
+                <tr>
+                    <th><?= __('Start Time') ?></th>
+                    <td><?= h($bookingsStylist->start_time) ?></td>
+                </tr>
+                <tr>
+                    <th><?= __('End Time') ?></th>
+                    <td><?= h($bookingsStylist->end_time) ?></td>
                 </tr>
             </table>
         </div>

@@ -12,7 +12,8 @@
             <thead>
                 <tr>
                     <th><?= $this->Paginator->sort('id') ?></th>
-                    <th><?= $this->Paginator->sort('duration') ?></th>
+                    <th><?= $this->Paginator->sort('start_time') ?></th>
+                    <th><?= $this->Paginator->sort('end_time') ?></th>
                     <th><?= $this->Paginator->sort('selected_cost') ?></th>
                     <th><?= $this->Paginator->sort('booking_id') ?></th>
                     <th><?= $this->Paginator->sort('stylist_id') ?></th>
@@ -23,7 +24,8 @@
                 <?php foreach ($bookingsStylists as $bookingsStylist): ?>
                 <tr>
                     <td><?= $this->Number->format($bookingsStylist->id) ?></td>
-                    <td><?= $this->Number->format($bookingsStylist->duration) ?></td>
+                    <td><?= h($bookingsStylist->start_time) ?></td>
+                    <td><?= h($bookingsStylist->end_time) ?></td>
                     <td><?= $this->Number->format($bookingsStylist->selected_cost) ?></td>
                     <td><?= $bookingsStylist->hasValue('booking') ? $this->Html->link($bookingsStylist->booking->id, ['controller' => 'Bookings', 'action' => 'view', $bookingsStylist->booking->id]) : '' ?></td>
                     <td><?= $bookingsStylist->hasValue('stylist') ? $this->Html->link($bookingsStylist->stylist->first_name, ['controller' => 'Stylists', 'action' => 'view', $bookingsStylist->stylist->id]) : '' ?></td>

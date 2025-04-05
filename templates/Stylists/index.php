@@ -23,11 +23,8 @@
                     <th><?= $this->Paginator->sort('first_name') ?></th>
                     <th><?= $this->Paginator->sort('last_name') ?></th>
                     <th><?= $this->Paginator->sort('email') ?></th>
-                    <th><?= $this->Paginator->sort('nonce') ?></th>
-                    <th><?= $this->Paginator->sort('nonce_expiry') ?></th>
                     <th><?= $this->Paginator->sort('created') ?></th>
                     <th><?= $this->Paginator->sort('modified') ?></th>
-                    <th><?= $this->Paginator->sort('profile_picture') ?></th>
                     <th class="actions"><?= __('Actions') ?></th>
                 </tr>
             </thead>
@@ -37,11 +34,8 @@
                     <td><?= h($stylist->first_name) ?></td>
                     <td><?= h($stylist->last_name) ?></td>
                     <td><?= h($stylist->email) ?></td>
-                    <td><?= h($stylist->nonce) ?></td>
-                    <td><?= h($stylist->nonce_expiry) ?></td>
                     <td><?= h($stylist->created) ?></td>
                     <td><?= h($stylist->modified) ?></td>
-                    <td><?= h($stylist->profile_picture) ?></td>
                     <td class="actions">
                         <?= $this->Html->link(__('View'), ['action' => 'view', $stylist->id], ['class' => 'button']) ?>
                         <?= $this->Html->link(__('Edit'), ['action' => 'edit', $stylist->id], ['class' => 'button']) ?>

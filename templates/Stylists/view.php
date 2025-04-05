@@ -14,7 +14,7 @@
             <?= $this->Html->link(__('New Stylist'), ['action' => 'add'], ['class' => 'side-nav-item']) ?>
         </div>
     </aside>
-    <div class="column column-80">
+    <div class="column column">
         <div class="stylists view content">
             <h3><?= h($stylist->first_name) ?></h3>
             <table>
@@ -31,16 +31,8 @@
                     <td><?= h($stylist->email) ?></td>
                 </tr>
                 <tr>
-                    <th><?= __('Type') ?></th>
-                    <td><?= h($stylist->type) ?></td>
-                </tr>
-                <tr>
                     <th><?= __('Profile Picture') ?></th>
                     <td><?= h($stylist->profile_picture) ?></td>
-                </tr>
-                <tr>
-                    <th><?= __('Id') ?></th>
-                    <td><?= $this->Number->format($stylist->id) ?></td>
                 </tr>
                 <tr>
                     <th><?= __('Nonce') ?></th>
@@ -65,7 +57,6 @@
                 <div class="table-responsive">
                     <table>
                         <tr>
-                            <th><?= __('Id') ?></th>
                             <th><?= __('Booking Date') ?></th>
                             <th><?= __('Total Cost') ?></th>
                             <th><?= __('Remaining Cost') ?></th>
@@ -74,7 +65,6 @@
                         </tr>
                         <?php foreach ($stylist->bookings as $booking) : ?>
                         <tr>
-                            <td><?= h($booking->id) ?></td>
                             <td><?= h($booking->booking_date) ?></td>
                             <td><?= h($booking->total_cost) ?></td>
                             <td><?= h($booking->remaining_cost) ?></td>
@@ -103,14 +93,12 @@
                 <div class="table-responsive">
                     <table>
                         <tr>
-                            <th><?= __('Id') ?></th>
                             <th><?= __('Service Name') ?></th>
                             <th><?= __('Service Cost') ?></th>
                             <th class="actions"><?= __('Actions') ?></th>
                         </tr>
                         <?php foreach ($stylist->services as $service) : ?>
                         <tr>
-                            <td><?= h($service->id) ?></td>
                             <td><?= h($service->service_name) ?></td>
                             <td><?= h($service->service_cost) ?></td>
                             <td class="actions">

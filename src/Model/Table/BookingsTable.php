@@ -63,6 +63,11 @@ class BookingsTable extends Table
     public function validationDefault(Validator $validator): Validator
     {
         $validator
+            ->scalar('booking_name')
+            ->maxLength('booking_name', 255)
+            ->allowEmptyString('booking_name');
+
+        $validator
             ->dateTime('booking_date')
             ->requirePresence('booking_date', 'create')
             ->notEmptyDateTime('booking_date');

@@ -9,6 +9,7 @@ use Cake\ORM\Entity;
  * Booking Entity
  *
  * @property int $id
+ * @property string|null $booking_name
  * @property \Cake\I18n\DateTime $booking_date
  * @property string $total_cost
  * @property string $remaining_cost
@@ -29,6 +30,7 @@ class Booking extends Entity
      * @var array<string, bool>
      */
     protected array $_accessible = [
+        'booking_name' => true,
         'booking_date' => true,
         'total_cost' => true,
         'remaining_cost' => true,

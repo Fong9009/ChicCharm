@@ -63,9 +63,14 @@ class BookingsStylistsTable extends Table
     public function validationDefault(Validator $validator): Validator
     {
         $validator
-            ->integer('duration')
-            ->requirePresence('duration', 'create')
-            ->notEmptyString('duration');
+            ->time('start_time')
+            ->requirePresence('start_time', 'create')
+            ->notEmptyTime('start_time');
+
+        $validator
+            ->time('end_time')
+            ->requirePresence('end_time', 'create')
+            ->notEmptyTime('end_time');
 
         $validator
             ->decimal('selected_cost')
