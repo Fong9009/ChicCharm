@@ -63,7 +63,7 @@ class BookingsStylistsController extends AppController
     public function customerstylistadd($booking_id = null)
     {
 
-        // Check if the booking ID is provided
+        //Check if the booking ID is provided
         if (!$booking_id) {
             $this->Flash->error(__('Invalid booking missing booking ID'));
             return $this->redirect(['controller' => 'Bookings', 'action' => 'customerindex']);
@@ -114,12 +114,12 @@ class BookingsStylistsController extends AppController
             $query = null;
         }
 
-        // Paginate the results if query is valid
+        //Paginate the results if query is valid
         $filterStylists = $this->paginate($query);
-        // Fetch the list of services and bookings
+        //Fetch the list of services and bookings
         $services = $this->BookingsStylists->Stylists->Services->find('list')->toArray();
         $bookings = $this->BookingsStylists->Bookings->find('list', limit: 200)->all();
-        // Pass the data to the view
+        //Pass the data to the view
         $this->set(compact('bookingsStylist', 'bookings', 'filterStylists', 'services', 'booking_id'));
     }
 
