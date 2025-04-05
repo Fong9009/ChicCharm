@@ -5,41 +5,6 @@
  * @var \Cake\Collection\CollectionInterface|string[] $bookings
  * @var \Cake\Collection\CollectionInterface|string[] $stylists
  */
-
-$this->Html->scriptBlock('
-    $(document).ready(function () {
-        function set30MinuteIntervals() {
-            var startTimeField = $("input[name=\'start_time\']");
-            var endTimeField = $("input[name=\'end_time\']");
-
-            // Restrict start time to 30-minute intervals
-            startTimeField.on("input", function () {
-                var value = startTimeField.val();
-                if (value) {
-                    var minutes = parseInt(value.split(":")[1], 10);
-                    if (minutes % 30 !== 0) {
-                        var newMinutes = (Math.round(minutes / 30) * 30) % 60;
-                        startTimeField.val(value.split(":")[0] + ":" + ("0" + newMinutes).slice(-2));
-                    }
-                }
-            });
-
-            // Restrict end time to 30-minute intervals
-            endTimeField.on("input", function () {
-                var value = endTimeField.val();
-                if (value) {
-                    var minutes = parseInt(value.split(":")[1], 10);
-                    if (minutes % 30 !== 0) {
-                        var newMinutes = (Math.round(minutes / 30) * 30) % 60;
-                        endTimeField.val(value.split(":")[0] + ":" + ("0" + newMinutes).slice(-2));
-                    }
-                }
-            });
-        }
-
-        set30MinuteIntervals();
-    });
-');
 ?>
 <div class="row">
     <aside class="column">
