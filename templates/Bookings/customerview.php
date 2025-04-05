@@ -53,11 +53,6 @@
                             <th><?= __('First Name') ?></th>
                             <th><?= __('Last Name') ?></th>
                             <th><?= __('Email') ?></th>
-                            <th><?= __('Password') ?></th>
-                            <th><?= __('Nonce') ?></th>
-                            <th><?= __('Nonce Expiry') ?></th>
-                            <th><?= __('Created') ?></th>
-                            <th><?= __('Modified') ?></th>
                             <th><?= __('Type') ?></th>
                             <th><?= __('Profile Picture') ?></th>
                             <th class="actions"><?= __('Actions') ?></th>
@@ -68,11 +63,6 @@
                             <td><?= h($stylist->first_name) ?></td>
                             <td><?= h($stylist->last_name) ?></td>
                             <td><?= h($stylist->email) ?></td>
-                            <td><?= h($stylist->password) ?></td>
-                            <td><?= h($stylist->nonce) ?></td>
-                            <td><?= h($stylist->nonce_expiry) ?></td>
-                            <td><?= h($stylist->created) ?></td>
-                            <td><?= h($stylist->modified) ?></td>
                             <td><?= h($stylist->type) ?></td>
                             <td><?= h($stylist->profile_picture) ?></td>
                             <td class="actions">
