@@ -10,7 +10,7 @@ use Cake\ORM\Entity;
  *
  * @property int $id
  * @property string|null $booking_name
- * @property \Cake\I18n\DateTime $booking_date
+ * @property \Cake\I18n\Date $booking_date
  * @property string $total_cost
  * @property string $remaining_cost
  * @property int|null $customer_id

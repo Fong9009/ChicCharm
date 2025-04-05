@@ -9,6 +9,7 @@ use Cake\ORM\Entity;
  * BookingsStylist Entity
  *
  * @property int $id
+ * @property \Cake\I18n\Date $stylist_date
  * @property \Cake\I18n\Time $start_time
  * @property \Cake\I18n\Time $end_time
  * @property string $selected_cost
@@ -30,6 +31,7 @@ class BookingsStylist extends Entity
      * @var array<string, bool>
      */
     protected array $_accessible = [
+        'stylist_date' => true,
         'start_time' => true,
         'end_time' => true,
         'selected_cost' => true,
