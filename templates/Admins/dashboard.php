@@ -75,21 +75,21 @@ $this->layout = 'default';
                 <div class="card">
                     <div class="card-header contractor-card-header p-3 pt-2 d-flex justify-content-between align-items-center">
                         <div class="text-left">
-                            <h4 class="mb-0 contractor-card-h4">Contractors</h4>
+                            <h4 class="mb-0 contractor-card-h4">Stylists</h4>
                         </div>
                         <i class="material-icons contractor-icon">group</i>
                     </div>
                     <div class="card-body contractor-card-body text-left">
                         <h3 class="customer-card-h3">Total Contractors</h3>
                         <div class="total-value-container">
-                            <p class="total-value contractor-card-count"><?= h($adminCount) ?></p>
+                            <p class="total-value contractor-card-count"><?= h($stylistCount) ?></p>
                         </div>
                     </div>
                     <hr class="dark horizontal my-0">
                     <div class="card-footer contractor-card-footer p-3">
                         <?= $this->Html->link(
                             'View Contractor Lists  <i class="material-icons">visibility</i>',
-                            ['controller' => 'Admins', 'action' => 'dashboard'],
+                            ['controller' => 'Stylists', 'action' => 'index'],
                             ['class' => 'btn contractor-button w-100', 'escape' => false]
                         ) ?>
                     </div>
