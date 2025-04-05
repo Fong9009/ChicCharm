@@ -122,9 +122,9 @@ class AdminsController extends AppController
         $contactsTable = $this->fetchTable('Contacts');
         $contactCount = $contactsTable->find()->count();
 
-        //Provides Contractor Count
-        //$contractorsTable = $this->fetchTable('Contractors');
-        //$contractorCount = $contractorsTable->find()->count();
+        //Provides Stylists Count
+        $stylistsTable = $this->fetchTable('Stylists');
+        $stylistCount = $stylistsTable->find()->count();
 
         //Provides Booking Count
         //$bookingsTable = $this->fetchTable('Bookings');
@@ -132,6 +132,6 @@ class AdminsController extends AppController
 
 
 
-        $this->set(compact('custCount', 'adminName','adminCount','contactCount'));
+        $this->set(compact('custCount', 'adminName', 'adminCount', 'contactCount', 'stylistCount'));
     }
 }

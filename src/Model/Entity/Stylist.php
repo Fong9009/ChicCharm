@@ -7,21 +7,24 @@ use Cake\ORM\Entity;
 use Authentication\PasswordHasher\DefaultPasswordHasher;
 
 /**
- * Customer Entity
+ * Stylist Entity
  *
  * @property int $id
  * @property string $first_name
  * @property string $last_name
  * @property string $email
  * @property string $password
- * @property string|null $nonce
+ * @property \Cake\I18n\DateTime|null $nonce
  * @property \Cake\I18n\DateTime|null $nonce_expiry
  * @property \Cake\I18n\DateTime|null $created
  * @property \Cake\I18n\DateTime|null $modified
  * @property string $type
  * @property string|null $profile_picture
+ *
+ * @property \App\Model\Entity\Booking[] $bookings
+ * @property \App\Model\Entity\Service[] $services
  */
-class Customer extends Entity
+class Stylist extends Entity
 {
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
@@ -43,6 +46,8 @@ class Customer extends Entity
         'modified' => true,
         'type' => true,
         'profile_picture' => true,
+        'bookings' => true,
+        'services' => true,
     ];
 
     /**

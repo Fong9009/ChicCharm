@@ -61,12 +61,12 @@ $this->layout = 'default';
                         <div class="align-items-end">
                             <?= $this->Html->link(
                                 'Create Booking',
-                                ['action' => 'edit', $customer->id],
-                                ['class' => 'btn btn-primary']
+                                ['controller' => 'Bookings', 'action' => 'customerbooking'],
+                                ['class' => 'btn btn-primary'],
                             ) ?>
                             <?= $this->Html->link(
                                 'View All Bookings',
-                                ['action' => 'edit', $customer->id],
+                                ['controller' => 'Bookings', 'action' => 'customerindex'],
                                 ['class' => 'btn btn-primary']
                             ) ?>
                         </div>
