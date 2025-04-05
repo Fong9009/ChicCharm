@@ -62,6 +62,7 @@ class BookingsStylistsController extends AppController
     //This function is to make sure that we can check that a stylist is available
     public function customerstylistadd($booking_id = null)
     {
+
         // Check if the booking ID is provided
         if (!$booking_id) {
             $this->Flash->error(__('Invalid booking missing booking ID'));
@@ -79,6 +80,7 @@ class BookingsStylistsController extends AppController
             $serviceId = $this->request->getData('service_id');
             $startTime = $this->request->getData('start_time');
             $endTime = $this->request->getData('end_time');
+
 
             //Stylist filter based on selected service
             //To ensure that we only get stylists that the client want
@@ -118,8 +120,9 @@ class BookingsStylistsController extends AppController
         $services = $this->BookingsStylists->Stylists->Services->find('list')->toArray();
         $bookings = $this->BookingsStylists->Bookings->find('list', limit: 200)->all();
         // Pass the data to the view
-        $this->set(compact('bookingsStylist', 'bookings', 'filterStylists', 'services'));
+        $this->set(compact('bookingsStylist', 'bookings', 'filterStylists', 'services', 'booking_id'));
     }
+
 
 
     /**
