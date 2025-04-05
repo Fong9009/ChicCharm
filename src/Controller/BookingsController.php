@@ -126,8 +126,12 @@ class BookingsController extends AppController
     }
 
     public function customerbooking(){
+        $loggedUser = $this->request->getAttribute('identity');
+
+
         $booking = $this->Bookings->newEmptyEntity();
         if ($this->request->is('post')) {
+            $booking->customer_id = $loggedUser->id;
             $booking = $this->Bookings->patchEntity($booking, $this->request->getData());
             if ($this->Bookings->save($booking)) {
                 $this->Flash->success(__('The booking has been saved.'));
