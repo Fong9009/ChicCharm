@@ -20,7 +20,8 @@ class BookingsStylistsFixture extends TestFixture
         $this->records = [
             [
                 'id' => 1,
-                'duration' => 1,
+                'start_time' => '07:00:22',
+                'end_time' => '07:00:22',
                 'selected_cost' => 1.5,
                 'booking_id' => 1,
                 'stylist_id' => 1,

@@ -9,7 +9,8 @@ use Cake\ORM\Entity;
  * BookingsStylist Entity
  *
  * @property int $id
- * @property int $duration
+ * @property \Cake\I18n\Time $start_time
+ * @property \Cake\I18n\Time $end_time
  * @property string $selected_cost
  * @property int $booking_id
  * @property int $stylist_id
@@ -29,7 +30,8 @@ class BookingsStylist extends Entity
      * @var array<string, bool>
      */
     protected array $_accessible = [
-        'duration' => true,
+        'start_time' => true,
+        'end_time' => true,
         'selected_cost' => true,
         'booking_id' => true,
         'stylist_id' => true,

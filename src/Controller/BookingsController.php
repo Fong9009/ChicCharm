@@ -24,6 +24,16 @@ class BookingsController extends AppController
         $this->set(compact('bookings'));
     }
 
+    public function customerindex()
+    {
+        $query = $this->Bookings->find()
+            ->contain(['Customers']);
+        $bookings = $this->paginate($query);
+
+        $this->set(compact('bookings'));
+    }
+
+
     /**
      * View method
      *
@@ -58,7 +68,6 @@ class BookingsController extends AppController
         $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
         $this->set(compact('booking', 'customers', 'stylists'));
     }
-
     /**
      * Edit method
      *
@@ -101,5 +110,48 @@ class BookingsController extends AppController
         }
 
         return $this->redirect(['action' => 'index']);
+    }
+
+    public function customerdelete($id = null)
+    {
+        $this->request->allowMethod(['post', 'delete']);
+        $booking = $this->Bookings->get($id);
+        if ($this->Bookings->delete($booking)) {
+            $this->Flash->success(__('The booking has been deleted.'));
+        } else {
+            $this->Flash->error(__('The booking could not be deleted. Please, try again.'));
+        }
+
+        return $this->redirect(['action' => 'customerindex']);
+    }
+
+    public function customerbooking(){
+        $booking = $this->Bookings->newEmptyEntity();
+        if ($this->request->is('post')) {
+            $booking = $this->Bookings->patchEntity($booking, $this->request->getData());
+            if ($this->Bookings->save($booking)) {
+                $this->Flash->success(__('The booking has been saved.'));
+
+                return $this->redirect(['action' => 'customerindex']);
+            }
+            $this->Flash->error(__('The booking could not be saved. Please, try again.'));
+        }
+        $customers = $this->Bookings->Customers->find('list', limit: 200)->all();
+        $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
+        $this->set(compact('booking', 'customers', 'stylists'));
+    }
+
+
+    /**
+     * View method
+     *
+     * @param string|null $id Booking id.
+     * @return \Cake\Http\Response|null|void Renders view
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     */
+    public function customerview($id = null)
+    {
+        $booking = $this->Bookings->get($id, contain: ['Customers', 'Stylists']);
+        $this->set(compact('booking'));
     }
 }

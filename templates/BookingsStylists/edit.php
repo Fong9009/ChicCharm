@@ -24,7 +24,8 @@
             <fieldset>
                 <legend><?= __('Edit Bookings Stylist') ?></legend>
                 <?php
-                    echo $this->Form->control('duration');
+                    echo $this->Form->control('start_time');
+                    echo $this->Form->control('end_time');
                     echo $this->Form->control('selected_cost');
                     echo $this->Form->control('booking_id', ['options' => $bookings]);
                     echo $this->Form->control('stylist_id', ['options' => $stylists]);

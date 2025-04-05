@@ -16,27 +16,66 @@
                 ['confirm' => __('Are you sure you want to delete # {0}?', $stylist->id), 'class' => 'side-nav-item']
             ) ?>
             <?= $this->Html->link(__('List Stylists'), ['action' => 'index'], ['class' => 'side-nav-item']) ?>
+            <?= $this->Html->link(__('Back To Dashboard'), ['controller' => 'Admins', 'action' => 'dashboard'], ['class' => 'side-nav-item']) ?>
         </div>
     </aside>
-    <div class="column column-80">
+    <div class="column">
         <div class="stylists form content">
             <?= $this->Form->create($stylist) ?>
             <fieldset>
-                <legend><?= __('Edit Stylist') ?></legend>
+                <legend><?= __('Add Stylist') ?></legend>
+                <div class="form-group mb-3">
+                    <?= $this->Form->control('first_name', [
+                        'label' => __('First Name'),
+                        'class' => 'form-control',
+                        'required' => true,
+                        'placeholder' => __('Enter first name'),
+                        'error' => ['class' => 'invalid-feedback'],
+                    ]); ?>
+                </div>
+                <div class="form-group mb-3">
+                    <?= $this->Form->control('last_name', [
+                        'label' => __('Last Name'),
+                        'class' => 'form-control',
+                        'required' => true,
+                        'placeholder' => __('Enter last name'),
+                        'error' => ['class' => 'invalid-feedback'],
+                    ]); ?>
+                </div>
+                <div class="form-group mb-3">
+                    <?= $this->Form->control('email', [
+                        'label' => __('Email'),
+                        'class' => 'form-control',
+                        'required' => true,
+                        'placeholder' => __('Enter email'),
+                        'error' => ['class' => 'invalid-feedback'],
+                    ]);?>
+                </div>
+                <div class="form-group mb-3">
+                    <?= $this->Form->control('password', [
+                        'label' => __('Password'),
+                        'class' => 'form-control',
+                        'required' => true,
+                        'placeholder' => __('Enter password'),
+                        'error' => ['class' => 'invalid-feedback'],
+                    ]); ?>
+                </div>
                 <?php
-                    echo $this->Form->control('first_name');
-                    echo $this->Form->control('last_name');
-                    echo $this->Form->control('email');
-                    echo $this->Form->control('password');
-                    echo $this->Form->control('nonce', ['empty' => true]);
-                    echo $this->Form->control('nonce_expiry', ['empty' => true]);
-                    echo $this->Form->control('type');
-                    echo $this->Form->control('profile_picture');
-                    echo $this->Form->control('bookings._ids', ['options' => $bookings]);
-                    echo $this->Form->control('services._ids', ['options' => $services]);
+                echo $this->Form->control('nonce', ['type' => 'hidden', 'empty' => true]);
+                echo $this->Form->control('nonce_expiry', ['type' => 'hidden', 'empty' => true]);
                 ?>
+                <?php if(empty($services)): ?>
+                    <p>No Services available at this time.</p>
+                <?php else: ?>
+                    <?= $this->Form->control('services._ids',[
+                        'label' => __('Services'),
+                        'type' => 'select',
+                        'multiple' => 'checkbox',
+                        'options' => $services,
+                    ]); ?>
+                <?php endif; ?>
             </fieldset>
-            <?= $this->Form->button(__('Submit')) ?>
+            <?= $this->Form->button(__('Submit'), ['class' => 'btn btn-primary']) ?>
             <?= $this->Form->end() ?>
         </div>
     </div>
