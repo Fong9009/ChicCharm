@@ -28,7 +28,7 @@ $appLocale = Configure::read('App.defaultLocale');
 
     <?= $this->Html->css('/landing-detail/css/styles.css') ?>
     <?= $this->Html->css(['fonts', 'cake', 'custom']) ?>
-
+    <?= $this->Html->script('custom') ?>
     <?= $this->fetch('meta') ?>
     <?= $this->fetch('css') ?>
     <?= $this->fetch('script') ?>

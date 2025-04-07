@@ -20,7 +20,7 @@
 
 .contacts.index.content {
     width: 100%;
-    max-width: 1200px;
+    max-width: 95vw;
     margin: 80px auto 20px;
     padding: 20px;
 }
@@ -411,7 +411,7 @@ body {
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 100%;
     margin: 0 auto;
     padding: 0 15px;
 }
@@ -483,10 +483,6 @@ body {
 }
 
 /* Contacts View Styling */
-.contacts.index.content {
-    padding: 20px 0;
-}
-
 .contacts.index.content h1 {
     color: #333;
     margin-bottom: 30px;
@@ -1827,12 +1823,11 @@ body:not(.landing-page) #mainNav {
 }
 
 /* Update table cell styling for message content */
-.contacts.index.content td:nth-child(5) { /* Adjust the number based on your message column position */
-    min-width: 200px; /* Minimum width to prevent squishing */
-    max-width: 300px; /* Maximum width to prevent stretching */
-    overflow-wrap: break-word; /* Breaks long words */
-    word-break: break-word; /* Breaks words at appropriate points */
-    line-height: 1.5; /* Better line spacing for readability */
+.contacts.index.content td:nth-child(5) { 
+    max-width: 300px;
+    overflow-wrap: break-word;
+    word-break: break-word; 
+    line-height: 1.5; 
 }
 
 /* Ensure table doesn't break layout on small screens */
@@ -1842,7 +1837,69 @@ body:not(.landing-page) #mainNav {
 }
 
 /* Adjust other columns to balance the layout */
-.contacts.index.content th:not(:nth-child(5)),
-.contacts.index.content td:not(:nth-child(5)) {
-    white-space: nowrap; /* Keep other columns from wrapping */
+.contacts.index.content th:not(:nth-child(3)):not(:nth-child(5)), 
+.contacts.index.content td:not(:nth-child(3)):not(:nth-child(5)) { 
+    white-space: nowrap; 
+}
+
+/* Email column specific styling */
+.contacts.index.content td:nth-child(3) { 
+    overflow-wrap: break-word;
+    word-break: break-all; 
+    min-width: 150px; 
+    max-width: 250px; 
+}
+
+/* Search and Sort/Filter Container */
+.search-filter-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 20px;
+}
+
+.search-box {
+    flex: 1;
+    max-width: 400px;
+}
+
+.filter-box {
+    min-width: 200px;
+}
+
+.search-box .input-group {
+    display: flex;
+    gap: 10px; /* Spacing between input and button */
+}
+
+.search-box .form-control {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.search-box .btn-primary {
+    padding: 8px 16px;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    flex-shrink: 0; /* Prevent button from shrinking */
+}
+
+.search-box .btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.filter-box .form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
 } 

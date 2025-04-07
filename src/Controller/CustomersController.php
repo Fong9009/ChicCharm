@@ -74,44 +74,31 @@ class CustomersController extends AppController
      */
     public function index()
     {
+        // Allow sorting by specific fields
+        $this->paginate = [
+            'order' => ['created' => 'DESC'] 
+        ];
+        
         $query = $this->Customers->find();
         
-        // Handle search
-        if ($this->request->getQuery('search')) {
-            $search = $this->request->getQuery('search');
+        // Search functionality
+        $search = $this->request->getQuery('search');
+        if ($search) {
             $query->where([
                 'OR' => [
                     'first_name LIKE' => '%' . $search . '%',
                     'last_name LIKE' => '%' . $search . '%',
                     'email LIKE' => '%' . $search . '%',
-                    'phone LIKE' => '%' . $search . '%',
                 ]
             ]);
         }
         
-        // Handle filters
-        if ($this->request->getQuery('filter')) {
-            $filter = $this->request->getQuery('filter');
-            switch ($filter) {
-                case 'recent':
-                    $query->order(['created' => 'DESC']);
-                    break;
-                case 'alphabetical':
-                    $query->order(['last_name' => 'ASC', 'first_name' => 'ASC']);
-                    break;
-                case 'oldest':
-                    $query->order(['created' => 'ASC']);
-                    break;
-                case 'email':
-                    $query->order(['email' => 'ASC']);
-                    break;
-                case 'phone':
-                    $query->order(['phone' => 'ASC']);
-                    break;
-            }
-        }
+        // Filter functionality (using the dropdown)
+        $filter = $this->request->getQuery('filter');
         
+        // Pagination applies sorting based on request or default
         $customers = $this->paginate($query);
+        
         $this->set(compact('customers'));
     }
 

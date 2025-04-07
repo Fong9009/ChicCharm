@@ -7,43 +7,7 @@
 $this->Html->css('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css', ['block' => true]);
 $this->Html->script('https://code.jquery.com/jquery-3.6.0.min.js', ['block' => true]);
 $this->Html->css('custom', ['block' => true]);
-
-// JavaScript for dropdown functionality
-$this->Html->scriptBlock('
-    document.addEventListener("DOMContentLoaded", function() {
-        // Close dropdowns when clicking outside
-        window.onclick = function(event) {
-            if (!event.target.matches(".dropdown-toggle")) {
-                var dropdowns = document.getElementsByClassName("dropdown-content");
-                for (var i = 0; i < dropdowns.length; i++) {
-                    var openDropdown = dropdowns[i];
-                    if (openDropdown.classList.contains("show")) {
-                        openDropdown.classList.remove("show");
-                    }
-                }
-            }
-        }
-        
-        // Toggle dropdown
-        var toggles = document.getElementsByClassName("dropdown-toggle");
-        for (var i = 0; i < toggles.length; i++) {
-            toggles[i].addEventListener("click", function(event) {
-                event.stopPropagation();
-                var content = this.nextElementSibling;
-                var allDropdowns = document.getElementsByClassName("dropdown-content");
-                
-                // Close all other dropdowns
-                for (var j = 0; j < allDropdowns.length; j++) {
-                    if (allDropdowns[j] !== content) {
-                        allDropdowns[j].classList.remove("show");
-                    }
-                }
-                
-                content.classList.toggle("show");
-            });
-        }
-    });
-', ['block' => true]);
+$this->Html->script('custom', ['block' => true]); 
 ?>
 <div class="row">
     <aside class="column">
@@ -55,6 +19,33 @@ $this->Html->scriptBlock('
     <div class="contacts index content">
         <h3><?= __('Active Messages') ?></h3>
         <div class="table-responsive">
+            <div class="search-filter-container">
+                <div class="search-box">
+                    <?= $this->Form->create(null, ['type' => 'get', 'class' => 'search-form']) ?>
+                    <div class="input-group">
+                        <?= $this->Form->control('search', [
+                            'label' => false,
+                            'class' => 'form-control',
+                            'placeholder' => 'Search...',
+                            'value' => $this->request->getQuery('search')
+                        ]) ?>
+                    </div>
+                    <?= $this->Form->end() ?>
+                </div>
+                
+                <div class="filter-box">
+                    <?= $this->Form->create(null, ['type' => 'get', 'class' => 'filter-form']) ?>
+                    <?= $this->Form->select('filter', [
+                        '' => 'All Messages',
+                        'replied' => 'Replied',
+                        'not_replied' => 'Not Replied'
+                    ], [
+                        'class' => 'form-control',
+                        'value' => $this->request->getQuery('filter'),
+                    ]) ?>
+                    <?= $this->Form->end() ?>
+                </div>
+            </div>
             <table>
                 <thead>
                     <tr>
