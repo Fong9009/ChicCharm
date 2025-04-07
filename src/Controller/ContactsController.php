@@ -27,10 +27,45 @@ class ContactsController extends AppController
      */
     public function index()
     {
-        $query = $this->Contacts->find()
-            ->where(['is_archived' => false]);
-        $contacts = $this->paginate($query);
+        // Allow sorting by specific fields
+        $this->paginate = [
+            'order' => ['created' => 'DESC']
+        ];
 
+        $query = $this->Contacts->find()
+            ->where(['is_archived' => false]); 
+        
+        // Search functionality
+        $search = $this->request->getQuery('search');
+        if ($search) {
+            $query->where([
+                'OR' => [
+                    'first_name LIKE' => '%' . $search . '%',
+                    'last_name LIKE' => '%' . $search . '%',
+                    'email LIKE' => '%' . $search . '%',
+                    'phone_number LIKE' => '%' . $search . '%',
+                    'message LIKE' => '%' . $search . '%',
+                ]
+            ]);
+        }
+        
+        // Filter functionality (using the dropdown)
+        $filter = $this->request->getQuery('filter');
+        if ($filter) {
+            switch ($filter) {
+                case 'replied':
+                    $query->where(['replied' => true]);
+                    break;
+                case 'not_replied':
+                    $query->where(['replied' => false]);
+                    break;
+                // No 'default' needed as '' means 'All Messages' (no extra where clause)
+            }
+        }
+        
+        // Pagination applies sorting based on request or default
+        $contacts = $this->paginate($query);
+        
         $this->set(compact('contacts'));
     }
 

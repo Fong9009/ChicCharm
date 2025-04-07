@@ -18,7 +18,7 @@ $this->layout = 'publiclayout';
             <?= $this->fetch('title') ?>
         </title>
     </head>
-    <body id="page-top" class="landing-page">
+    <body id="page-top">
         <!-- Masthead-->
         <header class="masthead"
                 style="background-image: url('<?= $this->Url->image('bg-mastheadv2.jpg')?>');

@@ -19,7 +19,8 @@ $titleDescription = 'Landing Page';
     <?= $this->Html->meta('icon') ?>
     <?= $this->Html->css('/landing-detail/css/styles.css') ?>
     <?= $this->Html->css(['fonts', 'cake', 'custom']) ?>
-
+    <?= $this->Html->script('custom') ?>
+    
     <?= $this->fetch('meta') ?>
     <?= $this->fetch('css') ?>
     <?= $this->fetch('script') ?>
@@ -134,7 +135,7 @@ $titleDescription = 'Landing Page';
         </div>
     </div>
 </nav>
-<body>
+<body class="landing-page">
 <main>
     <div class="container mt-4">
         <?= $this->Flash->render() ?>

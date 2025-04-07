@@ -3,12 +3,41 @@
  * @var \App\View\AppView $this
  * @var iterable<\App\Model\Entity\Admin> $admins
  */
+$this->Html->css('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css', ['block' => true]);
+$this->Html->script('https://code.jquery.com/jquery-3.6.0.min.js', ['block' => true]);
+$this->Html->css('custom', ['block' => true]);
+$this->Html->script('custom', ['block' => true]); 
 ?>
 <div class="contacts index content">
     <h3>
         <?= __('Admins List') ?>
     </h3>
     <div class="table-responsive">
+        <div class="search-filter-container">
+            <div class="search-box">
+                <?= $this->Form->create(null, ['type' => 'get', 'class' => 'search-form']) ?>
+                <div class="input-group">
+                    <?= $this->Form->control('search', [
+                        'label' => false,
+                        'class' => 'form-control',
+                        'placeholder' => 'Search...',
+                        'value' => $this->request->getQuery('search')
+                    ]) ?>
+                </div>
+                <?= $this->Form->end() ?>
+            </div>
+            
+            <div class="filter-box">
+                <?= $this->Form->create(null, ['type' => 'get', 'class' => 'filter-form']) ?>
+                <?= $this->Form->select('filter', [
+                    '' => 'All Users',
+                ], [
+                    'class' => 'form-control',
+                    'value' => $this->request->getQuery('filter')
+                ]) ?>
+                <?= $this->Form->end() ?>
+            </div>
+        </div>
         <table>
             <thead>
                 <tr>
