@@ -18,7 +18,7 @@ $titleDescription = 'Landing Page';
 
     <?= $this->Html->meta('icon') ?>
     <?= $this->Html->css('/landing-detail/css/styles.css') ?>
-    <?= $this->Html->css(['fonts', 'cake']) ?>
+    <?= $this->Html->css(['fonts', 'cake', 'custom']) ?>
 
     <?= $this->fetch('meta') ?>
     <?= $this->fetch('css') ?>

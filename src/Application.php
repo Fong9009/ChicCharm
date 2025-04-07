@@ -163,8 +163,6 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
         return $authenticationService;
     }
 
-
-
     /**
      * Register application container services.
      *

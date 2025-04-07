@@ -237,7 +237,7 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
 <!-- Bootstrap core JS-->
 <?= $this->Html->script('https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js') ?>
 <?= $this->Html->script('https://cdnjs.cloudflare.com/ajax/libs/SimpleLightbox/2.1.0/simpleLightbox.min.js') ?>
-<?= $this->Html->script('/landing-detail/js/scripts.js') ?>
+<?= $this->Html->script('landing-detail/js/scripts.js', ['block' => true]) ?>
 
 <!-- Show dropdown on hover -->
 <style>

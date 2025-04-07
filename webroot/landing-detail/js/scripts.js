@@ -56,4 +56,74 @@ window.addEventListener('DOMContentLoaded', event => {
         elements: '#portfolio a.portfolio-box'
     });
 
+    // Add this to your JavaScript file or inline script
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropdowns = document.querySelectorAll('#mainNav .dropdown');
+        
+        dropdowns.forEach(dropdown => {
+            const toggle = dropdown.querySelector('.dropdown-toggle');
+            
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Close other dropdowns
+                dropdowns.forEach(d => {
+                    if (d !== dropdown) {
+                        d.classList.remove('show');
+                        d.querySelector('.dropdown-menu').classList.remove('show');
+                    }
+                });
+                
+                // Toggle current dropdown
+                dropdown.classList.toggle('show');
+                dropdown.querySelector('.dropdown-menu').classList.toggle('show');
+            });
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.dropdown')) {
+                dropdowns.forEach(d => {
+                    d.classList.remove('show');
+                    d.querySelector('.dropdown-menu').classList.remove('show');
+                });
+            }
+        });
+    });
+    
+    // JavaScript for dropdown functionality
+    document.addEventListener("DOMContentLoaded", function() {
+        // Close dropdowns when clicking outside
+        window.onclick = function(event) {
+            if (!event.target.matches(".dropdown-toggle")) {
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains("show")) {
+                        openDropdown.classList.remove("show");
+                    }
+                }
+            }
+        }
+        
+        // Toggle dropdown
+        var toggles = document.getElementsByClassName("dropdown-toggle");
+        for (var i = 0; i < toggles.length; i++) {
+            toggles[i].addEventListener("click", function(event) {
+                event.stopPropagation();
+                var content = this.nextElementSibling;
+                var allDropdowns = document.getElementsByClassName("dropdown-content");
+                
+                // Close all other dropdowns
+                for (var j = 0; j < allDropdowns.length; j++) {
+                    if (allDropdowns[j] !== content) {
+                        allDropdowns[j].classList.remove("show");
+                    }
+                }
+                
+                content.classList.toggle("show");
+            });
+        }
+    });
 });

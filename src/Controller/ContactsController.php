@@ -27,10 +27,69 @@ class ContactsController extends AppController
      */
     public function index()
     {
-        $query = $this->Contacts->find();
+        $query = $this->Contacts->find()
+            ->where(['is_archived' => false]);
         $contacts = $this->paginate($query);
 
         $this->set(compact('contacts'));
+    }
+
+    /**
+     * Archive Index method
+     *
+     * @return \Cake\Http\Response|null|void Renders view
+     */
+    public function archiveIndex()
+    {
+        $query = $this->Contacts->find()
+            ->where(['is_archived' => true]);
+        $contacts = $this->paginate($query);
+
+        $this->set(compact('contacts'));
+    }
+
+    /**
+     * Archive method
+     *
+     * @param string|null $id Contact id.
+     * @return \Cake\Http\Response|null Redirects to index.
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     */
+    public function archive($id = null)
+    {
+        $this->request->allowMethod(['post']);
+        $contact = $this->Contacts->get($id);
+        $contact->is_archived = true;
+        
+        if ($this->Contacts->save($contact)) {
+            $this->Flash->success(__('The contact has been archived.'));
+        } else {
+            $this->Flash->error(__('The contact could not be archived. Please, try again.'));
+        }
+
+        return $this->redirect(['action' => 'index']);
+    }
+
+    /**
+     * Restore method
+     *
+     * @param string|null $id Contact id.
+     * @return \Cake\Http\Response|null Redirects to archive index.
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     */
+    public function restore($id = null)
+    {
+        $this->request->allowMethod(['post']);
+        $contact = $this->Contacts->get($id);
+        $contact->is_archived = false;
+        
+        if ($this->Contacts->save($contact)) {
+            $this->Flash->success(__('The contact has been restored.'));
+        } else {
+            $this->Flash->error(__('The contact could not be restored. Please, try again.'));
+        }
+
+        return $this->redirect(['action' => 'archiveIndex']);
     }
 
     /**
