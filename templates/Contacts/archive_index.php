@@ -1,9 +1,10 @@
 <?php
 /**
  * @var \App\View\AppView $this
- * @var \Cake\Collection\CollectionInterface|array<\App\Model\Entity\Contact> $contacts
+ * @var iterable<\App\Model\Entity\Contact> $contacts
  */
 
+// Dropdown functionalityscript
 $this->Html->css('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css', ['block' => true]);
 $this->Html->script('https://code.jquery.com/jquery-3.6.0.min.js', ['block' => true]);
 $this->Html->css('custom', ['block' => true]);
@@ -49,11 +50,11 @@ $this->Html->scriptBlock('
     <aside class="column">
         <div class="side-nav">
             <h4 class="heading"><?= __('Actions') ?></h4>
-            <?= $this->Html->link(__('Archived Messages'), ['action' => 'archiveIndex'], ['class' => 'side-nav-item']) ?>
+            <?= $this->Html->link(__('Back to Active Messages'), ['action' => 'index'], ['class' => 'side-nav-item']) ?>
         </div>
     </aside>
     <div class="contacts index content">
-        <h3><?= __('Active Messages') ?></h3>
+        <h3><?= __('Archived Messages') ?></h3>
         <div class="table-responsive">
             <table>
                 <thead>
@@ -63,7 +64,8 @@ $this->Html->scriptBlock('
                         <th><?= $this->Paginator->sort('email') ?></th>
                         <th><?= $this->Paginator->sort('phone_number') ?></th>
                         <th><?= $this->Paginator->sort('message') ?></th>
-                        <th><?= $this->Paginator->sort('sent_at') ?></th>
+                        <th><?= $this->Paginator->sort('created') ?></th>
+                        <th><?= $this->Paginator->sort('modified') ?></th>
                         <th><?= $this->Paginator->sort('replied') ?></th>
                         <th><?= __('Actions') ?></th>
                     </tr>
@@ -77,15 +79,14 @@ $this->Html->scriptBlock('
                         <td><?= h($contact->phone_number) ?></td>
                         <td><?= h($contact->message) ?></td>
                         <td><?= h($contact->created) ?></td>
+                        <td><?= h($contact->modified) ?></td>
                         <td><?= $contact->replied ? __('Yes') : __('No') ?></td>
                         <td class="actions">
                             <div class="dropdown">
                                 <button class="dropdown-toggle"><i class="fas fa-chevron-right"></i></button>
                                 <div class="dropdown-content">
                                     <?= $this->Html->link(__('View'), ['action' => 'view', $contact->id]) ?>
-                                    <?= $this->Html->link(__('Edit'), ['action' => 'edit', $contact->id]) ?>
-                                    <?= $this->Html->link(__('Email'), ['action' => 'reply', $contact->id]) ?>
-                                    <?= $this->Form->postLink(__('Archive'), ['action' => 'archive', $contact->id], ['confirm' => __('Are you sure you want to archive # {0}?', $contact->id)]) ?>
+                                    <?= $this->Form->postLink(__('Restore'), ['action' => 'restore', $contact->id], ['confirm' => __('Are you sure you want to restore this message?')]) ?>
                                     <?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $contact->id], ['confirm' => __('Are you sure you want to delete # {0}?', $contact->id), 'class' => 'text-danger']) ?>
                                 </div>
                             </div>
@@ -107,4 +108,3 @@ $this->Html->scriptBlock('
         </div>
     </div>
 </div>
-

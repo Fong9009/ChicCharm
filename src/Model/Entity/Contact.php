@@ -15,6 +15,7 @@ use Cake\ORM\Entity;
  * @property string $phone_number
  * @property string $message
  * @property bool $replied
+ * @property bool $is_archived
  */
 class Contact extends Entity
 {
@@ -34,5 +35,6 @@ class Contact extends Entity
         'phone_number' => true,
         'message' => true,
         'replied' => true,
+        'is_archived' => true,
     ];
 }
