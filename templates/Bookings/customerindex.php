@@ -19,24 +19,20 @@
         <table>
             <thead>
                 <tr>
-                    <th><?= $this->Paginator->sort('id') ?></th>
                     <th><?= $this->Paginator->sort('booking_name') ?></th>
                     <th><?= $this->Paginator->sort('booking_date') ?></th>
                     <th><?= $this->Paginator->sort('total_cost') ?></th>
                     <th><?= $this->Paginator->sort('remaining_cost') ?></th>
-                    <th><?= $this->Paginator->sort('customer_id') ?></th>
                     <th class="actions"><?= __('Actions') ?></th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($bookings as $booking): ?>
                 <tr>
-                    <td><?= $this->Number->format($booking->id) ?></td>
                     <td><?= h($booking->booking_name)?></td>
                     <td><?= h($booking->booking_date) ?></td>
                     <td><?= $this->Number->format($booking->total_cost) ?></td>
                     <td><?= $this->Number->format($booking->remaining_cost) ?></td>
-                    <td><?= $booking->hasValue('customer') ? $this->Html->link($booking->customer->first_name, ['controller' => 'Customers', 'action' => 'view', $booking->customer->id]) : '' ?></td>
                     <td class="actions">
                         <?= $this->Html->link(__('View'), ['action' => 'customerview', $booking->id], ['class' => 'button']) ?>
                         <?= $this->Html->link(__('Add Stylist'), ['controller' => 'BookingsStylists', 'action' => 'customerstylistadd', $booking->id], ['class' => 'button']) ?>
