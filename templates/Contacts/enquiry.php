@@ -4,30 +4,40 @@
  * @var \App\Model\Entity\Contact $contact
  */
 ?>
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="enquiry-form">
-                <h2>Enquiry Form</h2>
-                <?= $this->Form->create($contact) ?>
+<div class="form-wrapper">
+    <div class="contacts form content">
+        <h2>Contact Us</h2>
+        <p class="text-center mb-4">We'd love to hear from you. Please fill out the form below.</p>
+        <?= $this->Form->create($contact) ?>
+        <div class="row">
+            <div class="col-md-6">
                 <?= $this->Form->control('first_name', [
                     'label' => 'First Name',
                     'class' => 'form-control',
                     'required' => true,
                     'placeholder' => 'Enter your first name',
                 ]) ?>
+            </div>
+            <div class="col-md-6">
                 <?= $this->Form->control('last_name', [
                     'label' => 'Last Name',
                     'class' => 'form-control',
                     'required' => true,
                     'placeholder' => 'Enter your last name',
                 ]) ?>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
                 <?= $this->Form->control('email', [
                     'label' => 'Email',
                     'class' => 'form-control',
                     'required' => true,
                     'placeholder' => 'Enter your email',
+                    'type' => 'email'
                 ]) ?>
+            </div>
+            <div class="col-md-6">
                 <?= $this->Form->control('phone_number', [
                     'label' => 'Phone Number',
                     'class' => 'form-control',
@@ -36,18 +46,22 @@
                     'title' => 'Please enter a valid 10-digit phone number',
                     'placeholder' => 'Enter your 10-digit phone number',
                 ]) ?>
-                <?= $this->Form->control('message', [
-                    'label' => 'Message',
-                    'class' => 'form-control',
-                    'required' => true,
-                    'rows' => 5,
-                    'placeholder' => 'Enter your message',
-                ]) ?>
-                <?= $this->Recaptcha->display(['class' => 'mb-3'])?>
-                <?= $this->Form->button(__('Submit'), ['class' => 'submit-button']) ?>
-                <?= $this->Form->end() ?>
             </div>
         </div>
+        <?= $this->Form->control('message', [
+            'label' => 'Message',
+            'class' => 'form-control',
+            'required' => true,
+            'rows' => 5,
+            'placeholder' => 'Enter your message',
+        ]) ?>
+        <div class="text-center mt-4">
+            <?= $this->Recaptcha->display(['class' => 'mb-3 d-flex justify-content-center'])?>
+            <?= $this->Form->button(__('Submit Enquiry'), [
+                'class' => 'submit-button mt-3'
+            ]) ?>
+        </div>
+        <?= $this->Form->end() ?>
     </div>
 </div>
 

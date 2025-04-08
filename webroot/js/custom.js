@@ -1,33 +1,147 @@
 document.addEventListener("DOMContentLoaded", function() {
-    // Close dropdowns when clicking outside
-    window.onclick = function(event) {
-        if (!event.target.matches(".dropdown-toggle")) {
-            var dropdowns = document.getElementsByClassName("dropdown-content");
-            for (var i = 0; i < dropdowns.length; i++) {
-                var openDropdown = dropdowns[i];
-                if (openDropdown.classList.contains("show")) {
-                    openDropdown.classList.remove("show");
+    // Track input method
+    let isKeyboardUser = false;
+    
+    // Detect keyboard usage
+    document.addEventListener('keydown', function() {
+        isKeyboardUser = true;
+    });
+    
+    // Detect mouse usage
+    document.addEventListener('mousedown', function() {
+        isKeyboardUser = false;
+    });
+
+    // Smooth scrolling 
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+            
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+        });
+    });
+
+    // Dropdown functionality
+    const dropdowns = document.querySelectorAll('.dropdown');
+    
+    dropdowns.forEach(dropdown => {
+        const toggle = dropdown.querySelector('.dropdown-toggle');
+        const menu = dropdown.querySelector('.dropdown-menu');
+        
+        if (toggle && menu) {
+            // Click handler
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleDropdown(dropdown);
+            });
+
+            // Hover support
+            dropdown.addEventListener('mouseenter', function() {
+                if (window.innerWidth > 768 && !isKeyboardUser) { 
+                    toggleDropdown(dropdown, true);
                 }
+            });
+
+            dropdown.addEventListener('mouseleave', function() {
+                if (window.innerWidth > 768 && !isKeyboardUser) { 
+                    toggleDropdown(dropdown, false);
+                }
+            });
+
+            // Keyboard navigation
+            toggle.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleDropdown(dropdown);
+                } else if (e.key === 'Escape') {
+                    closeAllDropdowns();
+                }
+            });
+
+            // Handle keyboard navigation within dropdown menu
+            menu.addEventListener('keydown', function(e) {
+                if (!isKeyboardUser) return; // Only handle keyboard navigation for keyboard users
+                
+                const items = menu.querySelectorAll('a, button');
+                const currentIndex = Array.from(items).indexOf(document.activeElement);
+                
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    const nextIndex = (currentIndex + 1) % items.length;
+                    items[nextIndex].focus();
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    const prevIndex = (currentIndex - 1 + items.length) % items.length;
+                    items[prevIndex].focus();
+                } else if (e.key === 'Escape') {
+                    closeAllDropdowns();
+                    toggle.focus();
+                }
+            });
+        }
+    });
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.dropdown')) {
+            closeAllDropdowns();
+        }
+    });
+
+    // Handle window resize
+    window.addEventListener('resize', function() {
+        if (window.innerWidth <= 768) {
+            closeAllDropdowns();
+        }
+    });
+
+    // Helper functions
+    function toggleDropdown(dropdown, forceOpen = null) {
+        const isOpen = dropdown.classList.contains('show');
+        const shouldOpen = forceOpen !== null ? forceOpen : !isOpen;
+
+        if (shouldOpen) {
+            // Close other dropdowns first
+            closeAllDropdowns();
+            
+            // Open this dropdown
+            dropdown.classList.add('show');
+            const menu = dropdown.querySelector('.dropdown-menu');
+            if (menu) {
+                menu.classList.add('show');
+                // Focus first item when opening with keyboard
+                if (isKeyboardUser) {
+                    const firstItem = menu.querySelector('a, button');
+                    if (firstItem) {
+                        firstItem.focus();
+                    }
+                }
+            }
+        } else {
+            dropdown.classList.remove('show');
+            const menu = dropdown.querySelector('.dropdown-menu');
+            if (menu) {
+                menu.classList.remove('show');
             }
         }
     }
-    
-    // Toggle dropdown
-    var toggles = document.getElementsByClassName("dropdown-toggle");
-    for (var i = 0; i < toggles.length; i++) {
-        toggles[i].addEventListener("click", function(event) {
-            event.stopPropagation();
-            var content = this.nextElementSibling;
-            var allDropdowns = document.getElementsByClassName("dropdown-content");
-            
-            // Close all other dropdowns
-            for (var j = 0; j < allDropdowns.length; j++) {
-                if (allDropdowns[j] !== content) {
-                    allDropdowns[j].classList.remove("show");
-                }
+
+    function closeAllDropdowns() {
+        dropdowns.forEach(dropdown => {
+            dropdown.classList.remove('show');
+            const menu = dropdown.querySelector('.dropdown-menu');
+            if (menu) {
+                menu.classList.remove('show');
             }
-            
-            content.classList.toggle("show");
         });
     }
 
@@ -53,7 +167,7 @@ document.addEventListener("DOMContentLoaded", function() {
     */
 
     // Client-side Dynamic Filtering
-    const searchInput = document.querySelector('.search-box input[name="search"]'); // Use correct selector
+    const searchInput = document.querySelector('.search-box input[name="search"]');
     if (!searchInput) return;
 
     let timeoutId;
@@ -65,7 +179,7 @@ document.addEventListener("DOMContentLoaded", function() {
         // Set a new timeout to delay the search
         timeoutId = setTimeout(() => {
             const searchTerm = e.target.value.toLowerCase();
-            const tableRows = document.querySelectorAll('table tbody tr'); // Target rows in the current table body
+            const tableRows = document.querySelectorAll('table tbody tr');
 
             tableRows.forEach(row => {
                 // Ignore the 'no results' message row if it exists
@@ -94,10 +208,9 @@ document.addEventListener("DOMContentLoaded", function() {
     // Function to update "no results" message
     function updateNoResults(rows) {
         const tbody = document.querySelector('table tbody');
-        if (!tbody) return; // Exit if tbody doesn't exist
+        if (!tbody) return;
         let visibleRows = 0;
         rows.forEach(row => {
-            // Only count non-message rows that are visible
             if (!row.classList.contains('no-results-message') && row.style.display !== 'none') {
                 visibleRows++;
             }
@@ -111,7 +224,6 @@ document.addEventListener("DOMContentLoaded", function() {
         if (visibleRows === 0) {
             const messageRow = document.createElement('tr');
             messageRow.className = 'no-results-message';
-            // Adjust colspan based on the actual number of columns in your table
             const colCount = document.querySelectorAll('table thead th').length;
             messageRow.innerHTML = `
                 <td colspan="${colCount}" style="text-align: center; padding: 20px;">
@@ -122,11 +234,18 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // Ensure sort dropdown still works (it submits the form, which is fine)
-    const sortSelect = document.querySelector('.filter-box select');
-    if (sortSelect) {
-        sortSelect.addEventListener('change', function() {
-            this.closest('form').submit();
+    // Contacts Index Functionality
+    const searchInputContacts = document.getElementById('searchInput');
+    if (searchInputContacts) {
+        const tableRows = document.querySelectorAll('tbody tr');
+
+        searchInputContacts.addEventListener('input', function(e) {
+            const searchText = e.target.value.toLowerCase();
+            
+            tableRows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchText) ? '' : 'none';
+            });
         });
     }
 });
