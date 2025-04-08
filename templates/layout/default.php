@@ -29,6 +29,8 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
     <!-- Google fonts-->
     <link href="https://fonts.googleapis.com/css?family=Merriweather+Sans:400,700" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic" rel="stylesheet" type="text/css" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
     <?= $this->Html->meta('icon') ?>
     <?= $this->Html->css('/landing-detail/css/styles.css') ?>
@@ -64,10 +66,27 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
                         <li class="nav-item">
                             <a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link"
-                               href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'index']) ?>"
-                            >Contact List</a></li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="enquiriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-envelope"></i>
+                                <span>Enquiries</span>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="enquiriesDropdown">
+                                <li>
+                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'index']) ?>">
+                                        <i class="fas fa-inbox"></i>
+                                        <span>Active Messages</span>
+                                    </a>
+                                </li>
+                                <li><div class="dropdown-divider"></div></li>
+                                <li>
+                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'archiveIndex']) ?>">
+                                        <i class="fas fa-archive"></i>
+                                        <span>Archived Messages</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link"
                                href="<?= $this->Url->build(['controller' => 'Customers', 'action' => 'index']) ?>"
@@ -75,28 +94,27 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Admin
+                                <i class="fas fa-user-shield"></i>
+                                <span>Admin</span>
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="adminDropdown">
                                 <li>
-                                    <a class="dropdown-item"
-                                       href="<?= $this->Url->build([
-                                           'controller' => 'Admins',
-                                           'action' => 'dashboard'])?>">Admin Dashboard
+                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'dashboard'])?>">
+                                        <i class="fas fa-tachometer-alt"></i>
+                                        <span>Admin Dashboard</span>
+                                    </a>
+                                </li>
+                                <li><div class="dropdown-divider"></div></li>
+                                <li>
+                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'index']) ?>">
+                                        <i class="fas fa-users-cog"></i>
+                                        <span>Admins List</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item"
-                                       href="<?= $this->Url->build([
-                                           'controller' => 'Admins',
-                                           'action' => 'index']) ?>">Admins List
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item"
-                                       href="<?= $this->Url->build([
-                                           'controller' => 'Admins',
-                                           'action' => 'add']) ?>">Add New Admin
+                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'add']) ?>">
+                                        <i class="fas fa-user-plus"></i>
+                                        <span>Add New Admin</span>
                                     </a>
                                 </li>
                             </ul>
@@ -104,13 +122,13 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
                     <?php } elseif ($identity->get('type') === 'customer') {
                         // Customer Navigation ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a>
+                            <a class="nav-link" href="/#about">About</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a>
+                            <a class="nav-link" href="/#services">Services</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a>
+                            <a class="nav-link" href="/#portfolio">Portfolio</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link"
@@ -140,13 +158,13 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
                 <?php } else {
                     // Public Navigation ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a>
+                        <a class="nav-link" href="#about">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a>
+                        <a class="nav-link" href="#services">Services</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a>
+                        <a class="nav-link" href="#portfolio">Portfolio</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= $this->Url->build('/contacts/enquiry') ?>">Contact Us</a>
@@ -169,14 +187,14 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
 </main>
 
 <!-- Footer -->
-<?php if ($isPublicPage) : ?>
 <footer id="footer" class="footer bg-black text-white py-5">
     <div class="container text-center">
         <div class="row justify-content-center">
             <!-- Newsletter Signup -->
             <div class="col-md-3">
-                <h5 class="text-light fw-bold">Sign Up for Our Newsletter</h5>
-                <form method="post" action="<?= $this->Url->build(['controller' => 'Newsletter', 'action' => 'subscribe']); ?>" id="ContactFooter" class="needs-confirmation">
+                <h5 class="text-light fw-bold mb-3">Sign Up for Our Newsletter</h5>
+                <p class="text-light mb-3">Be the first to get notified about upcoming products and deals</p>
+                <form method="post" action="<?= $this->Url->build(['controller' => 'Newsletter', 'action' => 'subscribe']); ?>" id="ContactFooter" class="needs-confirmation newsletter-signup">
                     <?= $this->Form->hidden('_csrfToken', ['value' => $this->request->getAttribute('csrfToken')]) ?>
                     <div class="input-group">
                         <input type="email" class="form-control" name="email" placeholder="Enter your email" required>
@@ -233,7 +251,6 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
         </div>
     </div>
 </footer>
-<?php endif; ?>
 
 <!-- Bootstrap core JS-->
 <?= $this->Html->script('https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js') ?>
