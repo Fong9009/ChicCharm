@@ -26,8 +26,10 @@ class BookingsController extends AppController
 
     public function customerindex()
     {
+        $customerId = $this->request->getAttribute('identity')->id;
         $query = $this->Bookings->find()
-            ->contain(['Customers']);
+            ->contain(['Customers'])
+            ->where(['Bookings.customer_id' => $customerId]);
         $bookings = $this->paginate($query);
 
         $this->set(compact('bookings'));
