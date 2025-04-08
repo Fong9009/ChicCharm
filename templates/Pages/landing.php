@@ -25,19 +25,21 @@ $this->layout = 'publiclayout';
                     background-size: cover; background-position: center;"
         >
             <div class="container px-4 px-lg-5 h-100">
-                <div class="row gx-3 gx-lg-5 h-100 align-items-center  text-start">
+                <div class="row gx-3 gx-lg-5 h-100 align-items-center text-start text-md-start">
                     <div class="col-lg-8 align-self-end">
-                        <h1 class="text-white font-weight-bold fade-in-title">
+                        <h1 class="text-white font-weight-bold fade-in-title text-center text-md-start">
                             Australia's Go-To For Fashion & Entertainment Services
                         </h1>
                         <hr class="w-100 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
                     </div>
                     <div class="col-lg-8 align-self-baseline">
-                        <p class="text-white-75 mb-5 fade-in-para">
+                        <p class="text-white-75 mb-5 fade-in-para text-center text-md-start">
                             Out with the old and in with the new, ChicCharm's diverse range of services are sure to
                             assist your needs in makeup artistry, wig styling, fashion design and hairstyling
                         </p>
-                        <a class="btn btn-primary btn-xl fade-in-para" href="#about">Discover the World of ChicCharm</a>
+                        <div class="text-center text-md-start">
+                            <a class="btn btn-primary btn-xl fade-in-para" href="#about">Discover the World of ChicCharm</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -63,7 +65,10 @@ $this->layout = 'publiclayout';
                         <hr class="divider divider-light" />
                     </div>
                     <div class="col-lg-8 d-flex justify-content-center">
-                    <img src="<?= $this->Url->image('model.jpg')?>" alt="Image Description" style="width: 1000px; height: auto;">
+                        <img src="<?= $this->Url->image('model.jpg')?>" 
+                             alt="Image Description" 
+                             class="img-fluid"
+                             style="max-width: 100%; height: auto; object-fit: contain;">
                     </div>
                 </div>
             </div>
@@ -93,7 +98,9 @@ $this->layout = 'publiclayout';
                     <div class="col-lg-3 mb-2 order-lg-2">
                         <img
                             src="<?= $this->Url->image('Michonne.jpg')?>"
-                            alt="Owner of ChicCharm Michonne" style="width: auto; height: 400px;"
+                            alt="Owner of ChicCharm Michonne" 
+                            class="img-fluid mx-auto d-block"
+                            style="width: 100%; max-width: 400px; height: auto; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
                         >
                     </div>
                 </div>
@@ -162,55 +169,64 @@ $this->layout = 'publiclayout';
         </section>
         <!-- Portfolio-->
         <div id="portfolio">
-            <div class="container-fluid p-0">
-                <div class="row g-0">
+            <div class="container-fluid">
+                <div class="row g-0 justify-content-center">
                     <!--Hair Styling Image-->
-                    <div class="col-lg-4 col-sm-6">
-                        <a class="portfolio-box"
-                           href="<?= $this->Url->image('portfolio/fullsize/hair.jpg')?>"
-                           title="Hair Styling"
-                        >
-                            <img class="img-fluid w-100"
-                                 src="<?= $this->Url->image('portfolio/thumbnails/hair.jpg')?>"
-                                 alt="Smaller Version of Hairstyling"
-                            />
-                            <div class="portfolio-box-caption">
-                                <div class="project-category text-white-50">Hair Styling</div>
-                                <div class="project-name">Styling for next show</div>
-                            </div>
-                        </a>
+                    <div class="col-12 col-sm-6 col-lg-4 p-2">
+                        <div class="portfolio-box">
+                            <a href="<?= $this->Url->image('portfolio/fullsize/hair.jpg')?>" 
+                               title="Hair Styling"
+                               class="d-block"
+                            >
+                                <img src="<?= $this->Url->image('portfolio/thumbnails/hair.jpg')?>"
+                                     alt="Smaller Version of Hairstyling"
+                                     class="img-fluid w-100"
+                                     style="aspect-ratio: 4/3; object-fit: cover;"
+                                />
+                                <div class="portfolio-box-caption">
+                                    <div class="project-category text-white-50">Hair Styling</div>
+                                    <div class="project-name">Styling for next show</div>
+                                </div>
+                            </a>
+                        </div>
                     </div>
                     <!--Make Up Image-->
-                    <div class="col-lg-4 col-sm-6">
-                        <a class="portfolio-box"
-                           href="<?= $this->Url->image('portfolio/fullsize/make.jpg')?>"
-                           title="Makeup"
-                        >
-                            <img class="img-fluid w-100"
-                                 src="<?= $this->Url->image('portfolio/thumbnails/make.jpg')?>"
-                                 alt="Makeup artist"
-                            />
-                            <div class="portfolio-box-caption">
-                                <div class="project-category text-white-50">Makeup</div>
-                                <div class="project-name">Makeup for next show</div>
-                            </div>
-                        </a>
+                    <div class="col-12 col-sm-6 col-lg-4 p-2">
+                        <div class="portfolio-box">
+                            <a href="<?= $this->Url->image('portfolio/fullsize/make.jpg')?>"
+                               title="Makeup"
+                               class="d-block"
+                            >
+                                <img src="<?= $this->Url->image('portfolio/thumbnails/make.jpg')?>"
+                                     alt="Makeup artist"
+                                     class="img-fluid w-100"
+                                     style="aspect-ratio: 4/3; object-fit: cover;"
+                                />
+                                <div class="portfolio-box-caption">
+                                    <div class="project-category text-white-50">Makeup</div>
+                                    <div class="project-name">Makeup for next show</div>
+                                </div>
+                            </a>
+                        </div>
                     </div>
                     <!--Stage Image-->
-                    <div class="col-lg-4 col-sm-6">
-                        <a class="portfolio-box"
-                           href="<?= $this->Url->image('portfolio/fullsize/stage.jpg')?>"
-                           title="Stage Show"
-                        >
-                            <img class="img-fluid w-100"
-                                 src="<?= $this->Url->image('portfolio/thumbnails/stage.jpg')?>"
-                                 alt="Stage Show Dance"
-                            />
-                            <div class="portfolio-box-caption">
-                                <div class="project-category text-white-50">Stage Shows</div>
-                                <div class="project-name">Stage show of dance</div>
-                            </div>
-                        </a>
+                    <div class="col-12 col-sm-6 col-lg-4 p-2">
+                        <div class="portfolio-box">
+                            <a href="<?= $this->Url->image('portfolio/fullsize/stage.jpg')?>"
+                               title="Stage Show"
+                               class="d-block"
+                            >
+                                <img src="<?= $this->Url->image('portfolio/thumbnails/stage.jpg')?>"
+                                     alt="Stage Show Dance"
+                                     class="img-fluid w-100"
+                                     style="aspect-ratio: 4/3; object-fit: cover;"
+                                />
+                                <div class="portfolio-box-caption">
+                                    <div class="project-category text-white-50">Stage Shows</div>
+                                    <div class="project-name">Stage show of dance</div>
+                                </div>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
