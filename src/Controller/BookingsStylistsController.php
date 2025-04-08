@@ -201,7 +201,7 @@ class BookingsStylistsController extends AppController
         $newStylistBooking->start_time = $startTime;
         $newStylistBooking->end_time = $endTime;
 
-        //Ensure still a Float
+        //Ensure still a Float and add to entity record
         $numberServicePrice = (float)$totalServicePrice;
         if (is_numeric($numberServicePrice)) {
             $newStylistBooking->selected_cost = number_format($numberServicePrice, 2);
