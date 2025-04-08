@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use Cake\I18n\DateTime;
+
 /**
  * BookingsStylists Controller
  *
@@ -59,7 +61,6 @@ class BookingsStylistsController extends AppController
         $this->set(compact('bookingsStylist', 'bookings', 'stylists'));
     }
 
-    //This function is to make sure that we can check that a stylist is available
     public function customerstylistadd($booking_id = null)
     {
 
@@ -76,10 +77,30 @@ class BookingsStylistsController extends AppController
         //Initialisation of the query Variable
         $query = null;
 
-        if ($this->request->is(['post'])) {
+        if ($this->request->is(['post']) && $this->request->getData('filter') === '1') {
             $serviceId = $this->request->getData('service_id');
             $startTime = $this->request->getData('start_time');
             $endTime = $this->request->getData('end_time');
+
+            //Verify there is a Service
+            if($serviceId === null || $serviceId === "") {
+                $this->Flash->error(__('Please select a service'));
+                return $this->redirect(['action' => 'customerstylistadd', $booking_id]);
+            }
+
+
+            //Makes sure that the time is valid
+            if ($startTime && $endTime) {
+                $startTimeValue = strtotime($startTime);
+                $endTimeValue = strtotime($endTime);
+                if ($endTimeValue <= $startTimeValue) {
+                    $this->Flash->error(__('End time must be later than start time.'));
+
+                    return $this->redirect(['action' => 'customerstylistadd', $booking_id]);
+                }
+            } else {
+                $this->Flash->error(__('Start or End times Cannot be blank'));
+            }
 
 
             //Stylist filter based on selected service
@@ -108,10 +129,20 @@ class BookingsStylistsController extends AppController
             });
         }
         $bookingsStylist = $this->BookingsStylists->newEmptyEntity();
-
         //If nothing was obtained such as no available contractor
         if ($query === null) {
             $query = null;
+        }
+
+        $startTime = $this->request->getData('start_time');
+        $endTime = $this->request->getData('end_time');
+        $serviceId = $this->request->getData('service_id');
+        $nameOfService = "";
+        $totalServicePrice = null;
+
+        if ($serviceId !== null && $serviceId !== "") {
+            $totalServicePrice = $this->calculateServiceCost($serviceId, $startTime, $endTime);
+            $nameOfService = $this->findServiceName($serviceId);
         }
 
         //Paginate the results if query is valid
@@ -120,10 +151,90 @@ class BookingsStylistsController extends AppController
         $services = $this->BookingsStylists->Stylists->Services->find('list')->toArray();
         $bookings = $this->BookingsStylists->Bookings->find('list', limit: 200)->all();
         //Pass the data to the view
-        $this->set(compact('bookingsStylist', 'bookings', 'filterStylists', 'services', 'booking_id'));
+        $this->set(compact(
+            'bookingsStylist',
+            'bookings',
+            'filterStylists',
+            'nameOfService',
+            'totalServicePrice',
+            'services',
+            'booking_id',
+        ));
     }
 
+    //Used to Calculate the cost of the service by the time it takes
+    private function calculateServiceCost($serviceId, $startTime, $endTime)
+    {
+        //Obtain the cost of the service Per hour
+        $servicesTable = $this->fetchTable('Services');
+        $service = $servicesTable->get($serviceId);
+        $serviceCost = $service->service_cost;
 
+        //Obtain the total cost
+        $startTimeValue = new DateTime($startTime);
+        $endTimeValue = new DateTime($endTime);
+        $difference = $endTimeValue->diff($startTimeValue);
+        $hours = $difference->h;
+        if ($difference->i > 0) {
+            $hours ++;
+        }
+
+        return number_format($hours * $serviceCost,2);
+    }
+
+    //Used to find the service name from given id of stylist
+    private function findServiceName($serviceId)
+    {
+        $servicesTable = $this->fetchTable('Services');
+        $service = $servicesTable->get($serviceId);
+        return $service->service_name;
+    }
+
+    //This is to add a stylist into the bookings Stylists Controller
+    public function addStylist($stylistId, $bookingId, $startTime, $endTime, $totalServicePrice)
+    {
+        // This is to add the stylist to
+        $booking = $this->BookingsStylists->Bookings->get($bookingId);
+        $newStylistBooking = $this->BookingsStylists->newEmptyEntity();
+        $newStylistBooking->booking_id = $bookingId;
+        $newStylistBooking->stylist_id = $stylistId;
+        $newStylistBooking->start_time = $startTime;
+        $newStylistBooking->end_time = $endTime;
+
+        //Ensure still a Float and add to entity record
+        $numberServicePrice = (float)$totalServicePrice;
+        if (is_numeric($numberServicePrice)) {
+            $newStylistBooking->selected_cost = number_format($numberServicePrice, 2);
+
+            $this->addPriceBooking($bookingId, $numberServicePrice);
+        }
+        $newStylistBooking->stylist_date = $booking->booking_date;
+
+        if ($this->BookingsStylists->save($newStylistBooking)) {
+            $this->Flash->success(__('Contractor added successfully.'));
+        } else {
+            $this->Flash->error(__('Failed to add contractor.'));
+        }
+
+        return $this->redirect(['action' => 'customerstylistadd', $bookingId]);
+    }
+
+    //Add the Price into the booking
+    private function addPriceBooking($bookingId, $serviceCost)
+    {
+        $bookingsTable = $this->fetchTable('Bookings');
+        $booking = $bookingsTable->get($bookingId);
+        $previousPrice = $booking->service_cost;
+        $updatedPrice = $previousPrice + $serviceCost;
+        $booking->service_cost = $updatedPrice;
+        $booking = $bookingsTable->patchEntity($booking, ['total_cost' => $updatedPrice]);
+
+        if ($bookingsTable->save($booking)) {
+            $this->Flash->success(__('Price Updated successfully.'));
+        } else {
+            $this->Flash->error(__('Failed to add price.'));
+        }
+    }
 
     /**
      * Edit method
