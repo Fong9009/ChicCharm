@@ -7,54 +7,50 @@
 $this->layout = 'login';
 $this->assign('title', 'Reset Password');
 ?>
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="login-form">
-                <h2>Reset Your Password</h2>
-                
-                <?= $this->Flash->render() ?>
-                
-                <?= $this->Form->create($user, ['class' => 'needs-confirmation mt-4']) ?>
-                
-                <div class="mb-4">
-                    <?= $this->Form->control('password', [
-                        'type' => 'password',
-                        'label' => 'New Password',
-                        'class' => 'form-control',
-                        'required' => true,
-                        'autofocus' => true,
-                        'value' => ''
-                    ]); ?>
-                </div>
-                
-                <div class="mb-4">
-                    <?= $this->Form->control('password_confirm', [
-                        'type' => 'password',
-                        'label' => 'Confirm New Password',
-                        'class' => 'form-control',
-                        'required' => true,
-                        'value' => ''
-                    ]); ?>
-                </div>
-                
-                <div class="password-requirements mb-4">
-                    <p class="text-muted small">Password requirements:</p>
-                    <ul class="text-muted small">
-                        <li>At least 8 characters long</li>
-                        <li>Must include uppercase and lowercase letters</li>
-                        <li>Must include at least one number</li>
-                    </ul>
-                </div>
-                
-                <?= $this->Form->button('Reset Password', ['class' => 'submit-button mb-3']) ?>
-                <?= $this->Form->end() ?>
-                
-                <div class="text-center mt-3">
-                    <p><?= $this->Html->link('Back to login', ['controller' => 'Auth', 'action' => 'login'], ['class' => 'btn btn-link']) ?></p>
-                </div>
-            </div>
+<div class="reset-password-wrapper">
+    <div class="reset-password-form">
+        <h2>Reset Your Password</h2>
+        <?= $this->Flash->render() ?>
+        <?= $this->Form->create($user) ?>
+        
+        <div class="input">
+            <?= $this->Form->control('password', [
+                'type' => 'password',
+                'label' => 'New Password',
+                'class' => 'form-control',
+                'required' => true,
+                'autofocus' => true,
+                'value' => '',
+                'placeholder' => 'Enter your new password'
+            ]); ?>
         </div>
+        
+        <div class="input">
+            <?= $this->Form->control('password_confirm', [
+                'type' => 'password',
+                'label' => 'Confirm New Password',
+                'class' => 'form-control',
+                'required' => true,
+                'value' => '',
+                'placeholder' => 'Confirm your new password'
+            ]); ?>
+        </div>
+        
+        <div class="password-requirements">
+            <p>Password requirements:</p>
+            <ul>
+                <li>At least 8 characters long</li>
+                <li>Must include uppercase and lowercase letters</li>
+                <li>Must include at least one number</li>
+            </ul>
+        </div>
+        
+        <?= $this->Form->button('Reset Password', ['class' => 'submit-button']) ?>
+        
+        <div class="text-center mt-3">
+            <?= $this->Html->link('Back to Login', ['controller' => 'Auth', 'action' => 'login'], ['class' => 'btn btn-link']) ?>
+        </div>
+        <?= $this->Form->end() ?>
     </div>
 </div>
 

@@ -1,3 +1,88 @@
+/* Update container styles */
+.container {
+    width: 100%;
+    max-width: 90% !important;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+@media (min-width: 992px) {
+    .container {
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+}
+
+/* Update navbar styles */
+#mainNav {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 1030;
+    background-color: #121211 !important;
+}
+
+/* Update form container styles */
+.enquiry-form {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.enquiry-form h2 {
+    color: #333;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* Form field spacing */
+.enquiry-form .input {
+    margin-bottom: 1.5rem;
+}
+
+.enquiry-form .form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.enquiry-form .form-control:focus {
+    border-color: #f4623a;
+    box-shadow: 0 0 0 0.2rem rgba(244, 98, 58, 0.25);
+}
+
+/* Submit button styling */
+.enquiry-form .submit-button {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #fff;
+    background-color: #f4623a;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.enquiry-form .submit-button:hover {
+    background-color: #d44d2d;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .enquiry-form {
+        padding: 1.5rem;
+    }
+}
+
 .wrapper {
     display: flex;
     flex-direction: column;
@@ -20,22 +105,24 @@
 
 .contacts.index.content {
     width: 100%;
-    max-width: 95vw;
+    max-width: 90%;
     margin: 80px auto 20px;
     padding: 20px;
 }
 
 .contacts.index.content table {
     width: 100%;
+    table-layout: auto;
     border-collapse: collapse;
     margin-bottom: 20px;
 }
 
 .contacts.index.content th, .contacts.index.content td {
+    padding: 12px;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
     border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-    box-sizing: border-box;
 }
 
 .contacts.index.content th {
@@ -52,73 +139,7 @@
 }
 
 .contacts.index.content .actions {
-    white-space: nowrap;
-    text-align: right;
-}
-
-.contacts.index.content .actions a,
-.contacts.index.content .actions button {
-    display: inline-block;
-    padding: 6px 12px;
-    margin: 0 2px;
-    border-radius: 4px;
-    font-size: 13px;
-    text-decoration: none;
-    color: white;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    background-color: #6c757d;
-}
-
-/* View button */
-.contacts.index.content .actions a:nth-child(1) {
-    background-color: #28a745;
-}
-
-/* Edit/Reply button */
-.contacts.index.content .actions a:nth-child(2) {
-    background-color: #007bff;
-}
-
-/* Email button */
-.contacts.index.content .actions a:nth-child(3) {
-    background-color: #6c757d;
-}
-
-/* Archive/Restore button */
-.contacts.index.content .actions a:nth-child(4) {
-    background-color: #ffc107;
-    color: #212529;
-}
-
-/* Delete button */
-.contacts.index.content .actions .text-danger {
-    background-color: #dc3545;
-    color: white;
-}
-
-.contacts.index.content .actions a:hover,
-.contacts.index.content .actions button:hover {
-    opacity: 0.85;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Adjust table column widths */
-.contacts.index.content table th:last-child,
-.contacts.index.content table td:last-child {
-    width: 50px;
-    min-width: 50px;
     text-align: center;
-}
-
-/* Remove old dropdown styles */
-.dropdown,
-.dropdown-content,
-.dropdown-toggle,
-.show {
-    all: unset;
 }
 
 .contacts.index.content h3 {
@@ -218,83 +239,123 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Login Form Styling */
+/* Login Form Wrapper */
+.login-wrapper {
+    background-color: #f8f9fa;
+    min-height: 75vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Login Form Container */
 .login-form {
     background: white;
-    padding: 30px;
+    padding: 2rem;
     border-radius: 15px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    margin-top: 80px;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
 }
 
 .login-form h2 {
-    color: white;
-    background: #121211;
-    margin: -30px -30px 30px -30px;
-    padding: 20px;
-    border-radius: 15px 15px 0 0;
+    color: #333;
+    margin-bottom: 1.5rem;
     text-align: center;
-    font-weight: normal;
+    font-weight: 600;
+}
+
+/* Form Fields */
+.login-form .input {
+    margin-bottom: 1.5rem;
 }
 
 .login-form .form-control {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 12px;
-    margin-bottom: 20px;
     width: 100%;
-    box-sizing: border-box;
+    padding: 0.75rem 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-.login-form label {
-    display: block;
-    margin-bottom: 8px;
-    color: #333;
-    font-size: 16px;
+.login-form .form-control:focus {
+    border-color: #f4623a;
+    box-shadow: 0 0 0 0.2rem rgba(244, 98, 58, 0.25);
 }
 
+/* Submit Button */
 .login-form .submit-button {
-    background: #121211;
-    color: white;
     width: 100%;
-    padding: 15px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #fff;
+    background-color: #f4623a;
     border: none;
-    border-radius: 8px;
-    font-size: 16px;
+    border-radius: 0.375rem;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 10px;
+    transition: background-color 0.15s ease-in-out;
+    margin-top: 1rem;
 }
 
 .login-form .submit-button:hover {
-    background: #2a2a29;
+    background-color: #d44d2d;
 }
 
-/* Remove the default form field containers that CakePHP adds */
-.login-form div.input {
-    margin-bottom: 20px;
+/* Additional Links */
+.login-form .form-group.d-flex {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
-.login-form div.input label {
-    font-weight: normal;
+.login-form .btn.btn-link {
+    color: #f4623a;
+    text-decoration: none;
+    padding: 0;
+    font-size: 0.9rem;
 }
 
-/* Remove old login form styling */
-.form-container {
-    margin-top: 0;
-    box-shadow: none;
-    border-radius: 0;
-    overflow: visible;
+.login-form .btn.btn-link:hover {
+    color: #d44d2d;
+    text-decoration: underline;
 }
 
-.form-container .card-header,
-.form-container .card-body,
-.form-container .form-group,
-.form-container .form-control,
-.form-container label,
-.form-container .btn-primary,
-.form-container .form-actions {
-    all: revert;
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+    .form-wrapper,
+    .login-wrapper {
+        padding-top: 90px;
+        padding-left: 15px;
+        padding-right: 15px;
+        padding-bottom: 0;
+    }
+
+    .login-form {
+        padding: 1.5rem;
+        margin: 0;
+    }
+
+    .login-form h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .login-form .input {
+        margin-bottom: 1rem;
+    }
+
+    .login-form .form-group.d-flex {
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: stretch;
+        text-align: center;
+    }
 }
 
 /* Flash Messages Styling */
@@ -384,8 +445,7 @@
 
 /* Admin Layout Styling */
 body {
-    padding-top: 0;
-    margin: 0;
+    padding-top: 76px;
     background-color: #f8f9fa;
 }
 
@@ -408,12 +468,6 @@ body {
 /* Admin Content Styling */
 .main {
     padding: 20px 0;
-}
-
-.container {
-    max-width: 100%;
-    margin: 0 auto;
-    padding: 0 15px;
 }
 
 /* Table Styling for Admin Pages */
@@ -483,6 +537,10 @@ body {
 }
 
 /* Contacts View Styling */
+.contacts.index.content {
+    padding: 20px 0;
+}
+
 .contacts.index.content h1 {
     color: #333;
     margin-bottom: 30px;
@@ -512,10 +570,6 @@ body {
     padding: 12px 15px;
     border-bottom: 1px solid #dee2e6;
     color: #333;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    max-width: 300px;
-    vertical-align: top;
 }
 
 .contacts.index.content table tr:hover {
@@ -664,8 +718,6 @@ body {
     padding: 20px;
     border-radius: 15px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
-    margin-bottom: 20px;
 }
 
 .side-nav .heading {
@@ -731,114 +783,156 @@ body {
 /* Contact Edit Form Styling */
 .contacts.form.content {
     background: white;
-    padding: 30px;
+    padding: 2rem;
     border-radius: 15px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
+    width: 100%;
+    max-width: 800px;
+    margin: 76px auto 0;
 }
 
-.contacts.form.content fieldset {
-    border: none;
-    padding: 0;
-    margin: 0 0 30px 0;
-}
-
-.contacts.form.content legend {
+.contacts.form.content h2 {
     color: #333;
-    font-size: 24px;
+    margin-bottom: 1.5rem;
+    text-align: center;
     font-weight: 600;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #f0f0f0;
 }
 
-/* Form Fields Styling */
-.contacts.form.content .input,
+.contacts.form.content .description {
+    text-align: center;
+    color: #666;
+    margin-bottom: 2rem;
+}
+
 .contacts.form.content .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 1.5rem;
 }
 
 .contacts.form.content label {
     display: block;
-    color: #666;
-    font-size: 14px;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-size: 0.95rem;
     font-weight: 500;
-    margin-bottom: 8px;
 }
 
 .contacts.form.content input[type="text"],
 .contacts.form.content input[type="email"],
-.contacts.form.content input[type="password"],
-.contacts.form.content input[type="date"],
-.contacts.form.content input[type="datetime-local"] {
+.contacts.form.content input[type="tel"],
+.contacts.form.content textarea {
     width: 100%;
-    padding: 10px 15px;
+    padding: 12px;
     border: 1px solid #ddd;
-    border-radius: 4px;
+    border-radius: 8px;
     font-size: 16px;
-    color: #333;
-    transition: border-color 0.2s ease;
-    box-sizing: border-box;
-}
-
-.contacts.form.content input[type="text"]:focus,
-.contacts.form.content input[type="email"]:focus,
-.contacts.form.content input[type="password"]:focus,
-.contacts.form.content input[type="date"]:focus,
-.contacts.form.content input[type="datetime-local"]:focus {
-    border-color: #f4623a;
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(244, 98, 58, 0.1);
+    transition: all 0.3s ease;
+    background-color: #f8f9fa;
 }
 
 .contacts.form.content textarea {
-    min-height: 120px;
+    min-height: 150px;
     resize: vertical;
 }
 
-/* Submit Button Styling */
-.contacts.form.content .btn,
-.contacts.form.content button {
-    background-color: #121211;
-    color: white;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    min-width: 120px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.contacts.form.content input:focus,
+.contacts.form.content textarea:focus {
+    border-color: #f4623a;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(244, 98, 58, 0.1);
+    background-color: #fff;
 }
 
-.contacts.form.content .btn:hover,
-.contacts.form.content button:hover {
+.contacts.form.content button[type="submit"] {
+    width: 100%;
+    padding: 14px;
     background-color: #f4623a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+.contacts.form.content button[type="submit"]:hover {
+    background-color: #d44d2d;
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(244, 98, 58, 0.2);
 }
 
-/* Error Messages */
-.contacts.form.content .error-message {
-    color: #dc3545;
-    font-size: 14px;
-    margin-top: 5px;
-}
-
-/* Responsive Adjustments */
+/* Mobile Responsive Adjustments */
 @media (max-width: 768px) {
     .contacts.form.content {
-        padding: 20px;
+        padding: 1.5rem;
+        margin-top: 0;
     }
 
-    .contacts.form.content legend {
-        font-size: 20px;
+    .contacts.form.content h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
     }
 
-    .side-nav {
-        margin-bottom: 20px;
+    .contacts.form.content .description {
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
     }
+
+    .contacts.form.content .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .contacts.form.content label {
+        font-size: 0.9rem;
+    }
+
+    .contacts.form.content input[type="text"],
+    .contacts.form.content input[type="email"],
+    .contacts.form.content input[type="tel"],
+    .contacts.form.content textarea {
+        padding: 10px;
+        font-size: 16px; /* Keep 16px to prevent zoom on mobile */
+    }
+
+    .contacts.form.content textarea {
+        min-height: 120px;
+    }
+
+    .contacts.form.content button[type="submit"] {
+        padding: 12px;
+        font-size: 0.95rem;
+    }
+
+    /* Add spacing between form elements */
+    .contacts.form.content .input {
+        margin-bottom: 15px;
+    }
+
+    /* Improve touch target sizes */
+    .contacts.form.content input,
+    .contacts.form.content textarea,
+    .contacts.form.content button {
+        touch-action: manipulation;
+    }
+}
+
+/* Error message styling */
+.contacts.form.content .error-message {
+    color: #dc3545;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+/* Success message styling */
+.contacts.form.content .success-message {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    text-align: center;
 }
 
 /* Button Styling */
@@ -969,174 +1063,6 @@ button.danger:hover {
         min-width: 70px;
         font-size: 12px;
     }
-}
-
-/* Admin Navigation Dropdown (Hover) */
-.navbar .dropdown:hover > .dropdown-menu,
-.navbar-nav .dropdown:hover > .dropdown-menu,
-#mainNav .dropdown:hover > .dropdown-menu,
-.nav-item.dropdown:hover > .dropdown-menu {
-    display: block !important;
-    margin-top: 0;
-}
-
-.navbar .dropdown > .dropdown-menu,
-.navbar-nav .dropdown > .dropdown-menu,
-#mainNav .dropdown > .dropdown-menu,
-.nav-item.dropdown > .dropdown-menu {
-    margin-top: 0;
-    border: none;
-    border-radius: 4px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-/* Actions Dropdown Menu (Click) */
-.actions-dropdown {
-    position: relative;
-    display: inline-block;
-}
-
-.actions-dropdown-content {
-    display: none;
-    position: absolute;
-    right: 0;
-    top: 100%;
-    background-color: #f9f9f9;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-    border-radius: 4px;
-    padding: 4px;
-}
-
-.actions-dropdown-content a {
-    color: black;
-    padding: 8px 12px;
-    text-decoration: none;
-    display: block;
-    font-size: 13px;
-    border-radius: 4px;
-    margin: 2px 0;
-}
-
-.actions-dropdown-toggle {
-    background: none;
-    border: none;
-    padding: 4px 8px;
-    cursor: pointer;
-    font-size: 16px;
-    color: #6c757d;
-    width: 32px;
-    height: 32px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-}
-
-.actions-dropdown-toggle:hover {
-    background-color: #f1f1f1;
-}
-
-/* Show dropdown content when active */
-.actions-dropdown.show .actions-dropdown-content {
-    display: block;
-}
-
-/* Action button colors */
-.actions-dropdown-content a:nth-child(1) { /* View */
-    background-color: #28a745;
-    color: white;
-}
-
-.actions-dropdown-content a:nth-child(2) { /* Edit/Reply */
-    background-color: #007bff;
-    color: white;
-}
-
-.actions-dropdown-content a:nth-child(3) { /* Email */
-    background-color: #6c757d;
-    color: white;
-}
-
-.actions-dropdown-content a:nth-child(4) { /* Archive/Restore */
-    background-color: #ffc107;
-    color: #212529;
-}
-
-.actions-dropdown-content .text-danger { /* Delete */
-    background-color: #dc3545;
-    color: white;
-}
-
-.actions-dropdown-content a:hover {
-    opacity: 0.85;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Action column width */
-.contacts.index.content table th:last-child,
-.contacts.index.content table td:last-child {
-    width: 50px;
-    min-width: 50px;
-    text-align: center;
-}
-
-/* Override Bootstrap dropdown styles */
-.dropdown-menu {
-    margin: 0;
-    padding: 0.5rem 0;
-    border: none;
-    border-radius: 4px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.dropdown-item {
-    padding: 0.75rem 1rem;
-    color: #333;
-    transition: all 0.2s ease;
-}
-
-.dropdown-item:hover {
-    background-color: #f8f9fa;
-    color: #f4623a;
-}
-
-/* Remove hover styles for action dropdowns */
-.actions-dropdown:hover .actions-dropdown-content {
-    display: none;
-}
-
-/* Ensure mobile compatibility */
-@media (max-width: 991.98px) {
-    .navbar .dropdown:hover > .dropdown-menu,
-    .navbar-nav .dropdown:hover > .dropdown-menu,
-    #mainNav .dropdown:hover > .dropdown-menu,
-    .nav-item.dropdown:hover > .dropdown-menu {
-        display: none !important;
-    }
-    
-    .navbar .dropdown.show > .dropdown-menu,
-    .navbar-nav .dropdown.show > .dropdown-menu,
-    #mainNav .dropdown.show > .dropdown-menu,
-    .nav-item.dropdown.show > .dropdown-menu {
-        display: block !important;
-    }
-}
-
-html, body {
-    height: 100%;
-    margin: 0;
-}
-
-body {
-    display: flex;
-    flex-direction: column;
-}
-
-main {
-    flex: 1;
 }
 
 footer {
@@ -1276,112 +1202,113 @@ footer {
 
 /* For consistent NavBar styling across all pages */
 #mainNav {
-    padding: 1rem 0;
-    box-shadow: none;
-    background-color: transparent !important;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  background-color: #121211 !important;
+  transition: background-color 0.2s ease;
 }
 
-/* Only add background color when scrolled */
-#mainNav.navbar-shrink {
-    background-color: #121211 !important;
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-}
-
-/* Fix container padding */
+/* Fix for container width and padding consistency */
 #mainNav .container,
-#mainNav .container-fluid {
-    padding-left: 1.5rem !important;
-    padding-right: 1.5rem !important;
+#mainNav .container-fluid,
+#mainNav .container.px-4,
+#mainNav .container.px-4.px-lg-5 {
+  max-width: 1320px !important;
+  width: 100%;
+  margin: 0 auto !important;
+  padding-left: 3rem !important;
+  padding-right: 3rem !important;
 }
 
 @media (max-width: 767px) {
-    #mainNav .container,
-    #mainNav .container-fluid {
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
-    }
+  #mainNav .container,
+  #mainNav .container-fluid,
+  #mainNav .container.px-4,
+  #mainNav .container.px-4.px-lg-5 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
 }
 
 #mainNav .navbar-brand {
-    font-family: "Merriweather Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.7) !important;
-    margin-right: 2rem;
-    padding-left: 0 !important;
+  font-family: "Merriweather Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7) !important;
+  margin-right: 2rem;
+  padding-left: 0 !important;
 }
 
 #mainNav .navbar-nav {
-    margin-right: 0 !important;
+  margin-right: 0 !important;
 }
 
 /* Fix for nav item spacing */
 #mainNav .navbar-nav .nav-item {
-    margin: 0 0.125rem;
+  margin: 0 0.125rem;
 }
 
 @media (min-width: 992px) {
-    #mainNav {
-        box-shadow: none;
-        background-color: #121211 !important;
-    }
+  #mainNav {
+    box-shadow: none;
+    background-color: #121211 !important;
+  }
 
-    #mainNav .navbar-brand {
-        color: rgba(255, 255, 255, 0.7) !important;
-    }
+  #mainNav .navbar-brand {
+    color: rgba(255, 255, 255, 0.7) !important;
+  }
 
-    #mainNav .navbar-brand:hover {
-        color: #f4623a !important;
-    }
+  #mainNav .navbar-brand:hover {
+    color: #f4623a !important;
+  }
 
-    #mainNav .navbar-nav .nav-item .nav-link {
-        color: rgba(255, 255, 255, 0.7) !important;
-        padding: 0 1rem !important;
-    }
+  #mainNav .navbar-nav .nav-item .nav-link {
+    color: rgba(255, 255, 255, 0.7) !important;
+    padding: 0 1rem !important;
+  }
 
-    #mainNav .navbar-nav .nav-item .nav-link:hover {
-        color: #f4623a !important;
-    }
+  #mainNav .navbar-nav .nav-item .nav-link:hover {
+    color: #f4623a !important;
+  }
 
-    #mainNav .navbar-nav .nav-item:last-child .nav-link {
-        padding-right: 0 !important;
-    }
+  #mainNav .navbar-nav .nav-item:last-child .nav-link {
+    padding-right: 0 !important;
+  }
 }
 
 /* Customer Edit Form Styling */
 .customers.form.content {
-    background: white;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
 }
 
 .customers.form.content fieldset {
-    border: none;
-    padding: 0;
-    margin: 0 0 30px 0;
+  border: none;
+  padding: 0;
+  margin: 0 0 30px 0;
 }
 
 .customers.form.content legend {
-    color: #333;
-    font-size: 24px;
-    font-weight: 600;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #f0f0f0;
+  color: #333;
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f0f0f0;
 }
 
 /* Form Fields Styling */
 .customers.form.content .input {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 .customers.form.content label {
-    display: block;
-    color: #666;
-    font-size: 14px;
-    font-weight: 500;
-    margin-bottom: 8px;
+  display: block;
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
 }
 
 .customers.form.content input[type="text"],
@@ -1389,14 +1316,14 @@ footer {
 .customers.form.content input[type="password"],
 .customers.form.content input[type="date"],
 .customers.form.content input[type="datetime-local"] {
-    width: 100%;
-    padding: 10px 15px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 16px;
-    color: #333;
-    transition: border-color 0.2s ease;
-    box-sizing: border-box;
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  color: #333;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
 }
 
 .customers.form.content input[type="text"]:focus,
@@ -1404,48 +1331,48 @@ footer {
 .customers.form.content input[type="password"]:focus,
 .customers.form.content input[type="date"]:focus,
 .customers.form.content input[type="datetime-local"]:focus {
-    border-color: #f4623a;
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(244, 98, 58, 0.1);
+  border-color: #f4623a;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(244, 98, 58, 0.1);
 }
 
 /* Submit Button Styling */
 .customers.form.content button {
-    background-color: #121211;
-    color: white;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    min-width: 120px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #121211;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .customers.form.content button:hover {
-    background-color: #f4623a;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(244, 98, 58, 0.2);
+  background-color: #f4623a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(244, 98, 58, 0.2);
 }
 
 /* Error Messages */
 .customers.form.content .error-message {
-    color: #dc3545;
-    font-size: 14px;
-    margin-top: 5px;
+  color: #dc3545;
+  font-size: 14px;
+  margin-top: 5px;
 }
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
-    .customers.form.content {
-        padding: 20px;
-    }
+  .customers.form.content {
+    padding: 20px;
+  }
 
-    .customers.form.content legend {
-        font-size: 20px;
-    }
+  .customers.form.content legend {
+    font-size: 20px;
+  }
 }
 
 #mainNav .navbar-brand {
@@ -1576,10 +1503,13 @@ footer {
 }
 
 .dropdown-menu {
+    background-color: #121211;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    margin-top: 0;
     padding: 0.5rem 0;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    border: 1px solid #dee2e6;
-    min-width: 220px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    min-width: 200px;
 }
 
 .dropdown-header {
@@ -1592,11 +1522,11 @@ footer {
 }
 
 .dropdown-item {
-    padding: 0.75rem 1rem;
+    padding: 0.75rem 1.5rem;
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #333;
+    color: rgba(255, 255, 255, 0.7);
     transition: all 0.2s ease;
 }
 
@@ -1606,251 +1536,1057 @@ footer {
     color: #6c757d;
 }
 
-.dropdown-item:hover {
-    background-color: #f8f9fa;
-    color: #f4623a;
-}
-
-.dropdown-item:hover i {
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: rgba(244, 98, 58, 0.1);
     color: #f4623a;
 }
 
 .dropdown-divider {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
     margin: 0.5rem 0;
 }
 
-.dropdown {
+/* Mobile dropdown adjustments */
+@media (max-width: 991.98px) {
+    .navbar-collapse {
+        background-color: #121211;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-top: 0.5rem;
+    }
+
+    .dropdown-menu {
+        background-color: rgba(0, 0, 0, 0.2);
+        border: none;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .navbar-nav .nav-item {
+        padding: 0.5rem 0;
+    }
+
+    .dropdown-menu .dropdown-item {
+        padding: 0.75rem 1rem;
+    }
+}
+
+/* Fix for navbar toggler */
+.navbar-toggler {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.5rem;
+}
+
+.navbar-toggler:focus {
+    box-shadow: none;
+    outline: none;
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.7%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* Ensure proper z-index for dropdown */
+#mainNav {
+    z-index: 1030;
+}
+
+.dropdown-menu {
+    z-index: 1031;
+}
+
+/* Actions Column Dropdown Menu */
+.actions .dropdown {
     position: relative;
     display: inline-block;
 }
 
-.dropdown-content {
-    display: none;
-    position: absolute;
-    right: 0;
-    top: 100%;
-    background-color: #f9f9f9;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-    border-radius: 4px;
-    padding: 4px;
-}
-
-
-.dropdown-content .divider {
-    display: none;
-}
-
-.show {
-    display: block;
-}
-
-.dropdown-toggle {
+.actions .btn-icon {
     background: none;
     border: none;
-    padding: 4px 8px;
-    cursor: pointer;
-    font-size: 16px;
     color: #6c757d;
-    display: inline-flex;
+    padding: 0.25rem;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    display: flex;
     align-items: center;
     justify-content: center;
+    width: 28px;
+    height: 28px;
     border-radius: 4px;
-} 
-
-/* Action button colors */
-.dropdown-content a:nth-child(1) {
-    background-color: #28a745;
-    color: white;
+    transition: all 0.2s ease;
 }
 
-.dropdown-content a:nth-child(2) {
-    background-color: #007bff;
-    color: white;
+.actions .btn-icon:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: #495057;
 }
 
-.dropdown-content a:nth-child(3) {
-    background-color: #6c757d;
-    color: white;
+.actions .btn-icon:focus {
+    outline: none;
+    box-shadow: none;
 }
 
-.dropdown-content .text-danger {
-    background-color: #dc3545;
-    color: white;
+.actions .btn-icon::after {
+    display: none !important;
 }
 
-/* Add text-danger class for delete buttons */
-.text-danger {
+.actions .dropdown-menu {
+    min-width: 160px;
+    padding: 0.5rem 0;
+    margin: 0;
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 0.25rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.175);
+}
+
+.actions .dropdown-menu .dropdown-item {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    color: #212529;
+    text-decoration: none;
+    display: block;
+    width: 100%;
+    clear: both;
+    font-weight: 400;
+    text-align: inherit;
+    white-space: nowrap;
+    background-color: transparent;
+    border: 0;
+    transition: all 0.2s ease;
+}
+
+.actions .dropdown-menu .dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+.actions .dropdown-menu .view {
+    color: #28a745;
+}
+
+.actions .dropdown-menu .edit {
+    color: #007bff;
+}
+
+.actions .dropdown-menu .reply {
+    color: #17a2b8;
+}
+
+.actions .dropdown-menu .archive {
+    color: #6c757d;
+}
+
+.actions .dropdown-menu .delete {
     color: #dc3545;
 }
 
-.text-danger:hover {
-    color: #c82333;
-    background-color: #f8d7da !important;
+.actions .dropdown-menu .dropdown-item:hover {
+    opacity: 0.85;
 }
 
-/* Actions Dropdown Menu (for tables) */
-.actions-dropdown {
+/* Mobile optimization */
+@media (max-width: 768px) {
+    .actions .dropdown-menu {
+        position: fixed;
+        left: auto;
+        right: 1rem;
+        transform: none;
+        width: auto;
+        min-width: 160px;
+        max-width: calc(100vw - 2rem);
+    }
+}
+
+/* Base styles */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; 
+    width: 100%;
+}
+
+/* Container styles */
+.container,
+.container-fluid {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* Masthead styling */
+header.masthead {
     position: relative;
-    display: inline-block;
-}
-
-.actions-dropdown:hover .actions-dropdown-content {
-    display: block;
-}
-
-.actions-dropdown-content {
-    display: none;
-    position: absolute;
-    right: 0;
-    top: 100%;
-    background-color: #f9f9f9;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-    border-radius: 4px;
-    padding: 4px;
-}
-
-.actions-dropdown-content a {
-    color: black;
-    padding: 8px 12px;
-    text-decoration: none;
-    display: block;
-    font-size: 13px;
-    border-radius: 4px;
-    margin: 2px 0;
-}
-
-.actions-dropdown-toggle {
-    background: none;
-    border: none;
-    padding: 4px 8px;
-    cursor: pointer;
-    font-size: 16px;
-    color: #6c757d;
-    width: 32px;
-    height: 32px;
-    display: inline-flex;
+    width: 100vw;
+    height: 100vh !important;
+    min-height: 100vh;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 4px;
 }
 
-/* Action button colors */
-.actions-dropdown-content a:nth-child(1) { /* View */
-    background-color: #28a745;
-    color: white;
+header.masthead:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
-.actions-dropdown-content a:nth-child(2) { /* Edit/Reply */
-    background-color: #007bff;
-    color: white;
-}
-
-.actions-dropdown-content a:nth-child(3) { /* Email */
-    background-color: #6c757d;
-    color: white;
-}
-
-.actions-dropdown-content a:nth-child(4) { /* Archive/Restore */
-    background-color: #ffc107;
-    color: #212529;
-}
-
-.actions-dropdown-content .text-danger { /* Delete */
-    background-color: #dc3545;
-    color: white;
-}
-
-.actions-dropdown-content a:hover {
-    opacity: 0.85;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Action column width */
-.contacts.index.content table th:last-child,
-.contacts.index.content table td:last-child {
-    width: 50px;
-    min-width: 50px;
+header.masthead .container {
+    position: relative;
+    z-index: 2;
+    padding: 0 15px;
+    max-width: 1320px !important;
+    margin: 0 auto !important;
     text-align: center;
 }
 
-/* Add this to your CSS */
-body.landing-page {
-    padding-top: 0;
-}
-
-/* For non-landing pages */
-body:not(.landing-page) {
-    padding-top: 76px;
-}
-
-/* For non-landing pages navbar */
-body:not(.landing-page) #mainNav {
-    background-color: #121211 !important;
-}
-
-/* Admin nav dropdown styles */
-#mainNav .nav-item.dropdown:hover .dropdown-menu {
-    display: none; /* Disable hover behavior initially */
-}
-
-/* Show dropdown on click */
-#mainNav .nav-item.dropdown.show .dropdown-menu {
-    display: block;
-}
-
-/* Ensure consistent styling across pages */
-#mainNav .dropdown-menu {
-    background-color: #121211;
-    border: none;
-    border-radius: 0;
-    margin-top: 0;
-}
-
-#mainNav .dropdown-item {
-    color: rgba(255, 255, 255, 0.7);
-    padding: 0.75rem 1.25rem;
-}
-
-#mainNav .dropdown-item:hover,
-#mainNav .dropdown-item:focus {
+/* Button styling */
+.discover-button {
+    display: inline-block;
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-transform: uppercase;
     color: #fff;
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: #f4623a;
+    border: none;
+    border-radius: 30px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin: 2rem auto;
 }
 
-/* Update table cell styling for message content */
-.contacts.index.content td:nth-child(5) { 
-    max-width: 300px;
-    overflow-wrap: break-word;
-    word-break: break-word; 
-    line-height: 1.5; 
+.discover-button:hover {
+    background-color: #d44d2d;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Ensure table doesn't break layout on small screens */
-.contacts.index.content .table-responsive {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+/* Mobile optimizations */
+@media (max-width: 768px) {
+    header.masthead {
+        background-position: center center !important;
+        background-size: cover !important;
+        background-attachment: scroll !important;
+    }
+
+    header.masthead .container {
+        padding: 0 20px;
+    }
+
+    header.masthead h1 {
+        font-size: 2rem !important;
+        line-height: 1.2;
+        margin-bottom: 1rem;
+    }
+
+    header.masthead p {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .discover-button {
+        padding: 0.8rem 1.6rem;
+        font-size: 1rem;
+    }
 }
 
-/* Adjust other columns to balance the layout */
-.contacts.index.content th:not(:nth-child(3)):not(:nth-child(5)), 
-.contacts.index.content td:not(:nth-child(3)):not(:nth-child(5)) { 
-    white-space: nowrap; 
+/* Newsletter Signup Styles */
+footer .newsletter-signup {
+    margin-bottom: 1rem;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-/* Email column specific styling */
-.contacts.index.content td:nth-child(3) { 
-    overflow-wrap: break-word;
-    word-break: break-all; 
-    min-width: 150px; 
-    max-width: 250px; 
+footer .input-group {
+    display: flex;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
 }
 
-/* Search and Sort/Filter Container */
+footer .input-group input[type="email"] {
+    flex: 1;
+    height: 40px;
+    padding: 8px 12px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: none;
+    background: #fff;
+}
+
+footer .input-group .btn-primary {
+    height: 40px;
+    padding: 8px 20px;
+    font-size: 14px;
+    border-radius: 4px;
+    margin-left: 8px;
+    background-color: #f4623a;
+    border-color: #f4623a;
+    white-space: nowrap;
+}
+
+footer .input-group .btn-primary:hover {
+    background-color: #d44d2d;
+    border-color: #d44d2d;
+}
+
+@media (max-width: 576px) {
+    footer .newsletter-signup {
+        max-width: 300px;
+    }
+    
+    footer .input-group {
+        max-width: 300px;
+    }
+    
+    footer .input-group input[type="email"],
+    footer .input-group .btn-primary {
+        height: 36px;
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+}
+
+/* Form wrapper styling */
+.form-wrapper {
+    padding-top: 76px; 
+    padding: 76px 20px 0;
+    background-color: #f8f9fa;
+    min-height: 75vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Update form container styles */
+.contacts.form.content {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 800px;
+    margin: 76px auto 0;
+}
+
+.contacts.form.content h2 {
+    color: #333;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* Form Fields */
+.contacts.form.content .input {
+    margin-bottom: 1.5rem;
+}
+
+.contacts.form.content .form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.contacts.form.content .form-control:focus {
+    border-color: #f4623a;
+    box-shadow: 0 0 0 0.2rem rgba(244, 98, 58, 0.25);
+}
+
+/* Submit Button */
+.contacts.form.content .submit {
+    text-align: center;
+}
+
+.contacts.form.content .submit button {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #fff;
+    background-color: #f4623a;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+    margin-top: 1rem;
+}
+
+.contacts.form.content .submit button:hover {
+    background-color: #d44d2d;
+}
+
+/* Desktop specific styles */
+@media (min-width: 992px) {
+    .form-wrapper,
+    .login-wrapper {
+        padding: 96px 40px 0;
+    }
+
+    .contacts.form.content {
+        margin-top: 0;
+        padding: 2.5rem;
+    }
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+    .form-wrapper,
+    .login-wrapper {
+        padding-top: 90px;
+        padding-left: 15px;
+        padding-right: 15px;
+        padding-bottom: 0;
+    }
+
+    .contacts.form.content {
+        padding: 1.5rem;
+        margin-top: 0;
+    }
+
+    .contacts.form.content h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .contacts.form.content .input {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Registration Form Wrapper */
+.registration-wrapper {
+    padding-top: 76px; /* Match the navbar height */
+    padding: 20px;
+    background-color: #f8f9fa;
+    min-height: auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    .registration-wrapper {
+        padding-top: 90px; /* Increased padding for mobile */
+        padding-left: 15px;
+        padding-right: 15px;
+        padding-bottom: 15px;
+    }
+}
+
+/* Registration Form Container */
+.registration-form {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.registration-form h2 {
+    color: #333;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* Form Fields */
+.registration-form .input {
+    margin-bottom: 1.25rem;
+}
+
+.registration-form .form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.registration-form .form-control:focus {
+    border-color: #f4623a;
+    box-shadow: 0 0 0 0.2rem rgba(244, 98, 58, 0.25);
+}
+
+.registration-form .text-muted {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    color: #6c757d;
+}
+
+/* Submit Button */
+.registration-form .btn-primary {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #fff;
+    background-color: #f4623a;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+    margin-top: 1rem;
+}
+
+.registration-form .btn-primary:hover {
+    background-color: #d44d2d;
+}
+
+/* Back to Login Link */
+.registration-form .btn-link {
+    color: #f4623a;
+    text-decoration: none;
+    padding: 0;
+    font-size: 0.9rem;
+}
+
+.registration-form .btn-link:hover {
+    color: #d44d2d;
+    text-decoration: underline;
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+    .registration-form {
+        padding: 1.5rem;
+        margin: 0;
+    }
+
+    .registration-form h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .registration-form .input {
+        margin-bottom: 1rem;
+    }
+
+    .registration-form .btn-primary {
+        margin-top: 0.75rem;
+    }
+}
+
+/* Forget Password Form Wrapper */
+.forget-password-wrapper {
+    padding-top: 76px; /* Match the navbar height */
+    padding: 20px;
+    background-color: #f8f9fa;
+    min-height: auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    .forget-password-wrapper {
+        padding-top: 90px; /* Increased padding for mobile */
+        padding-left: 15px;
+        padding-right: 15px;
+        padding-bottom: 15px;
+    }
+}
+
+/* Forget Password Form Container */
+.forget-password-form {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.forget-password-form h2 {
+    color: #333;
+    margin-bottom: 1rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+.forget-password-form .text-muted {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    color: #6c757d;
+}
+
+/* Form Fields */
+.forget-password-form .input {
+    margin-bottom: 1.25rem;
+}
+
+.forget-password-form .form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.forget-password-form .form-control:focus {
+    border-color: #f4623a;
+    box-shadow: 0 0 0 0.2rem rgba(244, 98, 58, 0.25);
+}
+
+/* Submit Button */
+.forget-password-form .submit-button {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #fff;
+    background-color: #f4623a;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+    margin-top: 0.5rem;
+}
+
+.forget-password-form .submit-button:hover {
+    background-color: #d44d2d;
+}
+
+/* Back to Login Link */
+.forget-password-form .btn-link {
+    color: #f4623a;
+    text-decoration: none;
+    padding: 0;
+    font-size: 0.9rem;
+}
+
+.forget-password-form .btn-link:hover {
+    color: #d44d2d;
+    text-decoration: underline;
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+    .forget-password-form {
+        padding: 1.5rem;
+        margin: 0;
+    }
+
+    .forget-password-form h2 {
+        font-size: 1.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .forget-password-form .text-muted {
+        font-size: 0.875rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .forget-password-form .input {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Reset Password Form Wrapper */
+.reset-password-wrapper {
+    padding-top: 76px; /* Match the navbar height */
+    padding: 20px;
+    background-color: #f8f9fa;
+    min-height: auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    .reset-password-wrapper {
+        padding-top: 90px; /* Increased padding for mobile */
+        padding-left: 15px;
+        padding-right: 15px;
+        padding-bottom: 15px;
+    }
+}
+
+/* Reset Password Form Container */
+.reset-password-form {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.reset-password-form h2 {
+    color: #333;
+    margin-bottom: 1rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* Password Requirements Box */
+.reset-password-form .password-requirements {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #f4623a;
+    margin: 1rem 0;
+}
+
+.reset-password-form .password-requirements p {
+    color: #6c757d;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.reset-password-form .password-requirements ul {
+    padding-left: 1.25rem;
+    margin-bottom: 0;
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+
+.reset-password-form .password-requirements li {
+    margin-bottom: 0.25rem;
+}
+
+.reset-password-form .password-requirements li:last-child {
+    margin-bottom: 0;
+}
+
+/* Form Fields */
+.reset-password-form .input {
+    margin-bottom: 1.25rem;
+}
+
+.reset-password-form .form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.reset-password-form .form-control:focus {
+    border-color: #f4623a;
+    box-shadow: 0 0 0 0.2rem rgba(244, 98, 58, 0.25);
+}
+
+/* Submit Button */
+.reset-password-form .submit-button {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #fff;
+    background-color: #f4623a;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+    margin-top: 0.5rem;
+}
+
+.reset-password-form .submit-button:hover {
+    background-color: #d44d2d;
+}
+
+/* Back to Login Link */
+.reset-password-form .btn-link {
+    color: #f4623a;
+    text-decoration: none;
+    padding: 0;
+    font-size: 0.9rem;
+}
+
+.reset-password-form .btn-link:hover {
+    color: #d44d2d;
+    text-decoration: underline;
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+    .reset-password-form {
+        padding: 1.5rem;
+        margin: 0;
+    }
+
+    .reset-password-form h2 {
+        font-size: 1.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .reset-password-form .input {
+        margin-bottom: 1rem;
+    }
+
+    .reset-password-form .password-requirements {
+        padding: 0.75rem;
+        margin: 0.75rem 0;
+    }
+}
+
+/* Customer Dashboard Styles */
+.customer-dashboard {
+    padding-top: 76px;
+    min-height: 100vh;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    padding: 2rem;
+}
+
+.customer-dashboard .container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.customer-dashboard .card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border: none;
+    height: auto !important;
+    margin: 1rem auto;
+    max-width: 1400px;
+}
+
+.customer-dashboard .card-header {
+    background-color: transparent;
+    border-bottom: 1px solid #dee2e6;
+    padding: 1.5rem;
+}
+
+.customer-dashboard .card-title {
+    color: #333;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.customer-dashboard .card-body {
+    padding: 1.5rem;
+}
+
+.customer-dashboard .profile-picture {
+    width: 300px;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin: 10px auto;
+}
+
+.customer-dashboard .btn-primary {
+    background-color: #f4623a;
+    border-color: #f4623a;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    border-radius: 5px;
+    transition: all 0.2s ease;
+    margin: 0 0.25rem;
+}
+
+.customer-dashboard .btn-primary:hover {
+    background-color: #d44d2d;
+    border-color: #d44d2d;
+    transform: translateY(-1px);
+}
+
+/* Desktop Specific Adjustments */
+@media (min-width: 992px) {
+    .customer-dashboard {
+        padding: 2rem 4rem;
+    }
+
+    .customer-dashboard .container {
+        padding: 2rem;
+    }
+
+    .customer-dashboard .card {
+        margin: 2rem auto;
+    }
+
+    .customer-dashboard .row {
+        margin: 0 -1rem;
+    }
+
+    .customer-dashboard .col-md-6 {
+        padding: 0 1rem;
+    }
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+    .customer-dashboard {
+        padding: 1rem;
+        padding-top: 90px;
+    }
+
+    .customer-dashboard .container {
+        padding: 15px;
+    }
+
+    .customer-dashboard .card {
+        margin-bottom: 15px;
+    }
+
+    .customer-dashboard .card-header {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .customer-dashboard .card-header .btn-primary {
+        width: 100%;
+        margin: 0.5rem 0;
+    }
+
+    .customer-dashboard .card-header .align-items-end {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .customer-dashboard .card-header .align-items-end .btn {
+        width: 100%;
+    }
+
+    .customer-dashboard .profile-picture {
+        width: 200px;
+        height: 200px;
+    }
+
+    .customer-dashboard h2 {
+        font-size: 1.5rem;
+        text-align: center;
+    }
+
+    .customer-dashboard .card-title {
+        font-size: 1.1rem;
+    }
+
+    .customer-dashboard .card-body {
+        padding: 1rem;
+    }
+}
+
+/* Navbar Dropdown Styles */
+.navbar .dropdown-menu {
+    background-color: #343a40;
+    border: none;
+    border-radius: 0.25rem;
+    margin-top: 0.5rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.navbar .dropdown-item {
+    color: #ffffff;
+    padding: 0.5rem 1.5rem;
+    font-size: 0.9rem;
+}
+
+.navbar .dropdown-item:hover,
+.navbar .dropdown-item:focus {
+    background-color: #495057;
+    color: #ffffff;
+}
+
+/* Actions Dropdown Styles */
+.actions .dropdown-menu {
+    background-color: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 0.25rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.actions .dropdown-item {
+    color: #212529;
+    padding: 0.5rem 1.5rem;
+    font-size: 0.9rem;
+}
+
+.actions .dropdown-item:hover,
+.actions .dropdown-item:focus {
+    background-color: #f8f9fa;
+    color: #16181b;
+}
+
+@media (max-width: 768px) {
+    .navbar .dropdown-menu,
+    .actions .dropdown-menu {
+        width: 100%;
+        margin-top: 0;
+    }
+
+    .navbar .dropdown-item,
+    .actions .dropdown-item {
+        padding: 0.75rem 1.5rem;
+    }
+}
+
+/* Customer List Wrapper */
+.custom-list-wrapper {
+    padding: 20px;
+    margin-top: 76px;
+}
+
+.custom-list-wrapper .side-nav {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-top: 71px;
+}
+
+.custom-list-wrapper .side-nav .heading {
+    color: #333;
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #c99863;
+}
+
+.custom-list-wrapper .side-nav-item {
+    display: block;
+    padding: 8px 15px;
+    color: #666;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.custom-list-wrapper .side-nav-item:hover {
+    background-color: #c99863;
+    color: white;
+}
+
+.custom-list-wrapper .contacts.index.content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
 .search-filter-container {
     display: flex;
     justify-content: space-between;
@@ -1861,45 +2597,26 @@ body:not(.landing-page) #mainNav {
 
 .search-box {
     flex: 1;
-    max-width: 400px;
+    max-width: 300px;
 }
 
 .filter-box {
-    min-width: 200px;
+    width: 200px;
 }
 
-.search-box .input-group {
-    display: flex;
-    gap: 10px; /* Spacing between input and button */
-}
+@media (max-width: 768px) {
+    .custom-list-wrapper .side-nav {
+        margin-bottom: 20px;
+        margin-top: 0;
+    }
 
-.search-box .form-control {
-    flex: 1;
-    padding: 8px 12px;
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-    font-size: 14px;
-}
+    .search-filter-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
 
-.search-box .btn-primary {
-    padding: 8px 16px;
-    background-color: #007bff;
-    border: none;
-    border-radius: 4px;
-    color: white;
-    cursor: pointer;
-    flex-shrink: 0; /* Prevent button from shrinking */
+    .search-box, .filter-box {
+        width: 100%;
+        max-width: none;
+    }
 }
-
-.search-box .btn-primary:hover {
-    background-color: #0056b3;
-}
-
-.filter-box .form-control {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-    font-size: 14px;
-    cursor: pointer;
-} 

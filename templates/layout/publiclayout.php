@@ -15,6 +15,8 @@ $titleDescription = 'Landing Page';
     <link href="https://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic" rel="stylesheet" type="text/css" />
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
     <?= $this->Html->meta('icon') ?>
     <?= $this->Html->css('/landing-detail/css/styles.css') ?>
@@ -26,7 +28,7 @@ $titleDescription = 'Landing Page';
     <?= $this->fetch('script') ?>
 
 </head>
-<!-- Navigation-->
+<!-- Navigation -->
 <nav class="navbar navbar-expand-lg navbar-light fixed-top py-3" id="mainNav" style="background-color: #121211;">
     <div class="container px-4 px-lg-5">
         <a class="navbar-brand" href="<?= $this->Url->build('/') ?>">ChicCharm</a>
@@ -42,41 +44,64 @@ $titleDescription = 'Landing Page';
                     if ($identity->get('type') === 'admin') {
                         // Admin Navigation ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a>
+                            <a class="nav-link" href="<?= $this->Url->build('#about') ?>">About</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a>
+                            <a class="nav-link" href="<?= $this->Url->build('#services') ?>">Services</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a>
+                            <a class="nav-link" href="<?= $this->Url->build('#portfolio') ?>">Portfolio</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build([
-                                'controller' => 'Contacts', 'action' => 'index']) ?>">Contact List
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="enquiriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-envelope"></i>
+                                <span>Enquiries</span>
                             </a>
+                            <ul class="dropdown-menu" aria-labelledby="enquiriesDropdown">
+                                <li>
+                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'index']) ?>">
+                                        <i class="fas fa-inbox"></i>
+                                        <span>Active Messages</span>
+                                    </a>
+                                </li>
+                                <li><div class="dropdown-divider"></div></li>
+                                <li>
+                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'archiveIndex']) ?>">
+                                        <i class="fas fa-archive"></i>
+                                        <span>Archived Messages</span>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build([
-                                'controller' => 'Customers', 'action' => 'index']) ?>">Customers List
-                            </a>
+                            <a class="nav-link"
+                               href="<?= $this->Url->build(['controller' => 'Customers', 'action' => 'index']) ?>"
+                            >Customers List</a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Admin
+                                <i class="fas fa-user-shield"></i>
+                                <span>Admin</span>
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="adminDropdown">
                                 <li>
-                                    <a class="dropdown-item" href="<?= $this->Url->build([
-                                        'controller' => 'Admins', 'action' => 'dashboard']) ?>">Admin Dashboard
+                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'dashboard'])?>">
+                                        <i class="fas fa-tachometer-alt"></i>
+                                        <span>Admin Dashboard</span>
+                                    </a>
+                                </li>
+                                <li><div class="dropdown-divider"></div></li>
+                                <li>
+                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'index']) ?>">
+                                        <i class="fas fa-users-cog"></i>
+                                        <span>Admins List</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="<?= $this->Url->build([
-                                        'controller' => 'Admins', 'action' => 'index']) ?>">Admins List</a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="<?= $this->Url->build([
-                                        'controller' => 'Admins', 'action' => 'add']) ?>">Add New Admin</a>
+                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'add']) ?>">
+                                        <i class="fas fa-user-plus"></i>
+                                        <span>Add New Admin</span>
+                                    </a>
                                 </li>
                             </ul>
                         </li>
@@ -92,13 +117,16 @@ $titleDescription = 'Landing Page';
                             <a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build([
-                                'controller' => 'Contacts', 'action' => 'enquiry']) ?>">Contact Us
+                            <a class="nav-link"
+                               href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'enquiry']) ?>"
+                            >Contact Us
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build([
-                                'controller' => 'Customers', 'action' => 'dashboard']) ?>">Dashboard
+                            <a class="nav-link"
+                               href="<?= $this->Url->build([
+                                   'controller' => 'Customers',
+                                   'action' => 'dashboard']) ?>">Dashboard
                             </a>
                         </li>
                         <li class="nav-item">
@@ -116,13 +144,13 @@ $titleDescription = 'Landing Page';
                 <?php } else {
                     // Public Navigation ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a>
+                        <a class="nav-link" href="#about">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a>
+                        <a class="nav-link" href="#services">Services</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a>
+                        <a class="nav-link" href="#portfolio">Portfolio</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= $this->Url->build('/contacts/enquiry') ?>">Contact Us</a>
@@ -135,11 +163,24 @@ $titleDescription = 'Landing Page';
         </div>
     </div>
 </nav>
+
+<!-- Show dropdown on hover -->
+<style>
+.nav-item.dropdown:hover .dropdown-menu {
+    display: block;
+    margin-top: 0;
+}
+</style>
+
+<script>
+function confirmLogout() {
+    return confirm('Are you sure you want to logout?');
+}
+</script>
+
 <body class="landing-page">
 <main>
-    <div class="container mt-4">
-        <?= $this->Flash->render() ?>
-    </div>
+    <?= $this->Flash->render() ?>
     <?= $this->fetch('content') ?>
 </main>
 
@@ -149,8 +190,9 @@ $titleDescription = 'Landing Page';
         <div class="row justify-content-center">
             <!-- Newsletter Signup -->
             <div class="col-md-3">
-                <h5 class="text-light fw-bold">Sign Up for Our Newsletter</h5>
-                <form method="post" action="<?= $this->Url->build(['controller' => 'Newsletter', 'action' => 'subscribe']); ?>" id="ContactFooter" class="needs-confirmation">
+                <h5 class="text-light fw-bold mb-3">Sign Up for Our Newsletter</h5>
+                <p class="text-light mb-3">Be the first to get notified about upcoming products and deals</p>
+                <form method="post" action="<?= $this->Url->build(['controller' => 'Newsletter', 'action' => 'subscribe']); ?>" id="ContactFooter" class="needs-confirmation newsletter-signup">
                     <?= $this->Form->hidden('_csrfToken', ['value' => $this->request->getAttribute('csrfToken')]) ?>
                     <div class="input-group">
                         <input type="email" class="form-control" name="email" placeholder="Enter your email" required>
