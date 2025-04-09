@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use Cake\Event\EventInterface;
+
 /**
  * Bookings Controller
  *
@@ -10,6 +12,28 @@ namespace App\Controller;
  */
 class BookingsController extends AppController
 {
+    public function beforeFilter(EventInterface $event)
+    {
+        parent::beforeFilter($event);
+        
+        // Get the current action
+        $currentAction = $this->request->getParam('action');
+        
+        // Get the logged-in user's identity
+        $identity = $this->request->getAttribute('identity');
+        
+        // List of customer-specific actions
+        $customerActions = ['customerindex', 'customerview', 'customerbooking', 'customerdelete'];
+        
+        // If it's a customer-specific action, ensure the user is logged in
+        if (in_array($currentAction, $customerActions)) {
+            if (!$identity) {
+                $this->Flash->error(__('Please log in to access this page.'));
+                return $this->redirect(['controller' => 'Customers', 'action' => 'login']);
+            }
+        }
+    }
+
     /**
      * Index method
      *
@@ -29,7 +53,8 @@ class BookingsController extends AppController
         $customerId = $this->request->getAttribute('identity')->id;
         $query = $this->Bookings->find()
             ->contain(['Customers'])
-            ->where(['Bookings.customer_id' => $customerId]);
+            ->where(['Bookings.customer_id' => $customerId])
+            ->order(['Bookings.booking_date' => 'DESC']);
         $bookings = $this->paginate($query);
 
         $this->set(compact('bookings'));
@@ -117,7 +142,16 @@ class BookingsController extends AppController
     public function customerdelete($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
+        
+        $customerId = $this->request->getAttribute('identity')->id;
         $booking = $this->Bookings->get($id);
+        
+        // Check if the booking belongs to the logged-in customer
+        if ($booking->customer_id !== $customerId) {
+            $this->Flash->error(__('You are not authorized to delete this booking.'));
+            return $this->redirect(['action' => 'customerindex']);
+        }
+        
         if ($this->Bookings->delete($booking)) {
             $this->Flash->success(__('The booking has been deleted.'));
         } else {
@@ -127,9 +161,9 @@ class BookingsController extends AppController
         return $this->redirect(['action' => 'customerindex']);
     }
 
-    public function customerbooking(){
+    public function customerbooking()
+    {
         $loggedUser = $this->request->getAttribute('identity');
-
 
         $booking = $this->Bookings->newEmptyEntity();
         if ($this->request->is('post')) {
@@ -137,16 +171,12 @@ class BookingsController extends AppController
             $booking = $this->Bookings->patchEntity($booking, $this->request->getData());
             if ($this->Bookings->save($booking)) {
                 $this->Flash->success(__('The booking has been saved.'));
-
-                return $this->redirect(['action' => 'customerindex']);
+                return $this->redirect(['action' => 'customerview', $booking->id]);
             }
             $this->Flash->error(__('The booking could not be saved. Please, try again.'));
         }
-        $customers = $this->Bookings->Customers->find('list', limit: 200)->all();
-        $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
-        $this->set(compact('booking', 'customers', 'stylists'));
+        $this->set(compact('booking'));
     }
-
 
     /**
      * View method
@@ -157,7 +187,18 @@ class BookingsController extends AppController
      */
     public function customerview($id = null)
     {
-        $booking = $this->Bookings->get($id, contain: ['Customers', 'Stylists']);
+        $customerId = $this->request->getAttribute('identity')->id;
+        
+        $booking = $this->Bookings->get($id, [
+            'contain' => ['Customers', 'Stylists'],
+        ]);
+        
+        // Check if the booking belongs to the logged-in customer
+        if ($booking->customer_id !== $customerId) {
+            $this->Flash->error(__('You are not authorized to view this booking.'));
+            return $this->redirect(['action' => 'customerindex']);
+        }
+        
         $this->set(compact('booking'));
     }
 }

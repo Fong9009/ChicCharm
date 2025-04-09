@@ -59,7 +59,7 @@ $this->layout = 'default';
                                 <h3 class="card-title">Current Bookings</h3>
                                 <div class="align-items-end">
                                     <?= $this->Html->link(
-                                        'Create Booking',
+                                        'Make a Booking',
                                         ['controller' => 'Bookings', 'action' => 'customerbooking'],
                                         ['class' => 'btn btn-primary']
                                     ) ?>
@@ -71,7 +71,34 @@ $this->layout = 'default';
                                 </div>
                             </div>
                             <div class="card-body">
-                                <!-- Current bookings content -->
+                                <?php if (!empty($customer->bookings)): ?>
+                                    <div class="table-responsive">
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th><?= __('Booking Name') ?></th>
+                                                    <th><?= __('Booking Date') ?></th>
+                                                    <th><?= __('Total Cost') ?></th>
+                                                    <th><?= __('Actions') ?></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php foreach ($customer->bookings as $booking): ?>
+                                                <tr>
+                                                    <td><?= h($booking->booking_name) ?></td>
+                                                    <td><?= h($booking->booking_date->format('F j, Y')) ?></td>
+                                                    <td>$<?= number_format($booking->total_cost, 2) ?></td>
+                                                    <td class="actions">
+                                                        <?= $this->Html->link(__('View'), ['controller' => 'Bookings', 'action' => 'customerview', $booking->id], ['class' => 'button']) ?>
+                                                    </td>
+                                                </tr>
+                                                <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                <?php else: ?>
+                                    <p>No current bookings found.</p>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>

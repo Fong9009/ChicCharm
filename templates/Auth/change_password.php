@@ -1,7 +1,7 @@
 <?php
 /**
  * @var \App\View\AppView $this
- * @var \App\Model\Entity\User $user
+ * @var \App\Model\Entity\User $entity
  */
 
 $this->assign('title', 'Change User Password - Users');
@@ -9,25 +9,30 @@ $this->assign('title', 'Change User Password - Users');
 ?>
 <div class="row">
     <div class="column">
-        <div class="users form content">
+        <div class="customers form content">
 
-            <?= $this->Form->create($user) ?>
+            <?= $this->Form->create($entity) ?>
 
             <fieldset>
 
-                <legend>Change Password for <u><?= h($user->first_name) ?> <?= h($user->last_name) ?></u></legend>
+                <legend>Change Password for <u><?= h($entity->first_name) ?> <?= h($entity->last_name) ?></u></legend>
 
                 <div class="row">
                     <?php
-                    echo $this->Form->control('password', [
-                        'label' => 'New Password',
-                        'value' => '',  // Ensure password is not sending back to the client side
+                    echo $this->Form->control('current_password', [
+                        'type' => 'password',
+                        'label' => 'Current Password',
+                        'required' => true,
                         'templateVars' => ['container_class' => 'column']
                     ]);
-                    // Validate password by repeating it
+                    echo $this->Form->control('password', [
+                        'label' => 'New Password',
+                        'value' => '', 
+                        'templateVars' => ['container_class' => 'column']
+                    ]);
                     echo $this->Form->control('password_confirm', [
                         'type' => 'password',
-                        'value' => '',  // Ensure password is not sending back to the client side
+                        'value' => '', 
                         'label' => 'Retype New Password',
                         'templateVars' => ['container_class' => 'column']
                     ]);
@@ -36,7 +41,7 @@ $this->assign('title', 'Change User Password - Users');
 
             </fieldset>
 
-            <?= $this->Form->button('Submit') ?>
+            <?= $this->Form->button('Submit', ['class' => 'btn btn-primary']) ?>
             <?= $this->Form->end() ?>
 
         </div>

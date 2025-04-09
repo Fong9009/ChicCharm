@@ -82,7 +82,7 @@ $this->Html->script('custom', ['block' => true]);
                     <?php endforeach; ?>
                 </tbody>
             </table>
-            <?= $this->Html->link(__('New Customer'), ['action' => 'add'], ['class' => 'btn btn-primary']) ?>
+            <?= $this->Html->link(__('New Customer'), ['action' => 'registration'], ['class' => 'btn btn-primary']) ?>
         </div>
         <div class="paginator">
             <ul class="pagination">
