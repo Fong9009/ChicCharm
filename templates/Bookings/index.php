@@ -5,17 +5,17 @@
  */
 ?>
 <div class="contacts index content">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-2" style="padding: 10px 20px;">
-                <?= $this->Html->link(__('Back to Dashboard'), ['controller' => 'Admins', 'action' => 'dashboard'], ['class' => 'btn btn-primary', 'style' => 'white-space: nowrap;']) ?>
-            </div>
-            <div class="col-8">
-                <h3><?= __('Bookings') ?></h3>
+    <div class="table-responsive">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-2" style="padding: 10px 20px;">
+                    <?= $this->Html->link(__('Back to Dashboard'), ['controller' => 'Admins', 'action' => 'dashboard'], ['class' => 'btn btn-primary', 'style' => 'white-space: nowrap;']) ?>
+                </div>
+                <div class="col-8">
+                    <h3><?= __('Bookings') ?></h3>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="table-responsive">
         <table>
             <thead>
             <tr>
