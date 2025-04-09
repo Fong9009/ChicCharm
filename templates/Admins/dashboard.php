@@ -7,14 +7,17 @@ $this->layout = 'default';
 
 <main class="admin-dashboard">
     <div class="dashboard-container">
-        <!-- Welcome Section -->
+        <!-- Welcome, Section -->
         <div class="row mb-4">
             <div class="col-12">
                 <h1 class="welcome-text">Welcome back, <?= h($adminName)?></h1>
                 <h2 id="timeValue" class="mt-2"></h2>
             </div>
         </div>
-
+        <div>
+            <h2 class="welcome-text"> Quick Access</h2>
+        </div>
+        <hr class="flex-grow-1 mx-auto" style="border: none; height: 3px; background-color: #050505;"/>
         <!-- First Row: Customers and Admins -->
         <div class="row">
             <!-- Customers Card -->
@@ -135,7 +138,7 @@ $this->layout = 'default';
                     <div class="card-body booking-card-body">
                         <h3 class="booking-card-h3">Total Bookings</h3>
                         <div class="total-value-container">
-                            <p class="booking-card-count"><?= h($contactCount) ?></p>
+                            <p class="booking-card-count"><?= h($bookingCount) ?></p>
                         </div>
                     </div>
                     <div class="card-footer booking-card-footer">
@@ -168,6 +171,33 @@ $this->layout = 'default';
                             '<span>View Payment Lists</span><i class="material-icons">visibility</i>',
                             ['controller' => 'Payments', 'action' => 'index'],
                             ['class' => 'payment-button', 'escape' => false]
+                        ) ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 4th Row: Services -->
+        <div class="row">
+            <!-- Services Card -->
+            <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+                <div class="card h-100">
+                    <div class="card-header service-card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="service-card-h4">Services</h4>
+                        </div>
+                        <i class="material-icons service-icon">settings</i>
+                    </div>
+                    <div class="card-body service-card-body">
+                        <h3 class="service-card-h3">Total Services</h3>
+                        <div class="total-value-container">
+                            <p class="service-card-count"><?= h($serviceCount) ?></p>
+                        </div>
+                    </div>
+                    <div class="card-footer service-card-footer">
+                        <?= $this->Html->link(
+                            '<span>View Stylist Lists</span><i class="material-icons">visibility</i>',
+                            ['controller' => 'Services', 'action' => 'index'],
+                            ['class' => 'service-button', 'escape' => false]
                         ) ?>
                     </div>
                 </div>
