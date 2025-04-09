@@ -17,8 +17,17 @@ $this->Html->css('custom', ['block' => true]);
             </div>
         </aside>
         <div class="contacts index content">
-            <h3><?= __('Active Messages') ?></h3>
             <div class="table-responsive">
+                <div class="container">
+                    <div class="row align-items-center">
+                        <div class="col-2" style="padding: 10px 20px;">
+                            <?= $this->Html->link(__('Back to Dashboard'), ['controller' => 'Admins', 'action' => 'dashboard'], ['class' => 'btn btn-primary', 'style' => 'white-space: nowrap;']) ?>
+                        </div>
+                        <div class="col-8">
+                            <h3><?= __('Active Messages') ?></h3>
+                        </div>
+                    </div>
+                </div>
                 <div class="search-filter-container">
                     <div class="search-box">
                         <?= $this->Form->create(null, ['type' => 'get', 'class' => 'search-form']) ?>
@@ -32,7 +41,7 @@ $this->Html->css('custom', ['block' => true]);
                         </div>
                         <?= $this->Form->end() ?>
                     </div>
-                    
+
                     <div class="filter-box">
                         <?= $this->Form->create(null, ['type' => 'get', 'class' => 'filter-form']) ?>
                         <?= $this->Form->select('filter', [
