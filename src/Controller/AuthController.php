@@ -198,8 +198,18 @@ class AuthController extends AppController
              * to prevent email enumeration attacks
              */
             $this->Flash->success('Please check your inbox (or spam folder) for an email regarding how to reset your account password.');
-            $this->log(env('EMAIL_TRANSPORT_DEFAULT_USERNAME'), 'debug');
-            $this->log(env('EMAIL_TRANSPORT_DEFAULT_PASSWORD'), 'debug');
+            
+            // Add null checks before logging environment variables
+            $email_username = env('EMAIL_TRANSPORT_DEFAULT_USERNAME');
+            $email_password = env('EMAIL_TRANSPORT_DEFAULT_PASSWORD');
+            
+            if ($email_username !== null) {
+                $this->log($email_username, 'debug');
+            }
+            
+            if ($email_password !== null) {
+                $this->log($email_password, 'debug');
+            }
 
             return $this->redirect(['action' => 'login']);
         }

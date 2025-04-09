@@ -120,9 +120,9 @@ class BookingsStylistsController extends AppController
             //Ensures that the client can select their time
             $query->notMatching('BookingsStylists', function ($q) use ($bookingDateOnly, $startTime, $endTime) {
                 return $q->where([
-                    'BookingsStylists.stylist_date' => $bookingDateOnly, // Ensure the booking date matches with booking
-                    'BookingsStylists.start_time <' => $endTime, // Existing booking ends after new start time
-                    'BookingsStylists.end_time >' => $startTime,  // Existing booking starts before new end time
+                    'BookingsStylists.stylist_date' => $bookingDateOnly, 
+                    'BookingsStylists.start_time <' => $endTime,
+                    'BookingsStylists.end_time >' => $startTime, 
                     'BookingsStylists.start_time IS NOT NULL',
                     'BookingsStylists.end_time IS NOT NULL',
                 ]);
@@ -211,9 +211,9 @@ class BookingsStylistsController extends AppController
         $newStylistBooking->stylist_date = $booking->booking_date;
 
         if ($this->BookingsStylists->save($newStylistBooking)) {
-            $this->Flash->success(__('Contractor added successfully.'));
+            $this->Flash->success(__('Stylist added successfully.'));
         } else {
-            $this->Flash->error(__('Failed to add contractor.'));
+            $this->Flash->error(__('Failed to add Stylist.'));
         }
 
         return $this->redirect(['action' => 'customerstylistadd', $bookingId]);

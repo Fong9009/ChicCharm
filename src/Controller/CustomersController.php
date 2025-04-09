@@ -60,7 +60,11 @@ class CustomersController extends AppController
     {
         $customerId = $this->Authentication->getIdentity()->getIdentifier();
 
-        $customer = $this->Customers->get($customerId);
+        $customer = $this->Customers->get($customerId, [
+            'contain' => ['Bookings' => [
+                'sort' => ['Bookings.booking_date' => 'DESC']
+            ]]
+        ]);
         $this->set(compact('customer'));
 
         // Use the default layout which includes the navigation

@@ -7,7 +7,7 @@ $this->assign('title', 'Edit Profile');
 ?>
 <div class="form-wrapper">
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-md-12">
             <div class="customers form content">
                 <?= $this->Form->create($customer, ['type' => 'file']) ?>
                 <fieldset>
@@ -30,6 +30,18 @@ $this->assign('title', 'Edit Profile');
                             <div class="mb-3">
                                 <p class="text-muted">Leave password field empty if you don't want to change it.</p>
                                 <?= $this->Form->control('password', ['class' => 'form-control', 'value' => '', 'required' => false]) ?>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <?= $this->Form->control('confirm_password', [
+                                    'type' => 'password',
+                                    'class' => 'form-control',
+                                    'label' => 'Confirm Password',
+                                    'required' => false
+                                ]) ?>
                             </div>
                         </div>
                     </div>
