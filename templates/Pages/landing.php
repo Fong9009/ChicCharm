@@ -45,7 +45,7 @@ $this->layout = 'publiclayout';
             </div>
         </header>
         <!-- About-->
-        <section class="page-section bg-primary" id="about">
+        <section class="page-section bg-primary" id="about" style="padding-left: 100px; padding-right: 100px;">
             <div class="container mb-5 px-4 px-lg-5">
                 <div class="row gx-4 gx-lg-5 justify-content-center">
                     <div class="col-lg-8 text-center">
@@ -64,9 +64,9 @@ $this->layout = 'publiclayout';
 
                         <hr class="divider divider-light" />
                     </div>
-                    <div class="col-lg-8 d-flex justify-content-center">
-                        <img src="<?= $this->Url->image('model.jpg')?>" 
-                             alt="Image Description" 
+                    <div class="col-lg-8 d-flex justify-content-center mb-xl-5">
+                        <img src="<?= $this->Url->image('model.jpg')?>"
+                             alt="Image Description"
                              class="img-fluid"
                              style="max-width: 100%; height: auto; object-fit: contain;">
                     </div>
@@ -74,14 +74,14 @@ $this->layout = 'publiclayout';
             </div>
             <div class="w-100 mb-5" style="height: 2px; background-color: #6c757d;"></div>
             <div class="container mb-4 px-4 px-lg-5">
-                <div class="row gx-5 gx-lg-5 h-50 align-items-center text-start">
+                <div class="row gx-5 gx-lg-5 h-50 align-items-center text-start px-lg-5">
                     <div class="col-lg-9 text-start align-self-start order-lg-1">
                         <h2 class="text-white mt-0 display-1">Meet Michonne</h2>
                         <h4 class="text-white mt-0">The Owner and Visionary of ChicCharm's Future Creativity</h4>
                         <hr class="flex-grow-1 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
                         <h5 class="text-white mt-0">"Creativity is what drives ChicCharm and that is what I am about"</h5>
 
-                        <p class="text-white-75 mb-4">
+                        <p class="text-white-75 fs-5 mb-4">
                             Michonne had envisioned a future business that would take the fashion and entertainment
                             industry by storm. <br>
                             Seeing that the fashion and entertainment industry had yet to take its shape in Australia,
@@ -98,7 +98,7 @@ $this->layout = 'publiclayout';
                     <div class="col-lg-3 mb-2 order-lg-2">
                         <img
                             src="<?= $this->Url->image('Michonne.jpg')?>"
-                            alt="Owner of ChicCharm Michonne" 
+                            alt="Owner of ChicCharm Michonne"
                             class="img-fluid mx-auto d-block"
                             style="width: 100%; max-width: 400px; height: auto; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
                         >
@@ -107,32 +107,44 @@ $this->layout = 'publiclayout';
             </div>
         </section>
         <!-- Services-->
-        <section class="page-section" id="services">
-            <div class="container px-4 px-lg-5">
-                <h2 class="text-center mt-0">ChicCharm At Your Service</h2>
-                <hr class="divider" />
-                <h3 class="text-center mt-0">ChicCharm is dedicated to provide your show with the finest of artisens who are masters of their craft.
-                    They will make sure that your models or stars of the show will shine brighter than ever.</h3>
+        <section class="page-section" id="services" style="padding-left: 100px; padding-right: 100px;">
+            <div class="container">
+                <div class="row">
+                    <h2 class="text-center mt-0">ChicCharm At Your Service</h2>
+                    <hr class="divider" />
+                    <h3 class="text-center mt-0">ChicCharm is dedicated to provide your show with the finest of artisens who are masters of their craft.
+                        They will make sure that your models or stars of the show will shine brighter than ever.</h3>
+                </div>
                 <hr class="divider" />
                 <div class="row gx-4 gx-lg-5">
                     <div class="col-lg-3 col-md-5 text-center">
                         <h4>Makeup Artistry</h4>
-                        <p>ChicCharm can make sure your stars of the show shine.</p>
-                        <hr class="flex-grow-1 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
+                        <p class="fs-5">ChicCharm can make sure your stars of the show shine.</p>
                     </div>
                     <div class="col-lg-3 col-md-5 text-center">
                         <h4>Wig Styling</h4>
-                        <p>ChicCharm can design custom wigs for all your needs.</p>
-                        <hr class="flex-grow-1 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
+                        <p class="fs-5">ChicCharm can design custom wigs for all your needs.</p>
                     </div>
                     <div class="col-lg-3 col-md-5 text-center">
                         <h4>Fashion Design</h4>
-                        <p>ChicCharm can design custom clothes for all your theatre needs.</p>
-                        <hr class="flex-grow-1 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
+                        <p class="fs-5">ChicCharm can design custom clothes for all your theatre needs.</p>
                     </div>
                     <div class="col-lg-3 col-md-5 text-center">
                         <h4>Hair Styling</h4>
-                        <p>ChicCharm can make sure your stars hairs are stunning and fabulous.</p>
+                        <p class="fs-5">ChicCharm can make sure your stars hairs are stunning and fabulous.</p>
+                    </div>
+                </div>
+                <div class="row gx-4 gx-lg-5">
+                    <div class="col-3">
+                        <hr class="flex-grow-1 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
+                    </div>
+                    <div class="col-3">
+                        <hr class="flex-grow-1 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
+                    </div>
+                    <div class="col-3">
+                        <hr class="flex-grow-1 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
+                    </div>
+                    <div class="col-3">
                         <hr class="flex-grow-1 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
                     </div>
                 </div>
@@ -172,9 +184,9 @@ $this->layout = 'publiclayout';
             <div class="container-fluid">
                 <div class="row g-0 justify-content-center">
                     <!--Hair Styling Image-->
-                    <div class="col-12 col-sm-6 col-lg-4 p-2">
+                    <div class="col-12 col-sm-6 col-lg-4">
                         <div class="portfolio-box">
-                            <a href="<?= $this->Url->image('portfolio/fullsize/hair.jpg')?>" 
+                            <a href="<?= $this->Url->image('portfolio/fullsize/hair.jpg')?>"
                                title="Hair Styling"
                                class="d-block"
                             >
@@ -191,7 +203,7 @@ $this->layout = 'publiclayout';
                         </div>
                     </div>
                     <!--Make Up Image-->
-                    <div class="col-12 col-sm-6 col-lg-4 p-2">
+                    <div class="col-12 col-sm-6 col-lg-4">
                         <div class="portfolio-box">
                             <a href="<?= $this->Url->image('portfolio/fullsize/make.jpg')?>"
                                title="Makeup"
@@ -210,7 +222,7 @@ $this->layout = 'publiclayout';
                         </div>
                     </div>
                     <!--Stage Image-->
-                    <div class="col-12 col-sm-6 col-lg-4 p-2">
+                    <div class="col-12 col-sm-6 col-lg-4">
                         <div class="portfolio-box">
                             <a href="<?= $this->Url->image('portfolio/fullsize/stage.jpg')?>"
                                title="Stage Show"

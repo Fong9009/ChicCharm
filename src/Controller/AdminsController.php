@@ -26,11 +26,11 @@ class AdminsController extends AppController
     {
         // Allow sorting by specific fields
         $this->paginate = [
-            'order' => ['created' => 'DESC'] 
+            'order' => ['created' => 'DESC']
         ];
 
         $query = $this->Admins->find();
-        
+
         // Search functionality
         $search = $this->request->getQuery('search');
         if ($search) {
@@ -42,13 +42,13 @@ class AdminsController extends AppController
                 ]
             ]);
         }
-        
+
         // Filter functionality (using the dropdown)
         $filter = $this->request->getQuery('filter');
-        
+
         // Pagination applies sorting based on request or default
         $admins = $this->paginate($query);
-        
+
         $this->set(compact('admins'));
     }
 
@@ -150,11 +150,13 @@ class AdminsController extends AppController
         $stylistCount = $stylistsTable->find()->count();
 
         //Provides Booking Count
-        //$bookingsTable = $this->fetchTable('Bookings');
-        //$bookingCount = $bookingsTable->find()->count();
+        $bookingsTable = $this->fetchTable('Bookings');
+        $bookingCount = $bookingsTable->find()->count();
 
+        //Provides Service Count
+        $servicesTable = $this->fetchTable('Services');
+        $serviceCount = $servicesTable->find()->count();
 
-
-        $this->set(compact('custCount', 'adminName', 'adminCount', 'contactCount', 'stylistCount'));
+        $this->set(compact('custCount', 'adminName', 'adminCount', 'contactCount', 'bookingCount', 'serviceCount', 'stylistCount'));
     }
 }
