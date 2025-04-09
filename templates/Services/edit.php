@@ -5,10 +5,11 @@
  * @var string[]|\Cake\Collection\CollectionInterface $stylists
  */
 ?>
-<div class="row">
-    <aside class="column">
+<div class="row" style="padding: 100px;">
+    <aside class="column column-80" >
         <div class="side-nav">
             <h4 class="heading"><?= __('Actions') ?></h4>
+            <?= $this->Html->link(__('Back to Dashboard'), ['controller'=>'Admins', 'action' => 'dashboard'], ['class' => 'side-nav-item']) ?>
             <?= $this->Form->postLink(
                 __('Delete'),
                 ['action' => 'delete', $service->id],
