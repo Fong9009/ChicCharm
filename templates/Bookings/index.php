@@ -4,45 +4,54 @@
  * @var iterable<\App\Model\Entity\Booking> $bookings
  */
 ?>
-<div class="bookings index content">
-    <?= $this->Html->link(__('New Booking'), ['action' => 'add'], ['class' => 'button float-right']) ?>
-    <h3><?= __('Bookings') ?></h3>
+<div class="contacts index content">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-2" style="padding: 10px 20px;">
+                <?= $this->Html->link(__('Back to Dashboard'), ['controller' => 'Admins', 'action' => 'dashboard'], ['class' => 'btn btn-primary', 'style' => 'white-space: nowrap;']) ?>
+            </div>
+            <div class="col-8">
+                <h3><?= __('Bookings') ?></h3>
+            </div>
+        </div>
+    </div>
     <div class="table-responsive">
         <table>
             <thead>
-                <tr>
-                    <th><?= $this->Paginator->sort('id') ?></th>
-                    <th><?= $this->Paginator->sort('booking_date') ?></th>
-                    <th><?= $this->Paginator->sort('total_cost') ?></th>
-                    <th><?= $this->Paginator->sort('remaining_cost') ?></th>
-                    <th><?= $this->Paginator->sort('customer_id') ?></th>
-                    <th class="actions"><?= __('Actions') ?></th>
-                </tr>
+            <tr>
+                <th><?= $this->Paginator->sort('booking_name') ?></th>
+                <th><?= $this->Paginator->sort('booking_date') ?></th>
+                <th><?= $this->Paginator->sort('total_cost') ?></th>
+                <th><?= $this->Paginator->sort('remaining_cost') ?></th>
+                <th class="actions"><?= __('Actions') ?></th>
+            </tr>
             </thead>
             <tbody>
-                <?php foreach ($bookings as $booking): ?>
+            <?php foreach ($bookings as $booking): ?>
                 <tr>
-                    <td><?= $this->Number->format($booking->id) ?></td>
+                    <td><?= h($booking->booking_name)?></td>
                     <td><?= h($booking->booking_date) ?></td>
                     <td><?= $this->Number->format($booking->total_cost) ?></td>
                     <td><?= $this->Number->format($booking->remaining_cost) ?></td>
-                    <td><?= $booking->hasValue('customer') ? $this->Html->link($booking->customer->first_name, ['controller' => 'Customers', 'action' => 'view', $booking->customer->id]) : '' ?></td>
                     <td class="actions">
-                        <?= $this->Html->link(__('View'), ['action' => 'view', $booking->id]) ?>
-                        <?= $this->Html->link(__('Edit'), ['action' => 'edit', $booking->id]) ?>
+                        <?= $this->Html->link(__('View'), ['action' => 'customerview', $booking->id], ['class' => 'button']) ?>
+                        <?= $this->Html->link(__('Add Stylist'), ['controller' => 'BookingsStylists', 'action' => 'customerstylistadd', $booking->id], ['class' => 'button']) ?>
+                        <?= $this->Html->link(__('Edit'), ['action' => 'edit', $booking->id], ['class' => 'button']) ?>
                         <?= $this->Form->postLink(
                             __('Delete'),
-                            ['action' => 'delete', $booking->id],
+                            ['action' => 'customerdelete', $booking->id],
                             [
                                 'method' => 'delete',
                                 'confirm' => __('Are you sure you want to delete # {0}?', $booking->id),
+                                'class' => 'button',
                             ]
                         ) ?>
                     </td>
                 </tr>
-                <?php endforeach; ?>
+            <?php endforeach; ?>
             </tbody>
         </table>
+        <?= $this->Html->link(__('New Booking'), ['action' => 'customerbooking'], ['class' => 'btn btn-primary']) ?>
     </div>
     <div class="paginator">
         <ul class="pagination">
