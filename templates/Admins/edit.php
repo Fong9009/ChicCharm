@@ -20,7 +20,7 @@ $this->assign('title', 'Edit Admin');
         </aside>
         <div class="column">
             <div class="customers form content">
-                <?= $this->Form->create($admin) ?>
+                <?= $this->Form->create($admin, ['type' => 'file']) ?>
                 <fieldset>
                     <legend><?= __('Edit Admin') ?></legend>
                     <div class="row">
@@ -36,6 +36,27 @@ $this->assign('title', 'Edit Admin');
                             <?= $this->Form->control('email', ['label' => 'Email', 'class' => 'form-control']) ?>
                         </div>
                     </div>
+                    <!-- Profile Picture Preview -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="profile-preview text-center">
+                                <?php if (!empty($admin->profile_picture)): ?>
+                                    <img src="<?= $this->Url->image('profile/' . $admin->profile_picture) ?>"
+                                         alt="Profile Picture">
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- File Upload Location -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="input">
+                                <label for="profile_picture">Upload New Profile Picture</label>
+                                <?= $this->Form->Control('profile_picture', ['type' => 'file','class' => 'form-control','required' => false]) ?>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="row">
                         <div class="col-md-12">
                             <div class="mb-3">
@@ -49,7 +70,7 @@ $this->assign('title', 'Edit Admin');
                     <?= $this->Form->button(__('Update Admin'), ['class' => 'btn']) ?>
                 </div>
                 <?= $this->Form->end() ?>
-                
+
                 <div class="text-center mt-4">
                     <p>Want to change your password? <a href="<?= $this->Url->build(['controller' => 'Auth', 'action' => 'changePassword']) ?>">Click here</a></p>
                 </div>

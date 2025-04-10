@@ -78,7 +78,7 @@ class AdminsController extends AppController
             $data['type'] = 'admin';
             $admin = $this->Admins->patchEntity($admin, $data);
             if ($this->Admins->save($admin)) {
-                $this->Flash->success(__('The admin has been saved.'));
+                $this->Flash->success(__('The admin has been saved.'), ['key' => 'admin_notify']);
 
                 return $this->redirect(['action' => 'index']);
             }
@@ -98,13 +98,54 @@ class AdminsController extends AppController
     {
         $admin = $this->Admins->get($id, contain: []);
         if ($this->request->is(['patch', 'post', 'put'])) {
-            $admin = $this->Admins->patchEntity($admin, $this->request->getData());
+            $data = $this->request->getData();
+            $password = $this->request->getData('password');
+
+            if ($password == null || $password == '') {
+                $data['password'] = $admin->password;
+            } else {
+                $data['password'] = $password;
+            }
+
+            //Profile Picture Upload
+            $profile = $this->request->getData('profile_picture');
+            if ($profile && $profile->getClientFilename()) {
+                //Max Size to prevent massive files from being inserted
+                //This is measured in MB so max = 4MB
+                $maxSize = 4 * 1024 * 1024;
+                if ($profile->getSize() > $maxSize) {
+                    $this->Flash->error(__('The profile picture is too big please use something smaller than 2MB.'));
+                }
+
+                //Check Filetype
+                $allowedFileTypes = ['image/jpeg', 'image/png','image/jpg'];
+                if (!in_array($profile->getClientMediaType(), $allowedFileTypes)) {
+                    $this->Flash->error(__('The profile picture must be a jpeg/jpg or png format.'));
+                }
+
+                //Delete old Image if there is one
+                if ($admin->profile_picture != null) {
+                    $oldPath = WWW_ROOT . 'img/profile/' . $admin->profile_picture;
+                    if (file_exists($oldPath)) {
+                        unlink($oldPath);
+                    }
+                }
+                //Stores file in directory
+                $filename = rand(10000, 99999) . '_' . $profile->getClientFilename();
+                $profile->moveTo(WWW_ROOT . 'img/profile/' . $filename);
+                $data['profile_picture'] = $filename;
+            } else {
+                unset($data['profile_picture']);
+            }
+            $data['nonce'] = null;
+            // Patch the entity with the data
+            $admin = $this->Admins->patchEntity($admin, $data);
+
             if ($this->Admins->save($admin)) {
                 $this->Flash->success(__('The admin has been saved.'));
-
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The admin could not be saved. Please, try again.'));
+            $this->Flash->error(__('The admin could not be updated. Please, try again.'));
         }
         $this->set(compact('admin'));
     }
@@ -119,11 +160,16 @@ class AdminsController extends AppController
     public function delete($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
+        $user = $this->Authentication->getIdentity();
         $admin = $this->Admins->get($id);
-        if ($this->Admins->delete($admin)) {
-            $this->Flash->success(__('The admin has been deleted.'));
-        } else {
-            $this->Flash->error(__('The admin could not be deleted. Please, try again.'));
+        if($user->id != $admin->id) {
+            if ($this->Admins->delete($admin)) {
+                $this->Flash->success(__('The admin has been deleted.'), ['key' => 'admin_notify']);
+            } else {
+                $this->Flash->error(__('The admin could not be deleted. Please, try again.'), ['key' => 'admin_notify']);
+            }
+        } else{
+            $this->Flash->error(__('You cannot delete yourself'), ['key' => 'admin_notify']);
         }
         return $this->redirect(['action' => 'index']);
     }
@@ -158,5 +204,19 @@ class AdminsController extends AppController
         $serviceCount = $servicesTable->find()->count();
 
         $this->set(compact('custCount', 'adminName', 'adminCount', 'contactCount', 'bookingCount', 'serviceCount', 'stylistCount'));
+    }
+
+    public function profile($id = null)
+    {
+        $user = $this->Authentication->getIdentity();
+        //Check if the logged-in admin's ID matches the ID in the URL
+        if ($user->id != $id) {
+            //Redirect to their own profile
+            return $this->redirect(['controller' => 'Admins', 'action' => 'profile', $user->id]);
+        }
+        // If the IDs match, fetch the admin's profile
+        $admin = $this->Admins->get($id);
+        // Set variables to pass to the view
+        $this->set(compact('admin'));
     }
 }

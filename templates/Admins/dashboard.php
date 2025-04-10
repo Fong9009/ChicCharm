@@ -1,5 +1,6 @@
 <?php
 $this->layout = 'default';
+$identity = $this->request->getAttribute('identity');
 ?>
 <?= $this->Html->css('/dashboard/dash.css') ?>
 <?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
@@ -14,6 +15,32 @@ $this->layout = 'default';
                 <h2 id="timeValue" class="mt-2"></h2>
             </div>
         </div>
+        <!-- Admin Personal Utility-->
+        <div>
+            <h2 class="welcome-text"> Admin Shortcuts</h2>
+        </div>
+        <hr class="flex-grow-1 mx-auto" style="border: none; height: 3px; background-color: #050505;"/>
+        <div class="row">
+            <div class="col-lg-3  mb-4">
+                <div class="card h-100">
+                    <div class="card-header admin-card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="admin-card-h4">Profile</h4>
+                        </div>
+                        <i class="material-icons admin-icon">engineering</i>
+                    </div>
+                    <div class="card-body admin-card-body"></div>
+                    <div class="card-footer admin-card-footer">
+                        <?= $this->Html->link(
+                            '<span class="fs-5">View Admin Profile</span><i class="material-icons">visibility</i>',
+                            ['controller' => 'Admins', 'action' => 'profile', $identity->get('id')],
+                            ['class' => 'admin-button', 'escape' => false]
+                        ) ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div>
             <h2 class="welcome-text"> Quick Access</h2>
         </div>
@@ -37,7 +64,7 @@ $this->layout = 'default';
                     </div>
                     <div class="card-footer customer-card-footer">
                         <?= $this->Html->link(
-                            '<span>View Customer Lists</span><i class="material-icons">visibility</i>',
+                            '<span class="fs-5">View Customer Lists</span><i class="material-icons">visibility</i>',
                             ['controller' => 'Customers', 'action' => 'index'],
                             ['class' => 'customer-button', 'escape' => false]
                         ) ?>
@@ -62,7 +89,7 @@ $this->layout = 'default';
                     </div>
                     <div class="card-footer admin-card-footer">
                         <?= $this->Html->link(
-                            '<span>View Admin Lists</span><i class="material-icons">visibility</i>',
+                            '<span class="fs-5">View Admin Lists</span><i class="material-icons">visibility</i>',
                             ['controller' => 'Admins', 'action' => 'index'],
                             ['class' => 'admin-button', 'escape' => false]
                         ) ?>
@@ -90,7 +117,7 @@ $this->layout = 'default';
                     </div>
                     <div class="card-footer contractor-card-footer">
                         <?= $this->Html->link(
-                            '<span>View Stylist Lists</span><i class="material-icons">visibility</i>',
+                            '<span class="fs-5">View Stylist Lists</span><i class="material-icons">visibility</i>',
                             ['controller' => 'Stylists', 'action' => 'index'],
                             ['class' => 'contractor-button', 'escape' => false]
                         ) ?>
@@ -115,7 +142,7 @@ $this->layout = 'default';
                     </div>
                     <div class="card-footer contact-card-footer">
                         <?= $this->Html->link(
-                            '<span>View Contact Lists</span><i class="material-icons">visibility</i>',
+                            '<span class="fs-5">View Contact Lists</span><i class="material-icons">visibility</i>',
                             ['controller' => 'Contacts', 'action' => 'index'],
                             ['class' => 'contact-button', 'escape' => false]
                         ) ?>
@@ -143,7 +170,7 @@ $this->layout = 'default';
                     </div>
                     <div class="card-footer booking-card-footer">
                         <?= $this->Html->link(
-                            '<span>View Booking Lists</span><i class="material-icons">visibility</i>',
+                            '<span class="fs-5">View Booking Lists</span><i class="material-icons">visibility</i>',
                             ['controller' => 'Bookings', 'action' => 'index'],
                             ['class' => 'booking-button', 'escape' => false]
                         ) ?>
@@ -168,7 +195,7 @@ $this->layout = 'default';
                     </div>
                     <div class="card-footer payment-card-footer">
                         <?= $this->Html->link(
-                            '<span>View Payment Lists</span><i class="material-icons">visibility</i>',
+                            '<span class="fs-5">View Payment Lists</span><i class="material-icons">visibility</i>',
                             ['controller' => 'Payments', 'action' => 'index'],
                             ['class' => 'payment-button', 'escape' => false]
                         ) ?>
@@ -195,7 +222,7 @@ $this->layout = 'default';
                     </div>
                     <div class="card-footer service-card-footer">
                         <?= $this->Html->link(
-                            '<span>View Stylist Lists</span><i class="material-icons">visibility</i>',
+                            '<span class="fs-5">View Stylist Lists</span><i class="material-icons">visibility</i>',
                             ['controller' => 'Services', 'action' => 'index'],
                             ['class' => 'service-button', 'escape' => false]
                         ) ?>

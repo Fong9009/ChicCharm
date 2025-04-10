@@ -76,7 +76,6 @@ class CustomersController extends AppController
         // Use the default layout which includes the navigation
         $this->viewBuilder()->setLayout('default');
         $this->set(compact('customer', 'bookings'));
-
     }
 
     /**

@@ -9,6 +9,9 @@ $this->Html->css('custom', ['block' => true]);
 $this->Html->script('custom', ['block' => true]);
 ?>
 <div class="custom-list-wrapper">
+    <div style="padding-top: 60px;">
+        <?= $this->Flash->render('admin_notify') ?>
+    </div>
     <div class="contacts index content">
         <div class="table-responsive">
             <div class="container">
