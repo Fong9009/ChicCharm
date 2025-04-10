@@ -25,7 +25,7 @@ $this->Html->css('custom', ['block' => true]);
                     </div>
                 </div>
                 <div class="search-filter-container">
-                    <?= $this->Form->create(null, ['type' => 'get', 'url' => ['action' => 'filter', $booking_id], 'class' => 'filter-form']) ?>
+                    <?= $this->Form->create(null, ['type' => 'get', 'url' => ['action' => 'customerstylistadd', $booking_id], 'class' => 'filter-form']) ?>
                     <?= $this->Form->hidden('filter', ['value' => '1']) ?>
                     <div class="row">
                         <div class="col-md-4">

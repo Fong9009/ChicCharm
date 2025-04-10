@@ -14,7 +14,7 @@ $this->layout = 'default';
                         <h2>Welcome, <?= h($customer->first_name) ?> <?= h($customer->last_name) ?>!</h2>
                     </div>
                 </div>
-                
+
                 <!--Profile Picture and Summary-->
                 <div class="row">
                     <div class="col-md-6 mb-4">
@@ -31,7 +31,7 @@ $this->layout = 'default';
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="col-md-6 mb-4">
                         <div class="card h-100">
                             <div class="card-header d-flex justify-content-between align-items-center">
@@ -50,7 +50,7 @@ $this->layout = 'default';
                         </div>
                     </div>
                 </div>
-                
+
                 <!--Current Bookings-->
                 <div class="row">
                     <div class="col-12 mb-4">
@@ -83,7 +83,7 @@ $this->layout = 'default';
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <?php foreach ($customer->bookings as $booking): ?>
+                                                <?php foreach ($bookings as $booking): ?>
                                                 <tr>
                                                     <td><?= h($booking->booking_name) ?></td>
                                                     <td><?= h($booking->booking_date->format('F j, Y')) ?></td>
@@ -103,7 +103,7 @@ $this->layout = 'default';
                         </div>
                     </div>
                 </div>
-                
+
                 <!--Past Bookings-->
                 <div class="row">
                     <div class="col-12 mb-4">
@@ -122,7 +122,7 @@ $this->layout = 'default';
                         </div>
                     </div>
                 </div>
-                
+
                 <!--Past Invoices-->
                 <div class="row">
                     <div class="col-12 mb-4">
