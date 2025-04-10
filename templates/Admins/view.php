@@ -26,7 +26,7 @@ $adminId = $this->request->getAttribute('identity')->id
                             </div>
                             <div class="card-body view-card-body"></div>
                             <div class="card-footer view-card-footer">
-                                <span>Edit Admins</span>
+                                <span>Edit Admin</span>
                             </div>
                         </div>',
                             ['controller' => 'Admins', 'action' => 'edit', $admin->id],
