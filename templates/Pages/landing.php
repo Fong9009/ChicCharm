@@ -53,7 +53,7 @@ $this->layout = 'publiclayout';
                         <h4 class="text-white mt-0">A New Era</h4>
                         <hr class="divider divider-light" />
 
-                        <p class="text-white-75 mb-4">
+                        <p class="text-white-75 fs-5 mb-4">
                             ChicCharm is commited to providing a fresh experience to returning
                             customers all while attracting new clients far and wide.
                             We are committed to providing the highest quality and expertise for your fashion shoots and

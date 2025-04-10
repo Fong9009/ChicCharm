@@ -34,7 +34,7 @@
                     <td><?= $this->Number->format($booking->total_cost) ?></td>
                     <td><?= $this->Number->format($booking->remaining_cost) ?></td>
                     <td class="actions">
-                        <?= $this->Html->link(__('View'), ['action' => 'customerview', $booking->id], ['class' => 'button']) ?>
+                        <?= $this->Html->link(__('View'), ['action' => 'view', $booking->id], ['class' => 'button']) ?>
                         <?= $this->Html->link(__('Add Stylist'), ['controller' => 'BookingsStylists', 'action' => 'customerstylistadd', $booking->id], ['class' => 'button']) ?>
                         <?= $this->Html->link(__('Edit'), ['action' => 'edit', $booking->id], ['class' => 'button']) ?>
                         <?= $this->Form->postLink(

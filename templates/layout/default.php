@@ -36,7 +36,7 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
     <?= $this->Html->css('/landing-detail/css/styles.css') ?>
     <?= $this->Html->css(['fonts', 'cake', 'custom']) ?>
     <?= $this->Html->script('custom') ?>
-    
+
     <?= $this->fetch('meta') ?>
     <?= $this->fetch('css') ?>
     <?= $this->fetch('script') ?>
@@ -115,6 +115,12 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
                                     <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'add']) ?>">
                                         <i class="fas fa-user-plus"></i>
                                         <span>Add New Admin</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'profile', $identity->get('id')]) ?>">
+                                        <i class="fas fa-user-shield"></i>
+                                        <span>Admin Profile</span>
                                     </a>
                                 </li>
                             </ul>
