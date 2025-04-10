@@ -78,7 +78,7 @@ class AdminsController extends AppController
             $data['type'] = 'admin';
             $admin = $this->Admins->patchEntity($admin, $data);
             if ($this->Admins->save($admin)) {
-                $this->Flash->success(__('The admin has been saved.'));
+                $this->Flash->success(__('The admin has been saved.'), ['key' => 'admin_notify']);
 
                 return $this->redirect(['action' => 'index']);
             }
@@ -119,11 +119,16 @@ class AdminsController extends AppController
     public function delete($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
+        $user = $this->Authentication->getIdentity();
         $admin = $this->Admins->get($id);
-        if ($this->Admins->delete($admin)) {
-            $this->Flash->success(__('The admin has been deleted.'));
-        } else {
-            $this->Flash->error(__('The admin could not be deleted. Please, try again.'));
+        if($user->id != $admin->id) {
+            if ($this->Admins->delete($admin)) {
+                $this->Flash->success(__('The admin has been deleted.'), ['key' => 'admin_notify']);
+            } else {
+                $this->Flash->error(__('The admin could not be deleted. Please, try again.'), ['key' => 'admin_notify']);
+            }
+        } else{
+            $this->Flash->error(__('You cannot delete yourself'), ['key' => 'admin_notify']);
         }
         return $this->redirect(['action' => 'index']);
     }
