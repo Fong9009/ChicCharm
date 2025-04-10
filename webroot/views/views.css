@@ -1,0 +1,110 @@
+
+.view-card-header {
+    background-color: #1f89e5;
+    border:none;
+}
+.view-card-body {
+    background-color: #1f89e5;
+}
+.view-card-footer {
+    background-color: #1569b1;
+    color: white;
+    display: flex;
+    justify-content: center;
+}
+
+.card-footer .view-button {
+    background-color: #1569b1;
+    color: white;
+    display: flex;
+    justify-content: center;
+}
+
+.view-card-h4 {
+    font-size: 28px;
+    font-weight: bold;
+    color: white;
+}
+.view-card-h3 {
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+}
+.view-card-count {
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+}
+.view-icon {
+    color: white;
+    margin-left: auto;
+    margin-top: -10px;
+}
+
+
+/* Delete Stylists */
+.delete-card-header {
+    background-color: #da3544;
+    border:none;
+}
+.delete-card-body {
+    background-color: #da3544;
+}
+.delete-card-footer {
+    background-color: #a82a36;
+    color: white;
+    display: flex;
+    justify-content: center;
+}
+
+.card-footer .delete-button {
+    background-color: #a82a36;
+    color: white;
+    display: flex;
+    justify-content: center; /* Center the content horizontally */
+}
+
+/* List Stylists */
+.list-card-header {
+    background-color: #ef8b37;
+    border:none;
+}
+.list-card-body {
+    background-color: #ef8b37;
+}
+.list-card-footer {
+    background-color: #cc7a38;
+    color: white;
+    display: flex;
+    justify-content: center;
+}
+
+.card-footer .list-button {
+    background-color: #cc7a38;
+    color: white;
+    display: flex;
+    justify-content: center; /* Center the content horizontally */
+}
+
+/* New Stylists */
+.new-card-header {
+    background-color: #058413;
+    border:none;
+}
+.new-card-body {
+    background-color: #058413;
+}
+.new-card-footer {
+    background-color: #057512;
+    color: white;
+    display: flex;
+    justify-content: center;
+}
+
+.card-footer .new-button {
+    background-color: #057512;
+    color: white;
+    display: flex;
+    justify-content: center; /* Center the content horizontally */
+}
+
