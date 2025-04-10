@@ -14,6 +14,7 @@ use Authentication\PasswordHasher\DefaultPasswordHasher;
  * @property string $last_name
  * @property string $email
  * @property string $password
+ * @property string|null $profile_picture
  */
 class Admin extends Entity
 {
@@ -30,13 +31,14 @@ class Admin extends Entity
         'first_name' => true,
         'last_name' => true,
         'email' => true,
-        'password' => true, 
+        'password' => true,
         'password_confirm' => true,
         'created' => false,
         'modified' => false,
-        'nonce' => false, 
+        'nonce' => false,
         'nonce_expiry' => false,
         'type' => true,
+        'profile_picture' => true,
     ];
 
     /**
@@ -45,7 +47,7 @@ class Admin extends Entity
      * @var list<string>
      */
     protected array $_hidden = [
-        'password', 
+        'password',
         'password_confirm',
     ];
 

@@ -117,6 +117,12 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
                                         <span>Add New Admin</span>
                                     </a>
                                 </li>
+                                <li>
+                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'profile', $identity->get('id')]) ?>">
+                                        <i class="fas fa-user-shield"></i>
+                                        <span>Admin Profile</span>
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                     <?php } elseif ($identity->get('type') === 'customer') {
