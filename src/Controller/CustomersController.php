@@ -65,10 +65,18 @@ class CustomersController extends AppController
                 'sort' => ['Bookings.booking_date' => 'DESC']
             ]]
         ]);
-        $this->set(compact('customer'));
+
+        $bookingsTable = $this->fetchTable('Bookings');
+        $customerId = $this->request->getAttribute('identity')->id;
+        $query = $bookingsTable->find()
+            ->where(['Bookings.customer_id' => $customerId])
+            ->order(['Bookings.booking_date' => 'DESC']);
+        $bookings = $this->paginate($query);
 
         // Use the default layout which includes the navigation
         $this->viewBuilder()->setLayout('default');
+        $this->set(compact('customer', 'bookings'));
+
     }
 
     /**
@@ -80,11 +88,11 @@ class CustomersController extends AppController
     {
         // Allow sorting by specific fields
         $this->paginate = [
-            'order' => ['created' => 'DESC'] 
+            'order' => ['created' => 'DESC']
         ];
-        
+
         $query = $this->Customers->find();
-        
+
         // Search functionality
         $search = $this->request->getQuery('search');
         if ($search) {
@@ -96,13 +104,13 @@ class CustomersController extends AppController
                 ]
             ]);
         }
-        
+
         // Filter functionality (using the dropdown)
         $filter = $this->request->getQuery('filter');
-        
+
         // Pagination applies sorting based on request or default
         $customers = $this->paginate($query);
-        
+
         $this->set(compact('customers'));
     }
 
