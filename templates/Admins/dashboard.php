@@ -40,6 +40,7 @@ $identity = $this->request->getAttribute('identity');
                 </div>
             </div>
         </div>
+        <?= $this->Html->link('Content Blocks', ['plugin' => 'ContentBlocks', 'controller' => 'ContentBlocks', 'action' => 'index']) ?>
 
         <div>
             <h2 class="welcome-text"> Quick Access</h2>
