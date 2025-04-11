@@ -128,13 +128,13 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
                     <?php } elseif ($identity->get('type') === 'customer') {
                         // Customer Navigation ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="/#about">About</a>
+                            <a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/#services">Services</a>
+                            <a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/#portfolio">Portfolio</a>
+                            <a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link"
