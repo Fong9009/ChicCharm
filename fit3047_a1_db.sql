@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 11, 2025 at 03:26 AM
+-- Generation Time: Apr 11, 2025 at 04:06 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -219,7 +219,8 @@ INSERT INTO `content_blocks` (`id`, `parent`, `slug`, `label`, `description`, `t
 (23, 'Landing', 'booking-button', 'Booking Button', 'Button for booking', 'text', 'Make a Booking with ChicCharm', NULL, '2025-04-11 01:09:07'),
 (24, 'Landing', 'past-work-title', 'Past work title', 'Title', 'text', 'Some of ChicCharms latest works', NULL, '2025-04-11 01:10:08'),
 (25, 'Landing', 'past-text', 'Past text', 'Text description', 'text', 'ChicCharm is dedicated to helping make sure that your show is ready on the stage or a model show,\r\n                    Our Business is nothing without our fabulous customers who continue to work with us', NULL, '2025-04-11 01:10:49'),
-(26, 'Photos', 'photo-test', 'Photo Test', 'Photo Test', 'image', '/content-blocks/uploads/photo-test.0c5a460258f8dd77008ecac8d5de80eb.jpg', NULL, '2025-04-11 01:16:19');
+(26, 'Photos', 'photo-about', 'Photo about', 'Photo about', 'image', '/content-blocks/uploads/photo-test.0c5a460258f8dd77008ecac8d5de80eb.jpg', NULL, '2025-04-11 01:51:56'),
+(27, 'Photos', 'mast-photo', 'Cover photo', 'photo', 'image', '/content-blocks/uploads/mast-photo.59be958825f3b623353eae8d71e42064.jpg', NULL, '2025-04-11 01:53:54');
 
 -- --------------------------------------------------------
 
@@ -467,7 +468,7 @@ ALTER TABLE `contacts`
 -- AUTO_INCREMENT for table `content_blocks`
 --
 ALTER TABLE `content_blocks`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `customers`

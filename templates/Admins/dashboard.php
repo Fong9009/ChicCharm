@@ -39,9 +39,25 @@ $identity = $this->request->getAttribute('identity');
                     </div>
                 </div>
             </div>
+            <div class="col-lg-3  mb-4">
+                <div class="card h-100">
+                    <div class="card-header payment-card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="payment-card-h4">Web</h4>
+                        </div>
+                        <i class="material-icons admin-icon">settings</i>
+                    </div>
+                    <div class="card-body payment-card-body"></div>
+                    <div class="card-footer payment-card-footer">
+                        <?= $this->Html->link(
+                            '<span class="fs-5">View Content Blocks</span><i class="material-icons">visibility</i>',
+                            ['plugin' => 'ContentBlocks', 'controller' => 'ContentBlocks', 'action' => 'index'],
+                            ['class' => 'payment-button', 'escape' => false]
+                        ) ?>
+                    </div>
+                </div>
+            </div>
         </div>
-        <?= $this->Html->link('Content Blocks', ['plugin' => 'ContentBlocks', 'controller' => 'ContentBlocks', 'action' => 'index']) ?>
-
         <div>
             <h2 class="welcome-text"> Quick Access</h2>
         </div>
