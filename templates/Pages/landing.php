@@ -1,5 +1,19 @@
 <?php
 $this->layout = 'publiclayout';
+$identity = $this->request->getAttribute('identity');
+$bookingButton = $this->ContentBlock->text('booking-button');
+if ($identity) {
+    if ($identity->type === 'customer') {
+        $link = ['controller' => 'Bookings', 'action' => 'customerbooking'];
+    } elseif ($identity->type === 'admin') {
+        $link = ['controller' => 'Bookings', 'action' => 'index'];
+    } else {
+        //For expandability
+        $link = ['controller' => 'Pages', 'action' => 'display', 'landing'];
+    }
+} else {
+    $link = ['controller' => 'Auth', 'action' => 'login'];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -28,17 +42,16 @@ $this->layout = 'publiclayout';
                 <div class="row gx-3 gx-lg-5 h-100 align-items-center text-start text-md-start">
                     <div class="col-lg-8 align-self-end">
                         <h1 class="text-white font-weight-bold fade-in-title text-center text-md-start">
-                            Australia's Go-To For Fashion & Entertainment Services
+                            <?= $this->ContentBlock->text('web-title'); ?>
                         </h1>
                         <hr class="w-100 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
                     </div>
                     <div class="col-lg-8 align-self-baseline">
                         <p class="text-white-75 mb-5 fade-in-para text-center text-md-start">
-                            Out with the old and in with the new, ChicCharm's diverse range of services are sure to
-                            assist your needs in makeup artistry, wig styling, fashion design and hairstyling
+                            <?= $this->ContentBlock->text('title-catch'); ?>
                         </p>
                         <div class="text-center text-md-start">
-                            <a class="btn btn-primary btn-xl fade-in-para" href="#about">Discover the World of ChicCharm</a>
+                            <a class="btn btn-primary btn-xl fade-in-para" href="#about"> <?= $this->ContentBlock->text('discover-button'); ?></a>
                         </div>
                     </div>
                 </div>
@@ -49,26 +62,21 @@ $this->layout = 'publiclayout';
             <div class="container mb-5 px-4 px-lg-5">
                 <div class="row gx-4 gx-lg-5 justify-content-center">
                     <div class="col-lg-8 text-center">
-                        <h2 class="text-white mt-0 display-1">ChicCharm</h2>
-                        <h4 class="text-white mt-0">A New Era</h4>
+                        <h2 class="text-white mt-0 display-1"><?= $this->ContentBlock->text('about-chiccharm-title'); ?></h2>
+                        <h4 class="text-white mt-0"><?= $this->ContentBlock->text('about-catch'); ?></h4>
                         <hr class="divider divider-light" />
-
-                        <p class="text-white-75 fs-5 mb-4">
-                            ChicCharm is commited to providing a fresh experience to returning
-                            customers all while attracting new clients far and wide.
-                            We are committed to providing the highest quality and expertise for your fashion shoots and
-                            theatre entertainments
-                            Even so we still provide the same loved services that our customers adore With a new
-                            Business direction our services are only going to get wider!
-                        </p>
-
+                        <div class="text-white-75 fs-5 mb-4">
+                            <?= $this->ContentBlock->text('about-desc'); ?>
+                        </div>
                         <hr class="divider divider-light" />
                     </div>
                     <div class="col-lg-8 d-flex justify-content-center mb-xl-5">
-                        <img src="<?= $this->Url->image('model.jpg')?>"
-                             alt="Image Description"
-                             class="img-fluid"
-                             style="max-width: 100%; height: auto; object-fit: contain;">
+                        <div style="max-width: 950px; max-height: 520px; overflow: hidden;">
+                            <?= $this->ContentBlock->image('photo-about', [
+                                'style' => 'max-width: 100%; max-height: 520px; width: auto; height: auto; object-fit: contain;',
+                                'class' => 'img-fluid'
+                            ]); ?>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -76,23 +84,13 @@ $this->layout = 'publiclayout';
             <div class="container mb-4 px-4 px-lg-5">
                 <div class="row gx-5 gx-lg-5 h-50 align-items-center text-start px-lg-5">
                     <div class="col-lg-9 text-start align-self-start order-lg-1">
-                        <h2 class="text-white mt-0 display-1">Meet Michonne</h2>
-                        <h4 class="text-white mt-0">The Owner and Visionary of ChicCharm's Future Creativity</h4>
+                        <h2 class="text-white mt-0 display-1"><?= $this->ContentBlock->text('owner-title-text'); ?></h2>
+                        <h4 class="text-white mt-0"><?= $this->ContentBlock->text('desc-owner'); ?></h4>
                         <hr class="flex-grow-1 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
-                        <h5 class="text-white mt-0">"Creativity is what drives ChicCharm and that is what I am about"</h5>
-
-                        <p class="text-white-75 fs-5 mb-4">
-                            Michonne had envisioned a future business that would take the fashion and entertainment
-                            industry by storm. <br>
-                            Seeing that the fashion and entertainment industry had yet to take its shape in Australia,
-                            Michonne had saw an opportunity. <br>
-                            An opportunity to provide fashion and makeup services to cater for modelling and the
-                            entertainment industry <br>
-                            Michonne believes that with enough dedication and a new makeover of
-                            ChicCharm she can bring it onto the not just the local stage<br>
-                            But the whole of Australia.
-                        </p>
-
+                        <h5 class="text-white mt-0"><?= $this->ContentBlock->text('owner-quote'); ?></h5>
+                        <div class="text-white-75 fs-5 mb-4">
+                            <?= $this->ContentBlock->text('vision-statement'); ?>
+                        </div>
                         <hr class="flex-grow-1 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
                     </div>
                     <div class="col-lg-3 mb-2 order-lg-2">
@@ -110,28 +108,27 @@ $this->layout = 'publiclayout';
         <section class="page-section" id="services" style="padding-left: 100px; padding-right: 100px;">
             <div class="container">
                 <div class="row">
-                    <h2 class="text-center mt-0">ChicCharm At Your Service</h2>
+                    <h2 class="text-center mt-0"><?= $this->ContentBlock->text('service-title'); ?></h2>
                     <hr class="divider" />
-                    <h3 class="text-center mt-0">ChicCharm is dedicated to provide your show with the finest of artisens who are masters of their craft.
-                        They will make sure that your models or stars of the show will shine brighter than ever.</h3>
+                    <h3 class="text-center mt-0"><?= $this->ContentBlock->text('service-desc'); ?></h3>
                 </div>
                 <hr class="divider" />
                 <div class="row gx-4 gx-lg-5">
                     <div class="col-lg-3 col-md-5 text-center">
-                        <h4>Makeup Artistry</h4>
-                        <p class="fs-5">ChicCharm can make sure your stars of the show shine.</p>
+                        <h4><?= $this->ContentBlock->text('service-one-title'); ?></h4>
+                        <p class="fs-5"><?= $this->ContentBlock->text('service-one-desc'); ?></p>
                     </div>
                     <div class="col-lg-3 col-md-5 text-center">
-                        <h4>Wig Styling</h4>
-                        <p class="fs-5">ChicCharm can design custom wigs for all your needs.</p>
+                        <h4><?= $this->ContentBlock->text('service-two-title'); ?></h4>
+                        <p class="fs-5"><?= $this->ContentBlock->text('service-two-desc'); ?></p>
                     </div>
                     <div class="col-lg-3 col-md-5 text-center">
-                        <h4>Fashion Design</h4>
-                        <p class="fs-5">ChicCharm can design custom clothes for all your theatre needs.</p>
+                        <h4><?= $this->ContentBlock->text('service-three-title'); ?></h4>
+                        <p class="fs-5"><?= $this->ContentBlock->text('service-three-desc'); ?></p>
                     </div>
                     <div class="col-lg-3 col-md-5 text-center">
-                        <h4>Hair Styling</h4>
-                        <p class="fs-5">ChicCharm can make sure your stars hairs are stunning and fabulous.</p>
+                        <h4><?= $this->ContentBlock->text('service-four-title'); ?></h4>
+                        <p class="fs-5"><?= $this->ContentBlock->text('service-four-desc'); ?></p>
                     </div>
                 </div>
                 <div class="row gx-4 gx-lg-5">
@@ -165,16 +162,15 @@ $this->layout = 'publiclayout';
                 <hr class="flex-grow-1 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
                 <div class="row gx-4 gx-lg-5">
                     <div class="d-flex justify-content-center mb-4">
-                        <a class="btn btn-primary btn-xl" href="#about">Make a Booking with ChicCharm</a>
+                        <?= $this->Html->link($bookingButton, $link, ['class' => 'btn btn-primary btn-xl']) ?>
                     </div>
                 </div>
             </div>
             <div class="container px-4 px-lg-5">
                 <div class="row gx-4 gx-lg-5">
-                    <h2 class="text-center mt-0">Some of ChicCharms latest works</h2>
+                    <h2 class="text-center mt-0"><?= $this->ContentBlock->text('past-work-title'); ?></h2>
                     <hr class="divider" />
-                    <h3 class="text-center mt-0">ChicCharm is dedicated to helping make sure that your show is ready on the stage or a model show,
-                    Our Business is nothing without our fabulous customers who continue to work with us</h3>
+                    <h3 class="text-center mt-0"><?= $this->ContentBlock->text('past-text'); ?></h3>
                     <hr class="divider" />
                 </div>
             </div>

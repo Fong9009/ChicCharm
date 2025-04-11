@@ -39,5 +39,6 @@ class AppView extends View
     {
         $this->loadHelper('Recaptcha.Recaptcha');
         $this->loadHelper('Authentication.Identity');
+        $this->loadHelper('ContentBlocks.ContentBlock');
     }
 }
