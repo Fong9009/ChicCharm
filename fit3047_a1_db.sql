@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 10, 2025 at 03:26 PM
+-- Generation Time: Apr 11, 2025 at 03:26 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -176,6 +176,75 @@ INSERT INTO `contacts` (`id`, `first_name`, `last_name`, `email`, `phone_number`
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `content_blocks`
+--
+
+CREATE TABLE `content_blocks` (
+  `id` int(11) NOT NULL,
+  `parent` varchar(128) NOT NULL,
+  `slug` varchar(128) NOT NULL,
+  `label` varchar(255) NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `type` varchar(32) NOT NULL,
+  `value` text DEFAULT NULL,
+  `previous_value` text DEFAULT NULL,
+  `modified` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `content_blocks`
+--
+
+INSERT INTO `content_blocks` (`id`, `parent`, `slug`, `label`, `description`, `type`, `value`, `previous_value`, `modified`) VALUES
+(3, 'Landing', 'web-title', 'Web Title', 'The main name of Chiccharm', 'text', 'Australia\'s Go-To For Fashion & Entertainment Services', NULL, '2025-04-11 00:26:03'),
+(4, 'Landing', 'title-catch', 'Title Description', 'Description under the main page attraction', 'text', '           Out with the old and in with the new, ChicCharm\'s diverse range of services are sure to\r\n                            assist your needs in makeup artistry, wig styling, fashion design and hairstyling', NULL, '2025-04-11 00:27:40'),
+(5, 'Landing', 'discover-button', 'Discover Button', 'This is for the first call to action button', 'text', 'Discover the World of ChicCharm', NULL, '2025-04-11 00:31:10'),
+(6, 'Landing', 'about-chiccharm-title', 'About Chiccharm Title', 'ChicCharm about title', 'text', 'ChicCharm', NULL, '2025-04-11 00:38:05'),
+(7, 'Landing', 'about-catch', 'About Catch', 'Catch for the about section', 'text', 'A New Era', NULL, '2025-04-11 00:35:37'),
+(8, 'Landing', 'about-desc', 'Description in about', 'Description in about', 'text', '                            ChicCharm is commited to providing a fresh experience to returning\r\n                            customers all while attracting new clients far and wide.\r\n                            We are committed to providing the highest quality and expertise for your fashion shoots and\r\n                            theatre entertainments\r\n                            Even so we still provide the same loved services that our customers adore With a new\r\n                            Business direction our services are only going to get wider!', NULL, '2025-04-11 00:47:11'),
+(9, 'Landing', 'owner-title-text', 'Owner Title', 'Title of the owner', 'text', 'Meet Michonne', NULL, '2025-04-11 00:48:06'),
+(10, 'Landing', 'desc-owner', 'Description of Owner', 'Description of Owner', 'text', 'The Owner and Visionary of ChicCharm\'s Future Creativity', NULL, '2025-04-11 00:50:52'),
+(11, 'Landing', 'owner-quote', 'Quote from Owner', 'Quote from Owner', 'text', '\"Creativity is what drives ChicCharm and that is what I am about\"', NULL, '2025-04-11 00:52:41'),
+(12, 'Landing', 'vision-statement', 'Vision Statement', 'Statement of ChicCharms Vision', 'text', 'Michonne had envisioned a future business that would take the fashion and entertainment industry by storm. <br />Seeing that the fashion and entertainment industry had yet to take its shape in Australia, Michonne had saw an opportunity. <br />An opportunity to provide fashion and makeup services to cater for modelling and the entertainment industry <br />Michonne believes that with enough dedication and a new makeover of ChicCharm she can bring it onto the not just the local stage<br />But the whole of Australia.', NULL, '2025-04-11 00:52:20'),
+(13, 'Landing', 'service-title', 'Service Title', 'The Title for landing page service', 'text', 'ChicCharm At Your Service', NULL, '2025-04-11 00:55:39'),
+(14, 'Landing', 'service-desc', 'Service Description', 'Description of services provided at ChicCharm', 'text', 'ChicCharm is dedicated to provide your show with the finest of artisens who are masters of their craft.\r\n                        They will make sure that your models or stars of the show will shine brighter than ever.', NULL, '2025-04-11 00:56:39'),
+(15, 'Landing', 'service-one-title', 'Service one title', 'First service title', 'text', 'Makeup Artistry', NULL, '2025-04-11 01:06:58'),
+(16, 'Landing', 'service-one-desc', 'Service one description', 'Description Text', 'text', 'ChicCharm can make sure your stars of the show shine.', NULL, '2025-04-11 01:07:15'),
+(17, 'Landing', 'service-two-title', 'Service two title', 'Service Title', 'text', 'Wig Styling', NULL, '2025-04-11 01:02:10'),
+(18, 'Landing', 'service-two-desc', 'Service two description', 'Description Text', 'text', 'ChicCharm can design custom wigs for all your needs.', NULL, '2025-04-11 01:03:07'),
+(19, 'Landing', 'service-three-title', 'Service three title', 'Service title', 'text', 'Fashion Design', NULL, '2025-04-11 01:03:49'),
+(20, 'Landing', 'service-three-desc', 'Service three Description', 'Description text', 'text', 'ChicCharm can design custom clothes for all your theatre needs.', NULL, '2025-04-11 01:04:26'),
+(21, 'Landing', 'service-four-title', 'Service Four Title', 'Service Title', 'text', 'Hair Styling', NULL, '2025-04-11 01:07:38'),
+(22, 'Landing', 'service-four-desc', 'Service Four Description', 'Description Text', 'text', 'ChicCharm can make sure your stars hairs are stunning and fabulous.', NULL, '2025-04-11 01:05:41'),
+(23, 'Landing', 'booking-button', 'Booking Button', 'Button for booking', 'text', 'Make a Booking with ChicCharm', NULL, '2025-04-11 01:09:07'),
+(24, 'Landing', 'past-work-title', 'Past work title', 'Title', 'text', 'Some of ChicCharms latest works', NULL, '2025-04-11 01:10:08'),
+(25, 'Landing', 'past-text', 'Past text', 'Text description', 'text', 'ChicCharm is dedicated to helping make sure that your show is ready on the stage or a model show,\r\n                    Our Business is nothing without our fabulous customers who continue to work with us', NULL, '2025-04-11 01:10:49'),
+(26, 'Photos', 'photo-test', 'Photo Test', 'Photo Test', 'image', '/content-blocks/uploads/photo-test.0c5a460258f8dd77008ecac8d5de80eb.jpg', NULL, '2025-04-11 01:16:19');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `content_blocks_phinxlog`
+--
+
+CREATE TABLE `content_blocks_phinxlog` (
+  `version` bigint(20) NOT NULL,
+  `migration_name` varchar(100) DEFAULT NULL,
+  `start_time` timestamp NULL DEFAULT NULL,
+  `end_time` timestamp NULL DEFAULT NULL,
+  `breakpoint` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `content_blocks_phinxlog`
+--
+
+INSERT INTO `content_blocks_phinxlog` (`version`, `migration_name`, `start_time`, `end_time`, `breakpoint`) VALUES
+(20230402063959, 'ContentBlocksMigration', '2025-04-10 23:49:57', '2025-04-10 23:49:57', 0);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `customers`
 --
 
@@ -200,6 +269,20 @@ CREATE TABLE `customers` (
 INSERT INTO `customers` (`id`, `first_name`, `last_name`, `email`, `password`, `nonce`, `nonce_expiry`, `created`, `modified`, `type`, `profile_picture`) VALUES
 (1, 'Chay Fong', 'Hong', 'chayfong9009@gmail.com', '$2y$10$OEDCACaiUaYKhHkeHFuQmOLwDX9oJ4HiTD6K3bmAhkODBpG7zI6t6', NULL, NULL, '2025-03-26 11:10:12', '2025-03-26 11:10:12', 'customer', NULL),
 (2, 'Christian', 'Cochrane', 'cakephp@example.com', '$2y$10$4oCG2ResnEQbYk2rgtdTGe1faLZPOu29GZma4EfRmQ.B6vyHOk7u6', NULL, NULL, '2025-04-04 02:31:18', '2025-04-10 12:18:03', 'customer', '97406_Capture.PNG');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `phinxlog`
+--
+
+CREATE TABLE `phinxlog` (
+  `version` bigint(20) NOT NULL,
+  `migration_name` varchar(100) DEFAULT NULL,
+  `start_time` timestamp NULL DEFAULT NULL,
+  `end_time` timestamp NULL DEFAULT NULL,
+  `breakpoint` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -307,11 +390,29 @@ ALTER TABLE `contacts`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `content_blocks`
+--
+ALTER TABLE `content_blocks`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `content_blocks_phinxlog`
+--
+ALTER TABLE `content_blocks_phinxlog`
+  ADD PRIMARY KEY (`version`);
+
+--
 -- Indexes for table `customers`
 --
 ALTER TABLE `customers`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `email` (`email`);
+
+--
+-- Indexes for table `phinxlog`
+--
+ALTER TABLE `phinxlog`
+  ADD PRIMARY KEY (`version`);
 
 --
 -- Indexes for table `services`
@@ -361,6 +462,12 @@ ALTER TABLE `bookings_stylists`
 --
 ALTER TABLE `contacts`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+
+--
+-- AUTO_INCREMENT for table `content_blocks`
+--
+ALTER TABLE `content_blocks`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `customers`
