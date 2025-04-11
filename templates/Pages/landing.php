@@ -1,5 +1,19 @@
 <?php
 $this->layout = 'publiclayout';
+$identity = $this->request->getAttribute('identity');
+$bookingButton = $this->ContentBlock->text('booking-button');
+if ($identity) {
+    if ($identity->type === 'customer') {
+        $link = ['controller' => 'Bookings', 'action' => 'customerbooking'];
+    } elseif ($identity->type === 'admin') {
+        $link = ['controller' => 'Bookings', 'action' => 'index'];
+    } else {
+        //For expandability
+        $link = ['controller' => 'Pages', 'action' => 'display', 'landing'];
+    }
+} else {
+    $link = ['controller' => 'Auth', 'action' => 'login'];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -57,8 +71,11 @@ $this->layout = 'publiclayout';
                         <hr class="divider divider-light" />
                     </div>
                     <div class="col-lg-8 d-flex justify-content-center mb-xl-5">
-                        <div class="img-fluid" style="max-width: 100%; height: auto; object-fit: contain;">
-                            <?= $this->ContentBlock->image('photo-test'); ?>
+                        <div style="max-width: 950px; max-height: 520px; overflow: hidden;">
+                            <?= $this->ContentBlock->image('photo-about', [
+                                'style' => 'max-width: 100%; max-height: 520px; width: auto; height: auto; object-fit: contain;',
+                                'class' => 'img-fluid'
+                            ]); ?>
                         </div>
                     </div>
                 </div>
@@ -145,7 +162,7 @@ $this->layout = 'publiclayout';
                 <hr class="flex-grow-1 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
                 <div class="row gx-4 gx-lg-5">
                     <div class="d-flex justify-content-center mb-4">
-                        <a class="btn btn-primary btn-xl" href="#about"><?= $this->ContentBlock->text('booking-button'); ?></a>
+                        <?= $this->Html->link($bookingButton, $link, ['class' => 'btn btn-primary btn-xl']) ?>
                     </div>
                 </div>
             </div>
