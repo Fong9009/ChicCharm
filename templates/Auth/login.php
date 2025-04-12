@@ -19,19 +19,21 @@ $this->assign('title', 'Login');
             <?= $this->Form->control('email', [
                 'label' => 'Email',
                 'type' => 'email',
-                'class' => 'form-control',
+                'class' => 'form-control' . ($this->Form->isFieldError('email') ? ' is-invalid' : ''),
                 'required' => true,
                 'autofocus' => true,
-                'placeholder' => 'Enter your email'
+                'placeholder' => 'Enter your email',
+                'error' => ['class' => 'invalid-feedback']
             ]) ?>
         </div>
         <div class="input">
             <?= $this->Form->control('password', [
                 'label' => 'Password',
                 'type' => 'password',
-                'class' => 'form-control',
+                'class' => 'form-control' . ($this->Form->isFieldError('password') ? ' is-invalid' : ''),
                 'required' => true,
-                'placeholder' => 'Enter your password'
+                'placeholder' => 'Enter your password',
+                'error' => ['class' => 'invalid-feedback']
             ]) ?>
         </div>
         <?= $this->Form->button('Login', ['class' => 'submit-button']) ?>

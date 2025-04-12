@@ -94,10 +94,19 @@ class AdminsController extends AppController
             $admin = $this->Admins->patchEntity($admin, $data);
             if ($this->Admins->save($admin)) {
                 $this->Flash->success(__('The admin has been saved.'), ['key' => 'admin_notify']);
-
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The admin could not be saved. Please, try again.'));
+            
+            // Show specific error messages for each field
+            if ($admin->getErrors()) {
+                foreach ($admin->getErrors() as $field => $errors) {
+                    foreach ($errors as $error) {
+                        $this->Flash->error(__("{0}: {1}", ucfirst($field), $error));
+                    }
+                }
+            } else {
+                $this->Flash->error(__('The admin could not be saved. Please, try again.'));
+            }
         }
         $this->set(compact('admin'));
     }
@@ -111,6 +120,15 @@ class AdminsController extends AppController
      */
     public function edit($id = null)
     {
+        // Get current user
+        $currentUser = $this->Authentication->getIdentity();
+        
+        // Only allow admins to edit their own profile
+        if ($currentUser->id != $id) {
+            $this->Flash->error('Access denied. You can only edit your own profile.');
+            return $this->redirect(['action' => 'index']);
+        }
+
         $admin = $this->Admins->get($id, contain: []);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
@@ -157,10 +175,20 @@ class AdminsController extends AppController
             $admin = $this->Admins->patchEntity($admin, $data);
 
             if ($this->Admins->save($admin)) {
-                $this->Flash->success(__('The admin has been saved.'));
+                $this->Flash->success(__('Your profile has been updated.'));
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The admin could not be updated. Please, try again.'));
+            
+            // Show specific error messages for each field
+            if ($admin->getErrors()) {
+                foreach ($admin->getErrors() as $field => $errors) {
+                    foreach ($errors as $error) {
+                        $this->Flash->error(__("{0}: {1}", ucfirst($field), $error));
+                    }
+                }
+            } else {
+                $this->Flash->error(__('The profile could not be updated. Please, try again.'));
+            }
         }
         $this->set(compact('admin'));
     }
@@ -175,17 +203,23 @@ class AdminsController extends AppController
     public function delete($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
-        $user = $this->Authentication->getIdentity();
-        $admin = $this->Admins->get($id);
-        if($user->id != $admin->id) {
-            if ($this->Admins->delete($admin)) {
-                $this->Flash->success(__('The admin has been deleted.'), ['key' => 'admin_notify']);
-            } else {
-                $this->Flash->error(__('The admin could not be deleted. Please, try again.'), ['key' => 'admin_notify']);
-            }
-        } else{
-            $this->Flash->error(__('You cannot delete yourself'), ['key' => 'admin_notify']);
+        
+        // Get current user
+        $currentUser = $this->Authentication->getIdentity();
+        
+        // Prevent deleting own account
+        if ($currentUser->id == $id) {
+            $this->Flash->error(__('You cannot delete your own account.'));
+            return $this->redirect(['action' => 'index']);
         }
+        
+        $admin = $this->Admins->get($id);
+        if ($this->Admins->delete($admin)) {
+            $this->Flash->success(__('The admin has been deleted.'));
+        } else {
+            $this->Flash->error(__('The admin could not be deleted. Please, try again.'));
+        }
+
         return $this->redirect(['action' => 'index']);
     }
 
@@ -234,4 +268,43 @@ class AdminsController extends AppController
         // Set variables to pass to the view
         $this->set(compact('admin'));
     }
+
+    public function changePassword()
+    {
+        $admin = $this->Admins->get($this->Authentication->getIdentity()->id);
+        if ($this->request->is(['patch', 'post', 'put'])) {
+            $data = $this->request->getData();
+            
+            // Verify current password
+            $hasher = new DefaultPasswordHasher();
+            if (!$hasher->check($data['current_password'], $admin->password)) {
+                $this->Flash->error(__('Current password is incorrect.'));
+                return $this->redirect(['action' => 'changePassword']);
+            }
+            
+            $admin = $this->Admins->patchEntity($admin, $data, [
+                'validate' => 'resetPassword'
+            ]);
+            
+            if ($this->Admins->save($admin)) {
+                $this->Flash->success(__('Your password has been updated successfully.'));
+                return $this->redirect(['action' => 'edit', $admin->id]);
+            }
+            
+            // Show specific error messages
+            if ($admin->getErrors()) {
+                foreach ($admin->getErrors() as $field => $errors) {
+                    foreach ($errors as $error) {
+                        $this->Flash->error(__($error));
+                    }
+                }
+            } else {
+                $this->Flash->error(__('Unable to update your password. Please try again.'));
+            }
+        }
+        
+        $this->set(compact('admin'));
+        $this->set('userType', 'admin');
+    }
 }
+

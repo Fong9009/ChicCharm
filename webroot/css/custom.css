@@ -30,7 +30,7 @@
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 100%;
-    margin: 0 auto;
+    margin-bottom: 76px;
 }
 
 .enquiry-form h2 {
@@ -752,11 +752,13 @@ body {
 .row {
     display: flex;
     flex-wrap: wrap;
-    margin: 0 -15px;
 }
 
 .column {
-    
+    padding: 76px 15px;
+}
+
+.column-edit {
     padding: 0 15px;
 }
 
@@ -1755,7 +1757,7 @@ header.masthead {
     height: 100vh !important;
     min-height: 100vh;
     padding: 0;
-    margin: 0;
+    margin: -5px 0;
     overflow: hidden;
     display: flex;
     align-items: center;
@@ -1966,7 +1968,7 @@ footer .input-group .btn-primary:hover {
 @media (min-width: 992px) {
     .form-wrapper,
     .login-wrapper {
-        padding: 96px 40px 0;
+        padding: 40px 20px 76px;
     }
 
     .contacts.form.content {
@@ -2117,8 +2119,6 @@ footer .input-group .btn-primary:hover {
 
 /* Forget Password Form Wrapper */
 .forget-password-wrapper {
-    padding-top: 120px;
-    padding: 120px 20px 20px 20px;
     background-color: #f8f9fa;
     min-height: calc(100vh - 250px); 
     display: flex;
@@ -2577,10 +2577,10 @@ footer .input-group .btn-primary:hover {
     }
 }
 
-/* Customer List Wrapper */
+/* Custom List Wrapper */
 .custom-list-wrapper {
     padding: 20px;
-    margin-top: 76px;
+    margin-bottom: 76px;
 }
 
 .custom-list-wrapper .side-nav {
@@ -2656,8 +2656,7 @@ footer .input-group .btn-primary:hover {
 
 /* Customer Booking Form Styles */
 .booking-form-wrapper {
-    padding-top: 76px;
-    padding: 76px 20px 0;
+    padding: 50px 20px 76px;
     background-color: #f8f9fa;
     min-height: 75vh;
     display: flex;
@@ -3169,7 +3168,7 @@ footer .input-group .btn-primary:hover {
 /* Custom Edit Wrapper */
 .custom-edit-wrapper {
     padding: 2rem 2rem 1rem 2rem;
-    margin-top: 76px;
+    margin-top: 20px;
     margin-bottom: 20px;
     background-color: #f8f9fa;
     min-height: calc(100vh - 120px);
@@ -3182,6 +3181,180 @@ footer .input-group .btn-primary:hover {
     .custom-edit-wrapper {
         padding: 1rem;
         margin-top: 76px;
+    }
+}
+
+.error-message {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.form-error {
+    border-color: #dc3545 !important;
+}
+
+.form-error:focus {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+}
+
+.message.error {
+    background: #dc3545;
+    color: #fff;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 0.25rem;
+}
+
+/* Style for validation errors in forms */
+.is-invalid {
+    border-color: #dc3545 !important;
+}
+
+.invalid-feedback {
+    color: #dc3545;
+    display: block;
+    margin-top: 0.25rem;
+}
+
+/* Password validation errors */
+.password-requirements ul li.invalid {
+    color: #dc3545;
+}
+
+/* Flash messages */
+.message.error {
+    background-color: #dc3545;
+    color: white;
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 0.25rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Admin Form Content Styles */
+.admins.form.content {
+    background: white;
+    max-width: 600px;
+    margin: 76px auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.admins.form.content h2 {
+    color: #333;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.admins.form.content .form-group {
+    margin-bottom: 1.25rem;
+}
+
+.admins.form.content label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.admins.form.content input[type="text"],
+.admins.form.content input[type="email"],
+.admins.form.content input[type="password"] {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    transition: border-color 0.3s ease;
+}
+
+.admins.form.content input[type="text"]:focus,
+.admins.form.content input[type="email"]:focus,
+.admins.form.content input[type="password"]:focus {
+    border-color: #f4623a;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(244, 98, 58, 0.2);
+}
+
+.admins.form.content .password-requirements {
+    background-color: #f8f9fa;
+    padding: 0.75rem;
+    border-radius: 5px;
+    margin: 0.5rem 0 1rem 0;
+}
+
+.admins.form.content .password-requirements h6 {
+    color: #666;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.admins.form.content .password-requirements ul {
+    margin: 0;
+    padding-left: 1.2rem;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.admins.form.content .password-requirements ul li {
+    margin-bottom: 0.25rem;
+}
+
+.admins.form.content .btn-primary {
+    background-color: #f4623a;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 150px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    width: 100%;
+}
+
+.admins.form.content .btn-primary:hover {
+    background-color: #d44d2d;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(244, 98, 58, 0.2);
+}
+
+@media (max-width: 768px) {
+    .admins.form.content {
+        margin: 76px 1rem;
+        padding: 1.25rem;
+    }
+
+    .admins.form.content h2 {
+        font-size: 1.25rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .admins.form.content label {
+        font-size: 0.9rem;
+    }
+
+    .admins.form.content input[type="text"],
+    .admins.form.content input[type="email"],
+    .admins.form.content input[type="password"] {
+        font-size: 16px;
+        padding: 0.625rem;
+    }
+
+    .admins.form.content .btn-primary {
+        width: 100%;
+        padding: 0.75rem;
+        font-size: 0.95rem;
+        min-width: auto;
+        letter-spacing: normal;
     }
 }
 

@@ -177,15 +177,26 @@ class ContactsController extends AppController
      */
     public function edit($id = null)
     {
-        $contact = $this->Contacts->get($id, contain: []);
+        $contact = $this->Contacts->get($id, [
+            'contain' => [],
+        ]);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $contact = $this->Contacts->patchEntity($contact, $this->request->getData());
             if ($this->Contacts->save($contact)) {
                 $this->Flash->success(__('The contact has been saved.'));
-
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The contact could not be saved. Please, try again.'));
+            
+            // Show specific error messages for each field
+            if ($contact->getErrors()) {
+                foreach ($contact->getErrors() as $field => $errors) {
+                    foreach ($errors as $error) {
+                        $this->Flash->error(__("{0}: {1}", ucfirst($field), $error));
+                    }
+                }
+            } else {
+                $this->Flash->error(__('The contact could not be saved. Please, try again.'));
+            }
         }
         $this->set(compact('contact'));
     }
@@ -265,5 +276,30 @@ class ContactsController extends AppController
         
         return $this->redirect(['action' => 'reply', $id]);
     }
+
+    public function add()
+    {
+        $contact = $this->Contacts->newEmptyEntity();
+        if ($this->request->is('post')) {
+            $contact = $this->Contacts->patchEntity($contact, $this->request->getData());
+            if ($this->Contacts->save($contact)) {
+                $this->Flash->success(__('The contact has been saved.'));
+                return $this->redirect(['action' => 'index']);
+            }
+            
+            // Show specific error messages for each field
+            if ($contact->getErrors()) {
+                foreach ($contact->getErrors() as $field => $errors) {
+                    foreach ($errors as $error) {
+                        $this->Flash->error(__("{0}: {1}", ucfirst($field), $error));
+                    }
+                }
+            } else {
+                $this->Flash->error(__('The contact could not be saved. Please, try again.'));
+            }
+        }
+        $this->set(compact('contact'));
+    }
 }
+
 

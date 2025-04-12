@@ -55,10 +55,19 @@ class ServicesController extends AppController
 
             if ($this->Services->save($service)) {
                 $this->Flash->success(__('The service has been saved.'));
-
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The service could not be saved. Please, try again.'));
+            
+            // Show specific error messages for each field
+            if ($service->getErrors()) {
+                foreach ($service->getErrors() as $field => $errors) {
+                    foreach ($errors as $error) {
+                        $this->Flash->error(__("{0}: {1}", ucfirst($field), $error));
+                    }
+                }
+            } else {
+                $this->Flash->error(__('The service could not be saved. Please, try again.'));
+            }
         }
         $stylists = $this->Services->Stylists->find('list', limit: 200)->all();
         $this->set(compact('service', 'stylists'));
@@ -73,7 +82,9 @@ class ServicesController extends AppController
      */
     public function edit($id = null)
     {
-        $service = $this->Services->get($id, contain: ['Stylists']);
+        $service = $this->Services->get($id, [
+            'contain' => [],
+        ]);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $service = $this->Services->patchEntity($service, $this->request->getData());
 
@@ -84,10 +95,19 @@ class ServicesController extends AppController
             }
             if ($this->Services->save($service)) {
                 $this->Flash->success(__('The service has been saved.'));
-
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The service could not be saved. Please, try again.'));
+            
+            // Show specific error messages for each field
+            if ($service->getErrors()) {
+                foreach ($service->getErrors() as $field => $errors) {
+                    foreach ($errors as $error) {
+                        $this->Flash->error(__("{0}: {1}", ucfirst($field), $error));
+                    }
+                }
+            } else {
+                $this->Flash->error(__('The service could not be saved. Please, try again.'));
+            }
         }
         $stylists = $this->Services->Stylists->find('list', limit: 200)->all();
         $this->set(compact('service', 'stylists'));
@@ -113,3 +133,4 @@ class ServicesController extends AppController
         return $this->redirect(['action' => 'index']);
     }
 }
+

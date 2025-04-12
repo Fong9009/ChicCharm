@@ -22,6 +22,11 @@ class AuthController extends AppController
     private AdminsTable $Admins;
 
     /**
+     * @var \App\Model\Table\CustomersTable $Customers
+     */
+    private $Customers;
+
+    /**
      * Controller initialize override
      *
      * @return void
@@ -37,9 +42,9 @@ class AuthController extends AppController
         // These actions, however, are typically required for users who have not yet logged in.
         $this->Authentication->allowUnauthenticated(['login', 'forgetPassword', 'resetPassword']);
 
-        // CakePHP loads the model with the same name as the controller by default.
-        // Since we don't have an Auth model, we'll need to load "Admins" model when starting the controller manually.
+        // Load both Admins and Customers tables
         $this->Admins = $this->fetchTable('Admins');
+        $this->Customers = $this->fetchTable('Customers');
     }
 
     /**
@@ -133,7 +138,6 @@ class AuthController extends AppController
                 }
             } else {
                 // Check for customer account
-                $this->Customers = $this->fetchTable('Customers');
                 $customer = $this->Customers->findByEmail($email)->first();
 
                 if ($customer) {
@@ -226,7 +230,6 @@ class AuthController extends AppController
     {
         // Determine which model to use based on user type
         if ($type === 'customer') {
-            $this->Customers = $this->fetchTable('Customers');
             $user = $this->Customers->findByNonce($nonce)->first();
             $model = $this->Customers;
         } else {
@@ -276,38 +279,62 @@ class AuthController extends AppController
             $id = $user->id;
         }
 
-        // Only allow users to change their own password unless they're an admin
-        if ($user->type !== 'admin' && $user->id != $id) {
-            $this->Flash->error('Access denied. You can only change your own password.');
-            return $this->redirect(['action' => 'login']);
+        // Only allow users to change their own password
+        // For admins, they can only change customer passwords, not other admin passwords
+        if ($user->id != $id) {
+            if ($user->type !== 'admin') {
+                $this->Flash->error('Access denied. You can only change your own password.');
+                return $this->redirect(['action' => 'login']);
+            }
+            
+            // Check if target user is an admin
+            $targetAdmin = $this->Admins->find()->where(['id' => $id])->first();
+            if ($targetAdmin) {
+                $this->Flash->error('Access denied. Admins cannot change other admin passwords.');
+                return $this->redirect(['controller' => 'Admins', 'action' => 'index']);
+            }
         }
 
-        // Get the appropriate model based on user type
+        // Get the appropriate model and entity based on who is being edited
         if ($user->type === 'admin') {
             $model = $this->Admins;
-            $entity = $model->get($id, ['contain' => []]);
         } else {
             $model = $this->Customers;
-            $entity = $model->get($id, ['contain' => []]);
+        }
+
+        try {
+            $entity = $model->get($id, [
+                'fields' => ['id', 'first_name', 'last_name', 'password']
+            ]);
+            
+            // Create a clean entity for the form that only includes name fields
+            $formEntity = $model->newEmptyEntity();
+            $formEntity->id = $entity->id;
+            $formEntity->first_name = $entity->first_name;
+            $formEntity->last_name = $entity->last_name;
+            
+        } catch (\Exception $e) {
+            $this->Flash->error('User not found.');
+            return $this->redirect(['controller' => 'Admins', 'action' => 'index']);
         }
 
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
 
-            // Verify current password
+            // Verify current password against the original entity
             if (!password_verify($data['current_password'], $entity->password)) {
                 $this->Flash->error('Current password is incorrect.');
                 return $this->render();
             }
 
-            // Update password
+            // Update password on the original entity
             $entity = $model->patchEntity($entity, [
                 'password' => $data['password'],
-                'password_confirm' => $data['password_confirm']
+                'confirm_password' => $data['confirm_password']
             ], ['validate' => 'resetPassword']);
 
             if ($model->save($entity)) {
-                $this->Flash->success('Your password has been updated successfully.');
+                $this->Flash->success('Password has been updated successfully.');
 
                 // Redirect based on user type
                 if ($user->type === 'admin') {
@@ -319,7 +346,9 @@ class AuthController extends AppController
             $this->Flash->error('The password could not be updated. Please, try again.');
         }
 
-        $this->set(compact('entity'));
+        // Pass the clean entity to the view
+        $this->set('entity', $formEntity);
+        $this->set('userType', $user->type);
     }
 
     /**

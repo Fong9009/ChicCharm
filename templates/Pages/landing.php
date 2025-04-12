@@ -58,7 +58,7 @@ if ($identity) {
             </div>
         </header>
         <!-- About-->
-        <section class="page-section bg-primary" id="about" style="padding-left: 100px; padding-right: 100px;">
+        <section class="page-section bg-primary" id="about">
             <div class="container mb-5 px-4 px-lg-5">
                 <div class="row gx-4 gx-lg-5 justify-content-center">
                     <div class="col-lg-8 text-center">
@@ -105,7 +105,7 @@ if ($identity) {
             </div>
         </section>
         <!-- Services-->
-        <section class="page-section" id="services" style="padding-left: 100px; padding-right: 100px;">
+        <section class="page-section" id="services">
             <div class="container">
                 <div class="row">
                     <h2 class="text-center mt-0"><?= $this->ContentBlock->text('service-title'); ?></h2>

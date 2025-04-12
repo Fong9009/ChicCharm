@@ -14,35 +14,24 @@ $this->assign('title', 'Edit Profile');
                     <legend><?= __('Edit Your Profile') ?></legend>
                     <div class="row">
                         <div class="col-md-6">
-                            <?= $this->Form->control('first_name', ['class' => 'form-control']) ?>
+                            <?= $this->Form->control('first_name', [
+                                'class' => 'form-control' . ($this->Form->isFieldError('first_name') ? ' is-invalid' : ''),
+                                'error' => ['class' => 'invalid-feedback']
+                            ]) ?>
                         </div>
                         <div class="col-md-6">
-                            <?= $this->Form->control('last_name', ['class' => 'form-control']) ?>
+                            <?= $this->Form->control('last_name', [
+                                'class' => 'form-control' . ($this->Form->isFieldError('last_name') ? ' is-invalid' : ''),
+                                'error' => ['class' => 'invalid-feedback']
+                            ]) ?>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-12">
-                            <?= $this->Form->control('email', ['class' => 'form-control']) ?>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="mb-3">
-                                <p class="text-muted">Leave password field empty if you don't want to change it.</p>
-                                <?= $this->Form->control('password', ['class' => 'form-control', 'value' => '', 'required' => false]) ?>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="mb-3">
-                                <?= $this->Form->control('confirm_password', [
-                                    'type' => 'password',
-                                    'class' => 'form-control',
-                                    'label' => 'Confirm Password',
-                                    'required' => false
-                                ]) ?>
-                            </div>
+                            <?= $this->Form->control('email', [
+                                'class' => 'form-control' . ($this->Form->isFieldError('email') ? ' is-invalid' : ''),
+                                'error' => ['class' => 'invalid-feedback']
+                            ]) ?>
                         </div>
                     </div>
                     <!-- Profile Picture Preview -->
@@ -61,7 +50,12 @@ $this->assign('title', 'Edit Profile');
                         <div class="col-md-12">
                             <div class="input">
                                 <label for="profile_picture">Upload New Profile Picture</label>
-                                <?= $this->Form->Control('profile_picture', ['type' => 'file','class' => 'form-control','required' => false]) ?>
+                                <?= $this->Form->Control('profile_picture', [
+                                    'type' => 'file',
+                                    'class' => 'form-control' . ($this->Form->isFieldError('profile_picture') ? ' is-invalid' : ''),
+                                    'required' => false,
+                                    'error' => ['class' => 'invalid-feedback']
+                                ]) ?>
                             </div>
                         </div>
                     </div>
@@ -73,9 +67,19 @@ $this->assign('title', 'Edit Profile');
                 </fieldset>
 
                 <div class="text-center mt-4">
-                    <?= $this->Form->button(__('Update Profile'), ['class' => 'btn']) ?>
+                    <?= $this->Form->button(__('Update Profile'), ['class' => 'btn btn-primary']) ?>
+                    <?= $this->Html->link(__('Cancel'), 
+                        ['action' => 'dashboard'], 
+                        ['class' => 'btn btn-secondary ms-2', 
+                        'style' => 'background-color: #6c757d; border-color: #6c757d; color: white; transition: all 0.3s;',
+                        'onmouseover' => 'this.style.backgroundColor = "#5a6268"; this.style.borderColor = "#545b62";',
+                        'onmouseout' => 'this.style.backgroundColor = "#6c757d"; this.style.borderColor = "#6c757d";']) ?>
                 </div>
                 <?= $this->Form->end() ?>
+
+                <div class="text-center mt-4">
+                    <p>Want to change your password? <a href="<?= $this->Url->build(['controller' => 'Auth', 'action' => 'changePassword']) ?>">Click here</a></p>
+                </div>
             </div>
         </div>
     </div>
