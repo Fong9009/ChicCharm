@@ -10,7 +10,6 @@ $this->Html->css('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css
 $this->Html->css('https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css', ['block' => true]);
 $this->Html->css('custom', ['block' => true]);
 ?>
-<?php debug($booking_id); ?>
 <div class="custom-list-wrapper">
     <div class="row">
         <div class="contacts index content">
