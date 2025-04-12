@@ -69,7 +69,16 @@ class StylistsController extends AppController
     {
         $stylist = $this->Stylists->get($id, contain: ['Bookings', 'Services']);
         if ($this->request->is(['patch', 'post', 'put'])) {
-            $stylist = $this->Stylists->patchEntity($stylist, $this->request->getData());
+            $data = $this->request->getData();
+
+
+            $password = $this->request->getData('password');
+            if ($password == null || $password == '') {
+                $data['password'] = $stylist->password;
+            } else {
+                $data['password'] = $password;
+            }
+            $stylist = $this->Stylists->patchEntity($stylist, $data);
             if ($this->Stylists->save($stylist)) {
                 $this->Flash->success(__('The stylist has been saved.'));
 
