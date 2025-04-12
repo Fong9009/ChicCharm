@@ -187,10 +187,8 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
     
 <!-- Main Content Area -->
 <main class="main">
-    <div class="container">
-        <?= $this->Flash->render() ?>
-        <?= $this->fetch('content') ?>
-    </div>
+    <?= $this->Flash->render() ?>
+    <?= $this->fetch('content') ?>
 </main>
 
 <!-- Footer -->
