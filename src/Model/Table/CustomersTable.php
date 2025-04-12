@@ -87,13 +87,17 @@ class CustomersTable extends Table
             ->notEmptyString('password')
             ->minLength('password', 8, 'Password must be at least 8 characters long');
 
-
         $validator
             ->scalar('password_confirm')
             ->maxLength('password_confirm', 255)
             ->requirePresence('password_confirm', 'create')
             ->notEmptyString('password_confirm')
-            ->sameAs('password_confirm', 'password', 'Passwords do not match');
+            ->add('password_confirm', 'custom', [
+                'rule' => function($value, $context) {
+                    return isset($context['data']['password']) && $value === $context['data']['password'];
+                },
+                'message' => 'Passwords do not match'
+            ]);
 
         $validator
             ->scalar('nonce')
@@ -124,5 +128,35 @@ class CustomersTable extends Table
         $rules->add($rules->isUnique(['email']), ['errorField' => 'email']);
 
         return $rules;
+    }
+
+    /**
+     * Reset password validation rules.
+     *
+     * @param \Cake\Validation\Validator $validator Validator instance.
+     * @return \Cake\Validation\Validator
+     */
+    public function validationResetPassword(Validator $validator): Validator
+    {
+        $validator
+            ->scalar('password')
+            ->maxLength('password', 255)
+            ->requirePresence('password', true)
+            ->notEmptyString('password')
+            ->minLength('password', 8, 'Password must be at least 8 characters long');
+
+        $validator
+            ->scalar('confirm_password')
+            ->maxLength('confirm_password', 255)
+            ->requirePresence('confirm_password', true)
+            ->notEmptyString('confirm_password')
+            ->add('confirm_password', 'custom', [
+                'rule' => function($value, $context) {
+                    return isset($context['data']['password']) && $value === $context['data']['password'];
+                },
+                'message' => 'Passwords do not match'
+            ]);
+
+        return $validator;
     }
 }

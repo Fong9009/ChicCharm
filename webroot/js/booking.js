@@ -242,11 +242,11 @@ document.addEventListener('DOMContentLoaded', function() {
     serviceCheckboxes.forEach(checkbox => {
         checkbox.addEventListener('change', () => {
             calculateTotalCost();
-            updateStylistSelections(false); // Rebuild all when services change
+            updateStylistSelections(false); 
         });
     });
 
     [bookingDateInput, startTimeInput, endTimeInput].forEach(input => {
-        input.addEventListener('change', () => updateStylistSelections(true)); // Only update options when date/time changes
+        input.addEventListener('change', () => updateStylistSelections(true)); 
     });
 });

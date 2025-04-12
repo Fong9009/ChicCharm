@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use Cake\Event\EventInterface;
+use Cake\Auth\DefaultPasswordHasher;
 
 /**
  * Customers Controller
@@ -144,7 +145,17 @@ class CustomersController extends AppController
                 $this->Flash->success(__('Registration successful! Please login with your credentials.'));
                 return $this->redirect(['controller' => 'Auth', 'action' =>  'login']);
             }
-            $this->Flash->error(__('Registration failed. Please, try again.'));
+            
+            // Show specific error messages for each field
+            if ($customer->getErrors()) {
+                foreach ($customer->getErrors() as $field => $errors) {
+                    foreach ($errors as $error) {
+                        $this->Flash->error(__("{0}: {1}", ucfirst($field), $error));
+                    }
+                }
+            } else {
+                $this->Flash->error(__('Registration failed. Please, try again.'));
+            }
         }
         $this->set(compact('customer'));
     }
@@ -215,10 +226,19 @@ class CustomersController extends AppController
 
             if ($this->Customers->save($customer)) {
                 $this->Flash->success(__('Your profile has been updated.'));
-
                 return $this->redirect(['action' => 'dashboard']);
             }
-            $this->Flash->error(__('The profile could not be updated. Please, try again.'));
+            
+            // Show specific error messages for each field
+            if ($customer->getErrors()) {
+                foreach ($customer->getErrors() as $field => $errors) {
+                    foreach ($errors as $error) {
+                        $this->Flash->error(__("{0}: {1}", ucfirst($field), $error));
+                    }
+                }
+            } else {
+                $this->Flash->error(__('The profile could not be updated. Please, try again.'));
+            }
         }
         $this->set(compact('customer'));
     }
@@ -232,15 +252,17 @@ class CustomersController extends AppController
      */
     public function delete($id = null)
     {
-        $user = $this->Authentication->getIdentity();
-
-        // Only admins can delete accounts
-        if ($user->type !== 'admin') {
-            $this->Flash->error('Access denied. Only administrators can delete accounts.');
+        $this->request->allowMethod(['post', 'delete']);
+        
+        // Get current user
+        $currentUser = $this->Authentication->getIdentity();
+        
+        // If user is a customer, they cannot delete any account
+        if ($currentUser->type === 'customer') {
+            $this->Flash->error(__('Customers cannot delete accounts. Please contact an administrator.'));
             return $this->redirect(['action' => 'dashboard']);
         }
-
-        $this->request->allowMethod(['post', 'delete']);
+        
         $customer = $this->Customers->get($id);
         if ($this->Customers->delete($customer)) {
             $this->Flash->success(__('The customer has been deleted.'));
@@ -251,5 +273,44 @@ class CustomersController extends AppController
         return $this->redirect(['action' => 'index']);
     }
 
+    public function changePassword()
+    {
+        $customer = $this->Customers->get($this->Authentication->getIdentity()->id);
+        if ($this->request->is(['patch', 'post', 'put'])) {
+            $data = $this->request->getData();
+            
+            // Verify current password
+            $hasher = new DefaultPasswordHasher();
+            if (!$hasher->check($data['current_password'], $customer->password)) {
+                $this->Flash->error(__('Current password is incorrect.'));
+                return $this->redirect(['action' => 'changePassword']);
+            }
+            
+            $customer = $this->Customers->patchEntity($customer, $data, [
+                'validate' => 'resetPassword'
+            ]);
+            
+            if ($this->Customers->save($customer)) {
+                $this->Flash->success(__('Your password has been updated successfully.'));
+                return $this->redirect(['action' => 'edit', $customer->id]);
+            }
+            
+            // Show specific error messages
+            if ($customer->getErrors()) {
+                foreach ($customer->getErrors() as $field => $errors) {
+                    foreach ($errors as $error) {
+                        $this->Flash->error(__($error));
+                    }
+                }
+            } else {
+                $this->Flash->error(__('Unable to update your password. Please try again.'));
+            }
+        }
+        
+        $this->set(compact('customer'));
+        $this->set('userType', 'customer');
+    }
+
 }
+
 

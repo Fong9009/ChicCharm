@@ -48,10 +48,19 @@ class StylistsController extends AppController
             $stylist = $this->Stylists->patchEntity($stylist, $this->request->getData());
             if ($this->Stylists->save($stylist)) {
                 $this->Flash->success(__('The stylist has been saved.'));
-
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The stylist could not be saved. Please, try again.'));
+            
+            // Show specific error messages for each field
+            if ($stylist->getErrors()) {
+                foreach ($stylist->getErrors() as $field => $errors) {
+                    foreach ($errors as $error) {
+                        $this->Flash->error(__("{0}: {1}", ucfirst($field), $error));
+                    }
+                }
+            } else {
+                $this->Flash->error(__('The stylist could not be saved. Please, try again.'));
+            }
         }
         $bookings = $this->Stylists->Bookings->find('list', limit: 200)->all();
         $services = $this->Stylists->Services->find('list', limit: 200)->all();
@@ -67,7 +76,9 @@ class StylistsController extends AppController
      */
     public function edit($id = null)
     {
-        $stylist = $this->Stylists->get($id, contain: ['Bookings', 'Services']);
+        $stylist = $this->Stylists->get($id, [
+            'contain' => ['Services'],
+        ]);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
 
@@ -81,10 +92,19 @@ class StylistsController extends AppController
             $stylist = $this->Stylists->patchEntity($stylist, $data);
             if ($this->Stylists->save($stylist)) {
                 $this->Flash->success(__('The stylist has been saved.'));
-
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The stylist could not be saved. Please, try again.'));
+            
+            // Show specific error messages for each field
+            if ($stylist->getErrors()) {
+                foreach ($stylist->getErrors() as $field => $errors) {
+                    foreach ($errors as $error) {
+                        $this->Flash->error(__("{0}: {1}", ucfirst($field), $error));
+                    }
+                }
+            } else {
+                $this->Flash->error(__('The stylist could not be saved. Please, try again.'));
+            }
         }
         $bookings = $this->Stylists->Bookings->find('list', limit: 200)->all();
         $services = $this->Stylists->Services->find('list', limit: 200)->all();

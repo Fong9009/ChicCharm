@@ -8,11 +8,21 @@ $this->Html->script('https://code.jquery.com/jquery-3.6.0.min.js', ['block' => t
 $this->Html->css('custom', ['block' => true]);
 $this->Html->script('custom', ['block' => true]);
 ?>
+<<<<<<< HEAD
 <?= $this->Html->css('/utility/indexes/indexes.css') ?>
 <?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
     <div class="row">
         <div>
             <?= $this->Flash->render('admin_notify') ?>
+=======
+<div class="custom-list-wrapper">
+    <?= $this->Flash->render('admin_notify') ?>
+    <div class="row">
+        <div class="side-nav">
+            <h4 class="heading"><?= __('Actions') ?></h4>
+            <?= $this->Html->link(__('New Admin'), ['action' => 'add'], ['class' => 'side-nav-item']) ?>
+            <?= $this->Html->link(__('Back to Dashboard'), ['controller' => 'Admins', 'action' => 'dashboard'], ['class' => 'side-nav-item']) ?>
+>>>>>>> password-validation
         </div>
         <div class="contacts index content">
             <aside class="column">
@@ -57,9 +67,13 @@ $this->Html->script('custom', ['block' => true]);
             <div class="table-responsive mt-3">
                 <div class="container">
                     <div class="row align-items-center">
+<<<<<<< HEAD
                         <div class="row align-items-center">
                             <h3><?= __('Admin List') ?></h3>
                         </div>
+=======
+                        <h3><?= __('Admin List') ?></h3>
+>>>>>>> password-validation
                     </div>
                 </div>
                 <div class="search-filter-container">
