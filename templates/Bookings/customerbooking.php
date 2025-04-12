@@ -10,6 +10,9 @@
 // Add the JavaScript file
 $this->Html->script('booking', ['block' => 'script']);
 ?>
+<script>
+    const apiUrl = '<?= $this->Url->build("/bookings/get-stylists") ?>';
+</script>
 <div class="booking-form-wrapper">
         <div class="row">
             <aside class="column">
@@ -127,5 +130,5 @@ $this->Html->script('booking', ['block' => 'script']);
                 <?= $this->Form->end() ?>
             </div>
         </div>
-    </div>  
+    </div>
 </div>

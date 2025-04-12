@@ -46,6 +46,13 @@ class ServicesController extends AppController
         $service = $this->Services->newEmptyEntity();
         if ($this->request->is('post')) {
             $service = $this->Services->patchEntity($service, $this->request->getData());
+
+            //Checks if someone has put a negative number in it
+            if ($service['service_cost'] < 0) {
+                $this->Flash->error(__('Service Cost cannot be less than zero.'));
+                return $this->redirect(['action' => 'add']);
+            }
+
             if ($this->Services->save($service)) {
                 $this->Flash->success(__('The service has been saved.'));
 
@@ -69,6 +76,12 @@ class ServicesController extends AppController
         $service = $this->Services->get($id, contain: ['Stylists']);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $service = $this->Services->patchEntity($service, $this->request->getData());
+
+            //Checks if someone has put a negative number in it
+            if ($service['service_cost'] < 0) {
+                $this->Flash->error(__('Service Cost cannot be less than zero.'));
+                return $this->redirect(['action' => 'edit',$service['id']]);
+            }
             if ($this->Services->save($service)) {
                 $this->Flash->success(__('The service has been saved.'));
 
