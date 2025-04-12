@@ -6,7 +6,7 @@
 $this->layout = 'default';
 ?>
 <div class="customer-dashboard" style="background-image: url(<?= $this->Url->image('customerbackground.jpg')?>);">
-    <div class="container">
+    <div class="container" style="margin-top: -5px">
         <div class="card">
             <div class="card-body">
                 <div class="row mb-4">

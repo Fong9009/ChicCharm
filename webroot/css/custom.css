@@ -2,15 +2,6 @@
 .container {
     width: 100%;
     max-width: 90% !important;
-    padding-left: 1rem;
-    padding-right: 1rem;
-}
-
-@media (min-width: 992px) {
-    .container {
-        padding-left: 2rem;
-        padding-right: 2rem;
-    }
 }
 
 /* Update navbar styles */
@@ -445,7 +436,7 @@
 
 /* Admin Layout Styling */
 body {
-    padding-top: 76px;
+    padding-top: 70px;
     background-color: #f8f9fa;
 }
 
@@ -2373,12 +2364,12 @@ footer .input-group .btn-primary:hover {
 /* Customer Dashboard Styles */
 .customer-dashboard {
     padding-top: 76px;
+    padding-bottom: 76px;
     min-height: 100vh;
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
     background-attachment: fixed;
-    padding: 2rem;
 }
 
 .customer-dashboard .container {
@@ -2437,29 +2428,6 @@ footer .input-group .btn-primary:hover {
     background-color: #d44d2d;
     border-color: #d44d2d;
     transform: translateY(-1px);
-}
-
-/* Desktop Specific Adjustments */
-@media (min-width: 992px) {
-    .customer-dashboard {
-        padding: 2rem 4rem;
-    }
-
-    .customer-dashboard .container {
-        padding: 2rem;
-    }
-
-    .customer-dashboard .card {
-        margin: 2rem auto;
-    }
-
-    .customer-dashboard .row {
-        margin: 0 -1rem;
-    }
-
-    .customer-dashboard .col-md-6 {
-        padding: 0 1rem;
-    }
 }
 
 /* Mobile Responsive Adjustments */
