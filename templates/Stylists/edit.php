@@ -6,17 +6,85 @@
  * @var string[]|\Cake\Collection\CollectionInterface $services
  */
 ?>
-<div class="row">
+<?= $this->Html->css('/utility/edits/edits.css') ?>
+<?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
+<div class="contacts index content">
     <aside class="column">
         <div class="side-nav">
             <h4 class="heading"><?= __('Actions') ?></h4>
-            <?= $this->Form->postLink(
-                __('Delete'),
-                ['action' => 'delete', $stylist->id],
-                ['confirm' => __('Are you sure you want to delete # {0}?', $stylist->id), 'class' => 'side-nav-item']
-            ) ?>
-            <?= $this->Html->link(__('List Stylists'), ['action' => 'index'], ['class' => 'side-nav-item']) ?>
-            <?= $this->Html->link(__('Back To Dashboard'), ['controller' => 'Admins', 'action' => 'dashboard'], ['class' => 'side-nav-item']) ?>
+            <!-- Edit Services -->
+            <div class="row gx-2">
+                <div class="col-lg-3 col-md-6 col-sm-12 mb-3 side-nav-item">
+                    <?= $this->Html->link(
+                        '<div class="card h-100">
+                            <div class="card-header dashboard-card-header d-flex justify-content-between align-items-center flex-wrap">
+                                <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">Dashboard</h4>
+                                <i class="material-icons view-icon ms-2">person</i>
+                            </div>
+                            <div class="card-body dashboard-card-body"></div>
+                            <div class="card-footer dashboard-card-footer">
+                                <span class="mb-0 text-truncate">Back To Dashboard</span>
+                            </div>
+                        </div>',
+                        ['controller' => 'Admins', 'action' => 'dashboard'],
+                        ['escape' => false, 'class' => 'card-link-wrapper d-block text-decoration-none']
+                    ) ?>
+                </div>
+                <!-- Delete Service -->
+                <div class="col-lg-3 col-md-6 col-sm-12 mb-3 side-nav-item">
+                    <?= $this->Html->link(
+                        '<div class="card h-100">
+                            <div class="card-header delete-card-header d-flex justify-content-between align-items-center flex-wrap">
+                                 <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">Delete Stylist</h4>
+                                 <i class="material-icons view-icon ms-2">delete</i>
+                            </div>
+                            <div class="card-body delete-card-body"></div>
+                            <div class="card-footer delete-card-footer">
+                                <span class="mb-0 text-truncate">Delete Stylist</span>
+                            </div>
+                        </div>',
+                        ['controller' => 'Services', 'action' => 'delete', $stylist->id],
+                        ['escape' => false,'class' => 'card-link-wrapper d-block text-decoration-none',
+                            'confirm' => __('Are you sure you want to delete # {0}?', $stylist->id)],
+                    ) ?>
+                </div>
+
+                <!-- List Service -->
+                <div class="col-lg-3 col-md-6 col-sm-12 mb-3 side-nav-item">
+                    <?= $this->Html->link(
+                        '<div class="card h-100">
+                            <div class="card-header list-card-header d-flex justify-content-between align-items-center flex-wrap">
+                                <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">List Stylists</h4>
+                                <i class="material-icons view-icon ms-2">menu</i>
+                            </div>
+                            <div class="card-body list-card-body"></div>
+                            <div class="card-footer list-card-footer">
+                                <span class="mb-0 text-truncate">List Stylists</span>
+                            </div>
+                        </div>',
+                        ['controller' => 'Stylists', 'action' => 'index'],
+                        ['escape' => false, 'class' => 'card-link-wrapper d-block text-decoration-none']
+                    ) ?>
+                </div>
+
+                <!-- New Service -->
+                <div class="col-lg-3 col-md-6 col-sm-12 mb-3 side-nav-item">
+                    <?= $this->Html->link(
+                        '<div class="card h-100">
+                            <div class="card-header new-card-header d-flex justify-content-between align-items-center flex-wrap">
+                                 <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">Create New Stylist</h4>
+                                 <i class="material-icons view-icon ms-2">add</i>
+                            </div>
+                            <div class="card-body new-card-body"></div>
+                            <div class="card-footer new-card-footer">
+                                <span class="mb-0 text-truncate">Add Stylist</span>
+                            </div>
+                        </div>',
+                        ['controller' => 'Stylists', 'action' => 'add'],
+                        ['escape' => false, 'class' => 'card-link-wrapper d-block text-decoration-none']
+                    ) ?>
+                </div>
+            </div>
         </div>
     </aside>
     <div class="column">
@@ -52,11 +120,12 @@
                     ]);?>
                 </div>
                 <div class="form-group mb-3">
+                    <p class="text-muted">Leave password field empty if you don't want to change it.</p>
                     <?= $this->Form->control('password', [
                         'label' => __('Password'),
                         'class' => 'form-control',
-                        'required' => true,
-                        'placeholder' => __('Enter password'),
+                        'required' => false,
+                        'value' => '',
                         'error' => ['class' => 'invalid-feedback'],
                     ]); ?>
                 </div>

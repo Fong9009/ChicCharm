@@ -217,10 +217,10 @@ function confirmLogout() {
             <div class="col-md-3">
                 <h5 class="text-light fw-bold">Support</h5>
                 <ul class="list-unstyled">
-                    <li><a href="/pages/faq" class="text-secondary">FAQ</a></li>
-                    <li><a href="/pages/contact-us" class="text-secondary">Contact us</a></li>
-                    <li><a href="/policies/shipping-policy" class="text-secondary">Shipping Policy</a></li>
-                    <li><a href="/policies/refund-policy" class="text-secondary">Refund Policy</a></li>
+                    <li><a href="<?= $this->Url->build('/') ?>" class="text-secondary">FAQ</a></li>
+                    <li><a href="<?= $this->Url->build('/contacts/enquiry') ?>" class="text-secondary">Contact us</a></li>
+                    <li><a href="<?= $this->Url->build('/') ?>" class="text-secondary">Shipping Policy</a></li>
+                    <li><a href="<?= $this->Url->build('/') ?>" class="text-secondary">Refund Policy</a></li>
                 </ul>
             </div>
 
@@ -228,10 +228,10 @@ function confirmLogout() {
             <div class="col-md-2">
                 <h5 class="text-light fw-bold">Our Company</h5>
                 <ul class="list-unstyled">
-                    <li><a href="/pages/about" class="text-secondary">About Us</a></li>
-                    <li><a href="/policies/terms-of-service" class="text-secondary">Terms Of Service</a></li>
-                    <li><a href="/policies/privacy-policy" class="text-secondary">Privacy Policy</a></li>
-                    <li><a href="/pages/accessibility-statement" class="text-secondary">Accessibility Statement</a></li>
+                    <li><a href="<?= $this->Url->build('/#about') ?>" class="text-secondary">About Us</a></li>
+                    <li><a href="<?= $this->Url->build('/') ?>" class="text-secondary">Terms Of Service</a></li>
+                    <li><a href="<?= $this->Url->build('/') ?>" class="text-secondary">Privacy Policy</a></li>
+                    <li><a href="<?= $this->Url->build('/') ?>" class="text-secondary">Accessibility Statement</a></li>
                 </ul>
             </div>
 

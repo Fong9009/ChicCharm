@@ -203,7 +203,7 @@ class CustomersController extends AppController
                     }
                 }
                 //Stores file in directory
-                $filename = rand(10000, 99999) . '_' . $profile->getClientFilename();
+                $filename = rand(10000, 99999) . '_' . strtolower($profile->getClientFilename());
                 $profile->moveTo(WWW_ROOT . 'img/profile/' . $filename);
                 $data['profile_picture'] = $filename;
             } else {

@@ -108,7 +108,7 @@
                         </tr>
                         <tr>
                             <th><?= __('Service Cost') ?></th>
-                            <td>$<?= $this->Number->format($service->service_cost, ['places' => 2]) ?></td>
+                            <td><?= $this->Number->currency($service->service_cost) ?></td>
                         </tr>
                     </tbody>
                 </table>
