@@ -18,6 +18,7 @@ $this->Html->script('custom', ['block' => true]);
                 <div class="side-nav">
                     <h4 class="heading"><?= __('Actions') ?></h4>
                     <?= $this->Html->link(__('Back to Active Messages'), ['action' => 'index'], ['class' => 'side-nav-item']) ?>
+                    <?= $this->Html->link(__('Back to Dashboard'), ['controller' => 'Admins', 'action' => 'dashboard'], ['class' => 'side-nav-item']) ?>
                 </div>
             </aside>
             <div class="contacts index content">

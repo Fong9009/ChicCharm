@@ -19,13 +19,32 @@
                 <p class="form-control-static"><?= h($booking->booking_date->format('F j, Y')) ?></p>
             </div>
 
-            <?php if (!empty($booking->stylists)): ?>
+            <?php if (!empty($booking->bookings_stylists)): ?>
             <div class="info-group">
-                <label><?= __('Selected Stylists') ?></label>
+                <label><?= __('Selected Stylists and Services') ?></label>
                 <div class="stylists-list">
-                    <?php foreach ($booking->stylists as $stylist): ?>
+                    <?php foreach ($booking->bookings_stylists as $bookingStylist): ?>
                         <div class="stylist-item">
-                            <p><?= h($stylist->first_name) ?> <?= h($stylist->last_name) ?></p>
+                            <p class="stylist-service">
+                                <strong><?= h($bookingStylist->stylist->first_name) ?> <?= h($bookingStylist->stylist->last_name) ?></strong>: 
+                                <?php 
+                                $stylistServices = collection($booking->bookings_services)
+                                    ->filter(function ($bookingService) use ($bookingStylist) {
+                                        return $bookingService->stylist_id === $bookingStylist->stylist_id;
+                                    })
+                                    ->toArray();
+                                
+                                if (!empty($stylistServices)) {
+                                    $serviceNames = [];
+                                    foreach ($stylistServices as $bookingService) {
+                                        $serviceNames[] = h($bookingService->service->service_name);
+                                    }
+                                    echo implode(', ', $serviceNames);
+                                } else {
+                                    echo 'No services assigned';
+                                }
+                                ?>
+                            </p>
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -49,17 +68,13 @@
                 ['controller' => 'Customers', 'action' => 'dashboard'],
                 ['class' => 'btn btn-secondary']
             ) ?>
-            <?= $this->Html->link(
-                __('Add Stylist'),
-                ['controller' => 'BookingsStylists', 'action' => 'customerstylistadd', $booking->id],
-                ['class' => 'btn btn-primary']
-            ) ?>
             <?= $this->Form->postLink(
-                __('Delete Booking'),
+                __('Cancel Booking'),
                 ['action' => 'customerdelete', $booking->id],
                 [
-                    'confirm' => __('Are you sure you want to delete this booking?'),
-                    'class' => 'btn btn-danger'
+                    'method' => 'delete',
+                    'confirm' => __('Are you sure you want to cancel this booking?'),
+                    'class' => 'btn btn-danger',
                 ]
             ) ?>
         </div>

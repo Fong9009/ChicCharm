@@ -14,18 +14,15 @@ $this->Html->css('custom', ['block' => true]);
             <div class="side-nav">
                 <h4 class="heading"><?= __('Actions') ?></h4>
                 <?= $this->Html->link(__('Archived Messages'), ['action' => 'archiveIndex'], ['class' => 'side-nav-item']) ?>
+                <?= $this->Html->link(__('Back to Dashboard'), ['controller' => 'Admins', 'action' => 'dashboard'], ['class' => 'side-nav-item']) ?>
             </div>
         </aside>
         <div class="contacts index content">
             <div class="table-responsive">
                 <div class="container">
                     <div class="row align-items-center">
-                        <div class="col-2" style="padding: 10px 20px;">
-                            <?= $this->Html->link(__('Back to Dashboard'), ['controller' => 'Admins', 'action' => 'dashboard'], ['class' => 'btn btn-primary', 'style' => 'white-space: nowrap;']) ?>
-                        </div>
-                        <div class="col-8">
-                            <h3><?= __('Active Messages') ?></h3>
-                        </div>
+                        <h3><?= __('Active Messages') ?></h3>
+                        <?= $this->Flash->render('custom_location') ?>
                     </div>
                 </div>
                 <div class="search-filter-container">
@@ -63,7 +60,7 @@ $this->Html->css('custom', ['block' => true]);
                             <th><?= $this->Paginator->sort('email') ?></th>
                             <th><?= $this->Paginator->sort('phone_number') ?></th>
                             <th><?= $this->Paginator->sort('message') ?></th>
-                            <th><?= $this->Paginator->sort('sent_at') ?></th>
+                            <th><?= $this->Paginator->sort('created', 'Sent At') ?></th>
                             <th><?= $this->Paginator->sort('replied') ?></th>
                             <th class="actions"><?= __('Actions') ?></th>
                         </tr>
@@ -87,7 +84,7 @@ $this->Html->css('custom', ['block' => true]);
                                         <li><?= $this->Html->link(__('View'), ['action' => 'view', $contact->id], ['class' => 'dropdown-item view']) ?></li>
                                         <li><?= $this->Html->link(__('Edit'), ['action' => 'edit', $contact->id], ['class' => 'dropdown-item edit']) ?></li>
                                         <li><?= $this->Html->link(__('Email'), ['action' => 'reply', $contact->id], ['class' => 'dropdown-item reply']) ?></li>
-                                        <li><?= $this->Html->link(__('Archive'), ['action' => 'archive', $contact->id], ['class' => 'dropdown-item archive']) ?></li>
+                                        <li><?= $this->Form->postLink(__('Archive'), ['action' => 'archive', $contact->id], ['class' => 'dropdown-item archive']) ?></li>
                                         <li><?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $contact->id], [
                                             'confirm' => __('Are you sure you want to delete this message?'),
                                             'class' => 'dropdown-item delete'

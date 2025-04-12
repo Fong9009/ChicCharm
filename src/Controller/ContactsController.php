@@ -97,9 +97,9 @@ class ContactsController extends AppController
         $contact->is_archived = true;
         
         if ($this->Contacts->save($contact)) {
-            $this->Flash->success(__('The contact has been archived.'));
+            $this->Flash->success(__('The contact has been archived.'), ['key' => 'custom_location']);
         } else {
-            $this->Flash->error(__('The contact could not be archived. Please, try again.'));
+            $this->Flash->error(__('The contact could not be archived. Please, try again.'), ['key' => 'custom_location']);
         }
 
         return $this->redirect(['action' => 'index']);

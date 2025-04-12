@@ -114,13 +114,13 @@ $titleDescription = 'Landing Page';
                     <?php } elseif ($identity->get('type') === 'customer') {
                         // Customer Navigation ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a>
+                            <a class="nav-link" href="<?= $this->Url->build('#about') ?>">About</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a>
+                            <a class="nav-link" href="<?= $this->Url->build('#services') ?>">Services</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a>
+                            <a class="nav-link" href="<?= $this->Url->build('#portfolio') ?>">Portfolio</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link"

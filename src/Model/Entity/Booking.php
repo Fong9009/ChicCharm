@@ -32,10 +32,13 @@ class Booking extends Entity
     protected array $_accessible = [
         'booking_name' => true,
         'booking_date' => true,
+        'start_time' => true,
+        'end_time' => true,
         'total_cost' => true,
         'remaining_cost' => true,
         'customer_id' => true,
         'customer' => true,
         'stylists' => true,
+        'services' => true,
     ];
 }

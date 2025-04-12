@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Apr 11, 2025 at 04:06 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: localhost
+-- Generation Time: Apr 12, 2025 at 04:55 AM
+-- Server version: 9.0.1
+-- PHP Version: 8.3.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `cake_project_v2`
+-- Database: `fit3047_a1_db`
 --
 
 -- --------------------------------------------------------
@@ -28,17 +28,17 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `admins` (
-  `id` int(11) NOT NULL,
-  `first_name` varchar(255) NOT NULL,
-  `last_name` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `nonce` varchar(255) DEFAULT NULL,
+  `id` int NOT NULL,
+  `first_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `last_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `nonce` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `nonce_expiry` datetime DEFAULT NULL,
-  `created` datetime DEFAULT current_timestamp(),
-  `modified` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `type` varchar(50) NOT NULL DEFAULT 'admin',
-  `profile_picture` varchar(255) DEFAULT NULL
+  `created` datetime DEFAULT CURRENT_TIMESTAMP,
+  `modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `type` varchar(50) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'admin',
+  `profile_picture` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -55,12 +55,12 @@ INSERT INTO `admins` (`id`, `first_name`, `last_name`, `email`, `password`, `non
 --
 
 CREATE TABLE `bookings` (
-  `id` int(11) NOT NULL,
-  `booking_name` varchar(255) DEFAULT NULL,
+  `id` int NOT NULL,
+  `booking_name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `booking_date` date NOT NULL,
   `total_cost` decimal(10,2) NOT NULL,
   `remaining_cost` decimal(10,2) NOT NULL,
-  `customer_id` int(11) DEFAULT NULL
+  `customer_id` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -72,7 +72,34 @@ INSERT INTO `bookings` (`id`, `booking_name`, `booking_date`, `total_cost`, `rem
 (8, 'Double Test', '2025-04-06', 10.00, 10.00, NULL),
 (9, 'Fong', '2025-04-17', 0.00, 0.00, NULL),
 (10, 'Booking for Chay Fong Hong', '2025-04-09', 6.50, 6.50, NULL),
-(12, 'Fong', '2025-04-03', 0.00, 0.00, NULL);
+(12, 'Fong', '2025-04-03', 0.00, 0.00, NULL),
+(21, 'Booking for Chay Fong Hong', '2025-04-14', 22.50, 22.50, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `bookings_services`
+--
+
+CREATE TABLE `bookings_services` (
+  `id` int NOT NULL,
+  `booking_id` int NOT NULL,
+  `service_id` int NOT NULL,
+  `service_cost` decimal(10,2) NOT NULL,
+  `notes` text COLLATE utf8mb4_unicode_ci,
+  `created` datetime DEFAULT CURRENT_TIMESTAMP,
+  `modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `stylist_id` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `bookings_services`
+--
+
+INSERT INTO `bookings_services` (`id`, `booking_id`, `service_id`, `service_cost`, `notes`, `created`, `modified`, `stylist_id`) VALUES
+(18, 21, 1, 6.50, NULL, '2025-04-12 04:34:23', '2025-04-12 14:54:39', 4),
+(19, 21, 2, 7.50, NULL, '2025-04-12 04:34:23', '2025-04-12 14:54:39', 4),
+(20, 21, 3, 8.50, NULL, '2025-04-12 04:34:23', '2025-04-12 14:54:39', 4);
 
 -- --------------------------------------------------------
 
@@ -81,13 +108,13 @@ INSERT INTO `bookings` (`id`, `booking_name`, `booking_date`, `total_cost`, `rem
 --
 
 CREATE TABLE `bookings_stylists` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL,
   `stylist_date` date NOT NULL,
   `start_time` time NOT NULL,
   `end_time` time NOT NULL,
   `selected_cost` decimal(10,2) NOT NULL,
-  `booking_id` int(11) NOT NULL,
-  `stylist_id` int(11) NOT NULL
+  `booking_id` int NOT NULL,
+  `stylist_id` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -96,7 +123,10 @@ CREATE TABLE `bookings_stylists` (
 
 INSERT INTO `bookings_stylists` (`id`, `stylist_date`, `start_time`, `end_time`, `selected_cost`, `booking_id`, `stylist_id`) VALUES
 (5, '2025-04-03', '21:00:00', '22:00:00', 10.00, 7, 2),
-(6, '2025-04-06', '21:00:00', '22:00:00', 10.00, 8, 4);
+(6, '2025-04-06', '21:00:00', '22:00:00', 10.00, 8, 4),
+(15, '2025-04-14', '12:34:06', '17:34:08', 22.50, 21, 4),
+(16, '2025-04-14', '12:34:06', '17:34:08', 22.50, 21, 5),
+(17, '2025-04-14', '12:34:06', '17:34:08', 22.50, 21, 2);
 
 -- --------------------------------------------------------
 
@@ -105,16 +135,16 @@ INSERT INTO `bookings_stylists` (`id`, `stylist_date`, `start_time`, `end_time`,
 --
 
 CREATE TABLE `contacts` (
-  `id` int(11) NOT NULL,
-  `first_name` varchar(255) NOT NULL,
-  `last_name` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `phone_number` varchar(20) NOT NULL,
-  `message` text NOT NULL,
-  `replied` tinyint(1) DEFAULT 0,
-  `is_archived` tinyint(1) NOT NULL DEFAULT 0,
-  `created` datetime DEFAULT current_timestamp(),
-  `modified` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `id` int NOT NULL,
+  `first_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `last_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `phone_number` varchar(20) COLLATE utf8mb4_general_ci NOT NULL,
+  `message` text COLLATE utf8mb4_general_ci NOT NULL,
+  `replied` tinyint(1) DEFAULT '0',
+  `is_archived` tinyint(1) NOT NULL DEFAULT '0',
+  `created` datetime DEFAULT CURRENT_TIMESTAMP,
+  `modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -180,15 +210,15 @@ INSERT INTO `contacts` (`id`, `first_name`, `last_name`, `email`, `phone_number`
 --
 
 CREATE TABLE `content_blocks` (
-  `id` int(11) NOT NULL,
-  `parent` varchar(128) NOT NULL,
-  `slug` varchar(128) NOT NULL,
-  `label` varchar(255) NOT NULL,
-  `description` varchar(255) NOT NULL,
-  `type` varchar(32) NOT NULL,
-  `value` text DEFAULT NULL,
-  `previous_value` text DEFAULT NULL,
-  `modified` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `id` int NOT NULL,
+  `parent` varchar(128) COLLATE utf8mb4_general_ci NOT NULL,
+  `slug` varchar(128) COLLATE utf8mb4_general_ci NOT NULL,
+  `label` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `description` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `type` varchar(32) COLLATE utf8mb4_general_ci NOT NULL,
+  `value` text COLLATE utf8mb4_general_ci,
+  `previous_value` text COLLATE utf8mb4_general_ci,
+  `modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -229,11 +259,11 @@ INSERT INTO `content_blocks` (`id`, `parent`, `slug`, `label`, `description`, `t
 --
 
 CREATE TABLE `content_blocks_phinxlog` (
-  `version` bigint(20) NOT NULL,
-  `migration_name` varchar(100) DEFAULT NULL,
+  `version` bigint NOT NULL,
+  `migration_name` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `start_time` timestamp NULL DEFAULT NULL,
   `end_time` timestamp NULL DEFAULT NULL,
-  `breakpoint` tinyint(1) NOT NULL DEFAULT 0
+  `breakpoint` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -250,17 +280,17 @@ INSERT INTO `content_blocks_phinxlog` (`version`, `migration_name`, `start_time`
 --
 
 CREATE TABLE `customers` (
-  `id` int(11) NOT NULL,
-  `first_name` varchar(255) NOT NULL,
-  `last_name` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `nonce` varchar(255) DEFAULT NULL,
+  `id` int NOT NULL,
+  `first_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `last_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `nonce` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `nonce_expiry` datetime DEFAULT NULL,
-  `created` datetime DEFAULT current_timestamp(),
-  `modified` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `type` varchar(50) NOT NULL DEFAULT 'customer',
-  `profile_picture` varchar(255) DEFAULT NULL
+  `created` datetime DEFAULT CURRENT_TIMESTAMP,
+  `modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `type` varchar(50) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'customer',
+  `profile_picture` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -274,26 +304,12 @@ INSERT INTO `customers` (`id`, `first_name`, `last_name`, `email`, `password`, `
 -- --------------------------------------------------------
 
 --
--- Table structure for table `phinxlog`
---
-
-CREATE TABLE `phinxlog` (
-  `version` bigint(20) NOT NULL,
-  `migration_name` varchar(100) DEFAULT NULL,
-  `start_time` timestamp NULL DEFAULT NULL,
-  `end_time` timestamp NULL DEFAULT NULL,
-  `breakpoint` tinyint(1) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `services`
 --
 
 CREATE TABLE `services` (
-  `id` int(11) NOT NULL,
-  `service_name` varchar(255) NOT NULL,
+  `id` int NOT NULL,
+  `service_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
   `service_cost` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -313,17 +329,17 @@ INSERT INTO `services` (`id`, `service_name`, `service_cost`) VALUES
 --
 
 CREATE TABLE `stylists` (
-  `id` int(11) NOT NULL,
-  `first_name` varchar(255) NOT NULL,
-  `last_name` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
+  `id` int NOT NULL,
+  `first_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `last_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
   `nonce` datetime DEFAULT NULL,
   `nonce_expiry` datetime DEFAULT NULL,
-  `created` datetime DEFAULT current_timestamp(),
-  `modified` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `type` varchar(50) NOT NULL DEFAULT 'stylist',
-  `profile_picture` varchar(255) DEFAULT NULL
+  `created` datetime DEFAULT CURRENT_TIMESTAMP,
+  `modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `type` varchar(50) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'stylist',
+  `profile_picture` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -342,9 +358,9 @@ INSERT INTO `stylists` (`id`, `first_name`, `last_name`, `email`, `password`, `n
 --
 
 CREATE TABLE `stylists_services` (
-  `id` int(11) NOT NULL,
-  `stylist_id` int(11) NOT NULL,
-  `service_id` int(11) NOT NULL
+  `id` int NOT NULL,
+  `stylist_id` int NOT NULL,
+  `service_id` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -375,6 +391,14 @@ ALTER TABLE `admins`
 ALTER TABLE `bookings`
   ADD PRIMARY KEY (`id`),
   ADD KEY `customerForeignKey` (`customer_id`);
+
+--
+-- Indexes for table `bookings_services`
+--
+ALTER TABLE `bookings_services`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `booking_id` (`booking_id`),
+  ADD KEY `service_id` (`service_id`);
 
 --
 -- Indexes for table `bookings_stylists`
@@ -410,12 +434,6 @@ ALTER TABLE `customers`
   ADD UNIQUE KEY `email` (`email`);
 
 --
--- Indexes for table `phinxlog`
---
-ALTER TABLE `phinxlog`
-  ADD PRIMARY KEY (`version`);
-
---
 -- Indexes for table `services`
 --
 ALTER TABLE `services`
@@ -444,55 +462,61 @@ ALTER TABLE `stylists_services`
 -- AUTO_INCREMENT for table `admins`
 --
 ALTER TABLE `admins`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+
+--
+-- AUTO_INCREMENT for table `bookings_services`
+--
+ALTER TABLE `bookings_services`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `bookings_stylists`
 --
 ALTER TABLE `bookings_stylists`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `contacts`
 --
 ALTER TABLE `contacts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
 -- AUTO_INCREMENT for table `content_blocks`
 --
 ALTER TABLE `content_blocks`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 
 --
 -- AUTO_INCREMENT for table `services`
 --
 ALTER TABLE `services`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `stylists`
 --
 ALTER TABLE `stylists`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `stylists_services`
 --
 ALTER TABLE `stylists_services`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- Constraints for dumped tables
@@ -503,6 +527,13 @@ ALTER TABLE `stylists_services`
 --
 ALTER TABLE `bookings`
   ADD CONSTRAINT `customerForeignKey` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+--
+-- Constraints for table `bookings_services`
+--
+ALTER TABLE `bookings_services`
+  ADD CONSTRAINT `bookings_services_ibfk_1` FOREIGN KEY (`booking_id`) REFERENCES `bookings` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `bookings_services_ibfk_2` FOREIGN KEY (`service_id`) REFERENCES `services` (`id`) ON DELETE RESTRICT;
 
 --
 -- Constraints for table `bookings_stylists`

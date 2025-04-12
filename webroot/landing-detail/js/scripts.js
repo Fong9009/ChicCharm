@@ -53,7 +53,10 @@ window.addEventListener('DOMContentLoaded', event => {
 
     // Activate SimpleLightbox plugin for portfolio items
     new SimpleLightbox({
-        elements: '#portfolio a.portfolio-box'
+        elements: '#portfolio .portfolio-box a',
+        showNavigation: true,
+        navText: ['←', '→'],
+        closeText: '×'
     });
 
     // Add this to your JavaScript file or inline script
