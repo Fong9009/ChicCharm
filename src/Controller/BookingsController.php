@@ -44,7 +44,8 @@ class BookingsController extends AppController
         }
 
         $query = $this->Bookings->find()
-            ->contain(['Customers', 'Stylists', 'Services']);
+            ->contain(['Customers', 'Stylists', 'Services'])
+            ->order(['status' => 'ASC', 'booking_date' => 'DESC']);
         $bookings = $this->paginate($query);
 
         $this->set(compact('bookings'));
@@ -53,7 +54,10 @@ class BookingsController extends AppController
     public function customerindex()
     {
         $query = $this->Bookings->find()
-            ->where(['customer_id' => $this->Authentication->getIdentity()->id])
+            ->where([
+                'customer_id' => $this->Authentication->getIdentity()->id,
+                'status' => 'active'
+            ])
             ->contain([
                 'Customers',
                 'Services',
@@ -263,10 +267,13 @@ class BookingsController extends AppController
     {
         $this->request->allowMethod(['post', 'delete']);
         $booking = $this->Bookings->get($id);
-        if ($this->Bookings->delete($booking)) {
-            $this->Flash->success(__('The booking has been deleted.'));
+        
+        // Update status to cancelled instead of deleting
+        $booking = $this->Bookings->patchEntity($booking, ['status' => 'cancelled']);
+        if ($this->Bookings->save($booking)) {
+            $this->Flash->success(__('The booking has been cancelled.'));
         } else {
-            $this->Flash->error(__('The booking could not be deleted. Please, try again.'));
+            $this->Flash->error(__('The booking could not be cancelled. Please, try again.'));
         }
 
         return $this->redirect(['action' => 'customerindex']);
