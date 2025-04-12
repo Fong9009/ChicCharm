@@ -184,6 +184,7 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
     </div>
 </nav>
 <body>
+    
 <!-- Main Content Area -->
 <main class="main">
     <div class="container">

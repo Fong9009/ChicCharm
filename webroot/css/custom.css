@@ -106,7 +106,7 @@
 .contacts.index.content {
     width: 100%;
     max-width: 90%;
-    margin: 80px auto 20px;
+    margin: 40px auto 76px;
     padding: 20px;
 }
 
@@ -465,11 +465,6 @@ body {
     color: #f4623a !important;
 }
 
-/* Admin Content Styling */
-.main {
-    padding: 20px 0;
-}
-
 /* Table Styling for Admin Pages */
 .table-responsive {
     background: white;
@@ -755,7 +750,7 @@ body {
 }
 
 .column {
-    padding: 76px 15px;
+    padding: 40px;
 }
 
 .column-edit {

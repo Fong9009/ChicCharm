@@ -40,5 +40,6 @@ class Booking extends Entity
         'customer' => true,
         'stylists' => true,
         'services' => true,
+        'status' => true,
     ];
 }

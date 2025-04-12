@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 12, 2025 at 04:55 AM
+-- Generation Time: Apr 12, 2025 at 12:34 PM
 -- Server version: 9.0.1
 -- PHP Version: 8.3.12
 
@@ -46,7 +46,8 @@ CREATE TABLE `admins` (
 --
 
 INSERT INTO `admins` (`id`, `first_name`, `last_name`, `email`, `password`, `nonce`, `nonce_expiry`, `created`, `modified`, `type`, `profile_picture`) VALUES
-(4, 'Nemobyte', 'team071', 'team071@gmail.com', '$2y$10$2Nx/9hEpu4xqwbp7euCiWeO2YhJ5bU8cFveL2yg2UX5FrXOWIq.zO', NULL, NULL, '2025-03-24 02:43:16', '2025-04-10 12:24:57', 'admin', '60176_Test.PNG');
+(4, 'Nemobyte', 'team071', 'team071@gmail.com', '$2y$10$2Nx/9hEpu4xqwbp7euCiWeO2YhJ5bU8cFveL2yg2UX5FrXOWIq.zO', NULL, NULL, '2025-03-24 02:43:16', '2025-04-10 12:24:57', 'admin', '60176_Test.PNG'),
+(7, 'Chay Fong', 'Hong', 'chayfonghong1@gmail.com', '$2y$10$JGphfwPwja.dkOaZESK1XOlloJSFLYb18.jRZ2hlk0aBW.WF8CJTu', NULL, NULL, '2025-04-12 10:28:11', '2025-04-12 11:13:29', 'admin', NULL);
 
 -- --------------------------------------------------------
 
@@ -60,20 +61,21 @@ CREATE TABLE `bookings` (
   `booking_date` date NOT NULL,
   `total_cost` decimal(10,2) NOT NULL,
   `remaining_cost` decimal(10,2) NOT NULL,
-  `customer_id` int DEFAULT NULL
+  `customer_id` int DEFAULT NULL,
+  `status` varchar(20) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'active'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `bookings`
 --
 
-INSERT INTO `bookings` (`id`, `booking_name`, `booking_date`, `total_cost`, `remaining_cost`, `customer_id`) VALUES
-(7, 'Test Booking', '2025-04-03', 10.00, 10.00, NULL),
-(8, 'Double Test', '2025-04-06', 10.00, 10.00, NULL),
-(9, 'Fong', '2025-04-17', 0.00, 0.00, NULL),
-(10, 'Booking for Chay Fong Hong', '2025-04-09', 6.50, 6.50, NULL),
-(12, 'Fong', '2025-04-03', 0.00, 0.00, NULL),
-(21, 'Booking for Chay Fong Hong', '2025-04-14', 22.50, 22.50, 1);
+INSERT INTO `bookings` (`id`, `booking_name`, `booking_date`, `total_cost`, `remaining_cost`, `customer_id`, `status`) VALUES
+(7, 'Test Booking', '2025-04-03', 10.00, 10.00, NULL, 'active'),
+(8, 'Double Test', '2025-04-06', 10.00, 10.00, NULL, 'active'),
+(9, 'Fong', '2025-04-17', 0.00, 0.00, NULL, 'active'),
+(10, 'Booking for Chay Fong Hong', '2025-04-09', 6.50, 6.50, NULL, 'active'),
+(12, 'Fong', '2025-04-03', 0.00, 0.00, NULL, 'active'),
+(27, 'Booking for Chay Fong Hong', '2025-04-15', 14.00, 14.00, 1, 'active');
 
 -- --------------------------------------------------------
 
@@ -97,9 +99,8 @@ CREATE TABLE `bookings_services` (
 --
 
 INSERT INTO `bookings_services` (`id`, `booking_id`, `service_id`, `service_cost`, `notes`, `created`, `modified`, `stylist_id`) VALUES
-(18, 21, 1, 6.50, NULL, '2025-04-12 04:34:23', '2025-04-12 14:54:39', 4),
-(19, 21, 2, 7.50, NULL, '2025-04-12 04:34:23', '2025-04-12 14:54:39', 4),
-(20, 21, 3, 8.50, NULL, '2025-04-12 04:34:23', '2025-04-12 14:54:39', 4);
+(35, 27, 1, 6.50, NULL, '2025-04-12 08:12:22', '2025-04-12 08:12:22', 4),
+(36, 27, 2, 7.50, NULL, '2025-04-12 08:12:22', '2025-04-12 08:12:22', 2);
 
 -- --------------------------------------------------------
 
@@ -122,11 +123,8 @@ CREATE TABLE `bookings_stylists` (
 --
 
 INSERT INTO `bookings_stylists` (`id`, `stylist_date`, `start_time`, `end_time`, `selected_cost`, `booking_id`, `stylist_id`) VALUES
-(5, '2025-04-03', '21:00:00', '22:00:00', 10.00, 7, 2),
-(6, '2025-04-06', '21:00:00', '22:00:00', 10.00, 8, 4),
-(15, '2025-04-14', '12:34:06', '17:34:08', 22.50, 21, 4),
-(16, '2025-04-14', '12:34:06', '17:34:08', 22.50, 21, 5),
-(17, '2025-04-14', '12:34:06', '17:34:08', 22.50, 21, 2);
+(37, '2025-04-15', '21:12:12', '23:12:14', 14.00, 27, 4),
+(38, '2025-04-15', '21:12:12', '23:12:14', 14.00, 27, 2);
 
 -- --------------------------------------------------------
 
@@ -298,7 +296,7 @@ CREATE TABLE `customers` (
 --
 
 INSERT INTO `customers` (`id`, `first_name`, `last_name`, `email`, `password`, `nonce`, `nonce_expiry`, `created`, `modified`, `type`, `profile_picture`) VALUES
-(1, 'Chay Fong', 'Hong', 'chayfong9009@gmail.com', '$2y$10$OEDCACaiUaYKhHkeHFuQmOLwDX9oJ4HiTD6K3bmAhkODBpG7zI6t6', NULL, NULL, '2025-03-26 11:10:12', '2025-03-26 11:10:12', 'customer', NULL),
+(1, 'Chay Fong', 'Hong', 'chayfong9009@gmail.com', '$2y$10$hIXeX/RjXv4ox29mSuSZiuxclpjRXzyhjO9bgG5is13uBubV8gbqq', NULL, NULL, '2025-03-26 11:10:12', '2025-04-12 11:15:07', 'customer', NULL),
 (2, 'Christian', 'Cochrane', 'cakephp@example.com', '$2y$10$4oCG2ResnEQbYk2rgtdTGe1faLZPOu29GZma4EfRmQ.B6vyHOk7u6', NULL, NULL, '2025-04-04 02:31:18', '2025-04-10 12:18:03', 'customer', '97406_Capture.PNG');
 
 -- --------------------------------------------------------
@@ -462,25 +460,25 @@ ALTER TABLE `stylists_services`
 -- AUTO_INCREMENT for table `admins`
 --
 ALTER TABLE `admins`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `bookings_services`
 --
 ALTER TABLE `bookings_services`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `bookings_stylists`
 --
 ALTER TABLE `bookings_stylists`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT for table `contacts`

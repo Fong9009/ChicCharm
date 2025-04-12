@@ -26,6 +26,7 @@
                         <th><?= __('Services') ?></th>
                         <th><?= $this->Paginator->sort('total_cost') ?></th>
                         <th><?= $this->Paginator->sort('remaining_cost') ?></th>
+                        <th><?= $this->Paginator->sort('status') ?></th>
                         <th class="actions"><?= __('Actions') ?></th>
                     </tr>
                     </thead>
@@ -64,17 +65,20 @@
                             </td>
                             <td>$<?= $this->Number->format($booking->total_cost) ?></td>
                             <td>$<?= $this->Number->format($booking->remaining_cost) ?></td>
+                            <td><?= h($booking->status) ?></td>
                             <td class="actions">
                                 <?= $this->Html->link(__('View'), ['action' => 'customerview', $booking->id], ['class' => 'button']) ?>
-                                <?= $this->Form->postLink(
-                                    __('Cancel Booking'),
-                                    ['action' => 'customerdelete', $booking->id],
-                                    [
-                                        'method' => 'delete',
-                                        'confirm' => __('Are you sure you want to cancel this booking?'),
-                                        'class' => 'button',
-                                    ]
-                                ) ?>
+                                <?php if ($booking->status === 'active'): ?>
+                                    <?= $this->Form->postLink(
+                                        __('Cancel Booking'),
+                                        ['action' => 'customerdelete', $booking->id],
+                                        [
+                                            'method' => 'delete',
+                                            'confirm' => __('Are you sure you want to cancel this booking?'),
+                                            'class' => 'button',
+                                        ]
+                                    ) ?>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>
