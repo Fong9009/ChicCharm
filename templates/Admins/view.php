@@ -6,7 +6,7 @@
 
 $adminId = $this->request->getAttribute('identity')->id
 ?>
-<?= $this->Html->css('/views/views.css') ?>
+<?= $this->Html->css('/utility/views/views.css') ?>
 <?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
 <div class="custom-view-wrapper">
     <div class="row">

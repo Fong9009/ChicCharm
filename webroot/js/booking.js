@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to calculate total cost from selected services
     function calculateTotalCost() {
         let totalCost = 0;
-        
+
         // Loop through all checked service checkboxes
         serviceCheckboxes.forEach(checkbox => {
             if (checkbox.checked) {
@@ -33,9 +33,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
-        
+
         totalCostInput.value = totalCost.toFixed(2);
-        
+
         // Also update remaining cost if it exists
         const remainingCostInput = document.getElementById('remaining-cost');
         if (remainingCostInput) {
@@ -46,11 +46,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedCount = getSelectedServiceIds().length;
         document.getElementById('service-count').textContent = selectedCount;
         document.getElementById('service-total').textContent = totalCost.toFixed(2);
-        
+
         // Update the list of selected services
         const selectedList = document.getElementById('selected-services-list');
         selectedList.innerHTML = '';
-        
+
         serviceCheckboxes.forEach(checkbox => {
             if (checkbox.checked) {
                 const label = document.querySelector(`label[for="${checkbox.id}"]`).textContent;
@@ -124,10 +124,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         try {
             const csrfToken = document.querySelector('input[name="_csrfToken"]').value;
-            
-            const response = await fetch('/bookings/get-stylists', {
+            const url = apiUrl;
+            const response = await fetch(url, {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-Token': csrfToken
                 },
@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', function() {
             for (const selection of selections) {
                 const serviceId = selection.dataset.serviceId;
                 const select = selection.querySelector('select');
-                
+
                 if (!bookingDateInput.value || !startTimeInput.value || !endTimeInput.value) {
                     select.disabled = true;
                     select.innerHTML = '<option value="">Please select date and time first</option>';
@@ -196,12 +196,12 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateStylistIdsContainer() {
         const container = document.getElementById('stylist-ids-container');
         container.innerHTML = '';
-        
+
         const selects = document.querySelectorAll('.stylist-select');
         selects.forEach((select, index) => {
             const serviceId = select.closest('.service-stylist-selection').dataset.serviceId;
             const stylistId = select.value;
-            
+
             if (stylistId) {
                 // Create hidden input for service_id
                 const serviceInput = document.createElement('input');
