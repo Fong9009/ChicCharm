@@ -10,6 +10,7 @@ $this->Html->css('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css
 $this->Html->css('https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css', ['block' => true]);
 $this->Html->css('custom', ['block' => true]);
 ?>
+<?php debug($booking_id); ?>
 <div class="custom-list-wrapper">
     <div class="row">
         <div class="contacts index content">
@@ -25,7 +26,7 @@ $this->Html->css('custom', ['block' => true]);
                     </div>
                 </div>
                 <div class="search-filter-container">
-                    <?= $this->Form->create(null, ['type' => 'get', 'url' => ['action' => 'customerstylistadd', $booking_id], 'class' => 'filter-form']) ?>
+                    <?= $this->Form->create(null, ['type' => 'post', 'url' => ['action' => 'customerstylistadd', $booking_id], 'class' => 'filter-form']) ?>
                     <?= $this->Form->hidden('filter', ['value' => '1']) ?>
                     <div class="row">
                         <div class="col-md-4">
@@ -84,18 +85,19 @@ $this->Html->css('custom', ['block' => true]);
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end">
                                         <li>
-                                            <?= $this->Html->link(
+                                            <?= $this->Form->postLink(
                                                 __('Add Stylist'),
+                                                ['controller' => 'BookingsStylists', 'action' => 'addStylist', $booking_id],
                                                 [
-                                                    'controller' => 'BookingsStylists',
-                                                    'action' => 'addStylist',
-                                                    $stylist->id,
-                                                    $booking_id,
-                                                    $this->request->getQuery('start_time'),
-                                                    $this->request->getQuery('end_time'),
-                                                    $totalServicePrice,
-                                                ],
-                                                ['class' => 'dropdown-item', 'confirm' => 'Add this Stylist To Booking?']
+                                                    'data' => [
+                                                        'stylist_id' => $stylist->id,
+                                                        'start_time' => $this->request->getQuery('start_time'),
+                                                        'end_time' => $this->request->getQuery('end_time'),
+                                                        'service_id' => $this->request->getQuery('service_id')
+                                                    ],
+                                                    'class' => 'dropdown-item',
+                                                    'confirm' => 'Add this Stylist To Booking?'
+                                                ]
                                             ) ?>
                                         </li>
                                     </ul>

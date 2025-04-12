@@ -68,8 +68,8 @@
                 <tr>
                     <td><?= h($booking->booking_name)?></td>
                     <td><?= h($booking->booking_date) ?></td>
-                    <td><?= $this->Number->format($booking->total_cost) ?></td>
-                    <td><?= $this->Number->format($booking->remaining_cost) ?></td>
+                    <td><?= $this->Number->currency($booking->total_cost) ?></td>
+                    <td><?= $this->Number->currency($booking->remaining_cost) ?></td>
                     <td class="actions">
                         <?= $this->Html->link(__('View'), ['action' => 'view', $booking->id], ['class' => 'button']) ?>
                         <?= $this->Html->link(__('Add Stylist'), ['controller' => 'BookingsStylists', 'action' => 'customerstylistadd', $booking->id], ['class' => 'button']) ?>
