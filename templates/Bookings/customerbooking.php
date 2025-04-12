@@ -11,14 +11,12 @@
 $this->Html->script('booking', ['block' => 'script']);
 ?>
 <div class="booking-form-wrapper">
-        <div class="row">
-            <aside class="column">
-                <div class="side-nav">
-                <h4 class="heading"><?= __('Actions') ?></h4>
-                <?= $this->Html->link(__('List Bookings'), ['action' => 'index'], ['class' => 'side-nav-item']) ?>
-            </div>
-        </aside>
-        <div class="column">
+    <div class="row">
+        <div class="side-nav">
+        <h4 class="heading"><?= __('Actions') ?></h4>
+        <?= $this->Html->link(__('List Bookings'), ['action' => 'index'], ['class' => 'side-nav-item']) ?>
+        </div>
+        <div class="column-edit">
             <div class="bookings form content">
                 <?= $this->Form->create($booking) ?>
                 <fieldset>
@@ -43,7 +41,6 @@ $this->Html->script('booking', ['block' => 'script']);
                             </div>
                         </div>
                     </div>
-                    <br>
                     <div class="row">
                         <div class="col-md-4">
                             <h5>Please Select The Date</h5>
@@ -51,8 +48,9 @@ $this->Html->script('booking', ['block' => 'script']);
                                 echo $this->Form->control('booking_date', [
                                     'type' => 'date',
                                     'required' => true,
-                                    'class' => 'form-control',
-                                    'id' => 'booking-date'
+                                    'class' => 'form-control' . ($this->Form->isFieldError('booking_date') ? ' is-invalid' : ''),
+                                    'id' => 'booking-date',
+                                    'error' => ['class' => 'invalid-feedback']
                                 ]);
                             ?>
                         </div>
@@ -62,9 +60,10 @@ $this->Html->script('booking', ['block' => 'script']);
                                 echo $this->Form->control('start_time', [
                                     'type' => 'time',
                                     'required' => true,
-                                    'class' => 'form-control',
+                                    'class' => 'form-control' . ($this->Form->isFieldError('start_time') ? ' is-invalid' : ''),
                                     'id' => 'start-time',
-                                    'interval' => 15
+                                    'interval' => 15,
+                                    'error' => ['class' => 'invalid-feedback']
                                 ]);
                             ?>
                         </div>
@@ -74,9 +73,10 @@ $this->Html->script('booking', ['block' => 'script']);
                                 echo $this->Form->control('end_time', [
                                     'type' => 'time',
                                     'required' => true,
-                                    'class' => 'form-control',
+                                    'class' => 'form-control' . ($this->Form->isFieldError('end_time') ? ' is-invalid' : ''),
                                     'id' => 'end-time',
-                                    'interval' => 15
+                                    'interval' => 15,
+                                    'error' => ['class' => 'invalid-feedback']
                                 ]);
                             ?>
                         </div>
@@ -95,7 +95,8 @@ $this->Html->script('booking', ['block' => 'script']);
                                 echo $this->Form->control('total_cost', [
                                     'readonly' => true,
                                     'value' => '0.00',
-                                    'class' => 'form-control'
+                                    'class' => 'form-control' . ($this->Form->isFieldError('total_cost') ? ' is-invalid' : ''),
+                                    'error' => ['class' => 'invalid-feedback']
                                 ]);
                             ?>
                         </div>
@@ -105,9 +106,10 @@ $this->Html->script('booking', ['block' => 'script']);
                             <?php
                                 echo $this->Form->control('notes', [
                                     'type' => 'textarea',
-                                    'class' => 'form-control',
+                                    'class' => 'form-control' . ($this->Form->isFieldError('notes') ? ' is-invalid' : ''),
                                     'rows' => 3,
-                                    'placeholder' => 'Add any special notes or requirements...'
+                                    'placeholder' => 'Add any special notes or requirements...',
+                                    'error' => ['class' => 'invalid-feedback']
                                 ]);
                             ?>
                         </div>
@@ -121,7 +123,7 @@ $this->Html->script('booking', ['block' => 'script']);
                 <div class="row mt-3">
                     <div class="col-md-12">
                         <?= $this->Form->button(__('Create Booking'), ['class' => 'btn btn-primary']) ?>
-                        <?= $this->Html->link(__('Cancel'), ['action' => 'index'], ['class' => 'btn btn-secondary']) ?>
+                        <?= $this->Html->link(__('Cancel'), ['controller' => 'Customers', 'action' => 'dashboard'], ['class' => 'btn btn-secondary']) ?>
                     </div>
                 </div>
                 <?= $this->Form->end() ?>

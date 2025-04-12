@@ -34,7 +34,7 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
 
     <?= $this->Html->meta('icon') ?>
     <?= $this->Html->css('/landing-detail/css/styles.css') ?>
-    <?= $this->Html->css(['fonts', 'cake', 'custom']) ?>
+    <?= $this->Html->css(['fonts', 'cake', 'custom']) ?> 
     <?= $this->Html->script('custom') ?>
 
     <?= $this->fetch('meta') ?>

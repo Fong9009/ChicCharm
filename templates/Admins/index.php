@@ -9,24 +9,18 @@ $this->Html->css('custom', ['block' => true]);
 $this->Html->script('custom', ['block' => true]);
 ?>
 <div class="custom-list-wrapper">
-    <div style="padding-top: 60px;">
-        <?= $this->Flash->render('admin_notify') ?>
-    </div>
+    <?= $this->Flash->render('admin_notify') ?>
     <div class="row">
-        <aside class="column">
-            <div class="side-nav">
-                <h4 class="heading"><?= __('Actions') ?></h4>
-                <?= $this->Html->link(__('New Admin'), ['action' => 'add'], ['class' => 'side-nav-item']) ?>
-                <?= $this->Html->link(__('Back to Dashboard'), ['controller' => 'Admins', 'action' => 'dashboard'], ['class' => 'side-nav-item']) ?>
-            </div>
-        </aside>
+        <div class="side-nav">
+            <h4 class="heading"><?= __('Actions') ?></h4>
+            <?= $this->Html->link(__('New Admin'), ['action' => 'add'], ['class' => 'side-nav-item']) ?>
+            <?= $this->Html->link(__('Back to Dashboard'), ['controller' => 'Admins', 'action' => 'dashboard'], ['class' => 'side-nav-item']) ?>
+        </div>
         <div class="contacts index content">
             <div class="table-responsive">
                 <div class="container">
                     <div class="row align-items-center">
-                        <div class="col-8">
-                            <h3><?= __('Admin List') ?></h3>
-                        </div>
+                        <h3><?= __('Admin List') ?></h3>
                     </div>
                 </div>
                 <div class="search-filter-container">
