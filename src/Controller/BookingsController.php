@@ -213,6 +213,7 @@ class BookingsController extends AppController
                     if (!$this->BookingsStylists->save($bookingStylist)) {
                         $this->Flash->error(__('The booking was updated, but stylist details could not be updated.'));
                     }
+
                 }
                 
                 $this->Flash->success(__('The booking has been saved.'));

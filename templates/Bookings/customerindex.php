@@ -6,12 +6,10 @@
 ?>
 <div class="custom-list-wrapper">
     <div class="row">
-        <aside class="column">
-            <div class="side-nav">
-                <h4 class="heading"><?= __('Actions') ?></h4>
-                <?= $this->Html->link(__('Back to Dashboard'), ['controller' => 'Customers', 'action' => 'dashboard'], ['class' => 'side-nav-item']) ?>
-            </div>
-        </aside>
+        <div class="side-nav">
+            <h4 class="heading"><?= __('Actions') ?></h4>
+            <?= $this->Html->link(__('Back to Dashboard'), ['controller' => 'Customers', 'action' => 'dashboard'], ['class' => 'side-nav-item']) ?>
+        </div>
         <div class="contacts index content">
             <div class="table-responsive">
                 <div class="container">
