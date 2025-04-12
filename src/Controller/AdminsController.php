@@ -16,6 +16,22 @@ use Cake\Mailer\Mailer;
  */
 class AdminsController extends AppController
 {
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->loadComponent('Authentication.Authentication');
+    }
+
+    public function beforeFilter(\Cake\Event\EventInterface $event)
+    {
+        parent::beforeFilter($event);
+        // Check if user is admin for all actions
+        $user = $this->Authentication->getIdentity();
+        if (!$user || $user->type !== 'admin') {
+            $this->Flash->error('Access denied. Admin only area.');
+            return $this->redirect(['controller' => 'Bookings', 'action' => 'customerindex']);
+        }
+    }
 
     /**
      * Index method

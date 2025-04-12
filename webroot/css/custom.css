@@ -1748,25 +1748,6 @@ footer {
     }
 }
 
-/* Base styles */
-html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden; 
-    width: 100%;
-}
-
-/* Container styles */
-.container,
-.container-fluid {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-}
-
 /* Masthead styling */
 header.masthead {
     position: relative;

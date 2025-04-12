@@ -13,6 +13,7 @@ use Cake\Validation\Validator;
  *
  * @property \App\Model\Table\CustomersTable&\Cake\ORM\Association\BelongsTo $Customers
  * @property \App\Model\Table\StylistsTable&\Cake\ORM\Association\BelongsToMany $Stylists
+ * @property \App\Model\Table\ServicesTable&\Cake\ORM\Association\BelongsToMany $Services
  *
  * @method \App\Model\Entity\Booking newEmptyEntity()
  * @method \App\Model\Entity\Booking newEntity(array $data, array $options = [])
@@ -52,6 +53,21 @@ class BookingsTable extends Table
             'targetForeignKey' => 'stylist_id',
             'joinTable' => 'bookings_stylists',
         ]);
+        $this->belongsToMany('Services', [
+            'foreignKey' => 'booking_id',
+            'targetForeignKey' => 'service_id',
+            'joinTable' => 'bookings_services',
+        ]);
+
+        $this->hasMany('BookingsStylists', [
+            'foreignKey' => 'booking_id',
+            'dependent' => true,
+        ]);
+
+        $this->hasMany('BookingsServices', [
+            'foreignKey' => 'booking_id',
+            'dependent' => true,
+        ]);
     }
 
     /**
@@ -71,6 +87,25 @@ class BookingsTable extends Table
             ->date('booking_date')
             ->requirePresence('booking_date', 'create')
             ->notEmptyDate('booking_date');
+
+        $validator
+            ->time('start_time')
+            ->requirePresence('start_time', 'create')
+            ->notEmptyTime('start_time');
+
+        $validator
+            ->time('end_time')
+            ->requirePresence('end_time', 'create')
+            ->notEmptyTime('end_time')
+            ->add('end_time', 'compareWithStartTime', [
+                'rule' => function ($value, $context) {
+                    if (empty($context['data']['start_time'])) {
+                        return true;
+                    }
+                    return $value > $context['data']['start_time'];
+                },
+                'message' => 'End time must be after start time'
+            ]);
 
         $validator
             ->decimal('total_cost')

@@ -24,7 +24,26 @@
             <fieldset>
                 <legend><?= __('Edit Booking') ?></legend>
                 <?php
-                    echo $this->Form->control('booking_date');
+                    echo $this->Form->control('booking_date', [
+                        'type' => 'date',
+                        'class' => 'form-control'
+                    ]);
+                    echo $this->Form->control('start_time', [
+                        'type' => 'time',
+                        'class' => 'form-control',
+                        'interval' => 15
+                    ]);
+                    echo $this->Form->control('end_time', [
+                        'type' => 'time',
+                        'class' => 'form-control',
+                        'interval' => 15
+                    ]);
+                    echo $this->Form->control('services._ids', [
+                        'options' => $services,
+                        'multiple' => true,
+                        'class' => 'form-control',
+                        'style' => 'height: 150px;'
+                    ]);
                     echo $this->Form->control('total_cost');
                     echo $this->Form->control('remaining_cost');
                     echo $this->Form->control('customer_id', ['options' => $customers, 'empty' => true]);
