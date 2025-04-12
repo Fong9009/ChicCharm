@@ -31,22 +31,6 @@
                 <div class="col-lg-4 col-md-6 col-sm-12 mb-3 side-nav-item">
                     <?= $this->Html->link(
                         '<div class="card h-100">
-                            <div class="card-header list-card-header d-flex justify-content-between align-items-center flex-wrap">
-                                <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">List Services</h4>
-                                <i class="material-icons view-icon ms-2">list</i>
-                            </div>
-                            <div class="card-body list-card-body"></div>
-                            <div class="card-footer list-card-footer">
-                                <span  class="mb-0 text-truncate">List Services</span>
-                            </div>
-                        </div>',
-                        ['controller' => 'Services', 'action' => 'index'],
-                        ['escape' => false, 'class' => 'card-link-wrapper d-block text-decoration-none']
-                    ) ?>
-                </div>
-                <div class="col-lg-4 col-md-6 col-sm-12 mb-3 side-nav-item">
-                    <?= $this->Html->link(
-                        '<div class="card h-100">
                             <div class="card-header new-card-header d-flex justify-content-between align-items-center flex-wrap">
                                 <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">New Service</h4>
                                 <i class="material-icons view-icon ms-2">add</i>
@@ -83,7 +67,7 @@
             <?php foreach ($services as $service): ?>
                 <tr>
                     <td><?= h($service->service_name) ?></td>
-                    <td>$<?= $this->Number->format($service->service_cost, ['places' => 2]) ?></td>
+                    <td><?= $this->Number->currency($service->service_cost) ?></td>
                     <td class="actions">
                         <?= $this->Html->link(__('View'), ['action' => 'view', $service->id], ['class' => 'button']) ?>
                         <?= $this->Html->link(__('Edit'), ['action' => 'edit', $service->id], ['class' => 'button']) ?>
