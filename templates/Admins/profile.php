@@ -17,7 +17,7 @@ $this->layout = 'default';
 
                 <!--Profile Picture and Summary-->
                 <div class="row">
-                    <div class="col-md-6 mb-4">
+                    <div class="col-lg-6 col-md-12 col-sm-12 mb-4">
                         <div class="card h-100">
                             <div class="card-header">
                                 <h3 class="card-title">Profile Picture</h3>
@@ -26,13 +26,13 @@ $this->layout = 'default';
                                 <?php if (!empty($admin->profile_picture)) : ?>
                                     <img src="<?= $this->Url->image('profile/' . $admin->profile_picture) ?>"
                                          alt="Profile Picture"
-                                         class="profile-picture">
+                                         class="profile-picture img-fluid rounded mx-auto d-block">
                                 <?php endif; ?>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-md-6 mb-4">
+                    <div class="col-lg-6 col-md-12 mb-4 col-sm-12">
                         <div class="card h-100">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h3 class="card-title">Profile Summary</h3>

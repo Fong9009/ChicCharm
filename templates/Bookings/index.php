@@ -4,16 +4,53 @@
  * @var iterable<\App\Model\Entity\Booking> $bookings
  */
 ?>
+<?= $this->Html->css('/utility/indexes/indexes.css') ?>
+<?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
 <div class="contacts index content">
-    <div class="table-responsive">
+    <!-- Action Menu -->
+    <aside class="column">
+        <div class="side-nav">
+            <h4 class="heading"><?= __('Actions') ?></h4>
+            <div class="row gx-2">
+                <div class="col-lg-4 col-md-6 col-sm-12 mb-3 side-nav-item">
+                    <?= $this->Html->link(
+                        '<div class="card h-100">
+                            <div class="card-header dashboard-card-header d-flex justify-content-between align-items-center flex-wrap">
+                                <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">Dashboard</h4>
+                                <i class="material-icons view-icon ms-2">person</i>
+                            </div>
+                            <div class="card-body dashboard-card-body"></div>
+                            <div class="card-footer dashboard-card-footer">
+                                <span class="mb-0 text-truncate">Back To Dashboard</span>
+                            </div>
+                        </div>',
+                        ['controller' => 'Admins', 'action' => 'dashboard'],
+                        ['escape' => false, 'class' => 'card-link-wrapper d-block text-decoration-none']
+                    ) ?>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12 mb-3 side-nav-item">
+                    <?= $this->Html->link(
+                        '<div class="card h-100">
+                            <div class="card-header new-card-header d-flex justify-content-between align-items-center flex-wrap">
+                                <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">New Booking</h4>
+                                <i class="material-icons view-icon ms-2">add</i>
+                            </div>
+                            <div class="card-body new-card-body"></div>
+                            <div class="card-footer new-card-footer">
+                                <span  class="mb-0 text-truncate">Add Booking</span>
+                            </div>
+                        </div>',
+                        ['controller' => 'Bookings', 'action' => 'customerbooking'],
+                        ['escape' => false, 'class' => 'card-link-wrapper d-block text-decoration-none']
+                    ) ?>
+                </div>
+            </div>
+        </div>
+    </aside>
+    <div class="table-responsive mt-4">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-2" style="padding: 10px 20px;">
-                    <?= $this->Html->link(__('Back to Dashboard'), ['controller' => 'Admins', 'action' => 'dashboard'], ['class' => 'btn btn-primary', 'style' => 'white-space: nowrap;']) ?>
-                </div>
-                <div class="col-8">
-                    <h3><?= __('Bookings') ?></h3>
-                </div>
+                <h3><?= __('Bookings') ?></h3>
             </div>
         </div>
         <table>
@@ -51,7 +88,6 @@
             <?php endforeach; ?>
             </tbody>
         </table>
-        <?= $this->Html->link(__('New Booking'), ['action' => 'customerbooking'], ['class' => 'btn btn-primary']) ?>
     </div>
     <div class="paginator">
         <ul class="pagination">

@@ -28,8 +28,7 @@ class AdminsController extends AppController
         // Check if user is admin for all actions
         $user = $this->Authentication->getIdentity();
         if (!$user || $user->type !== 'admin') {
-            $this->Flash->error('Access denied. Admin only area.');
-            return $this->redirect(['controller' => 'Bookings', 'action' => 'customerindex']);
+            return $this->redirect(['controller' => 'Auth', 'action' => 'login']);
         }
     }
 
@@ -147,7 +146,7 @@ class AdminsController extends AppController
                     }
                 }
                 //Stores file in directory
-                $filename = rand(10000, 99999) . '_' . $profile->getClientFilename();
+                $filename = rand(10000, 99999) . '_' . strtolower($profile->getClientFilename());
                 $profile->moveTo(WWW_ROOT . 'img/profile/' . $filename);
                 $data['profile_picture'] = $filename;
             } else {
