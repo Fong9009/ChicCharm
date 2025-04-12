@@ -192,15 +192,6 @@
                                 <td class="actions">
                                     <?= $this->Html->link(__('View'), ['controller' => 'Stylists', 'action' => 'view', $stylist->id], ['class' => 'button']) ?>
                                     <?= $this->Html->link(__('Edit'), ['controller' => 'Stylists', 'action' => 'edit', $stylist->id], ['class' => 'button']) ?>
-                                    <?= $this->Form->postLink(
-                                        __('Delete'),
-                                        ['controller' => 'Stylists', 'action' => 'delete', $stylist->id],
-                                        [
-                                            'method' => 'delete',
-                                            'confirm' => __('Are you sure you want to delete # {0}?', $stylist->id),
-                                            'class' => 'button',
-                                        ]
-                                    ) ?>
                                 </td>
                             </tr>
                             <?php endforeach; ?>

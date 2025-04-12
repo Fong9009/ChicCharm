@@ -4,7 +4,7 @@
  * @var \App\Model\Entity\Stylist $stylist
  */
 ?>
-<?= $this->Html->css('/views/views.css') ?>
+<?= $this->Html->css('/utility/views/views.css') ?>
 <?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
 <div class="row px-4" style="padding-top: 80px;">
     <aside class="column">
