@@ -207,13 +207,13 @@ $identity = $this->request->getAttribute('identity');
                     <div class="card-body payment-card-body">
                         <h3 class="payment-card-h3">Total Payments</h3>
                         <div class="total-value-container">
-                            <p class="payment-card-count"><?= h($contactCount) ?></p>
+                            <p class="payment-card-count"><?= h(0) ?></p>
                         </div>
                     </div>
                     <div class="card-footer payment-card-footer">
                         <?= $this->Html->link(
                             '<span class="fs-5">View Payment Lists</span><i class="material-icons">visibility</i>',
-                            ['controller' => 'Payments', 'action' => 'index'],
+                            ['controller' => 'Admins', 'action' => 'dashboard'],
                             ['class' => 'payment-button', 'escape' => false]
                         ) ?>
                     </div>
