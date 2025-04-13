@@ -2,6 +2,9 @@
 declare(strict_types=1);
 
 namespace App\Controller;
+use App\Model\Table\ServicesTable;
+use App\Model\Table\StylistsTable;
+use App\Model\Table\BookingsStylistsTable;
 
 /**
  * Bookings Controller
@@ -13,6 +16,9 @@ namespace App\Controller;
  */
 class BookingsController extends AppController
 {
+    protected ServicesTable $Services;
+    protected StylistsTable $Stylists;
+    protected BookingsStylistsTable $BookingsStylists;
     public function initialize(): void
     {
         parent::initialize();
