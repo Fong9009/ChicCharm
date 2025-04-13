@@ -10,8 +10,8 @@ $this->Html->script('custom', ['block' => true]);
 ?>
 <?= $this->Html->css('/utility/indexes/indexes.css') ?>
 <?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
-    <div class="row">
-        <!-- Action Menu -->
+<div class="contacts index content">
+    <!-- Action Menu -->
         <aside class="column">
             <div class="side-nav">
                 <h4 class="heading"><?= __('Actions') ?></h4>
@@ -51,7 +51,6 @@ $this->Html->script('custom', ['block' => true]);
                 </div>
             </div>
         </aside>
-        <div class="contacts index content">
             <div class="table-responsive mt-3">
                 <div class="container">
                     <div class="row align-items-center">
@@ -132,4 +131,4 @@ $this->Html->script('custom', ['block' => true]);
             </div>
         </div>
     </div>
-</div>
+
