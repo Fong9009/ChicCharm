@@ -228,12 +228,13 @@ class BookingsController extends AppController
         }
         $customers = $this->Bookings->Customers->find('list', limit: 200)->all();
         $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
-        $services = $this->Bookings->Services->find('list', [
-            'keyField' => 'id',
-            'valueField' => function ($service) {
+        $services = $this->fetchTable('Services')->find(
+            'list',
+            keyField: 'id',
+            valueField: function ($service) {
                 return $service->service_name . ' ($' . $service->service_cost . ')';
             }
-        ])->all();
+        )->all();
         $this->set(compact('booking', 'customers', 'stylists', 'services'));
     }
 
@@ -360,12 +361,13 @@ class BookingsController extends AppController
             $this->Flash->error(__('The booking could not be saved. Please, try again.'));
         }
         $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
-        $services = $this->Services->find('list', [
-            'keyField' => 'id',
-            'valueField' => function ($service) {
+        $services = $this->fetchTable('Services')->find(
+            'list',
+            keyField: 'id',
+            valueField: function ($service) {
                 return $service->service_name . ' ($' . $service->service_cost . ')';
             }
-        ])->all();
+        )->all();
         $this->set(compact('booking', 'stylists', 'services'));
     }
 
@@ -459,12 +461,13 @@ class BookingsController extends AppController
         $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
         $customersTable = $this->fetchTable('Customers');
         $customers = $customersTable->find('list', limit: 200)->all()->toArray();
-        $services = $this->Services->find('list', [
-            'keyField' => 'id',
-            'valueField' => function ($service) {
+        $services = $this->fetchTable('Services')->find(
+            'list',
+            keyField: 'id',
+            valueField: function ($service) {
                 return $service->service_name . ' ($' . $service->service_cost . ')';
             }
-        ])->all();
+        )->all();
         $this->set(compact('booking', 'stylists', 'services','customers'));
     }
 
