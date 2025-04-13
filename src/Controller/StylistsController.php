@@ -50,7 +50,7 @@ class StylistsController extends AppController
                 $this->Flash->success(__('The stylist has been saved.'));
                 return $this->redirect(['action' => 'index']);
             }
-            
+
             // Show specific error messages for each field
             if ($stylist->getErrors()) {
                 foreach ($stylist->getErrors() as $field => $errors) {
@@ -76,9 +76,7 @@ class StylistsController extends AppController
      */
     public function edit($id = null)
     {
-        $stylist = $this->Stylists->get($id, [
-            'contain' => ['Services'],
-        ]);
+        $stylist = $this->Stylists->get($id, contain: ['Services']);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
 
@@ -94,7 +92,7 @@ class StylistsController extends AppController
                 $this->Flash->success(__('The stylist has been saved.'));
                 return $this->redirect(['action' => 'index']);
             }
-            
+
             // Show specific error messages for each field
             if ($stylist->getErrors()) {
                 foreach ($stylist->getErrors() as $field => $errors) {

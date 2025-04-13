@@ -57,7 +57,7 @@ class ServicesController extends AppController
                 $this->Flash->success(__('The service has been saved.'));
                 return $this->redirect(['action' => 'index']);
             }
-            
+
             // Show specific error messages for each field
             if ($service->getErrors()) {
                 foreach ($service->getErrors() as $field => $errors) {
@@ -82,9 +82,7 @@ class ServicesController extends AppController
      */
     public function edit($id = null)
     {
-        $service = $this->Services->get($id, [
-            'contain' => [],
-        ]);
+        $service = $this->Services->get($id, contain: []);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $service = $this->Services->patchEntity($service, $this->request->getData());
 
@@ -97,7 +95,7 @@ class ServicesController extends AppController
                 $this->Flash->success(__('The service has been saved.'));
                 return $this->redirect(['action' => 'index']);
             }
-            
+
             // Show specific error messages for each field
             if ($service->getErrors()) {
                 foreach ($service->getErrors() as $field => $errors) {
