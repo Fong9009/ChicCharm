@@ -44,7 +44,7 @@ $this->Html->script('custom', ['block' => true]);
                             <span  class="mb-0 text-truncate">Add Customer</span>
                         </div>
                     </div>',
-                            ['controller' => 'Services', 'action' => 'add'],
+                            ['controller' => 'Customers', 'action' => 'registration'],
                             ['escape' => false, 'class' => 'card-link-wrapper d-block text-decoration-none']
                         ) ?>
                     </div>
