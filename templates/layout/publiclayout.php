@@ -59,14 +59,14 @@ $titleDescription = 'Landing Page';
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="enquiriesDropdown">
                                 <li>
-                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'index']) ?>">
+                                    <a class="dropdown-item" href="<?= $this->Url->build(['plugin' => false,'controller' => 'Contacts', 'action' => 'index']) ?>">
                                         <i class="fas fa-inbox"></i>
                                         <span>Active Messages</span>
                                     </a>
                                 </li>
                                 <li><div class="dropdown-divider"></div></li>
                                 <li>
-                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'archiveIndex']) ?>">
+                                    <a class="dropdown-item" href="<?= $this->Url->build(['plugin' => false,'controller' => 'Contacts', 'action' => 'archiveIndex']) ?>">
                                         <i class="fas fa-archive"></i>
                                         <span>Archived Messages</span>
                                     </a>
@@ -75,7 +75,7 @@ $titleDescription = 'Landing Page';
                         </li>
                         <li class="nav-item">
                             <a class="nav-link"
-                               href="<?= $this->Url->build(['controller' => 'Customers', 'action' => 'index']) ?>"
+                               href="<?= $this->Url->build([ 'plugin' => false, 'controller' => 'Customers', 'action' => 'index']) ?>"
                             >Customers List</a>
                         </li>
                         <li class="nav-item dropdown">
@@ -85,26 +85,26 @@ $titleDescription = 'Landing Page';
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="adminDropdown">
                                 <li>
-                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'dashboard'])?>">
+                                    <a class="dropdown-item" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Admins', 'action' => 'dashboard'])?>">
                                         <i class="fas fa-tachometer-alt"></i>
                                         <span>Admin Dashboard</span>
                                     </a>
                                 </li>
                                 <li><div class="dropdown-divider"></div></li>
                                 <li>
-                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'index']) ?>">
+                                    <a class="dropdown-item" href="<?= $this->Url->build(['plugin' => false,'controller' => 'Admins', 'action' => 'index']) ?>">
                                         <i class="fas fa-users-cog"></i>
                                         <span>Admins List</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'add']) ?>">
+                                    <a class="dropdown-item" href="<?= $this->Url->build(['plugin' => false,'controller' => 'Admins', 'action' => 'add']) ?>">
                                         <i class="fas fa-user-plus"></i>
                                         <span>Add New Admin</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'profile',$identity->get('id')]) ?>">
+                                    <a class="dropdown-item" href="<?= $this->Url->build(['plugin' => false,'controller' => 'Admins', 'action' => 'profile',$identity->get('id')]) ?>">
                                         <i class="fas fa-user-shield"></i>
                                         <span>Admin Profile</span>
                                     </a>
@@ -124,7 +124,7 @@ $titleDescription = 'Landing Page';
                         </li>
                         <li class="nav-item">
                             <a class="nav-link"
-                               href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'enquiry']) ?>"
+                               href="<?= $this->Url->build([ 'plugin' => false, 'controller' => 'Contacts', 'action' => 'enquiry']) ?>"
                             >Contact Us
                             </a>
                         </li>
@@ -136,14 +136,14 @@ $titleDescription = 'Landing Page';
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build([
+                            <a class="nav-link" href="<?= $this->Url->build(['plugin' => false,
                                 'controller' => 'Customers', 'action' => 'edit', $identity->get('id')]) ?>">My Profile
                             </a>
                         </li>
                     <?php }
                     // Logout button for both admin and customer ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= $this->Url->build([
+                        <a class="nav-link" href="<?= $this->Url->build(['plugin' => false,
                             'controller' => 'Auth', 'action' => 'logout']) ?>" onclick="return confirmLogout()">Logout
                         </a>
                     </li>
@@ -198,7 +198,7 @@ function confirmLogout() {
             <div class="col-md-3">
                 <h5 class="text-light fw-bold mb-3">Sign Up for Our Newsletter</h5>
                 <p class="text-light mb-3">Be the first to get notified about upcoming products and deals</p>
-                <form method="post" action="<?= $this->Url->build(['controller' => 'Newsletter', 'action' => 'subscribe']); ?>" id="ContactFooter" class="needs-confirmation newsletter-signup">
+                <form method="post" action="<?= $this->Url->build(['plugin' => false,'controller' => 'Newsletter', 'action' => 'subscribe']); ?>" id="ContactFooter" class="needs-confirmation newsletter-signup">
                     <?= $this->Form->hidden('_csrfToken', ['value' => $this->request->getAttribute('csrfToken')]) ?>
                     <div class="input-group">
                         <input type="email" class="form-control" name="email" placeholder="Enter your email" required>
