@@ -49,7 +49,7 @@ $this->Html->script('booking', ['block' => 'script']);
                                             'class' => 'form-check-input service-checkbox'
                                         ]) ?>
                                         <label class="form-check-label" for="service-<?= $id ?>">
-                                            <?= h($service) ?>
+                                            <?= h($service) ?> Per Hour
                                         </label>
                                     </div>
                                 <?php endforeach; ?>
