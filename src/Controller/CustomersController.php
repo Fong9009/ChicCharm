@@ -61,11 +61,12 @@ class CustomersController extends AppController
     {
         $customerId = $this->Authentication->getIdentity()->getIdentifier();
 
-        $customer = $this->Customers->get($customerId, [
-            'contain' => ['Bookings' => [
-                'sort' => ['Bookings.booking_date' => 'DESC']
+        $customer = $this->Customers->get(
+            $customerId,
+            contain: ['Bookings' => [
+                'sort' => ['Bookings.booking_date' => 'DESC'],
             ]]
-        ]);
+        );
 
         $bookingsTable = $this->fetchTable('Bookings');
         $customerId = $this->request->getAttribute('identity')->id;
@@ -145,7 +146,7 @@ class CustomersController extends AppController
                 $this->Flash->success(__('Registration successful! Please login with your credentials.'));
                 return $this->redirect(['controller' => 'Auth', 'action' =>  'login']);
             }
-            
+
             // Show specific error messages for each field
             if ($customer->getErrors()) {
                 foreach ($customer->getErrors() as $field => $errors) {
@@ -228,7 +229,7 @@ class CustomersController extends AppController
                 $this->Flash->success(__('Your profile has been updated.'));
                 return $this->redirect(['action' => 'dashboard']);
             }
-            
+
             // Show specific error messages for each field
             if ($customer->getErrors()) {
                 foreach ($customer->getErrors() as $field => $errors) {
@@ -253,16 +254,16 @@ class CustomersController extends AppController
     public function delete($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
-        
+
         // Get current user
         $currentUser = $this->Authentication->getIdentity();
-        
+
         // If user is a customer, they cannot delete any account
         if ($currentUser->type === 'customer') {
             $this->Flash->error(__('Customers cannot delete accounts. Please contact an administrator.'));
             return $this->redirect(['action' => 'dashboard']);
         }
-        
+
         $customer = $this->Customers->get($id);
         if ($this->Customers->delete($customer)) {
             $this->Flash->success(__('The customer has been deleted.'));
@@ -278,23 +279,23 @@ class CustomersController extends AppController
         $customer = $this->Customers->get($this->Authentication->getIdentity()->id);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
-            
+
             // Verify current password
             $hasher = new DefaultPasswordHasher();
             if (!$hasher->check($data['current_password'], $customer->password)) {
                 $this->Flash->error(__('Current password is incorrect.'));
                 return $this->redirect(['action' => 'changePassword']);
             }
-            
+
             $customer = $this->Customers->patchEntity($customer, $data, [
                 'validate' => 'resetPassword'
             ]);
-            
+
             if ($this->Customers->save($customer)) {
                 $this->Flash->success(__('Your password has been updated successfully.'));
                 return $this->redirect(['action' => 'edit', $customer->id]);
             }
-            
+
             // Show specific error messages
             if ($customer->getErrors()) {
                 foreach ($customer->getErrors() as $field => $errors) {
@@ -306,7 +307,7 @@ class CustomersController extends AppController
                 $this->Flash->error(__('Unable to update your password. Please try again.'));
             }
         }
-        
+
         $this->set(compact('customer'));
         $this->set('userType', 'customer');
     }
