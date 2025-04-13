@@ -10,9 +10,8 @@ $this->Html->script('custom', ['block' => true]);
 ?>
 <?= $this->Html->css('/utility/indexes/indexes.css') ?>
 <?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
-<div class="custom-list-wrapper">
+<div class="contacts index content">
     <?= $this->Flash->render('admin_notify') ?>
-    <div class="row">
         <aside class="column">
             <div class="side-nav">
                 <h4 class="heading"><?= __('Actions') ?></h4>
@@ -52,13 +51,10 @@ $this->Html->script('custom', ['block' => true]);
                 </div>
             </div>
         </aside>
-        <div class="contacts index content">
             <div class="table-responsive mt-3">
                 <div class="container">
                     <div class="row align-items-center">
-                        <div class="row align-items-center">
-                            <h3><?= __('Admin List') ?></h3>
-                        </div>
+                        <h3><?= __('Admin List') ?></h3>
                     </div>
                 </div>
                 <div class="search-filter-container">
@@ -86,7 +82,7 @@ $this->Html->script('custom', ['block' => true]);
                         <?= $this->Form->end() ?>
                     </div>
                 </div>
-                <table>
+                <table class="table">
                     <thead>
                         <tr>
                             <th><?= $this->Paginator->sort('first_name') ?></th>
@@ -134,5 +130,4 @@ $this->Html->script('custom', ['block' => true]);
                 <p><?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} record(s) out of {{count}} total')) ?></p>
             </div>
         </div>
-    </div>
-</div>
+

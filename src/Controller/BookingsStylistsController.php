@@ -205,7 +205,7 @@ class BookingsStylistsController extends AppController
             $serviceId = $this->request->getData('service_id');
             $servicesTable = $this->fetchTable('Services');
             $service = $servicesTable->get($serviceId);
-            $totalServicePrice = $service->service_cost;
+            $totalServicePrice = $this->calculateServiceCost($serviceId, $this->request->getData('start_time'), $this->request->getData('end_time'));
 
             //Ensure still a Float and add to entity record
             $numberServicePrice = (float)$totalServicePrice;
