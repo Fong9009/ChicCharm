@@ -79,7 +79,12 @@
                             <?= h($booking->start_time->format('H:i')) ?> - <?= h($booking->end_time->format('H:i')) ?>
                         <?php endif; ?>
                     </td>
-                    <td><?= h($booking->customer->first_name) ?> <?= h($booking->customer->last_name) ?></td>
+                    <td><?php if (empty($booking->customer->first_name) || empty($booking->customer->last_name)): ?>
+                            <p>No Name Available</p>
+                        <?php else: ?>
+                            <?= h($booking->customer->first_name) ?> <?= h($booking->customer->last_name) ?>
+                        <?php endif; ?>
+                    </td>
                     <td>
                         <?php if (!empty($booking->stylists)): ?>
                             <ul style="list-style: none; padding-left: 0;">
