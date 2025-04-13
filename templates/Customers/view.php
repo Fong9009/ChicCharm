@@ -18,7 +18,7 @@
                             '<div class="card h-100">
                             <div class="card-header view-card-header d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h4 class="view-card-h4">Edit Customer</h4>
+                                    <h4 class="view-card-h4 view-card-h4 mb-0 flex-grow-1 text-truncate">Edit Customer</h4>
                                 </div>
                                 <i class="material-icons view-icon">edit</i>
                             </div>
@@ -37,7 +37,7 @@
                             '<div class="card h-100">
                             <div class="card-header delete-card-header d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h4 class="view-card-h4">Delete Customer</h4>
+                                    <h4 class="view-card-h4 view-card-h4 mb-0 flex-grow-1 text-truncate">Delete Customer</h4>
                                 </div>
                                 <i class="material-icons view-icon">delete</i>
                             </div>
@@ -58,7 +58,7 @@
                             '<div class="card h-100">
                             <div class="card-header list-card-header d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h4 class="view-card-h4">List Customers</h4>
+                                    <h4 class="view-card-h4 view-card-h4 mb-0 flex-grow-1 text-truncate">List Customers</h4>
                                 </div>
                                 <i class="material-icons view-icon">menu</i>
                             </div>
@@ -78,7 +78,7 @@
                             '<div class="card h-100">
                             <div class="card-header new-card-header d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h4 class="view-card-h4">Create New Customer</h4>
+                                    <h4 class="view-card-h4 view-card-h4 mb-0 flex-grow-1 text-truncate">Create New Customer</h4>
                                 </div>
                                 <i class="material-icons view-icon">add</i>
                             </div>
