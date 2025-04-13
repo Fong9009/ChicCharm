@@ -12,18 +12,16 @@
             <h4 class="heading"><?= __('Actions') ?></h4>
             <!-- Edit Stylists -->
             <div class="row px-2">
-                <div class="col-lg-3 mb-4 side-nav-item">
+                <div class="col-lg-3 col-md-6 col-sm-12 mb-3 side-nav-item">
                     <?= $this->Html->link(
                         '<div class="card h-100">
-                            <div class="card-header view-card-header d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h4 class="view-card-h4">Edit Stylist</h4>
-                                </div>
-                                <i class="material-icons view-icon">edit</i>
+                            <div class="card-header view-card-header d-flex justify-content-between align-items-center flex-wrap">
+                                 <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">Edit Stylist</h4>
+                                 <i class="material-icons view-icon ms-2">edit</i>
                             </div>
                             <div class="card-body view-card-body"></div>
                             <div class="card-footer view-card-footer">
-                                <span>Edit Stylists</span>
+                                <span class="mb-0 text-truncate">Edit Stylists</span>
                             </div>
                         </div>',
                         ['controller' => 'Stylists', 'action' => 'edit', $stylist->id],
@@ -31,18 +29,16 @@
                     ) ?>
                 </div>
                 <!-- Delete Stylist -->
-                <div class="col-lg-3 mb-4 side-nav-item">
+                <div class="col-lg-3 col-md-6 col-sm-12 mb-3 side-nav-item">
                     <?= $this->Html->link(
                         '<div class="card h-100">
-                            <div class="card-header delete-card-header d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h4 class="view-card-h4">Delete Stylist</h4>
-                                </div>
-                                <i class="material-icons view-icon">delete</i>
+                            <div class="card-header delete-card-header d-flex justify-content-between align-items-center flex-wrap">
+                                  <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">Delete Stylist</h4>
+                                 <i class="material-icons view-icon ms-2">delete</i>
                             </div>
                             <div class="card-body delete-card-body"></div>
                             <div class="card-footer delete-card-footer">
-                                <span>Delete Stylist</span>
+                                <span class="mb-0 text-truncate">Delete Stylist</span>
                             </div>
                         </div>',
                         ['controller' => 'Stylists', 'action' => 'delete', $stylist->id],
@@ -52,18 +48,16 @@
                 </div>
 
                 <!-- List Stylist -->
-                <div class="col-lg-3 mb-4 side-nav-item">
+                <div class="col-lg-3 col-md-6 col-sm-12 mb-3 side-nav-item">
                     <?= $this->Html->link(
                         '<div class="card h-100">
-                            <div class="card-header list-card-header d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h4 class="view-card-h4">List Stylists</h4>
-                                </div>
-                                <i class="material-icons view-icon">menu</i>
+                            <div class="card-header list-card-header d-flex justify-content-between align-items-center flex-wrap">
+                                <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">List Stylists</h4>
+                                <i class="material-icons view-icon ms-2">menu</i>
                             </div>
                             <div class="card-body list-card-body"></div>
                             <div class="card-footer list-card-footer">
-                                <span>List Stylists</span>
+                                <span class="mb-0 text-truncate">List Stylists</span>
                             </div>
                         </div>',
                         ['controller' => 'Stylists', 'action' => 'index'],
@@ -72,18 +66,16 @@
                 </div>
 
                 <!-- New Stylist -->
-                <div class="col-lg-3 mb-4 side-nav-item">
+                <div class="col-lg-3 col-md-6 col-sm-12 mb-3 side-nav-item">
                     <?= $this->Html->link(
                         '<div class="card h-100">
-                            <div class="card-header new-card-header d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h4 class="view-card-h4">Create New Stylist</h4>
-                                </div>
-                                <i class="material-icons view-icon">add</i>
+                            <div class="card-header new-card-header d-flex justify-content-between align-items-center flex-wrap">
+                                <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">Create New Stylist</h4>
+                                <i class="material-icons view-icon ms-2">add</i>
                             </div>
                             <div class="card-body new-card-body"></div>
                             <div class="card-footer new-card-footer">
-                                <span>Add Stylist</span>
+                                <span class="mb-0 text-truncate">Add Stylist</span>
                             </div>
                         </div>',
                         ['controller' => 'Stylists', 'action' => 'add'],
