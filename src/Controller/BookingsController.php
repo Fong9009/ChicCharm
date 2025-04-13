@@ -16,9 +16,9 @@ class BookingsController extends AppController
     public function initialize(): void
     {
         parent::initialize();
-        $this->Services = $this->fetchTable('Services');
-        $this->Stylists = $this->fetchTable('Stylists');
-        $this->BookingsStylists = $this->fetchTable('BookingsStylists');
+        $this->Services = $this->getTableLocator()->get('Services');
+        $this->Stylists = $this->getTableLocator()->get('Stylists');
+        $this->BookingsStylists = $this->getTableLocator()->get('BookingsStylists');
         $this->loadComponent('Authentication.Authentication');
     }
 
@@ -139,12 +139,13 @@ class BookingsController extends AppController
         }
         $customers = $this->Bookings->Customers->find('list', limit: 200)->all();
         $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
-        $services = $this->fetchTable('Services')->find('list', [
-            'keyField' => 'id',
-            'valueField' => function ($service) {
+        $services = $this->fetchTable('Services')->find(
+            'list',
+            keyField: 'id',
+            valueField: function ($service) {
                 return $service->service_name . ' ($' . $service->service_cost . ')';
             }
-        ])->all();
+        )->all();
         $this->set(compact('booking', 'customers', 'stylists', 'services'));
     }
     /**
