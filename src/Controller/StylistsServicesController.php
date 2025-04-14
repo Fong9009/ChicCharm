@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 namespace App\Controller;
-
+use Cake\Event\EventInterface;
 /**
  * StylistsServices Controller
  *
@@ -10,6 +10,15 @@ namespace App\Controller;
  */
 class StylistsServicesController extends AppController
 {
+    public function beforeFilter(\Cake\Event\EventInterface $event)
+    {
+        parent::beforeFilter($event);
+        // Check if user is admin for all actions
+        $user = $this->Authentication->getIdentity();
+        if (!$user || $user->type !== 'admin') {
+            return $this->redirect(['controller' => 'Auth', 'action' => 'login']);
+        }
+    }
     /**
      * Index method
      *
