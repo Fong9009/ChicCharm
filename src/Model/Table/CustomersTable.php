@@ -62,13 +62,21 @@ class CustomersTable extends Table
             ->scalar('first_name')
             ->maxLength('first_name', 255)
             ->requirePresence('first_name', 'create')
-            ->notEmptyString('first_name');
+            ->notEmptyString('first_name')
+            ->add('first_name', 'alphanumeric', [
+                'rule' => ['custom', '/^[a-zA-Z ]+$/'],
+                'message' => 'First name must be alphanumeric.',
+            ]);
 
         $validator
             ->scalar('last_name')
             ->maxLength('last_name', 255)
             ->requirePresence('last_name', 'create')
-            ->notEmptyString('last_name');
+            ->notEmptyString('last_name')
+            ->add('last_name', 'alphanumeric', [
+                'rule' => ['custom', '/^[a-zA-Z ]+$/'],
+                'message' => 'Last name must be alphanumeric.',
+            ]);
 
 
         $validator

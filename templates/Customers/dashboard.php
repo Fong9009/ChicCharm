@@ -110,11 +110,6 @@ $this->layout = 'default';
                         <div class="card">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h3 class="card-title">Past Bookings</h3>
-                                <?= $this->Html->link(
-                                    'View all Previous Bookings',
-                                    ['action' => 'edit', $customer->id],
-                                    ['class' => 'btn btn-primary']
-                                ) ?>
                             </div>
                             <div class="card-body">
                                 <!-- Past bookings content -->
@@ -129,11 +124,6 @@ $this->layout = 'default';
                         <div class="card">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h3 class="card-title">Past Invoices</h3>
-                                <?= $this->Html->link(
-                                    'View all Previous Invoices',
-                                    ['action' => 'edit', $customer->id],
-                                    ['class' => 'btn btn-primary']
-                                ) ?>
                             </div>
                             <div class="card-body">
                                 <!-- Past invoices content -->

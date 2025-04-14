@@ -195,33 +195,6 @@ $identity = $this->request->getAttribute('identity');
                 </div>
             </div>
 
-            <!-- Payments Card -->
-            <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
-                <div class="card h-100">
-                    <div class="card-header payment-card-header d-flex justify-content-between align-items-center">
-                        <div>
-                            <h4 class="payment-card-h4">Payments</h4>
-                        </div>
-                        <i class="material-icons payment-icon">payments</i>
-                    </div>
-                    <div class="card-body payment-card-body">
-                        <h3 class="payment-card-h3">Total Payments</h3>
-                        <div class="total-value-container">
-                            <p class="payment-card-count"><?= h(0) ?></p>
-                        </div>
-                    </div>
-                    <div class="card-footer payment-card-footer">
-                        <?= $this->Html->link(
-                            '<span class="fs-5">View Payment Lists</span><i class="material-icons">visibility</i>',
-                            ['controller' => 'Admins', 'action' => 'dashboard'],
-                            ['class' => 'payment-button', 'escape' => false]
-                        ) ?>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- 4th Row: Services -->
-        <div class="row">
             <!-- Services Card -->
             <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
                 <div class="card h-100">

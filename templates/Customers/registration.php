@@ -3,7 +3,7 @@
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Customer $customer
  */
-?> 
+?>
 <div class="registration-wrapper">
     <div class="registration-form">
         <h2>Registration Form</h2>
@@ -11,7 +11,7 @@
         <?= $this->Flash->render() ?>
         <div class="input">
             <?= $this->Form->control('email', [
-                'label' => 'Email', 
+                'label' => 'Email',
                 'class' => 'form-control' . ($this->Form->isFieldError('email') ? ' is-invalid' : ''),
                 'required' => true,
                 'placeholder' => 'Enter your email',
@@ -20,7 +20,7 @@
         </div>
         <div class="input">
             <?= $this->Form->control('first_name', [
-                'label' => 'First Name', 
+                'label' => 'First Name',
                 'class' => 'form-control' . ($this->Form->isFieldError('first_name') ? ' is-invalid' : ''),
                 'required' => true,
                 'placeholder' => 'Enter your first name',
@@ -29,7 +29,7 @@
         </div>
         <div class="input">
             <?= $this->Form->control('last_name', [
-                'label' => 'Last Name', 
+                'label' => 'Last Name',
                 'class' => 'form-control' . ($this->Form->isFieldError('last_name') ? ' is-invalid' : ''),
                 'required' => true,
                 'placeholder' => 'Enter your last name',
@@ -38,7 +38,7 @@
         </div>
         <div class="input">
             <?= $this->Form->control('password', [
-                'label' => 'Password', 
+                'label' => 'Password',
                 'class' => 'form-control' . ($this->Form->isFieldError('password') ? ' is-invalid' : ''),
                 'required' => true,
                 'placeholder' => 'Enter your password',
@@ -47,8 +47,8 @@
         </div>
         <div class="input">
             <?= $this->Form->control('password_confirm', [
-                'type' => 'password', 
-                'label' => 'Confirm Password', 
+                'type' => 'password',
+                'label' => 'Confirm Password',
                 'class' => 'form-control' . ($this->Form->isFieldError('password_confirm') ? ' is-invalid' : ''),
                 'required' => true,
                 'placeholder' => 'Confirm your password',
@@ -66,9 +66,9 @@
         <div class="text-center mt-3">
             <?= $this->Form->button('Register', ['class' => 'btn btn-primary']) ?>
             <br>
-            <?= $this->Html->link(__('Cancel'), 
-                ['controller' => 'Auth', 'action' => 'login'], 
-                ['class' => 'btn btn-secondary', 
+            <?= $this->Html->link(__('Cancel'),
+                ['controller' => 'Auth', 'action' => 'login'],
+                ['class' => 'btn btn-secondary',
                 'style' => 'background-color: #6c757d; border-color: #6c757d; color: white; transition: all 0.3s;',
                 'onmouseover' => 'this.style.backgroundColor = "#5a6268"; this.style.borderColor = "#545b62";',
                 'onmouseout' => 'this.style.backgroundColor = "#6c757d"; this.style.borderColor = "#6c757d";']) ?>
