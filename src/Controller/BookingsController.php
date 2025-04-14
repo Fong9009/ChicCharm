@@ -169,79 +169,63 @@ class BookingsController extends AppController
             $this->Flash->error('Access denied. Admin only area.');
             return $this->redirect(['action' => 'customerindex']);
         }
-
         $booking = $this->Bookings->get($id, contain: ['Stylists', 'Services']);
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $data = $this->request->getData();
+        $this->set(compact('booking'));
+    }
 
-            // Calculate total cost based on services
-            if (!empty($data['services']['_ids'])) {
-                $totalCost = 0;
-                foreach ($data['services']['_ids'] as $serviceId) {
-                    $service = $this->Services->get($serviceId);
-                    $totalCost += $service->service_cost;
-                }
-                $data['total_cost'] = $totalCost;
-                $data['remaining_cost'] = $totalCost;
+    //Remove Stylists from a booking
+    public function removeStylist($stylistId, $bookingId) {
+        $bookServicesTable = $this->fetchTable('BookingsServices');
+        $bookStylistTable = $this->fetchTable('BookingsStylists');
+
+        //Obtains the booking from the booking table given booking id
+        $bookingsTable = $this->fetchTable('Bookings');
+        $booking = $bookingsTable->find()->where(['id' => $bookingId])->first();
+
+        //Obtains the booking service from the booking service table
+        $bookingService = $bookServicesTable
+            ->find()
+            ->where([
+                'stylist_id' => $stylistId,
+                'booking_id' => $bookingId
+            ])->first();
+
+        //Obtains the booking Stylist from the booking Stylist table
+        $bookingStylist = $bookStylistTable
+            ->find()
+            ->where([
+                'stylist_id' => $stylistId,
+                'booking_id' => $bookingId
+            ])->first();
+
+        if ($bookingService && $bookingStylist && $booking) {
+            //Remove the service cost from the booking
+            $serviceCost = $bookingService->service_cost;
+            $booking->total_cost -= $serviceCost;
+            if ($booking->total_cost < 0) {
+                $booking->total_cost = 0;
             }
 
-            $booking = $this->Bookings->patchEntity($booking, $data);
+            $booking->remaining_cost -= $serviceCost;
+            if ($booking->remaining_cost < 0) {
+                $booking->remaining_cost = 0;
+            }
 
+            //Save the new updated booking cost
             if ($this->Bookings->save($booking)) {
-                // If services were updated, update BookingsServices records
-                if (!empty($data['services']['_ids'])) {
-                    // First delete all existing records
-                    $this->fetchTable('BookingsServices')->deleteAll(['booking_id' => $booking->id]);
-
-                    // Then create new records
-                    $bookingsServicesData = [];
-                    foreach ($data['services']['_ids'] as $serviceId) {
-                        $service = $this->Services->get($serviceId);
-                        $bookingsServicesData[] = [
-                            'booking_id' => $booking->id,
-                            'service_id' => $serviceId,
-                            'service_cost' => $service->service_cost
-                        ];
-                    }
-
-                    $bookingsServicesTable = $this->fetchTable('BookingsServices');
-                    $bookingsServices = $bookingsServicesTable->newEntities($bookingsServicesData);
-                    if (!$bookingsServicesTable->saveMany($bookingsServices)) {
-                        $this->Flash->error(__('The booking was updated, but service details could not be updated.'));
-                    }
+                //Delete the service From Booking service
+                if ($bookServicesTable->delete($bookingService) &&  $bookStylistTable->delete($bookingStylist)) {
+                    $this->Flash->success('Stylist/Service removed and booking updated.');
+                } else {
+                    $this->Flash->error('Stylist/Service could not be deleted.');
                 }
-
-                // Update any existing BookingsStylists records for this booking
-                $bookingStylists = $this->BookingsStylists->find()
-                    ->where(['booking_id' => $booking->id])
-                    ->all();
-
-                foreach ($bookingStylists as $bookingStylist) {
-                    $bookingStylist->stylist_date = $booking->booking_date;
-                    $bookingStylist->start_time = $booking->start_time;
-                    $bookingStylist->end_time = $booking->end_time;
-
-                    if (!$this->BookingsStylists->save($bookingStylist)) {
-                        $this->Flash->error(__('The booking was updated, but stylist details could not be updated.'));
-                    }
-
-                }
-
-                $this->Flash->success(__('The booking has been saved.'));
-                return $this->redirect(['action' => 'index']);
+            } else {
+                $this->Flash->error('Booking could not be updated.');
             }
-            $this->Flash->error(__('The booking could not be saved. Please, try again.'));
+        } else {
+            $this->Flash->error('Booking could not be updated.');
         }
-        $customers = $this->Bookings->Customers->find('list', limit: 200)->all();
-        $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
-        $services = $this->fetchTable('Services')->find(
-            'list',
-            keyField: 'id',
-            valueField: function ($service) {
-                return $service->service_name . ' ($' . $service->service_cost . ')';
-            }
-        )->all();
-        $this->set(compact('booking', 'customers', 'stylists', 'services'));
+        return $this->redirect(['action' => 'edit', $bookingId]);
     }
 
     /**
