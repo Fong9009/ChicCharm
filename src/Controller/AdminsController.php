@@ -96,7 +96,7 @@ class AdminsController extends AppController
                 $this->Flash->success(__('The admin has been saved.'), ['key' => 'admin_notify']);
                 return $this->redirect(['action' => 'index']);
             }
-            
+
             // Show specific error messages for each field
             if ($admin->getErrors()) {
                 foreach ($admin->getErrors() as $field => $errors) {
@@ -122,7 +122,7 @@ class AdminsController extends AppController
     {
         // Get current user
         $currentUser = $this->Authentication->getIdentity();
-        
+
         // Only allow admins to edit their own profile
         if ($currentUser->id != $id) {
             $this->Flash->error('Access denied. You can only edit your own profile.');
@@ -132,8 +132,8 @@ class AdminsController extends AppController
         $admin = $this->Admins->get($id, contain: []);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
+            $error = 0;
             $password = $this->request->getData('password');
-
             if ($password == null || $password == '') {
                 $data['password'] = $admin->password;
             } else {
@@ -147,38 +147,48 @@ class AdminsController extends AppController
                 //This is measured in MB so max = 4MB
                 $maxSize = 4 * 1024 * 1024;
                 if ($profile->getSize() > $maxSize) {
+                    $error = 1;
                     $this->Flash->error(__('The profile picture is too big please use something smaller than 2MB.'));
                 }
 
                 //Check Filetype
                 $allowedFileTypes = ['image/jpeg', 'image/png','image/jpg'];
                 if (!in_array($profile->getClientMediaType(), $allowedFileTypes)) {
+                    $error = 1;
                     $this->Flash->error(__('The profile picture must be a jpeg/jpg or png format.'));
                 }
 
                 //Delete old Image if there is one
-                if ($admin->profile_picture != null) {
+                if ($admin->profile_picture != null && $error !== 1) {
                     $oldPath = WWW_ROOT . 'img/profile/' . $admin->profile_picture;
                     if (file_exists($oldPath)) {
                         unlink($oldPath);
                     }
+                    //Stores file in directory
+                    $filename = rand(10000, 99999) . '_' . strtolower($profile->getClientFilename());
+                    $profile->moveTo(WWW_ROOT . 'img/profile/' . $filename);
+                    $data['profile_picture'] = $filename;
                 }
-                //Stores file in directory
-                $filename = rand(10000, 99999) . '_' . strtolower($profile->getClientFilename());
-                $profile->moveTo(WWW_ROOT . 'img/profile/' . $filename);
-                $data['profile_picture'] = $filename;
+                if ($admin->profile_picture === null && $error !== 1) {
+                    //Stores file in directory
+                    $filename = rand(10000, 99999) . '_' . strtolower($profile->getClientFilename());
+                    $profile->moveTo(WWW_ROOT . 'img/profile/' . $filename);
+                    $data['profile_picture'] = $filename;
+                }
             } else {
-                unset($data['profile_picture']);
+                $data['profile_picture'] = null;
             }
             $data['nonce'] = null;
             // Patch the entity with the data
             $admin = $this->Admins->patchEntity($admin, $data);
 
-            if ($this->Admins->save($admin)) {
-                $this->Flash->success(__('Your profile has been updated.'));
-                return $this->redirect(['action' => 'index']);
+            if ($error !== 1) {
+                if ($this->Admins->save($admin)) {
+                    $this->Flash->success(__('Your profile has been updated.'));
+                    return $this->redirect(['action' => 'index']);
+                }
             }
-            
+
             // Show specific error messages for each field
             if ($admin->getErrors()) {
                 foreach ($admin->getErrors() as $field => $errors) {
@@ -203,16 +213,16 @@ class AdminsController extends AppController
     public function delete($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
-        
+
         // Get current user
         $currentUser = $this->Authentication->getIdentity();
-        
+
         // Prevent deleting own account
         if ($currentUser->id == $id) {
             $this->Flash->error(__('You cannot delete your own account.'));
             return $this->redirect(['action' => 'index']);
         }
-        
+
         $admin = $this->Admins->get($id);
         if ($this->Admins->delete($admin)) {
             $this->Flash->success(__('The admin has been deleted.'));
@@ -274,23 +284,23 @@ class AdminsController extends AppController
         $admin = $this->Admins->get($this->Authentication->getIdentity()->id);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
-            
+
             // Verify current password
             $hasher = new DefaultPasswordHasher();
             if (!$hasher->check($data['current_password'], $admin->password)) {
                 $this->Flash->error(__('Current password is incorrect.'));
                 return $this->redirect(['action' => 'changePassword']);
             }
-            
+
             $admin = $this->Admins->patchEntity($admin, $data, [
                 'validate' => 'resetPassword'
             ]);
-            
+
             if ($this->Admins->save($admin)) {
                 $this->Flash->success(__('Your password has been updated successfully.'));
                 return $this->redirect(['action' => 'edit', $admin->id]);
             }
-            
+
             // Show specific error messages
             if ($admin->getErrors()) {
                 foreach ($admin->getErrors() as $field => $errors) {
@@ -302,7 +312,7 @@ class AdminsController extends AppController
                 $this->Flash->error(__('Unable to update your password. Please try again.'));
             }
         }
-        
+
         $this->set(compact('admin'));
         $this->set('userType', 'admin');
     }
