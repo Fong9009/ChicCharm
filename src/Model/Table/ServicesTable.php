@@ -48,7 +48,7 @@ class ServicesTable extends Table
             'targetForeignKey' => 'stylist_id',
             'joinTable' => 'stylists_services',
         ]);
-        
+
         $this->belongsToMany('Bookings', [
             'foreignKey' => 'service_id',
             'targetForeignKey' => 'booking_id',
@@ -68,12 +68,17 @@ class ServicesTable extends Table
             ->scalar('service_name')
             ->maxLength('service_name', 255)
             ->requirePresence('service_name', 'create')
-            ->notEmptyString('service_name');
+            ->notEmptyString('service_name')
+            ->add('service_name', 'alphanumeric', [
+                'rule' => ['custom', '/^[a-zA-Z ]+$/'],
+                'message' => 'Service name must be alphanumeric.',
+            ]);
 
         $validator
             ->decimal('service_cost')
             ->requirePresence('service_cost', 'create')
-            ->notEmptyString('service_cost');
+            ->notEmptyString('service_cost')
+            ->greaterThanOrEqual('service_cost', 0, 'Service cost must be 0 or more.');
 
         return $validator;
     }
