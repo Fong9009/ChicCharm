@@ -47,6 +47,7 @@
                 </div>
             </div>
         </div>
+    </aside>
     <div class="table-responsive mt-4">
         <div class="container">
             <div class="row align-items-center">
