@@ -47,6 +47,7 @@
                 </div>
             </div>
         </div>
+    </aside>
     <div class="table-responsive mt-4">
         <div class="container">
             <div class="row align-items-center">
@@ -100,13 +101,13 @@
                         <?php if (!empty($booking->services)): ?>
                             <ul style="list-style: none; padding-left: 0;">
                             <?php foreach ($booking->services as $service): ?>
-                                <li><?= h($service->service_name) ?> ($<?= $this->Number->format($service->service_cost) ?>)</li>
+                                <li><?= h($service->service_name) ?> (<?= $this->Number->currency($service->service_cost) ?>)</li>
                             <?php endforeach; ?>
                             </ul>
                         <?php endif; ?>
                     </td>
-                    <td>$<?= $this->Number->format($booking->total_cost) ?></td>
-                    <td>$<?= $this->Number->format($booking->remaining_cost) ?></td>
+                    <td><?= $this->Number->currency($booking->total_cost) ?></td>
+                    <td><?= $this->Number->currency($booking->remaining_cost) ?></td>
                     <td><?= h($booking->status) ?></td>
                     <td class="actions">
                         <?= $this->Html->link(__('View'), ['action' => 'view', $booking->id], ['class' => 'button']) ?>

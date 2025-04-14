@@ -78,7 +78,7 @@
                                 <span class="mb-0 text-truncate">Add Booking</span>
                             </div>
                         </div>',
-                        ['controller' => 'Services', 'action' => 'add'],
+                        ['controller' => 'Bookings', 'action' => 'adminbooking'],
                         ['escape' => false, 'class' => 'card-link-wrapper d-block text-decoration-none']
                     ) ?>
                 </div>

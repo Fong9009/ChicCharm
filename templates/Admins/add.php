@@ -3,7 +3,7 @@
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Admin $admin
  */
-?> 
+?>
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-6">
@@ -13,46 +13,46 @@
                 <?= $this->Flash->render() ?>
                 <div class="form-group">
                     <?= $this->Form->control('email', [
-                        'label' => 'Email', 
+                        'label' => 'Email',
                         'class' => 'form-control' . ($this->Form->isFieldError('email') ? ' is-invalid' : ''),
-                        'required' => true, 
+                        'required' => true,
                         'placeholder' => 'Enter your email',
                         'error' => ['class' => 'invalid-feedback']
                     ]) ?>
                 </div>
                 <div class="form-group">
                     <?= $this->Form->control('first_name', [
-                        'label' => 'First Name', 
+                        'label' => 'First Name',
                         'class' => 'form-control' . ($this->Form->isFieldError('first_name') ? ' is-invalid' : ''),
-                        'required' => true, 
+                        'required' => true,
                         'placeholder' => 'Enter your first name',
                         'error' => ['class' => 'invalid-feedback']
                     ]) ?>
                 </div>
                 <div class="form-group">
                     <?= $this->Form->control('last_name', [
-                        'label' => 'Last Name', 
+                        'label' => 'Last Name',
                         'class' => 'form-control' . ($this->Form->isFieldError('last_name') ? ' is-invalid' : ''),
-                        'required' => true, 
+                        'required' => true,
                         'placeholder' => 'Enter your last name',
                         'error' => ['class' => 'invalid-feedback']
                     ]) ?>
                 </div>
                 <div class="form-group">
                     <?= $this->Form->control('password', [
-                        'label' => 'Password', 
+                        'label' => 'Password',
                         'class' => 'form-control' . ($this->Form->isFieldError('password') ? ' is-invalid' : ''),
-                        'required' => true, 
+                        'required' => true,
                         'placeholder' => 'Enter your password',
                         'error' => ['class' => 'invalid-feedback']
                     ]) ?>
                 </div>
                 <div class="form-group">
                     <?= $this->Form->control('password_confirm', [
-                        'type' => 'password', 
-                        'label' => 'Retype Password', 
+                        'type' => 'password',
+                        'label' => 'Retype Password',
                         'class' => 'form-control' . ($this->Form->isFieldError('password_confirm') ? ' is-invalid' : ''),
-                        'required' => true, 
+                        'required' => true,
                         'placeholder' => 'Retype your password',
                         'error' => ['class' => 'invalid-feedback']
                     ]) ?>
@@ -73,9 +73,9 @@
                     <?= $this->Form->button('Register', ['class' => 'btn btn-primary']) ?>
                     <br>
                     <br>
-                    <?= $this->Html->link(__('Cancel'), 
-                        ['action' => 'index'], 
-                        ['class' => 'btn btn-secondary', 
+                    <?= $this->Html->link(__('Cancel'),
+                        ['action' => 'index'],
+                        ['class' => 'btn btn-secondary',
                         'style' => 'background-color: #6c757d; border-color: #6c757d; color: white; transition: all 0.3s;',
                         'onmouseover' => 'this.style.backgroundColor = "#5a6268"; this.style.borderColor = "#545b62";',
                         'onmouseout' => 'this.style.backgroundColor = "#6c757d"; this.style.borderColor = "#6c757d";']) ?>

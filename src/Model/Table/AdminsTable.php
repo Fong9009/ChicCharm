@@ -57,13 +57,21 @@ class AdminsTable extends Table
             ->scalar('first_name')
             ->maxLength('first_name', 255)
             ->requirePresence('first_name', 'create')
-            ->notEmptyString('first_name');
+            ->notEmptyString('first_name')
+            ->add('first_name', 'alphanumeric', [
+                'rule' => ['custom', '/^[a-zA-Z ]+$/'],
+                'message' => 'First name must be alphanumeric.',
+            ]);
 
         $validator
             ->scalar('last_name')
             ->maxLength('last_name', 255)
             ->requirePresence('last_name', 'create')
-            ->notEmptyString('last_name');
+            ->notEmptyString('last_name')
+            ->add('last_name', 'alphanumeric', [
+                'rule' => ['custom', '/^[a-zA-Z ]+$/'],
+                'message' => 'Last name must be alphanumeric.',
+            ]);
 
         $validator
             ->email('email')
@@ -71,7 +79,7 @@ class AdminsTable extends Table
             ->add('email', 'unique', [
                 'rule' => 'validateUnique',
                 'provider' => 'table',
-                'message' => 'This email is already in use.'
+                'message' => 'This email is already in use.',
             ]);
 
         $validator
@@ -86,7 +94,7 @@ class AdminsTable extends Table
                     $hasLowercase = preg_match('/[a-z]/', $value);
                     $hasNumber = preg_match('/[0-9]/', $value);
                     $hasSpecialChar = preg_match('/[^A-Za-z0-9]/', $value);
-                    
+
                     return $hasUppercase && $hasLowercase && $hasNumber && $hasSpecialChar;
                 },
                 'message' => 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
@@ -147,7 +155,7 @@ class AdminsTable extends Table
                     $hasLowercase = preg_match('/[a-z]/', $value);
                     $hasNumber = preg_match('/[0-9]/', $value);
                     $hasSpecialChar = preg_match('/[^A-Za-z0-9]/', $value);
-                    
+
                     return $hasUppercase && $hasLowercase && $hasNumber && $hasSpecialChar;
                 },
                 'message' => 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
