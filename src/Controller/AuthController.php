@@ -222,45 +222,74 @@ class AuthController extends AppController
     /**
      * Reset Password method
      *
-     * @param string|null $nonce Reset password nonce
-     * @param string|null $type User type (admin or customer)
+     * @param string|null $token Reset password token
      * @return \Cake\Http\Response|null|void Redirects on successful password reset, renders view otherwise.
      */
-    public function resetPassword(?string $nonce = null, ?string $type = null)
+    public function resetPassword($token = null)
     {
-        // Determine which model to use based on user type
-        if ($type === 'customer') {
-            $user = $this->Customers->findByNonce($nonce)->first();
-            $model = $this->Customers;
-        } else {
-            // Default to admin if type not specified or is 'admin'
-            $user = $this->Admins->findByNonce($nonce)->first();
-            $model = $this->Admins;
-        }
-
-        // If nonce cannot find the user, or nonce is expired, prompt for re-reset password
-        if (!$user || $user->nonce_expiry < DateTime::now()) {
-            $this->Flash->error('Your link is invalid or expired. Please try again.');
-            return $this->redirect(['action' => 'forgetPassword']);
-        }
-
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            // Used a different validation set in Model/Table file to ensure both fields are filled
-            $user = $model->patchEntity($user, $this->request->getData(), ['validate' => 'resetPassword']);
-
-            // Also clear the nonce-related fields on successful password resets.
-            // This ensures that the reset link can't be used a second time.
-            $user->nonce = null;
-            $user->nonce_expiry = null;
-
-            if ($model->save($user)) {
-                $this->Flash->success('Your password has been successfully reset. Please login with your new password.');
-                return $this->redirect(['action' => 'login']);
+        $this->viewBuilder()->setLayout('login');
+        
+        if ($this->request->is('post')) {
+            $data = $this->request->getData();
+            $user = $this->Users->findByNonce($token)->first();
+            
+            if ($user) {
+                // Check if nonce is expired
+                if ($user->nonce_expiry < new \DateTime()) {
+                    $this->Flash->error(__('Password reset link has expired. Please request a new one.'));
+                    return $this->redirect(['action' => 'forgotPassword']);
+                }
+                
+                // Different validation rules based on user type
+                if ($user->type === 'admin') {
+                    $validator = new \Cake\Validation\Validator();
+                    $validator
+                        ->requirePresence('password')
+                        ->notEmptyString('password', 'Please enter a password')
+                        ->minLength('password', 8, 'Password must be at least 8 characters long')
+                        ->add('password', 'custom', [
+                            'rule' => function ($value) {
+                                return preg_match('/[A-Z]/', $value) && // Uppercase
+                                       preg_match('/[a-z]/', $value) && // Lowercase
+                                       preg_match('/[0-9]/', $value) && // Number
+                                       preg_match('/[^A-Za-z0-9]/', $value); // Special character
+                            },
+                            'message' => 'Password must include uppercase, lowercase, number, and special character'
+                        ]);
+                } else {
+                    // Customer validation - only 8 characters minimum
+                    $validator = new \Cake\Validation\Validator();
+                    $validator
+                        ->requirePresence('password')
+                        ->notEmptyString('password', 'Please enter a password')
+                        ->minLength('password', 8, 'Password must be at least 8 characters long');
+                }
+                
+                $errors = $validator->validate($data);
+                if (!empty($errors)) {
+                    foreach ($errors as $field => $error) {
+                        $this->Flash->error($error['_empty'] ?? $error['minLength'] ?? $error['custom'] ?? 'Invalid password');
+                    }
+                    return;
+                }
+                
+                $user = $this->Users->patchEntity($user, [
+                    'password' => $data['password'],
+                    'nonce' => null,
+                    'nonce_expiry' => null
+                ]);
+                
+                if ($this->Users->save($user)) {
+                    $this->Flash->success(__('Your password has been updated.'));
+                    return $this->redirect(['action' => 'login']);
+                }
+                $this->Flash->error(__('Unable to update your password.'));
+            } else {
+                $this->Flash->error(__('Invalid password reset link.'));
             }
-            $this->Flash->error('The password cannot be reset. Please try again.');
         }
-
-        $this->set(compact('user', 'type'));
+        
+        $this->set(compact('token'));
     }
 
     /**
@@ -324,6 +353,65 @@ class AuthController extends AppController
             // Verify current password against the original entity
             if (!password_verify($data['current_password'], $entity->password)) {
                 $this->Flash->error('Current password is incorrect.');
+                $this->set('entity', $formEntity);
+                $this->set('userType', $user->type);
+                return $this->render();
+            }
+
+            // Create validator with specific rules based on user type
+            $validator = new \Cake\Validation\Validator();
+            
+            if ($user->type === 'admin') {
+                $validator
+                    ->requirePresence('password')
+                    ->notEmptyString('password', 'Please enter a new password')
+                    ->minLength('password', 8, 'Password must be at least 8 characters long')
+                    ->add('password', 'custom', [
+                        'rule' => function ($value) {
+                            return preg_match('/[A-Z]/', $value) && // Uppercase
+                                   preg_match('/[a-z]/', $value) && // Lowercase
+                                   preg_match('/[0-9]/', $value) && // Number
+                                   preg_match('/[^A-Za-z0-9]/', $value); // Special character
+                        },
+                        'message' => 'Password must include uppercase, lowercase, number, and special character'
+                    ])
+                    ->requirePresence('confirm_password')
+                    ->notEmptyString('confirm_password', 'Please confirm your new password')
+                    ->add('confirm_password', 'custom', [
+                        'rule' => function ($value, $context) {
+                            return $value === $context['data']['password'];
+                        },
+                        'message' => 'Passwords do not match'
+                    ]);
+            } else {
+                // Customer validation - only 8 characters minimum
+                $validator
+                    ->requirePresence('password')
+                    ->notEmptyString('password', 'Please enter a new password')
+                    ->minLength('password', 8, 'Password must be at least 8 characters long')
+                    ->requirePresence('confirm_password')
+                    ->notEmptyString('confirm_password', 'Please confirm your new password')
+                    ->add('confirm_password', 'custom', [
+                        'rule' => function ($value, $context) {
+                            return $value === $context['data']['password'];
+                        },
+                        'message' => 'Passwords do not match'
+                    ]);
+            }
+
+            $errors = $validator->validate($data);
+            if (!empty($errors)) {
+                // Convert errors to a format that can be displayed under each field
+                $fieldErrors = [];
+                foreach ($errors as $field => $error) {
+                    $fieldErrors[$field] = $error['_empty'] ?? $error['minLength'] ?? $error['custom'] ?? 'Invalid password';
+                }
+                
+                // Set the errors in the entity for the form helper
+                $formEntity->setErrors($fieldErrors);
+                
+                $this->set('entity', $formEntity);
+                $this->set('userType', $user->type);
                 return $this->render();
             }
 

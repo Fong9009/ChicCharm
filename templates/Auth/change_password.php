@@ -26,25 +26,36 @@ $this->assign('title', 'Change Password');
                         'label' => 'Current Password',
                         'required' => true,
                         'class' => 'form-control' . ($this->Form->isFieldError('current_password') ? ' is-invalid' : ''),
-                        'error' => ['class' => 'invalid-feedback'],
+                        'error' => ['class' => 'invalid-feedback d-block text-danger'],
                         'value' => ''
                     ]);
+                    if ($this->Form->isFieldError('current_password')) {
+                        echo $this->Form->error('current_password', null, ['class' => 'invalid-feedback d-block text-danger']);
+                    }
+
                     echo $this->Form->control('password', [
                         'type' => 'password',
                         'label' => 'New Password',
                         'required' => true,
                         'class' => 'form-control' . ($this->Form->isFieldError('password') ? ' is-invalid' : ''),
-                        'error' => ['class' => 'invalid-feedback'],
+                        'error' => ['class' => 'invalid-feedback d-block text-danger'],
                         'value' => ''
                     ]);
+                    if ($this->Form->isFieldError('password')) {
+                        echo $this->Form->error('password', null, ['class' => 'invalid-feedback d-block text-danger']);
+                    }
+
                     echo $this->Form->control('confirm_password', [
                         'type' => 'password',
                         'label' => 'Retype New Password',
                         'required' => true,
                         'class' => 'form-control' . ($this->Form->isFieldError('confirm_password') ? ' is-invalid' : ''),
-                        'error' => ['class' => 'invalid-feedback'],
+                        'error' => ['class' => 'invalid-feedback d-block text-danger'],
                         'value' => ''
                     ]);
+                    if ($this->Form->isFieldError('confirm_password')) {
+                        echo $this->Form->error('confirm_password', null, ['class' => 'invalid-feedback d-block text-danger']);
+                    }
                     ?>
                 </div>
                 <div class="password-requirements mb-3">
@@ -53,10 +64,9 @@ $this->assign('title', 'Change Password');
                         <ul>
                             <?php if (isset($userType) && $userType === 'admin'): ?>
                                 <li>At least 8 characters long</li>
-                                <li>At least one uppercase letter</li>
-                                <li>At least one lowercase letter</li>
-                                <li>At least one number</li>
-                                <li>At least one special character</li>
+                                <li>Must include uppercase and lowercase letters</li>
+                                <li>Must include at least one number</li>
+                                <li>Must include at least one special character</li>
                             <?php else: ?>
                                 <li>At least 8 characters long</li>
                             <?php endif; ?>
