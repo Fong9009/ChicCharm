@@ -36,13 +36,19 @@ $this->assign('title', 'Reset Password');
             ]); ?>
         </div>
         
-        <div class="password-requirements">
-            <p>Password requirements:</p>
-            <ul>
-                <li>At least 8 characters long</li>
-                <li>Must include uppercase and lowercase letters</li>
-                <li>Must include at least one number</li>
-            </ul>
+        <div class="password-requirements mb-3">
+            <small class="text-muted">
+                <h6>Password Requirements:</h6>
+                <ul>
+                    <?php if (isset($userType) && $userType === 'admin'): ?>
+                        <li>At least 8 characters long</li>
+                        <li>Must include uppercase and lowercase letters</li>
+                        <li>Must include at least one number</li>
+                    <?php else: ?>
+                        <li>At least 8 characters long</li>
+                    <?php endif; ?>
+                </ul>
+            </small>
         </div>
         
         <?= $this->Form->button('Reset Password', ['class' => 'submit-button']) ?>
@@ -53,17 +59,3 @@ $this->assign('title', 'Reset Password');
         <?= $this->Form->end() ?>
     </div>
 </div>
-
-<style>
-.password-requirements {
-    background-color: #f8f9fa;
-    padding: 15px;
-    border-radius: 8px;
-    border-left: 4px solid #f4623a;
-}
-
-.password-requirements ul {
-    padding-left: 18px;
-    margin-bottom: 0;
-}
-</style>

@@ -39,14 +39,56 @@ $appLocale = Configure::read('App.defaultLocale');
 <!-- Navigation -->
 <nav class="navbar navbar-expand-lg navbar-light fixed-top py-3" id="mainNav" style="background-color: #121211;">
     <div class="container px-4 px-lg-5">
-        <a class="navbar-brand" href="<?= $this->Url->build('/') ?>">ChicCharm</a>
-        <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+        <!-- Mobile Navigation -->
+        <div class="mobile-icons-nav">
+            <!-- Hamburger Menu -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <!-- Brand/Logo -->
+            <a class="navbar-brand" href="<?= $this->Url->build('/') ?>">ChicCharm</a>
+            
+            <!-- Profile Icon -->
+            <div class="mobile-profile-icon">
+                <button class="btn btn-link" type="button" id="mobileProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user fa-lg"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="mobileProfileDropdown">
+                    <?php $identity = $this->request->getAttribute('identity');
+                    if ($identity) : ?>
+                        <?php if ($identity->get('type') === 'admin') : ?>
+                            <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'dashboard']) ?>">
+                                <i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
+                            <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'profile', $identity->get('id')]) ?>">
+                                <i class="fas fa-user-shield"></i><span>My Profile</span></a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Auth', 'action' => 'logout']) ?>" onclick="return confirmLogout()">
+                                <i class="fas fa-sign-out-alt"></i><span>Logout</span></a></li>
+                        <?php elseif ($identity->get('type') === 'customer') : ?>
+                            <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Customers', 'action' => 'dashboard']) ?>">
+                                <i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
+                            <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Customers', 'action' => 'edit', $identity->get('id')]) ?>">
+                                <i class="fas fa-user"></i><span>My Profile</span></a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Auth', 'action' => 'logout']) ?>" onclick="return confirmLogout()">
+                                <i class="fas fa-sign-out-alt"></i><span>Logout</span></a></li>
+                        <?php endif; ?>
+                    <?php else : ?>
+                        <li><a class="dropdown-item" href="<?= $this->Url->build('/auth/login') ?>">
+                            <i class="fas fa-sign-in-alt"></i><span>Login</span></a></li>
+                        <li><a class="dropdown-item" href="<?= $this->Url->build('/customers/registration') ?>">
+                            <i class="fas fa-user-plus"></i><span>Sign Up</span></a></li>
+                    <?php endif; ?>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Regular Navigation for Desktop -->
+        <a class="navbar-brand d-none d-lg-block" href="<?= $this->Url->build('/') ?>">ChicCharm</a>
         <div class="collapse navbar-collapse" id="navbarResponsive">
             <ul class="navbar-nav ms-auto my-2 my-lg-0">
                 <?php
-                $identity = $this->request->getAttribute('identity');
                 if ($identity) {
                     // User is logged in
                     if ($identity->get('type') === 'admin') {
@@ -67,24 +109,59 @@ $appLocale = Configure::read('App.defaultLocale');
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="enquiriesDropdown">
                                 <li>
-                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'index']) ?>">
+                                    <a class="dropdown-item" href="<?= $this->Url->build([  'plugin' => false,'controller' => 'Contacts', 'action' => 'index']) ?>">
                                         <i class="fas fa-inbox"></i>
                                         <span>Active Messages</span>
                                     </a>
                                 </li>
                                 <li><div class="dropdown-divider"></div></li>
                                 <li>
-                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'archiveIndex']) ?>">
+                                    <a class="dropdown-item" href="<?= $this->Url->build([ 'plugin' => false, 'controller' => 'Contacts', 'action' => 'archiveIndex']) ?>">
                                         <i class="fas fa-archive"></i>
                                         <span>Archived Messages</span>
                                     </a>
                                 </li>
                             </ul>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link"
-                               href="<?= $this->Url->build(['controller' => 'Customers', 'action' => 'index']) ?>"
-                            >Customers List</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="customersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-users"></i>
+                                <span>Customers</span>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="customersDropdown">
+                                <li>
+                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Customers', 'action' => 'index']) ?>">
+                                        <i class="fas fa-list"></i>
+                                        <span>List Customers</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Customers', 'action' => 'registration']) ?>">
+                                        <i class="fas fa-user-plus"></i>
+                                        <span>Add Customer</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="stylistsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-cut"></i>
+                                <span>Stylists</span>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="stylistsDropdown">
+                                <li>
+                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Stylists', 'action' => 'index']) ?>">
+                                        <i class="fas fa-list"></i>
+                                        <span>List Stylists</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Stylists', 'action' => 'add']) ?>">
+                                        <i class="fas fa-user-plus"></i>
+                                        <span>Add Stylist</span>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -93,22 +170,28 @@ $appLocale = Configure::read('App.defaultLocale');
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="adminDropdown">
                                 <li>
-                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'dashboard'])?>">
+                                    <a class="dropdown-item" href="<?= $this->Url->build(['plugin' => false,'controller' => 'Admins', 'action' => 'dashboard'])?>">
                                         <i class="fas fa-tachometer-alt"></i>
                                         <span>Admin Dashboard</span>
                                     </a>
                                 </li>
                                 <li><div class="dropdown-divider"></div></li>
                                 <li>
-                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'index']) ?>">
+                                    <a class="dropdown-item" href="<?= $this->Url->build([ 'plugin' => false,'controller' => 'Admins', 'action' => 'index']) ?>">
                                         <i class="fas fa-users-cog"></i>
                                         <span>Admins List</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'add']) ?>">
+                                    <a class="dropdown-item" href="<?= $this->Url->build(['plugin' => false,'controller' => 'Admins', 'action' => 'add']) ?>">
                                         <i class="fas fa-user-plus"></i>
                                         <span>Add New Admin</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="<?= $this->Url->build(['plugin' => false,'controller' => 'Admins', 'action' => 'profile', $identity->get('id')]) ?>">
+                                        <i class="fas fa-user-shield"></i>
+                                        <span>Admin Profile</span>
                                     </a>
                                 </li>
                             </ul>
@@ -138,14 +221,14 @@ $appLocale = Configure::read('App.defaultLocale');
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build([
+                            <a class="nav-link" href="<?= $this->Url->build(['plugin' => false,
                                 'controller' => 'Customers', 'action' => 'edit', $identity->get('id')]) ?>">My Profile
                             </a>
                         </li>
                     <?php }
                     // Logout button for both admin and customer ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= $this->Url->build([
+                        <a class="nav-link" href="<?= $this->Url->build(['plugin' => false,
                             'controller' => 'Auth', 'action' => 'logout']) ?>" onclick="return confirmLogout()">Logout
                         </a>
                     </li>
@@ -179,7 +262,7 @@ $appLocale = Configure::read('App.defaultLocale');
     <?= $this->fetch('content') ?>
 </main>
 
-<!-- Footer-->
+<!-- Footer -->
 <footer id="footer" class="footer bg-black text-white py-5">
     <div class="container text-center">
         <div class="row justify-content-center">
@@ -187,7 +270,7 @@ $appLocale = Configure::read('App.defaultLocale');
             <div class="col-md-3">
                 <h5 class="text-light fw-bold mb-3">Sign Up for Our Newsletter</h5>
                 <p class="text-light mb-3">Be the first to get notified about upcoming products and deals</p>
-                <form method="post" action="<?= $this->Url->build(['controller' => 'Newsletter', 'action' => 'subscribe']); ?>" id="ContactFooter" class="needs-confirmation newsletter-signup">
+                <form method="post" action="<?= $this->Url->build(['plugin' => false, 'controller' => 'Newsletter', 'action' => 'subscribe']); ?>" id="ContactFooter" class="needs-confirmation newsletter-signup">
                     <?= $this->Form->hidden('_csrfToken', ['value' => $this->request->getAttribute('csrfToken')]) ?>
                     <div class="input-group">
                         <input type="email" class="form-control" name="email" placeholder="Enter your email" required>
@@ -206,10 +289,7 @@ $appLocale = Configure::read('App.defaultLocale');
             <div class="col-md-3">
                 <h5 class="text-light fw-bold">Support</h5>
                 <ul class="list-unstyled">
-                    <li><a href="/pages/faq" class="text-secondary">FAQ</a></li>
-                    <li><a href="/pages/contact-us" class="text-secondary">Contact us</a></li>
-                    <li><a href="/policies/shipping-policy" class="text-secondary">Shipping Policy</a></li>
-                    <li><a href="/policies/refund-policy" class="text-secondary">Refund Policy</a></li>
+                    <li><a href="<?= $this->Url->build('/contacts/enquiry') ?>" class="text-secondary">Contact us</a></li>
                 </ul>
             </div>
 
@@ -217,21 +297,8 @@ $appLocale = Configure::read('App.defaultLocale');
             <div class="col-md-2">
                 <h5 class="text-light fw-bold">Our Company</h5>
                 <ul class="list-unstyled">
-                    <li><a href="/pages/about" class="text-secondary">About Us</a></li>
-                    <li><a href="/policies/terms-of-service" class="text-secondary">Terms Of Service</a></li>
-                    <li><a href="/policies/privacy-policy" class="text-secondary">Privacy Policy</a></li>
-                    <li><a href="/pages/accessibility-statement" class="text-secondary">Accessibility Statement</a></li>
+                    <li><a href="<?= $this->Url->build('/#about') ?>" class="text-secondary">About Us</a></li>
                 </ul>
-            </div>
-
-            <!-- Social Media -->
-            <div class="col-md-2">
-                <h5 class="text-light fw-bold">Follow Us</h5>
-                <div class="d-flex justify-content-center">
-                    <a href="https://facebook.com" class="text-white me-3 fs-4"><i class="bi bi-facebook"></i></a>
-                    <a href="https://instagram.com" class="text-white me-3 fs-4"><i class="bi bi-instagram"></i></a>
-                    <a href="https://youtube.com" class="text-white fs-4"><i class="bi bi-youtube"></i></a>
-                </div>
             </div>
         </div>
 
