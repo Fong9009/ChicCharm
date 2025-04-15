@@ -17,7 +17,7 @@ $this->Html->script('booking', ['block' => 'script']);
     <div class="row">
         <div class="side-nav">
         <h4 class="heading"><?= __('Actions') ?></h4>
-        <?= $this->Html->link(__('List Bookings'), ['action' => 'index'], ['class' => 'side-nav-item']) ?>
+        <?= $this->Html->link(__('My Bookings'), ['action' => 'customerindex'], ['class' => 'side-nav-item']) ?>
         </div>
         <div class="column-edit">
             <div class="bookings form content">
