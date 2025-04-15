@@ -12,6 +12,7 @@ $this->Html->script('booking', ['block' => 'script']);
 ?>
 <script>
     const apiUrl = '<?= $this->Url->build("/bookings/get-stylists") ?>';
+    const apiUrl2 = '<?= $this->Url->build("/bookings/get-available-time-slots") ?>';
 </script>
 <div class="booking-form-wrapper">
     <div class="row">
@@ -30,15 +31,15 @@ $this->Html->script('booking', ['block' => 'script']);
                             <div class="service-list">
                                 <?php foreach ($services as $service): ?>
                                     <div class="form-check">
-                                        <input class="form-check-input service-checkbox" type="checkbox" 
-                                               name="bookings_services[<?= $service->id ?>][service_id]" 
-                                               value="<?= $service->id ?>" 
+                                        <input class="form-check-input service-checkbox" type="checkbox"
+                                               name="bookings_services[<?= $service->id ?>][service_id]"
+                                               value="<?= $service->id ?>"
                                                id="service-<?= $service->id ?>"
                                                data-duration="<?= $service->duration_minutes ?>"
                                                data-cost="<?= $service->service_cost ?>">
                                         <label class="form-check-label" for="service-<?= $service->id ?>">
-                                            <?= h($service->service_name) ?> 
-                                            (<?= h($service->duration_minutes) ?> mins) - 
+                                            <?= h($service->service_name) ?>
+                                            (<?= h($service->duration_minutes) ?> mins) -
                                             $<?= number_format($service->service_cost, 2) ?>
                                         </label>
                                     </div>
@@ -69,7 +70,7 @@ $this->Html->script('booking', ['block' => 'script']);
                                 echo $this->Form->control('start_time', [
                                     'type' => 'select',
                                     'options' => array_reduce(
-                                        range(9 * 4, 17 * 4), 
+                                        range(9 * 4, 17 * 4),
                                         function($options, $i) {
                                             $hour = floor($i / 4);
                                             $minute = ($i % 4) * 15;

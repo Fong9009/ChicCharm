@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to get service duration from data attribute
     function getServiceDuration(serviceId) {
         const checkbox = document.querySelector(`#service-${serviceId}`);
-        return parseInt(checkbox.dataset.duration) || 60; 
+        return parseInt(checkbox.dataset.duration) || 60;
     }
 
     // Function to get service cost from data attribute
@@ -46,19 +46,19 @@ document.addEventListener('DOMContentLoaded', function() {
             endTimeDisplay.value = 'The shop closes at 5 PM';
             endTimeDisplay.style.color = '#856404';
             endTimeDisplay.style.backgroundColor = '#fff3cd';
-            endTimeDisplay.style.padding = '0.375rem 0.75rem'; 
-            endTimeDisplay.style.border = '1px solid #ffeeba'; 
+            endTimeDisplay.style.padding = '0.375rem 0.75rem';
+            endTimeDisplay.style.border = '1px solid #ffeeba';
         } else {
             // Format the end time in 12-hour format with AM/PM for display
             let displayHours = endHours % 12;
-            displayHours = displayHours === 0 ? 12 : displayHours; 
+            displayHours = displayHours === 0 ? 12 : displayHours;
             const ampm = endHours >= 12 ? 'PM' : 'AM';
             const displayEndTime = `${displayHours}:${endMinutes.toString().padStart(2, '0')} ${ampm}`;
             endTimeDisplay.value = displayEndTime;
-            endTimeDisplay.style.color = ''; 
-            endTimeDisplay.style.backgroundColor = ''; 
+            endTimeDisplay.style.color = '';
+            endTimeDisplay.style.backgroundColor = '';
             endTimeDisplay.style.padding = '';
-            endTimeDisplay.style.border = ''; 
+            endTimeDisplay.style.border = '';
         }
     }
 
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             const result = await response.json();
-            
+
             // Check if there's a message about shop closing time
             if (result.message) {
                 // Create or update the warning message
@@ -255,7 +255,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const hasSelectedServices = getSelectedServiceIds().length > 0;
         bookingDateInput.disabled = !hasSelectedServices;
         startTimeInput.disabled = !hasSelectedServices;
-        
+
         if (!hasSelectedServices) {
             bookingDateInput.value = '';
             startTimeInput.value = '';
@@ -281,7 +281,7 @@ document.addEventListener('DOMContentLoaded', function() {
         startTimeInput.innerHTML = '<option value="">Loading available times...</option>';
 
         try {
-            const response = await fetch('/bookings/get-available-time-slots', {
+            const response = await fetch(apiUrl2, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
