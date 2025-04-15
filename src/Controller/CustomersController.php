@@ -59,24 +59,33 @@ class CustomersController extends AppController
      */
     public function dashboard()
     {
-        $customerId = $this->Authentication->getIdentity()->getIdentifier();
+        $customer = $this->Customers->get($this->Authentication->getIdentity()->id, [
+            'contain' => ['Bookings']
+        ]);
 
-        $customer = $this->Customers->get(
-            $customerId,
-            contain: ['Bookings' => [
-                'sort' => ['Bookings.booking_date' => 'DESC'],
-            ]]
-        );
-
+        // Get upcoming bookings with the same structure as customerindex
         $bookingsTable = $this->fetchTable('Bookings');
-        $customerId = $this->request->getAttribute('identity')->id;
-        $query = $bookingsTable->find()
-            ->where(['Bookings.customer_id' => $customerId])
-            ->order(['Bookings.booking_date' => 'DESC']);
-        $bookings = $this->paginate($query);
+        $bookings = $bookingsTable->find()
+            ->where([
+                'customer_id' => $this->Authentication->getIdentity()->id,
+                'status' => 'active'
+            ])
+            ->contain([
+                'Customers',
+                'BookingsServices' => [
+                    'Services',
+                    'Stylists' => [
+                        'fields' => ['id', 'first_name', 'last_name']
+                    ]
+                ]
+            ])
+            ->order([
+                'ABS(DATEDIFF(booking_date, CURDATE()))' => 'ASC',
+                'booking_date' => 'ASC',
+                'start_time' => 'ASC'
+            ])
+            ->limit(5);  // Only show the next 5 upcoming bookings
 
-        // Use the default layout which includes the navigation
-        $this->viewBuilder()->setLayout('default');
         $this->set(compact('customer', 'bookings'));
     }
 

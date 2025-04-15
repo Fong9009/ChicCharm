@@ -80,6 +80,19 @@ class ServicesTable extends Table
             ->notEmptyString('service_cost')
             ->greaterThanOrEqual('service_cost', 0, 'Service cost must be 0 or more.');
 
+        $validator
+            ->integer('duration_minutes')
+            ->requirePresence('duration_minutes', 'create')
+            ->notEmptyString('duration_minutes')
+            ->greaterThan('duration_minutes', 0, 'Duration must be greater than 0 minutes')
+            ->lessThanOrEqual('duration_minutes', 480, 'Duration cannot exceed 8 hours (480 minutes)')
+            ->add('duration_minutes', 'multipleOf15', [
+                'rule' => function ($value) {
+                    return $value % 15 === 0;
+                },
+                'message' => 'Duration must be in 15-minute increments'
+            ]);
+            
         return $validator;
     }
 }

@@ -122,13 +122,19 @@ $titleDescription = 'Landing Page';
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="customersDropdown">
                                 <li>
-                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Customers', 'action' => 'index']) ?>">
+                                    <a class="dropdown-item" href="<?= $this->Url->build([ 'plugin' => false, 'controller' => 'Bookings', 'action' => 'index']) ?>">
+                                        <i class="fas fa-list"></i>
+                                        <span>Bookings</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="<?= $this->Url->build([ 'plugin' => false, 'controller' => 'Customers', 'action' => 'index']) ?>">
                                         <i class="fas fa-list"></i>
                                         <span>List Customers</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Customers', 'action' => 'registration']) ?>">
+                                    <a class="dropdown-item" href="<?= $this->Url->build([ 'plugin' => false, 'controller' => 'Customers', 'action' => 'registration']) ?>">
                                         <i class="fas fa-user-plus"></i>
                                         <span>Add Customer</span>
                                     </a>
@@ -142,13 +148,13 @@ $titleDescription = 'Landing Page';
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="stylistsDropdown">
                                 <li>
-                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Stylists', 'action' => 'index']) ?>">
+                                    <a class="dropdown-item" href="<?= $this->Url->build([ 'plugin' => false, 'controller' => 'Stylists', 'action' => 'index']) ?>">
                                         <i class="fas fa-list"></i>
                                         <span>List Stylists</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Stylists', 'action' => 'add']) ?>">
+                                    <a class="dropdown-item" href="<?= $this->Url->build([ 'plugin' => false, 'controller' => 'Stylists', 'action' => 'add']) ?>">
                                         <i class="fas fa-user-plus"></i>
                                         <span>Add Stylist</span>
                                     </a>

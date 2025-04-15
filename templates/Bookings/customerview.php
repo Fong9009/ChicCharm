@@ -16,7 +16,12 @@
 
             <div class="info-group">
                 <label><?= __('Booking Date') ?></label>
-                <p class="form-control-static"><?= h($booking->booking_date->format('F j, Y')) ?></p>
+                <p class="form-control-static">
+                    <?= h($booking->booking_date->format('F j, Y')) ?><br>
+                    <?php if ($booking->start_time && $booking->end_time): ?>
+                        <?= h($booking->start_time->format('g:i A')) ?> - <?= h($booking->end_time->format('g:i A')) ?>
+                    <?php endif; ?>
+                </p>
             </div>
 
             <?php if (!empty($booking->bookings_stylists)): ?>

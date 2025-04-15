@@ -5,6 +5,9 @@
  */
 $this->layout = 'default';
 ?>
+<?= $this->Html->css('/landing-detail/css/styles.css') ?>
+<?= $this->Html->css(['fonts', 'cake', 'custom']) ?>
+<?= $this->Html->script('custom') ?>
 <div class="customer-dashboard" style="background-image: url(<?= $this->Url->image('customerbackground.jpg')?>);">
     <div class="container" style="margin-top: -5px">
         <div class="card">
@@ -76,20 +79,82 @@ $this->layout = 'default';
                                         <table>
                                             <thead>
                                                 <tr>
-                                                    <th><?= __('Booking Name') ?></th>
                                                     <th><?= __('Booking Date') ?></th>
+                                                    <th><?= __('Services & Stylists') ?></th>
                                                     <th><?= __('Total Cost') ?></th>
-                                                    <th><?= __('Actions') ?></th>
+                                                    <th class="actions"><?= __('Actions') ?></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <?php foreach ($bookings as $booking): ?>
                                                 <tr>
-                                                    <td><?= h($booking->booking_name) ?></td>
-                                                    <td><?= h($booking->booking_date->format('F j, Y')) ?></td>
-                                                    <td>$<?= number_format($booking->total_cost, 2) ?></td>
+                                                    <td>
+                                                        <?php if ($booking->booking_date): ?>
+                                                            <?= h($booking->booking_date->format('Y-m-d')) ?><br>
+                                                        <?php endif; ?>
+                                                        <?php if ($booking->start_time && $booking->end_time): ?>
+                                                            <?= h($booking->start_time->format('g:i A')) ?> - <?= h($booking->end_time->format('g:i A')) ?>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                    <td>
+                                                        <?php if (!empty($booking->bookings_services)): ?>
+                                                            <?php 
+                                                            // Group services by stylist
+                                                            $stylistServices = [];
+                                                            foreach ($booking->bookings_services as $bookingService) {
+                                                                $stylistId = $bookingService->stylist->id;
+                                                                if (!isset($stylistServices[$stylistId])) {
+                                                                    $stylistServices[$stylistId] = [
+                                                                        'stylist' => $bookingService->stylist,
+                                                                        'services' => []
+                                                                    ];
+                                                                }
+                                                                $stylistServices[$stylistId]['services'][] = $bookingService->service;
+                                                            }
+                                                            ?>
+                                                            <ul style="list-style: none; padding-left: 0;">
+                                                            <?php foreach ($stylistServices as $stylistData): ?>
+                                                                <li class="mb-2">
+                                                                    <?= h($stylistData['stylist']->first_name) ?> 
+                                                                    <?= h($stylistData['stylist']->last_name) ?>
+                                                                    <ul style="list-style: none; padding-left: 1rem; margin-top: 0.25rem;">
+                                                                        <?php foreach ($stylistData['services'] as $service): ?>
+                                                                            <li>
+                                                                                <small>
+                                                                                    • <?= h($service->service_name) ?> 
+                                                                                    (<?= $this->Number->currency($service->service_cost) ?>)
+                                                                                </small>
+                                                                            </li>
+                                                                        <?php endforeach; ?>
+                                                                    </ul>
+                                                                </li>
+                                                            <?php endforeach; ?>
+                                                            </ul>
+                                                        <?php else: ?>
+                                                            <p>No services booked</p>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                    <td><?= $this->Number->currency($booking->total_cost) ?></td>
                                                     <td class="actions">
-                                                        <?= $this->Html->link(__('View'), ['controller' => 'Bookings', 'action' => 'customerview', $booking->id], ['class' => 'button']) ?>
+                                                        <?= $this->Html->link(
+                                                            'View',
+                                                            ['controller' => 'Bookings', 'action' => 'customerview', $booking->id],
+                                                            ['class' => 'button', 'style' => 'background-color: rgb(40, 167, 69); border-color: rgb(40, 167, 69);']
+                                                        ) ?>
+                                                        <?php if ($booking->status === 'active'): ?>
+                                                            <?= $this->Form->postLink(
+                                                                'Cancel Booking',
+                                                                ['controller' => 'Bookings', 'action' => 'customerdelete', $booking->id],
+                                                                [
+                                                                    'method' => 'delete',
+                                                                    'confirm' => __('Are you sure you want to cancel this booking?'),
+                                                                    'class' => 'button',
+                                                                    'style' => 'background-color: rgb(220, 53, 69); border-color: rgb(220, 53, 69);'
+                                                                ]
+                                                            ) ?>
+                                                        <?php else: ?>
+                                                            <span class="text-muted small">Booking is already cancelled</span>
+                                                        <?php endif; ?>
                                                     </td>
                                                 </tr>
                                                 <?php endforeach; ?>

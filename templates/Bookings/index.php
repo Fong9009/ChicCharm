@@ -63,7 +63,6 @@
                 <th><?= __('Stylists') ?></th>
                 <th><?= __('Services') ?></th>
                 <th><?= $this->Paginator->sort('total_cost') ?></th>
-                <th><?= $this->Paginator->sort('remaining_cost') ?></th>
                 <th><?= $this->Paginator->sort('status') ?></th>
                 <th class="actions"><?= __('Actions') ?></th>
             </tr>
@@ -107,22 +106,27 @@
                         <?php endif; ?>
                     </td>
                     <td><?= $this->Number->currency($booking->total_cost) ?></td>
-                    <td><?= $this->Number->currency($booking->remaining_cost) ?></td>
-                    <td><?= h($booking->status) ?></td>
+                    <td>
+                        <span class="badge <?= $booking->status === 'active' ? 'bg-success' : 'bg-secondary' ?>">
+                            <?= h($booking->status) ?>
+                        </span>
+                    </td>
                     <td class="actions">
                         <?= $this->Html->link(__('View'), ['action' => 'view', $booking->id], ['class' => 'button']) ?>
-                        <?= $this->Html->link(__('Add Stylist'), [
-                            'controller' => 'bookingsStylists',
-                            'action' => 'customerstylistadd', $booking->id], ['class' => 'button']) ?>
-                        <?= $this->Html->link(__('Edit'), ['action' => 'edit', $booking->id], ['class' => 'button']) ?>
                         <?php if ($booking->status === 'active'): ?>
+                            <?= $this->Html->link(__('Add Stylist'), [
+                                'controller' => 'bookingsStylists',
+                                'action' => 'customerstylistadd', $booking->id], ['class' => 'button']) ?>
+                            <?= $this->Html->link(__('Edit'), ['action' => 'edit', $booking->id], ['class' => 'button']) ?>
+                            <span class="text-muted small">Cannot delete active bookings</span>
+                        <?php else: ?>
                             <?= $this->Form->postLink(
                                 __('Delete'),
                                 ['action' => 'delete', $booking->id],
                                 [
                                     'method' => 'delete',
-                                    'confirm' => __('Are you sure you want to delete # {0}?', $booking->id),
-                                    'class' => 'button',
+                                    'confirm' => __('Are you sure you want to permanently delete this cancelled booking?'),
+                                    'class' => 'button btn-danger',
                                 ]
                             ) ?>
                         <?php endif; ?>

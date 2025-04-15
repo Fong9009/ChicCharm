@@ -26,6 +26,9 @@ class BookingsController extends AppController
         $this->Stylists = $this->getTableLocator()->get('Stylists');
         $this->BookingsStylists = $this->getTableLocator()->get('BookingsStylists');
         $this->loadComponent('Authentication.Authentication');
+        
+        // Add this line to allow dashboard action
+        $this->Authentication->addUnauthenticatedActions(['customerbooking', 'customerindex', 'customerview', 'dashboard']);
     }
 
     public function beforeFilter(\Cake\Event\EventInterface $event)
@@ -66,12 +69,17 @@ class BookingsController extends AppController
             ])
             ->contain([
                 'Customers',
-                'Services',
-                'BookingsStylists' => [
+                'BookingsServices' => [
+                    'Services',
                     'Stylists' => [
                         'fields' => ['id', 'first_name', 'last_name']
                     ]
                 ]
+            ])
+            ->order([
+                'ABS(DATEDIFF(booking_date, CURDATE()))' => 'ASC',
+                'booking_date' => 'ASC',
+                'start_time' => 'ASC'
             ]);
         $bookings = $this->paginate($query);
 
@@ -246,6 +254,13 @@ class BookingsController extends AppController
 
         $this->request->allowMethod(['post', 'delete']);
         $booking = $this->Bookings->get($id);
+
+        // Only allow deletion of cancelled bookings
+        if ($booking->status !== 'cancelled') {
+            $this->Flash->error(__('Only cancelled bookings can be deleted.'));
+            return $this->redirect(['action' => 'index']);
+        }
+
         if ($this->Bookings->delete($booking)) {
             $this->Flash->success(__('The booking has been deleted.'));
         } else {
@@ -311,8 +326,14 @@ class BookingsController extends AppController
                             'service_cost' => $serviceData['service_cost']
                         ]);
 
+                        // Debug logging
+                        \Cake\Log\Log::debug('Attempting to save booking service with data: ' . json_encode($bookingService->toArray()));
+                        
                         if (!$bookingsServicesTable->save($bookingService)) {
+                            \Cake\Log\Log::error('Failed to save booking service. Errors: ' . json_encode($bookingService->getErrors()));
                             $this->Flash->error(__('The booking was saved, but some service details could not be saved.'));
+                        } else {
+                            \Cake\Log\Log::debug('Successfully saved booking service');
                         }
                     }
                 }
@@ -351,13 +372,7 @@ class BookingsController extends AppController
             $this->Flash->error(__('The booking could not be saved. Please, try again.'));
         }
         $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
-        $services = $this->fetchTable('Services')->find(
-            'list',
-            keyField: 'id',
-            valueField: function ($service) {
-                return $service->service_name . ' ($' . $service->service_cost . ')';
-            }
-        )->all();
+        $services = $this->fetchTable('Services')->find('all')->all();
         $this->set(compact('booking', 'stylists', 'services'));
     }
 
@@ -406,8 +421,14 @@ class BookingsController extends AppController
                             'service_cost' => $serviceData['service_cost']
                         ]);
 
+                        // Debug logging
+                        \Cake\Log\Log::debug('Attempting to save booking service with data: ' . json_encode($bookingService->toArray()));
+                        
                         if (!$bookingsServicesTable->save($bookingService)) {
+                            \Cake\Log\Log::error('Failed to save booking service. Errors: ' . json_encode($bookingService->getErrors()));
                             $this->Flash->error(__('The booking was saved, but some service details could not be saved.'));
+                        } else {
+                            \Cake\Log\Log::debug('Successfully saved booking service');
                         }
                     }
                 }
@@ -642,5 +663,28 @@ class BookingsController extends AppController
             return $this->response->withStatus(500)
                 ->withStringBody(json_encode(['error' => 'An error occurred while fetching stylists: ' . $e->getMessage()]));
         }
+    }
+
+    public function dashboard()
+    {
+        $query = $this->Bookings->find()
+            ->where([
+                'customer_id' => $this->Authentication->getIdentity()->id,
+                'status' => 'active'
+            ])
+            ->contain([
+                'Customers',
+                'Services',
+                'BookingsStylists' => [
+                    'Stylists' => [
+                        'fields' => ['id', 'first_name', 'last_name']
+                    ]
+                ]
+            ])
+            ->order(['booking_date' => 'ASC'])
+            ->limit(5);  // Only show the next 5 upcoming bookings
+            
+        $bookings = $query->all();
+        $this->set(compact('bookings'));
     }
 }

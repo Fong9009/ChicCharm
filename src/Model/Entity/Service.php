@@ -11,6 +11,7 @@ use Cake\ORM\Entity;
  * @property int $id
  * @property string $service_name
  * @property string $service_cost
+ * @property int $duration_minutes
  *
  * @property \App\Model\Entity\Stylist[] $stylists
  */
@@ -28,6 +29,7 @@ class Service extends Entity
     protected array $_accessible = [
         'service_name' => true,
         'service_cost' => true,
+        'duration_minutes' => true,
         'stylists' => true,
     ];
 }
