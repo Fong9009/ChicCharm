@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 12, 2025 at 12:34 PM
+-- Generation Time: Apr 15, 2025 at 07:22 PM
 -- Server version: 9.0.1
 -- PHP Version: 8.3.12
 
@@ -47,7 +47,7 @@ CREATE TABLE `admins` (
 
 INSERT INTO `admins` (`id`, `first_name`, `last_name`, `email`, `password`, `nonce`, `nonce_expiry`, `created`, `modified`, `type`, `profile_picture`) VALUES
 (4, 'Nemobyte', 'team071', 'team071@gmail.com', '$2y$10$2Nx/9hEpu4xqwbp7euCiWeO2YhJ5bU8cFveL2yg2UX5FrXOWIq.zO', NULL, NULL, '2025-03-24 02:43:16', '2025-04-10 12:24:57', 'admin', '60176_Test.PNG'),
-(7, 'Chay Fong', 'Hong', 'chayfonghong1@gmail.com', '$2y$10$JGphfwPwja.dkOaZESK1XOlloJSFLYb18.jRZ2hlk0aBW.WF8CJTu', NULL, NULL, '2025-04-12 10:28:11', '2025-04-12 11:13:29', 'admin', NULL);
+(7, 'Chay Fong', 'Hong', 'chayfonghong1@gmail.com', '$2y$10$yRLMe7NvgLTlUIeqz/MIEuz3uLLgLgurAeKybzNLbcAsBc.ulgnAq', NULL, NULL, '2025-04-12 10:28:11', '2025-04-13 13:45:11', 'admin', NULL);
 
 -- --------------------------------------------------------
 
@@ -62,20 +62,18 @@ CREATE TABLE `bookings` (
   `total_cost` decimal(10,2) NOT NULL,
   `remaining_cost` decimal(10,2) NOT NULL,
   `customer_id` int DEFAULT NULL,
-  `status` varchar(20) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'active'
+  `status` varchar(20) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'active',
+  `start_time` time DEFAULT NULL,
+  `end_time` time DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `bookings`
 --
 
-INSERT INTO `bookings` (`id`, `booking_name`, `booking_date`, `total_cost`, `remaining_cost`, `customer_id`, `status`) VALUES
-(7, 'Test Booking', '2025-04-03', 10.00, 10.00, NULL, 'active'),
-(8, 'Double Test', '2025-04-06', 10.00, 10.00, NULL, 'active'),
-(9, 'Fong', '2025-04-17', 0.00, 0.00, NULL, 'active'),
-(10, 'Booking for Chay Fong Hong', '2025-04-09', 6.50, 6.50, NULL, 'active'),
-(12, 'Fong', '2025-04-03', 0.00, 0.00, NULL, 'active'),
-(27, 'Booking for Chay Fong Hong', '2025-04-15', 14.00, 14.00, 1, 'active');
+INSERT INTO `bookings` (`id`, `booking_name`, `booking_date`, `total_cost`, `remaining_cost`, `customer_id`, `status`, `start_time`, `end_time`) VALUES
+(75, 'Booking for Chay Fong Hong', '2025-04-17', 22.50, 22.50, 1, 'active', '09:00:00', '14:00:00'),
+(76, 'Booking for Chay Fong Hong', '2025-04-17', 14.00, 14.00, 1, 'active', '15:30:00', '17:00:00');
 
 -- --------------------------------------------------------
 
@@ -99,8 +97,11 @@ CREATE TABLE `bookings_services` (
 --
 
 INSERT INTO `bookings_services` (`id`, `booking_id`, `service_id`, `service_cost`, `notes`, `created`, `modified`, `stylist_id`) VALUES
-(35, 27, 1, 6.50, NULL, '2025-04-12 08:12:22', '2025-04-12 08:12:22', 4),
-(36, 27, 2, 7.50, NULL, '2025-04-12 08:12:22', '2025-04-12 08:12:22', 2);
+(141, 75, 1, 6.50, NULL, '2025-04-15 19:13:25', '2025-04-15 19:13:25', 4),
+(142, 75, 2, 7.50, NULL, '2025-04-15 19:13:25', '2025-04-15 19:13:25', 5),
+(143, 75, 3, 8.50, NULL, '2025-04-15 19:13:25', '2025-04-15 19:13:25', 2),
+(144, 76, 1, 6.50, NULL, '2025-04-15 19:17:17', '2025-04-15 19:17:17', 4),
+(145, 76, 2, 7.50, NULL, '2025-04-15 19:17:17', '2025-04-15 19:17:17', 4);
 
 -- --------------------------------------------------------
 
@@ -123,8 +124,10 @@ CREATE TABLE `bookings_stylists` (
 --
 
 INSERT INTO `bookings_stylists` (`id`, `stylist_date`, `start_time`, `end_time`, `selected_cost`, `booking_id`, `stylist_id`) VALUES
-(37, '2025-04-15', '21:12:12', '23:12:14', 14.00, 27, 4),
-(38, '2025-04-15', '21:12:12', '23:12:14', 14.00, 27, 2);
+(107, '2025-04-17', '09:00:00', '14:00:00', 22.50, 75, 4),
+(108, '2025-04-17', '09:00:00', '14:00:00', 22.50, 75, 5),
+(109, '2025-04-17', '09:00:00', '14:00:00', 22.50, 75, 2),
+(110, '2025-04-17', '15:30:00', '17:00:00', 14.00, 76, 4);
 
 -- --------------------------------------------------------
 
@@ -296,8 +299,9 @@ CREATE TABLE `customers` (
 --
 
 INSERT INTO `customers` (`id`, `first_name`, `last_name`, `email`, `password`, `nonce`, `nonce_expiry`, `created`, `modified`, `type`, `profile_picture`) VALUES
-(1, 'Chay Fong', 'Hong', 'chayfong9009@gmail.com', '$2y$10$hIXeX/RjXv4ox29mSuSZiuxclpjRXzyhjO9bgG5is13uBubV8gbqq', NULL, NULL, '2025-03-26 11:10:12', '2025-04-12 11:15:07', 'customer', NULL),
-(2, 'Christian', 'Cochrane', 'cakephp@example.com', '$2y$10$4oCG2ResnEQbYk2rgtdTGe1faLZPOu29GZma4EfRmQ.B6vyHOk7u6', NULL, NULL, '2025-04-04 02:31:18', '2025-04-10 12:18:03', 'customer', '97406_Capture.PNG');
+(1, 'Chay Fong', 'Hong', 'chayfong9009@gmail.com', '$2y$10$hIXeX/RjXv4ox29mSuSZiuxclpjRXzyhjO9bgG5is13uBubV8gbqq', 'cc15950b7cef51a668b0f471703d014cb0951e29a7774c49847a669a719ad4bf972d19fdc3cf2ba6ab3adfa14ec3b63a49047e642ebca46469bd429cd37b8471', '2025-04-20 13:28:57', '2025-03-26 11:10:12', '2025-04-13 13:28:57', 'customer', NULL),
+(2, 'Christian', 'Cochrane', 'cakephp@example.com', '$2y$10$4oCG2ResnEQbYk2rgtdTGe1faLZPOu29GZma4EfRmQ.B6vyHOk7u6', NULL, NULL, '2025-04-04 02:31:18', '2025-04-10 12:18:03', 'customer', '97406_Capture.PNG'),
+(57, 'Chay Fong', 'Hong', 'chayfong820@gmail.com', '$2y$10$34mKA091HcSo8K1ctw6U5ODM6gIaMrvPZC3dLfzYQzGKSgB4c6ef2', NULL, NULL, '2025-04-15 08:41:59', '2025-04-15 08:41:59', 'customer', NULL);
 
 -- --------------------------------------------------------
 
@@ -308,17 +312,18 @@ INSERT INTO `customers` (`id`, `first_name`, `last_name`, `email`, `password`, `
 CREATE TABLE `services` (
   `id` int NOT NULL,
   `service_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `service_cost` decimal(10,2) NOT NULL
+  `service_cost` decimal(10,2) NOT NULL,
+  `duration_minutes` int NOT NULL DEFAULT '60'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `services`
 --
 
-INSERT INTO `services` (`id`, `service_name`, `service_cost`) VALUES
-(1, 'Makeup', 6.50),
-(2, 'Hair Dressing', 7.50),
-(3, 'Dress Making', 8.50);
+INSERT INTO `services` (`id`, `service_name`, `service_cost`, `duration_minutes`) VALUES
+(1, 'Makeup', 6.50, 60),
+(2, 'Hair Dressing', 7.50, 90),
+(3, 'Dress Making', 8.50, 120);
 
 -- --------------------------------------------------------
 
@@ -466,19 +471,19 @@ ALTER TABLE `admins`
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=77;
 
 --
 -- AUTO_INCREMENT for table `bookings_services`
 --
 ALTER TABLE `bookings_services`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=146;
 
 --
 -- AUTO_INCREMENT for table `bookings_stylists`
 --
 ALTER TABLE `bookings_stylists`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=111;
 
 --
 -- AUTO_INCREMENT for table `contacts`
@@ -496,7 +501,7 @@ ALTER TABLE `content_blocks`
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
 
 --
 -- AUTO_INCREMENT for table `services`
