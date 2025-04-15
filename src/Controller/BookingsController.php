@@ -273,9 +273,19 @@ class BookingsController extends AppController
     public function customerdelete($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
-        $booking = $this->Bookings->get($id);
+        $booking = $this->Bookings->get($id, [
+            'contain' => ['BookingsStylists']
+        ]);
 
-        // Update status to cancelled instead of deleting
+        // Delete the associated BookingsStylists records 
+        if (!empty($booking->bookings_stylists)) {
+            $bookingsStylistsTable = $this->fetchTable('BookingsStylists');
+            foreach ($booking->bookings_stylists as $bookingStylist) {
+                $bookingsStylistsTable->delete($bookingStylist);
+            }
+        }
+
+        // Update status to cancelled
         $booking = $this->Bookings->patchEntity($booking, ['status' => 'cancelled']);
         if ($this->Bookings->save($booking)) {
             $this->Flash->success(__('The booking has been cancelled.'));
@@ -290,6 +300,18 @@ class BookingsController extends AppController
         $booking = $this->Bookings->newEmptyEntity();
         if ($this->request->is('post')) {
             $data = $this->request->getData();
+            
+            // Check if end time exceeds 5 PM
+            if (isset($data['end_time'])) {
+                $endTime = new \DateTime($data['end_time']);
+                $closingTime = new \DateTime('17:00'); 
+                
+                if ($endTime > $closingTime) {
+                    $this->Flash->error(__('Booking cannot extend past 5 PM as the shop will be closed.'));
+                    return $this->redirect(['action' => 'customerbooking']);
+                }
+            }
+            
             // Automatically set customer details
             $user = $this->Authentication->getIdentity();
             $data['customer_id'] = $user->id;
@@ -583,6 +605,17 @@ class BookingsController extends AppController
             return $this->response->withStringBody(json_encode([]));
         }
 
+        // Check if end time exceeds 5 PM
+        $endTimeObj = new \DateTime($endTime);
+        $closingTime = new \DateTime('17:00'); // 5 PM
+        
+        if ($endTimeObj > $closingTime) {
+            return $this->response->withStringBody(json_encode([
+                'message' => 'Note: The shop closes at 5 PM. Please select an earlier time slot.',
+                'stylists' => []
+            ]));
+        }
+
         try {
             // First check if the services exist
             $invalidServiceIds = [];
@@ -686,5 +719,92 @@ class BookingsController extends AppController
             
         $bookings = $query->all();
         $this->set(compact('bookings'));
+    }
+
+    /**
+     * Get Available Time Slots method
+     *
+     * @return \Cake\Http\Response|null|void Returns JSON response with available time slots
+     */
+    public function getAvailableTimeSlots()
+    {
+        $this->request->allowMethod(['post']);
+        $this->autoRender = false;
+        $this->response = $this->response->withType('json');
+
+        $data = $this->request->getData();
+        $date = $data['date'] ?? null;
+        $serviceIds = $data['service_ids'] ?? [];
+
+        if (!$date || empty($serviceIds)) {
+            return $this->response->withStringBody(json_encode([]));
+        }
+
+        try {
+            // Get all services to calculate total duration
+            $totalDuration = 0;
+            foreach ($serviceIds as $serviceId) {
+                $service = $this->Services->get($serviceId);
+                $totalDuration += $service->duration_minutes;
+            }
+
+            // Get all bookings for the selected date
+            $existingBookings = $this->BookingsStylists->find()
+                ->where([
+                    'stylist_date' => $date,
+                    'BookingsStylists.start_time IS NOT NULL',
+                    'BookingsStylists.end_time IS NOT NULL'
+                ])
+                ->select(['start_time', 'end_time'])
+                ->toArray();
+
+            // Generate all possible time slots from 9 AM to 5 PM in 15-minute intervals
+            $availableSlots = [];
+            $startHour = 9;
+            $endHour = 17;
+            $interval = 15;
+
+            for ($hour = $startHour; $hour < $endHour; $hour++) {
+                for ($minute = 0; $minute < 60; $minute += $interval) {
+                    $slotStart = sprintf('%02d:%02d', $hour, $minute);
+                    
+                    // Calculate slot end time
+                    $endTime = strtotime("+{$totalDuration} minutes", strtotime($slotStart));
+                    $slotEnd = date('H:i', $endTime);
+
+                    // Allow bookings that end at exactly 5 PM (17:00)
+                    if (strtotime($slotEnd) > strtotime('17:00')) {
+                        continue;
+                    }
+
+                    // Check if slot overlaps with any existing booking
+                    $isAvailable = true;
+                    foreach ($existingBookings as $booking) {
+                        if (
+                            ($slotStart >= $booking->start_time->format('H:i') && $slotStart < $booking->end_time->format('H:i')) ||
+                            ($slotEnd > $booking->start_time->format('H:i') && $slotEnd <= $booking->end_time->format('H:i')) ||
+                            ($slotStart <= $booking->start_time->format('H:i') && $slotEnd >= $booking->end_time->format('H:i'))
+                        ) {
+                            $isAvailable = false;
+                            break;
+                        }
+                    }
+
+                    if ($isAvailable) {
+                        $availableSlots[] = [
+                            'value' => $slotStart,
+                            'display' => date('g:i A', strtotime($slotStart))
+                        ];
+                    }
+                }
+            }
+
+            return $this->response->withStringBody(json_encode($availableSlots));
+
+        } catch (\Exception $e) {
+            $this->log('Error in getAvailableTimeSlots: ' . $e->getMessage());
+            return $this->response->withStatus(500)
+                ->withStringBody(json_encode(['error' => 'An error occurred while fetching available time slots']));
+        }
     }
 }

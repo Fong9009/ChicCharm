@@ -25,41 +25,41 @@ document.addEventListener('DOMContentLoaded', function() {
         return parseFloat(checkbox.dataset.cost) || 0;
     }
 
-    // Function to calculate end time based on start time and service durations
-    function calculateEndTime() {
-        const startTime = startTimeInput.value;
+    // Function to update end time based on start time and duration
+    function updateEndTime(startTime, durationMinutes) {
         if (!startTime) return;
 
         const [hours, minutes] = startTime.split(':').map(Number);
-        let totalMinutes = 0;
+        const startDate = new Date();
+        startDate.setHours(hours, minutes, 0);
 
-        // Calculate total duration from selected services
-        serviceCheckboxes.forEach(checkbox => {
-            if (checkbox.checked) {
-                totalMinutes += getServiceDuration(checkbox.value);
-            }
-        });
-
-        // Calculate end time
-        let endHours = hours + Math.floor(totalMinutes / 60);
-        let endMinutes = minutes + (totalMinutes % 60);
-
-        // Handle overflow of minutes
-        if (endMinutes >= 60) {
-            endHours += Math.floor(endMinutes / 60);
-            endMinutes = endMinutes % 60;
-        }
+        const endDate = new Date(startDate.getTime() + durationMinutes * 60000);
+        const endHours = endDate.getHours();
+        const endMinutes = endDate.getMinutes();
 
         // Format the end time in 24-hour format for the hidden input
         const formattedEndTime = `${endHours.toString().padStart(2, '0')}:${endMinutes.toString().padStart(2, '0')}`;
         endTimeInput.value = formattedEndTime;
 
-        // Format the end time in 12-hour format with AM/PM for display
-        let displayHours = endHours % 12;
-        displayHours = displayHours === 0 ? 12 : displayHours; // Convert 0 to 12 for 12 AM
-        const ampm = endHours >= 12 ? 'PM' : 'AM';
-        const displayEndTime = `${displayHours}:${endMinutes.toString().padStart(2, '0')} ${ampm}`;
-        endTimeDisplay.value = displayEndTime;
+        // Check if end time exceeds 5 PM (17:00)
+        if (endHours > 17 || (endHours === 17 && endMinutes > 0)) {
+            endTimeDisplay.value = 'The shop closes at 5 PM';
+            endTimeDisplay.style.color = '#856404';
+            endTimeDisplay.style.backgroundColor = '#fff3cd';
+            endTimeDisplay.style.padding = '0.375rem 0.75rem'; 
+            endTimeDisplay.style.border = '1px solid #ffeeba'; 
+        } else {
+            // Format the end time in 12-hour format with AM/PM for display
+            let displayHours = endHours % 12;
+            displayHours = displayHours === 0 ? 12 : displayHours; 
+            const ampm = endHours >= 12 ? 'PM' : 'AM';
+            const displayEndTime = `${displayHours}:${endMinutes.toString().padStart(2, '0')} ${ampm}`;
+            endTimeDisplay.value = displayEndTime;
+            endTimeDisplay.style.color = ''; 
+            endTimeDisplay.style.backgroundColor = ''; 
+            endTimeDisplay.style.padding = '';
+            endTimeDisplay.style.border = ''; 
+        }
     }
 
     // Function to get all selected service IDs
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         totalCostInput.value = totalCost.toFixed(2);
-        calculateEndTime(); // Update end time when services change
+        updateEndTime(startTimeInput.value, getServiceDuration(selectedServices[0])); // Update end time when services change
 
         // Also update remaining cost if it exists
         const remainingCostInput = document.getElementById('remaining-cost');
@@ -107,92 +107,6 @@ document.addEventListener('DOMContentLoaded', function() {
         updateInputStates();
     }
 
-    // Function to create stylist selection for a service
-    async function createStylistSelection(serviceId, serviceName) {
-        const container = document.createElement('div');
-        container.className = 'service-stylist-selection mb-3';
-        container.dataset.serviceId = serviceId;
-
-        const label = document.createElement('label');
-        label.className = 'form-label';
-        label.textContent = `Select stylist for ${serviceName}`;
-
-        const select = document.createElement('select');
-        select.className = 'form-control stylist-select';
-        select.name = `bookings_services[${serviceId}][stylist_id]`;
-        select.required = true;
-
-        // Add hidden input for service cost
-        const costInput = document.createElement('input');
-        costInput.type = 'hidden';
-        costInput.name = `bookings_services[${serviceId}][service_cost]`;
-        costInput.value = getServiceCost(serviceId);
-
-        // Add hidden input for service_id
-        const serviceInput = document.createElement('input');
-        serviceInput.type = 'hidden';
-        serviceInput.name = `bookings_services[${serviceId}][service_id]`;
-        serviceInput.value = serviceId;
-
-        const loadingSpinner = document.createElement('div');
-        loadingSpinner.className = 'spinner-border spinner-border-sm ms-2 d-none';
-        loadingSpinner.setAttribute('role', 'status');
-        loadingSpinner.innerHTML = '<span class="visually-hidden">Loading...</span>';
-
-        const errorMessage = document.createElement('div');
-        errorMessage.className = 'invalid-feedback d-none';
-        errorMessage.textContent = 'Error loading stylists. Please try again.';
-
-        container.appendChild(label);
-        container.appendChild(select);
-        container.appendChild(costInput);
-        container.appendChild(serviceInput);
-        container.appendChild(loadingSpinner);
-        container.appendChild(errorMessage);
-
-        // Check if date and time are selected
-        if (!bookingDateInput.value || !startTimeInput.value) {
-            select.disabled = true;
-            select.innerHTML = '<option value="">Please select date and time first</option>';
-            return container;
-        }
-
-        await updateStylistOptions(select, serviceId, loadingSpinner, errorMessage);
-        return container;
-    }
-
-    // Function to update stylist options
-    async function updateStylistOptions(select, serviceId, loadingSpinner, errorMessage) {
-        select.disabled = true;
-        select.innerHTML = '<option value="">Loading available stylists...</option>';
-        loadingSpinner.classList.remove('d-none');
-        errorMessage.classList.add('d-none');
-
-        try {
-            const stylists = await fetchStylistsForService(serviceId);
-            if (stylists && stylists.length > 0) {
-                select.disabled = false;
-                select.innerHTML = '<option value="">Select a stylist...</option>';
-                stylists.forEach(stylist => {
-                    const option = document.createElement('option');
-                    option.value = stylist.id;
-                    option.textContent = stylist.name;
-                    select.appendChild(option);
-                });
-            } else {
-                select.disabled = true;
-                select.innerHTML = '<option value="">No available stylists for this service</option>';
-            }
-        } catch (error) {
-            console.error('Error fetching stylists:', error);
-            select.disabled = true;
-            select.innerHTML = '<option value="">Error loading stylists</option>';
-            errorMessage.classList.remove('d-none');
-        } finally {
-            loadingSpinner.classList.add('d-none');
-        }
-    }
-
     // Function to fetch stylists for a specific service
     async function fetchStylistsForService(serviceId) {
         if (!bookingDateInput.value || !startTimeInput.value) {
@@ -208,8 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         try {
             const csrfToken = document.querySelector('input[name="_csrfToken"]').value;
-            const url = apiUrl;
-            const response = await fetch(url, {
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -223,39 +136,88 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             const result = await response.json();
-            return result.error ? null : result;
+            
+            // Check if there's a message about shop closing time
+            if (result.message) {
+                // Create or update the warning message
+                let warningDiv = document.getElementById('closing-time-warning');
+                if (!warningDiv) {
+                    warningDiv = document.createElement('div');
+                    warningDiv.id = 'closing-time-warning';
+                    warningDiv.className = 'alert alert-warning mt-3';
+                    warningDiv.role = 'alert';
+                    serviceStylistSelections.parentNode.insertBefore(warningDiv, serviceStylistSelections);
+                }
+                warningDiv.textContent = result.message;
+                return null;
+            } else {
+                // Remove the warning message if it exists
+                const warningDiv = document.getElementById('closing-time-warning');
+                if (warningDiv) {
+                    warningDiv.remove();
+                }
+            }
+
+            return result;
         } catch (error) {
             console.error('Error fetching stylists:', error);
             return null;
         }
     }
 
-    // Function to update stylist selections when services change
-    async function updateStylistSelections(onlyUpdateOptions = false) {
-        if (!onlyUpdateOptions) {
-            serviceStylistSelections.innerHTML = '';
-            const selectedServices = getSelectedServiceIds();
+    // Function to update stylist selections
+    async function updateStylistSelections() {
+        serviceStylistSelections.innerHTML = '';
+        const selectedServices = getSelectedServiceIds();
 
-            for (const serviceId of selectedServices) {
-                const serviceLabel = document.querySelector(`label[for="service-${serviceId}"]`).textContent;
-                const selection = await createStylistSelection(serviceId, serviceLabel);
-                serviceStylistSelections.appendChild(selection);
-            }
-        } else {
-            const selections = document.querySelectorAll('.service-stylist-selection');
-            for (const selection of selections) {
-                const serviceId = selection.dataset.serviceId;
-                const select = selection.querySelector('select');
-                const loadingSpinner = selection.querySelector('.spinner-border');
-                const errorMessage = selection.querySelector('.invalid-feedback');
+        if (selectedServices.length === 0 || !bookingDateInput.value || !startTimeInput.value || !endTimeInput.value) {
+            return;
+        }
 
-                if (!bookingDateInput.value || !startTimeInput.value) {
-                    select.disabled = true;
-                    select.innerHTML = '<option value="">Please select date and time first</option>';
-                    continue;
-                }
+        for (const serviceId of selectedServices) {
+            const serviceLabel = document.querySelector(`label[for="service-${serviceId}"]`).textContent;
+            const container = document.createElement('div');
+            container.className = 'service-stylist-selection mb-3';
 
-                await updateStylistOptions(select, serviceId, loadingSpinner, errorMessage);
+            const label = document.createElement('h6');
+            label.textContent = serviceLabel;
+            container.appendChild(label);
+
+            const select = document.createElement('select');
+            select.className = 'form-control';
+            select.name = `bookings_services[${serviceId}][stylist_id]`;
+            select.required = true;
+
+            // Add hidden inputs
+            const serviceInput = document.createElement('input');
+            serviceInput.type = 'hidden';
+            serviceInput.name = `bookings_services[${serviceId}][service_id]`;
+            serviceInput.value = serviceId;
+
+            const costInput = document.createElement('input');
+            costInput.type = 'hidden';
+            costInput.name = `bookings_services[${serviceId}][service_cost]`;
+            costInput.value = getServiceCost(serviceId);
+
+            select.innerHTML = '<option value="">Loading available stylists...</option>';
+            container.appendChild(select);
+            container.appendChild(serviceInput);
+            container.appendChild(costInput);
+            serviceStylistSelections.appendChild(container);
+
+            // Fetch and populate stylists
+            const stylists = await fetchStylistsForService(serviceId);
+            if (stylists && Array.isArray(stylists)) {
+                select.innerHTML = '<option value="">Select a stylist...</option>';
+                stylists.forEach(stylist => {
+                    const option = document.createElement('option');
+                    option.value = stylist.id;
+                    option.textContent = stylist.name;
+                    select.appendChild(option);
+                });
+            } else {
+                select.innerHTML = '<option value="">No available services for this stylist at this time</option>';
+                select.disabled = true;
             }
         }
     }
@@ -304,22 +266,109 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Function to update available time slots
+    async function updateAvailableTimeSlots() {
+        const selectedServices = getSelectedServiceIds();
+        const selectedDate = bookingDateInput.value;
+
+        if (!selectedDate || selectedServices.length === 0) {
+            startTimeInput.disabled = true;
+            startTimeInput.innerHTML = '<option value="">Please select date and services first</option>';
+            return;
+        }
+
+        startTimeInput.disabled = true;
+        startTimeInput.innerHTML = '<option value="">Loading available times...</option>';
+
+        try {
+            const response = await fetch('/bookings/get-available-time-slots', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': document.querySelector('input[name="_csrfToken"]').value
+                },
+                body: JSON.stringify({
+                    date: selectedDate,
+                    service_ids: selectedServices
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const availableSlots = await response.json();
+
+            startTimeInput.innerHTML = '<option value="">Select a time slot</option>';
+            if (availableSlots.length > 0) {
+                availableSlots.forEach(slot => {
+                    const option = document.createElement('option');
+                    option.value = slot.value;
+                    option.textContent = slot.display;
+                    startTimeInput.appendChild(option);
+                });
+                startTimeInput.disabled = false;
+            } else {
+                startTimeInput.innerHTML = '<option value="">No available time slots</option>';
+                startTimeInput.disabled = true;
+            }
+        } catch (error) {
+            console.error('Error fetching available time slots:', error);
+            startTimeInput.innerHTML = '<option value="">Error loading time slots</option>';
+            startTimeInput.disabled = true;
+        }
+    }
+
     // Event listeners
     serviceCheckboxes.forEach(checkbox => {
         checkbox.addEventListener('change', () => {
-            calculateTotalCost();
-            updateInputStates();
-            updateStylistSelections(false);
+            const selectedServices = Array.from(serviceCheckboxes)
+                .filter(cb => cb.checked);
+
+            // Enable/disable date input
+            bookingDateInput.disabled = selectedServices.length === 0;
+
+            // Calculate total duration and cost
+            let totalDuration = 0;
+            let totalCost = 0;
+            selectedServices.forEach(service => {
+                totalDuration += getServiceDuration(service.value);
+                totalCost += getServiceCost(service.value);
+            });
+
+            // Update service count and total
+            document.getElementById('service-count').textContent = selectedServices.length;
+            document.getElementById('service-total').textContent = totalCost.toFixed(2);
+
+            // Update available time slots
+            updateAvailableTimeSlots();
+
+            // Update stylist selections
+            updateStylistSelections();
         });
     });
 
-    startTimeInput.addEventListener('change', () => {
-        calculateEndTime();
-        updateStylistSelections(true);
+    bookingDateInput.addEventListener('change', () => {
+        updateAvailableTimeSlots();
+        updateStylistSelections();
     });
 
-    bookingDateInput.addEventListener('change', () => {
-        updateStylistSelections(true);
+    startTimeInput.addEventListener('change', () => {
+        if (!startTimeInput.value) {
+            endTimeInput.value = '';
+            endTimeDisplay.value = '';
+            return;
+        }
+
+        const selectedServices = Array.from(serviceCheckboxes)
+            .filter(cb => cb.checked);
+        let totalDuration = 0;
+        selectedServices.forEach(service => {
+            totalDuration += getServiceDuration(service.value);
+        });
+
+        updateEndTime(startTimeInput.value, totalDuration);
+        updateStylistSelections();
     });
 
     // Add event listener for stylist selection changes

@@ -60,11 +60,6 @@
                 <label><?= __('Total Cost') ?></label>
                 <p class="form-control-static">$<?= number_format($booking->total_cost, 2) ?></p>
             </div>
-
-            <div class="info-group">
-                <label><?= __('Remaining Cost') ?></label>
-                <p class="form-control-static">$<?= number_format($booking->remaining_cost, 2) ?></p>
-            </div>
         </div>
 
         <div class="actions">
