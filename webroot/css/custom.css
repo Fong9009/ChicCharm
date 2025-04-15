@@ -319,12 +319,11 @@
 
 /* Mobile Responsive Adjustments */
 @media (max-width: 768px) {
-    .form-wrapper,
     .login-wrapper {
-        padding-top: 90px;
+        padding-top: 50px;
         padding-left: 15px;
         padding-right: 15px;
-        padding-bottom: 0;
+        padding-bottom: 76px;
     }
 
     .login-form {
@@ -436,7 +435,7 @@
 
 /* Admin Layout Styling */
 body {
-    padding-top: 70px;
+    padding-top: 50px;
     background-color: #f8f9fa;
 }
 
@@ -1230,11 +1229,98 @@ footer {
 #mainNav .container-fluid,
 #mainNav .container.px-4,
 #mainNav .container.px-4.px-lg-5 {
-  max-width: 1320px !important;
-  width: 100%;
-  margin: 0 auto !important;
-  padding-left: 3rem !important;
-  padding-right: 3rem !important;
+    max-width: 1320px !important;
+    width: 100%;
+    margin: 0 auto !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+}
+
+@media (min-width: 992px) {
+    #mainNav {
+        box-shadow: none;
+        background-color: #121211 !important;
+        padding: 0.75rem 0 !important;
+    }
+
+    #mainNav .container,
+    #mainNav .container-fluid,
+    #mainNav .container.px-4,
+    #mainNav .container.px-4.px-lg-5 {
+        max-width: 1320px !important;
+        width: 100%;
+        margin: 0 auto !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
+    #mainNav .navbar-brand {
+        font-family: "Merriweather Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.7) !important;
+        font-size: 1.15rem;
+        padding: 0 !important;
+        margin-right: 2rem;
+    }
+
+    #mainNav .navbar-brand:hover {
+        color: #f4623a !important;
+    }
+
+    #mainNav .navbar-nav {
+        margin-left: auto !important;
+        margin-right: 0 !important;
+    }
+
+    #mainNav .navbar-nav .nav-item {
+        margin: 0 0.25rem;
+    }
+
+    #mainNav .navbar-nav .nav-item .nav-link {
+        color: rgba(255, 255, 255, 0.7) !important;
+        padding: 0.5rem 0.5rem !important;
+        font-size: 0.85rem;
+        transition: color 0.3s ease;
+    }
+
+    #mainNav .navbar-nav .nav-item .nav-link:hover {
+        color: #f4623a !important;
+    }
+
+    #mainNav .navbar-nav .nav-item:last-child .nav-link {
+        padding-right: 0 !important;
+    }
+
+    /* Hide mobile elements on desktop */
+    .mobile-icons-nav,
+    .mobile-profile-icon,
+    .navbar-toggler {
+        display: none !important;
+    }
+}
+
+/* Larger Desktop Screens */
+@media (min-width: 1200px) {
+    #mainNav .container,
+    #mainNav .container-fluid,
+    #mainNav .container.px-4,
+    #mainNav .container.px-4.px-lg-5 {
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
+    }
+
+    #mainNav .navbar-brand {
+        font-size: 1.25rem;
+    }
+
+    #mainNav .navbar-nav .nav-item {
+        margin: 0 0.75rem;
+    }
+
+    #mainNav .navbar-nav .nav-item .nav-link {
+        padding: 0.5rem 0.75rem !important;
+        font-size: 1rem;
+    }
 }
 
 @media (max-width: 767px) {
@@ -1583,31 +1669,6 @@ footer {
     margin: 0.5rem 0;
 }
 
-/* Mobile dropdown adjustments */
-@media (max-width: 991.98px) {
-    .navbar-collapse {
-        background-color: #121211;
-        padding: 1rem;
-        border-radius: 8px;
-        margin-top: 0.5rem;
-    }
-
-    .dropdown-menu {
-        background-color: rgba(0, 0, 0, 0.2);
-        border: none;
-        margin-top: 0.5rem;
-        margin-bottom: 0.5rem;
-    }
-
-    .navbar-nav .nav-item {
-        padding: 0.5rem 0;
-    }
-
-    .dropdown-menu .dropdown-item {
-        padding: 0.75rem 1rem;
-    }
-}
-
 /* Fix for navbar toggler */
 .navbar-toggler {
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1881,7 +1942,7 @@ footer .input-group .btn-primary:hover {
 /* Form wrapper styling */
 .form-wrapper {
     padding-top: 76px; 
-    padding: 76px 20px 0;
+    padding: 76px 20px 76px;
     background-color: #f8f9fa;
     min-height: 75vh;
     display: flex;
@@ -1952,14 +2013,18 @@ footer .input-group .btn-primary:hover {
 
 /* Desktop specific styles */
 @media (min-width: 992px) {
-    .form-wrapper,
-    .login-wrapper {
-        padding: 40px 20px 76px;
-    }
 
     .contacts.form.content {
         margin-top: 0;
         padding: 2.5rem;
+    }
+
+    .mobile-icons-nav {
+        display: none;
+    }
+    
+    .mobile-profile-icon {
+        display: none;
     }
 }
 
@@ -1967,10 +2032,10 @@ footer .input-group .btn-primary:hover {
 @media (max-width: 768px) {
     .form-wrapper,
     .login-wrapper {
-        padding-top: 90px;
+        padding-top: 50px;
         padding-left: 15px;
         padding-right: 15px;
-        padding-bottom: 0;
+        padding-bottom: 50px;
     }
 
     .contacts.form.content {
@@ -2222,8 +2287,8 @@ footer .input-group .btn-primary:hover {
 
 /* Reset Password Form Wrapper */
 .reset-password-wrapper {
-    padding-top: 120px; /* Increased from 76px to add more space */
-    padding: 120px 20px 20px 20px; /* Add padding top and maintain other padding */
+    padding-top: 76px; 
+    padding: 76px 20px 76px; 
     background-color: #f8f9fa;
     min-height: auto;
     display: flex;
@@ -2233,7 +2298,7 @@ footer .input-group .btn-primary:hover {
 
 @media (max-width: 768px) {
     .reset-password-wrapper {
-        padding-top: 120px; /* Increased from 90px */
+        padding-top: 76px; 
         padding-left: 15px;
         padding-right: 15px;
         padding-bottom: 15px;
@@ -2364,7 +2429,7 @@ footer .input-group .btn-primary:hover {
 /* Customer Dashboard Styles */
 .customer-dashboard {
     padding-top: 76px;
-    padding-bottom: 76px;
+    padding-bottom: 40px;
     min-height: 100vh;
     background-size: cover;
     background-position: center center;
@@ -2491,7 +2556,7 @@ footer .input-group .btn-primary:hover {
     background-color: #343a40;
     border: none;
     border-radius: 0.25rem;
-    margin-top: 0.5rem;
+    margin-top: 0;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
@@ -3321,3 +3386,216 @@ footer .input-group .btn-primary:hover {
     }
 }
 
+.password-requirements {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #f4623a;
+}
+
+.password-requirements ul {
+    padding-left: 18px;
+    margin-bottom: 0;
+}
+
+/* Mobile Navigation Styles */
+@media (max-width: 991.98px) {
+    #mainNav {
+        padding: 10px 0 !important;
+    }
+    
+    .mobile-icons-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        position: left;
+    }
+
+    .navbar-toggler {
+        padding: 8px;
+        border: none;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.9);
+        order: 1;
+        margin: 0;
+        margin-left: -20px;
+    }
+
+    .navbar-toggler:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.9%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    }
+
+    .navbar-brand {
+        color: #fff;
+        font-size: 1.25rem;
+        margin: 0;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        order: 2;
+    }
+
+    .mobile-profile-icon {
+        order: 3;
+        margin-left: auto;
+        z-index: 1050;
+    }
+
+    .mobile-profile-icon .btn-link {
+        color: rgba(255, 255, 255, 0.9);
+        padding: 8px;
+        font-size: 1.25rem;
+        display: flex;
+        align-items: center;
+        transition: color 0.3s ease;
+        border: none;
+    }
+
+    .mobile-profile-icon .btn-link:hover {
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .mobile-profile-icon .dropdown-menu {
+        position: absolute;
+        right: 0;
+        left: auto;
+        top: 100%;
+        margin-top: 10px;
+        background-color: #121211;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        min-width: 200px;
+        padding: 0.5rem 0;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .mobile-profile-icon .dropdown-item {
+        padding: 0.75rem 1.5rem;
+        color: rgba(255, 255, 255, 0.9);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.2s ease;
+    }
+
+    .mobile-profile-icon .dropdown-item:hover {
+        background-color: rgba(244, 98, 58, 0.1);
+        color: #f4623a;
+    }
+
+    .mobile-profile-icon .dropdown-item i {
+        width: 20px;
+        text-align: center;
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .mobile-profile-icon .dropdown-divider {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        margin: 0.5rem 0;
+    }
+
+    .navbar-collapse {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 80%;
+        max-width: 300px;
+        height: 100vh;
+        padding: 1rem 1.5rem;
+        background-color: #121211;
+        transition: left 0.3s ease-in-out;
+        z-index: 1040;
+        overflow-y: auto;
+        margin-top: 54px;
+    }
+
+    .navbar-collapse.show {
+        left: 0;
+    }
+
+    .navbar-nav {
+        padding: 0;
+        margin: 0;
+    }
+
+    .navbar-nav .nav-item {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .navbar-nav .nav-item:last-child {
+        border-bottom: none;
+    }
+
+    .navbar-nav .nav-link {
+        padding: 1rem;
+        color: rgba(255, 255, 255, 0.8) !important;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+
+    .navbar-nav .nav-link:hover {
+        color: #fff !important;
+        background-color: rgba(255, 255, 255, 0.1);
+        padding-left: 1.5rem;
+    }
+}
+
+@media (max-width: 991.98px) {
+/* Mobile Profile Icon */
+.mobile-profile-icon {
+    position: fixed;
+    right: 15px;
+    margin-top: 9px;
+    top: 15px;
+    z-index: 1000;
+    margin-right: -20px;
+}
+
+.mobile-profile-icon .btn-link {
+    color: rgba(255, 255, 255, 0.7) !important;
+    padding: 0;
+    border: none;
+}
+
+.mobile-profile-icon .btn-link:hover {
+    color: #f8f9fa;
+}
+
+.mobile-profile-icon .dropdown-menu {
+    background-color: #121211;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 15px;
+    margin-right: 5px;
+    right: 0;
+    left: auto;
+}
+
+.mobile-profile-icon .dropdown-item {
+    color: rgba(255, 255, 255, 0.7) !important;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.mobile-profile-icon .dropdown-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.mobile-profile-icon .dropdown-item i {
+    width: 20px;
+    text-align: center;
+}
+
+.mobile-profile-icon .dropdown-divider {
+    border-color: rgba(255, 255, 255, 0.1);
+    margin: 5px 0;
+}
+}

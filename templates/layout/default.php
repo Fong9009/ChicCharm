@@ -45,14 +45,56 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
 <!-- Navigation -->
 <nav class="navbar navbar-expand-lg navbar-light fixed-top py-3" id="mainNav" style="background-color: #121211;">
     <div class="container px-4 px-lg-5">
-        <a class="navbar-brand" href="<?= $this->Url->build('/') ?>">ChicCharm</a>
-        <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+        <!-- Mobile Navigation -->
+        <div class="mobile-icons-nav">
+            <!-- Hamburger Menu -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <!-- Brand/Logo -->
+            <a class="navbar-brand" href="<?= $this->Url->build('/') ?>">ChicCharm</a>
+            
+            <!-- Profile Icon -->
+            <div class="mobile-profile-icon">
+                <button class="btn btn-link" type="button" id="mobileProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user fa-lg"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="mobileProfileDropdown">
+                    <?php $identity = $this->request->getAttribute('identity');
+                    if ($identity) : ?>
+                        <?php if ($identity->get('type') === 'admin') : ?>
+                            <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'dashboard']) ?>">
+                                <i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
+                            <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'profile', $identity->get('id')]) ?>">
+                                <i class="fas fa-user-shield"></i><span>My Profile</span></a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Auth', 'action' => 'logout']) ?>" onclick="return confirmLogout()">
+                                <i class="fas fa-sign-out-alt"></i><span>Logout</span></a></li>
+                        <?php elseif ($identity->get('type') === 'customer') : ?>
+                            <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Customers', 'action' => 'dashboard']) ?>">
+                                <i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
+                            <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Customers', 'action' => 'edit', $identity->get('id')]) ?>">
+                                <i class="fas fa-user"></i><span>My Profile</span></a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Auth', 'action' => 'logout']) ?>" onclick="return confirmLogout()">
+                                <i class="fas fa-sign-out-alt"></i><span>Logout</span></a></li>
+                        <?php endif; ?>
+                    <?php else : ?>
+                        <li><a class="dropdown-item" href="<?= $this->Url->build('/auth/login') ?>">
+                            <i class="fas fa-sign-in-alt"></i><span>Login</span></a></li>
+                        <li><a class="dropdown-item" href="<?= $this->Url->build('/customers/registration') ?>">
+                            <i class="fas fa-user-plus"></i><span>Sign Up</span></a></li>
+                    <?php endif; ?>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Regular Navigation for Desktop -->
+        <a class="navbar-brand d-none d-lg-block" href="<?= $this->Url->build('/') ?>">ChicCharm</a>
         <div class="collapse navbar-collapse" id="navbarResponsive">
             <ul class="navbar-nav ms-auto my-2 my-lg-0">
                 <?php
-                $identity = $this->request->getAttribute('identity');
                 if ($identity) {
                     // User is logged in
                     if ($identity->get('type') === 'admin') {
@@ -87,10 +129,45 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
                                 </li>
                             </ul>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link"
-                               href="<?= $this->Url->build([ 'plugin' => false, 'controller' => 'Customers', 'action' => 'index']) ?>"
-                            >Customers List</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="customersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-users"></i>
+                                <span>Customers</span>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="customersDropdown">
+                                <li>
+                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Customers', 'action' => 'index']) ?>">
+                                        <i class="fas fa-list"></i>
+                                        <span>List Customers</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Customers', 'action' => 'registration']) ?>">
+                                        <i class="fas fa-user-plus"></i>
+                                        <span>Add Customer</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="stylistsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-cut"></i>
+                                <span>Stylists</span>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="stylistsDropdown">
+                                <li>
+                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Stylists', 'action' => 'index']) ?>">
+                                        <i class="fas fa-list"></i>
+                                        <span>List Stylists</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Stylists', 'action' => 'add']) ?>">
+                                        <i class="fas fa-user-plus"></i>
+                                        <span>Add Stylist</span>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -164,13 +241,13 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
                 <?php } else {
                     // Public Navigation ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="#about">About</a>
+                        <a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#services">Services</a>
+                        <a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#portfolio">Portfolio</a>
+                        <a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= $this->Url->build('/contacts/enquiry') ?>">Contact Us</a>
@@ -218,10 +295,7 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
             <div class="col-md-3">
                 <h5 class="text-light fw-bold">Support</h5>
                 <ul class="list-unstyled">
-                    <li><a href="<?= $this->Url->build('/') ?>" class="text-secondary">FAQ</a></li>
                     <li><a href="<?= $this->Url->build('/contacts/enquiry') ?>" class="text-secondary">Contact us</a></li>
-                    <li><a href="<?= $this->Url->build('/') ?>" class="text-secondary">Shipping Policy</a></li>
-                    <li><a href="<?= $this->Url->build('/') ?>" class="text-secondary">Refund Policy</a></li>
                 </ul>
             </div>
 
@@ -230,20 +304,7 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
                 <h5 class="text-light fw-bold">Our Company</h5>
                 <ul class="list-unstyled">
                     <li><a href="<?= $this->Url->build('/#about') ?>" class="text-secondary">About Us</a></li>
-                    <li><a href="<?= $this->Url->build('/') ?>" class="text-secondary">Terms Of Service</a></li>
-                    <li><a href="<?= $this->Url->build('/') ?>" class="text-secondary">Privacy Policy</a></li>
-                    <li><a href="<?= $this->Url->build('/') ?>" class="text-secondary">Accessibility Statement</a></li>
                 </ul>
-            </div>
-
-            <!-- Social Media -->
-            <div class="col-md-2">
-                <h5 class="text-light fw-bold">Follow Us</h5>
-                <div class="d-flex justify-content-center">
-                    <a href="https://facebook.com" class="text-white me-3 fs-4"><i class="bi bi-facebook"></i></a>
-                    <a href="https://instagram.com" class="text-white me-3 fs-4"><i class="bi bi-instagram"></i></a>
-                    <a href="https://youtube.com" class="text-white fs-4"><i class="bi bi-youtube"></i></a>
-                </div>
             </div>
         </div>
 
@@ -261,14 +322,6 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
 <?= $this->Html->script('https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js') ?>
 <?= $this->Html->script('https://cdnjs.cloudflare.com/ajax/libs/SimpleLightbox/2.1.0/simpleLightbox.min.js') ?>
 <?= $this->Html->script('landing-detail/js/scripts.js', ['block' => true]) ?>
-
-<!-- Show dropdown on hover -->
-<style>
-.nav-item.dropdown:hover .dropdown-menu {
-    display: block;
-    margin-top: 0; /* Adjust if needed */
-}
-</style>
 
 <script>
 function confirmLogout() {
