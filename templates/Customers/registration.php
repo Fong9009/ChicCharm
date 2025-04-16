@@ -68,7 +68,7 @@
             <br>
             <?= $this->Html->link(__('Cancel'),
                 ['controller' => 'Auth', 'action' => 'login'],
-                ['class' => 'btn btn-secondary',
+                ['class' => 'btn btn-primary',
                 'style' => 'background-color: #6c757d; border-color: #6c757d; color: white; transition: all 0.3s;',
                 'onmouseover' => 'this.style.backgroundColor = "#5a6268"; this.style.borderColor = "#545b62";',
                 'onmouseout' => 'this.style.backgroundColor = "#6c757d"; this.style.borderColor = "#6c757d";']) ?>

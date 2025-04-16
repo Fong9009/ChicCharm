@@ -33,7 +33,7 @@
                     </div>
                     <!-- Delete Customer -->
                     <div class="col-lg-3 mb-4 side-nav-item">
-                        <?= $this->Html->link(
+                        <?= $this->Form->postLink(
                             '<div class="card h-100">
                             <div class="card-header delete-card-header d-flex justify-content-between align-items-center">
                                 <div>

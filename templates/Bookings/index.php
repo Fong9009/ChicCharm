@@ -60,10 +60,10 @@
                 <th><?= $this->Paginator->sort('booking_name') ?></th>
                 <th><?= $this->Paginator->sort('booking_date') ?></th>
                 <th><?= __('Customer') ?></th>
-                <th><?= __('Stylists') ?></th>
-                <th><?= __('Services') ?></th>
+                <th><?= __('Stylists & Services') ?></th>
                 <th><?= $this->Paginator->sort('total_cost') ?></th>
                 <th><?= $this->Paginator->sort('status') ?></th>
+                <th><?= __('Notes') ?></th>
                 <th class="actions"><?= __('Actions') ?></th>
             </tr>
             </thead>
@@ -86,23 +86,39 @@
                         <?php endif; ?>
                     </td>
                     <td>
-                        <?php if (!empty($booking->stylists)): ?>
+                        <?php if (!empty($booking->bookings_services)): ?>
                             <ul style="list-style: none; padding-left: 0;">
-                            <?php foreach ($booking->stylists as $stylist): ?>
-                                <li><?= h($stylist->first_name) ?> <?= h($stylist->last_name) ?></li>
+                            <?php 
+                            // Group services by stylist
+                            $stylistServices = [];
+                            foreach ($booking->bookings_services as $bookingService) {
+                                $stylistId = $bookingService->stylist->id;
+                                if (!isset($stylistServices[$stylistId])) {
+                                    $stylistServices[$stylistId] = [
+                                        'stylist' => $bookingService->stylist,
+                                        'services' => []
+                                    ];
+                                }
+                                $stylistServices[$stylistId]['services'][] = $bookingService;
+                            }
+                            ?>
+                            <?php foreach ($stylistServices as $stylistData): ?>
+                                <li class="mb-2">
+                                    <?= h($stylistData['stylist']->first_name) ?> 
+                                    <?= h($stylistData['stylist']->last_name) ?>
+                                    <ul style="list-style: none; padding-left: 1rem; margin-top: 0.25rem;">
+                                        <?php foreach ($stylistData['services'] as $bookingService): ?>
+                                            <li>
+                                                • <?= h($bookingService->service->service_name) ?> 
+                                                (<?= $this->Number->currency($bookingService->service->service_cost) ?>)
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </li>
                             <?php endforeach; ?>
                             </ul>
                         <?php else: ?>
-                            <p>No stylists assigned</p>
-                        <?php endif; ?>
-                    </td>
-                    <td>
-                        <?php if (!empty($booking->services)): ?>
-                            <ul style="list-style: none; padding-left: 0;">
-                            <?php foreach ($booking->services as $service): ?>
-                                <li><?= h($service->service_name) ?> (<?= $this->Number->currency($service->service_cost) ?>)</li>
-                            <?php endforeach; ?>
-                            </ul>
+                            <p>No services booked</p>
                         <?php endif; ?>
                     </td>
                     <td><?= $this->Number->currency($booking->total_cost) ?></td>
@@ -111,6 +127,7 @@
                             <?= h($booking->status) ?>
                         </span>
                     </td>
+                    <td><?= !empty($booking->notes) ? h($booking->notes) : 'No notes' ?></td>
                     <td class="actions">
                         <?= $this->Html->link(__('View'), ['action' => 'view', $booking->id], ['class' => 'button']) ?>
                         <?php if ($booking->status === 'active'): ?>

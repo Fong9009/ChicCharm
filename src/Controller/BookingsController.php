@@ -53,7 +53,20 @@ class BookingsController extends AppController
         }
 
         $query = $this->Bookings->find()
-            ->contain(['Customers', 'Stylists', 'Services'])
+            ->contain([
+                'Customers',
+                'BookingsServices' => [
+                    'Services',
+                    'Stylists' => [
+                        'fields' => ['id', 'first_name', 'last_name']
+                    ]
+                ],
+                'BookingsStylists' => [
+                    'Stylists' => [
+                        'fields' => ['id', 'first_name', 'last_name']
+                    ]
+                ]
+            ])
             ->order(['status' => 'ASC', 'booking_date' => 'DESC']);
         $bookings = $this->paginate($query);
 
@@ -293,7 +306,13 @@ class BookingsController extends AppController
             $this->Flash->error(__('The booking could not be cancelled. Please, try again.'));
         }
 
-        return $this->redirect(['action' => 'customerindex']);
+        // Check where the request came from
+        $referer = $this->request->getHeader('Referer');
+        if (strpos($referer[0], 'dashboard') !== false) {
+            return $this->redirect(['controller' => 'Customers', 'action' => 'dashboard']);
+        } else {
+            return $this->redirect(['action' => 'customerindex']);
+        }
     }
 
     public function customerbooking() {
@@ -348,9 +367,6 @@ class BookingsController extends AppController
                             'service_cost' => $serviceData['service_cost']
                         ]);
 
-                        // Debug logging
-                        \Cake\Log\Log::debug('Attempting to save booking service with data: ' . json_encode($bookingService->toArray()));
-
                         if (!$bookingsServicesTable->save($bookingService)) {
                             \Cake\Log\Log::error('Failed to save booking service. Errors: ' . json_encode($bookingService->getErrors()));
                             $this->Flash->error(__('The booking was saved, but some service details could not be saved.'));
@@ -389,7 +405,7 @@ class BookingsController extends AppController
                 }
 
                 $this->Flash->success(__('Your booking has been saved successfully.'));
-                return $this->redirect(['action' => 'customerindex']);
+                return $this->redirect(['controller' => 'Customers', 'action' => 'dashboard']);
             }
             $this->Flash->error(__('The booking could not be saved. Please, try again.'));
         }
@@ -453,9 +469,6 @@ class BookingsController extends AppController
                             'stylist_id' => $serviceData['stylist_id'],
                             'service_cost' => $serviceData['service_cost']
                         ]);
-
-                        // Debug logging
-                        \Cake\Log\Log::debug('Attempting to save booking service with data: ' . json_encode($bookingService->toArray()));
 
                         if (!$bookingsServicesTable->save($bookingService)) {
                             \Cake\Log\Log::error('Failed to save booking service. Errors: ' . json_encode($bookingService->getErrors()));

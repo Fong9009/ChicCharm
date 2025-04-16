@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 15, 2025 at 07:22 PM
+-- Generation Time: Apr 16, 2025 at 11:28 AM
 -- Server version: 9.0.1
 -- PHP Version: 8.3.12
 
@@ -29,16 +29,16 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `admins` (
   `id` int NOT NULL,
-  `first_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `last_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `nonce` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `first_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `last_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `nonce` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `nonce_expiry` datetime DEFAULT NULL,
   `created` datetime DEFAULT CURRENT_TIMESTAMP,
   `modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `type` varchar(50) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'admin',
-  `profile_picture` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL
+  `type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'admin',
+  `profile_picture` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -57,12 +57,12 @@ INSERT INTO `admins` (`id`, `first_name`, `last_name`, `email`, `password`, `non
 
 CREATE TABLE `bookings` (
   `id` int NOT NULL,
-  `booking_name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `booking_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `booking_date` date NOT NULL,
   `total_cost` decimal(10,2) NOT NULL,
   `remaining_cost` decimal(10,2) NOT NULL,
   `customer_id` int DEFAULT NULL,
-  `status` varchar(20) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'active',
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'active',
   `start_time` time DEFAULT NULL,
   `end_time` time DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -86,7 +86,7 @@ CREATE TABLE `bookings_services` (
   `booking_id` int NOT NULL,
   `service_id` int NOT NULL,
   `service_cost` decimal(10,2) NOT NULL,
-  `notes` text COLLATE utf8mb4_unicode_ci,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created` datetime DEFAULT CURRENT_TIMESTAMP,
   `modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `stylist_id` int DEFAULT NULL
@@ -137,11 +137,11 @@ INSERT INTO `bookings_stylists` (`id`, `stylist_date`, `start_time`, `end_time`,
 
 CREATE TABLE `contacts` (
   `id` int NOT NULL,
-  `first_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `last_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `phone_number` varchar(20) COLLATE utf8mb4_general_ci NOT NULL,
-  `message` text COLLATE utf8mb4_general_ci NOT NULL,
+  `first_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `last_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `phone_number` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `replied` tinyint(1) DEFAULT '0',
   `is_archived` tinyint(1) NOT NULL DEFAULT '0',
   `created` datetime DEFAULT CURRENT_TIMESTAMP,
@@ -153,56 +153,56 @@ CREATE TABLE `contacts` (
 --
 
 INSERT INTO `contacts` (`id`, `first_name`, `last_name`, `email`, `phone_number`, `message`, `replied`, `is_archived`, `created`, `modified`) VALUES
-(1, 'Lila Kramer', 'Zephr Cobb', 'l_zephrcobb3506@hotmail.net', '(02) 0651 1347', 'imperdiet non, vestibulum nec, euismod in, dolor. Fusce feugiat. Lorem', 0, 1, '2024-09-18 04:31:12', '2024-04-09 01:29:10'),
-(2, 'Astra Rollins', 'Kaitlin Burris', 'a.kaitlinburris1979@protonmail.net', '(06) 2475 6465', 'malesuada. Integer id magna et ipsum cursus vestibulum. Mauris', 1, 1, '2024-08-31 17:21:36', '2025-12-16 22:05:16'),
-(3, 'Dominic Ramirez', 'Dillon Glenn', 'ddillonglenn@google.edu', '(02) 8511 8654', 'ullamcorper. Duis at lacus. Quisque', 0, 0, '2025-01-15 06:55:09', '2024-11-02 23:12:24'),
-(4, 'Hyatt Horton', 'Alden Figueroa', 'haldenfigueroa@google.ca', '(05) 7620 0389', 'ut dolor dapibus gravida. Aliquam tincidunt, nunc ac', 1, 0, '2025-10-21 20:20:27', '2025-07-26 05:26:18'),
-(5, 'Carolyn Heath', 'Rachel Bates', 'r_carolynheath@hotmail.org', '(08) 5077 8073', 'adipiscing lobortis risus. In mi pede, nonummy ut,', 0, 1, '2026-03-04 10:05:47', '2025-11-26 18:37:41'),
-(6, 'Steel Henson', 'Charity Bowen', 'charitybowensteelhenson@protonmail.edu', '(03) 3121 3211', 'erat volutpat. Nulla facilisis. Suspendisse commodo tincidunt nibh.', 1, 0, '2024-08-23 14:37:11', '2024-05-11 02:36:32'),
-(7, 'Ivor Guerra', 'Thomas Dotson', 'ivorguerra_thomasdotson4228@icloud.org', '(09) 9488 2883', 'Pellentesque ut ipsum ac mi eleifend egestas. Sed', 1, 0, '2025-12-27 16:32:13', '2025-08-23 21:40:17'),
-(8, 'Hayley Weaver', 'Rhea Ballard', 'rhayleyweaver@outlook.com', '(07) 3791 5842', 'dui. Fusce diam nunc, ullamcorper', 0, 1, '2026-02-14 09:44:17', '2025-10-21 10:19:10'),
-(9, 'Dana Kinney', 'Isadora Burt', 'isadoraburt_danakinney@icloud.couk', '(04) 7116 8632', 'cubilia Curae Phasellus ornare. Fusce mollis.', 1, 0, '2025-04-23 22:38:49', '2025-01-31 19:54:41'),
-(10, 'Karly Goff', 'Mufutau Mcgee', 'karlygoffmufutaumcgee998@protonmail.com', '(07) 2302 5822', 'Maecenas iaculis aliquet diam. Sed diam lorem,', 0, 1, '2024-07-28 15:34:35', '2026-01-08 19:39:17'),
-(11, 'Bethany Whitaker', 'Walter Osborn', 'walterosborn-bethanywhitaker@protonmail.org', '(02) 9056 9328', 'Fusce dolor quam, elementum at, egestas a, scelerisque sed,', 1, 1, '2025-02-06 22:33:50', '2024-05-09 13:25:03'),
-(12, 'Adrian Bell', 'Emi Mccullough', 'adrianbell-emimccullough@hotmail.net', '(01) 5570 7769', 'velit. Cras lorem lorem, luctus ut,', 1, 1, '2025-05-30 11:27:10', '2025-07-22 08:37:47'),
-(13, 'Callum Whitehead', 'Lara Dyer', 'laradyercallumwhitehead3323@protonmail.com', '(05) 1646 2952', 'magna, malesuada vel, convallis in, cursus et, eros.', 0, 1, '2025-05-09 02:07:38', '2025-10-29 19:30:28'),
-(14, 'Knox Hicks', 'Upton Holland', 'uptonhollandknoxhicks@google.org', '(04) 9425 6466', 'Suspendisse non leo. Vivamus nibh dolor, nonummy ac,', 0, 1, '2026-01-19 07:06:34', '2024-04-13 06:07:57'),
-(15, 'Elvis Compton', 'Ryan Valencia', 'ryanvalencia.elviscompton7502@protonmail.net', '(01) 2608 2341', 'et tristique pellentesque, tellus sem mollis dui, in', 1, 1, '2024-07-24 02:12:20', '2024-07-24 20:38:45'),
-(16, 'Tashya Macias', 'Galvin Goodwin', 'galvingoodwin_tashyamacias1519@icloud.couk', '(04) 4212 2956', 'lectus, a sollicitudin orci sem eget massa. Suspendisse', 0, 0, '2024-09-13 22:44:02', '2024-11-27 20:17:37'),
-(17, 'Risa Robles', 'Keelie Rodgers', 'keelierodgers.risarobles5822@outlook.ca', '(07) 4891 9234', 'torquent per conubia nostra, per inceptos hymenaeos.', 1, 0, '2024-08-05 18:24:43', '2025-02-19 18:36:47'),
-(18, 'Isaac Fischer', 'Paloma Bates', 'ipalomabates801@icloud.edu', '(07) 4151 2955', 'Integer urna. Vivamus molestie dapibus ligula. Aliquam erat', 1, 1, '2025-12-23 21:04:29', '2025-03-03 11:30:19'),
-(19, 'Edan Parks', 'Kai Cabrera', 'kaicabrera_edanparks@yahoo.ca', '(09) 0924 3812', 'vestibulum lorem, sit amet ultricies', 1, 0, '2025-03-21 00:03:26', '2025-04-26 22:33:34'),
-(20, 'Macy Alvarado', 'Selma Nunez', 'macyalvarado.selmanunez@aol.edu', '(04) 4894 4223', 'metus facilisis lorem tristique aliquet. Phasellus', 0, 1, '2025-01-13 05:45:03', '2025-05-29 20:44:39'),
-(21, 'Adam Michael', 'Merrill Allen', 'a.merrillallen@icloud.net', '(01) 2317 4423', 'quis, pede. Suspendisse dui. Fusce diam', 1, 0, '2024-12-26 13:53:42', '2025-01-02 22:06:57'),
-(22, 'Linus Anderson', 'Cole Vinson', 'colevinson_linusanderson9643@aol.org', '(05) 4612 0845', 'consequat purus. Maecenas libero est,', 0, 0, '2025-12-10 23:18:29', '2024-07-13 00:23:38'),
-(23, 'Denise Reyes', 'Jordan Poole', 'jdenisereyes@hotmail.net', '(07) 6585 6315', 'odio. Nam interdum enim non nisi. Aenean', 0, 0, '2025-07-14 01:06:40', '2024-12-10 01:47:16'),
-(24, 'Felix Yang', 'Fulton Sellers', 'fultonsellersfelixyang@google.edu', '(09) 7682 4570', 'scelerisque neque sed sem egestas blandit. Nam nulla magna,', 0, 0, '2025-03-07 08:30:35', '2024-10-15 11:45:40'),
-(25, 'Kylee Hughes', 'Thane Finley', 'k-thanefinley@icloud.org', '(05) 9434 8767', 'ipsum. Suspendisse sagittis. Nullam vitae diam. Proin dolor. Nulla semper', 0, 1, '2024-11-16 08:53:31', '2026-01-31 06:23:53'),
-(26, 'Hayden Gordon', 'Drake Butler', 'd-haydengordon@yahoo.net', '(03) 0016 7464', 'pede, ultrices a, auctor non, feugiat nec,', 0, 1, '2026-01-21 03:30:55', '2025-08-01 01:04:24'),
-(27, 'Norman Klein', 'Angela Brock', 'n_angelabrock5677@aol.net', '(08) 1387 6826', 'at lacus. Quisque purus sapien, gravida non,', 1, 1, '2025-05-13 23:57:09', '2024-08-08 06:53:22'),
-(28, 'Reagan Wise', 'Idola Mcintosh', 'idolamcintoshreaganwise@outlook.couk', '(03) 4130 2527', 'non, lobortis quis, pede. Suspendisse dui.', 0, 1, '2026-01-07 22:13:24', '2025-12-24 07:38:37'),
-(29, 'Ima Melendez', 'Dorian Torres', 'imamelendez.doriantorres@yahoo.org', '(05) 1226 4343', 'mattis velit justo nec ante. Maecenas mi felis,', 1, 1, '2024-12-26 21:55:37', '2024-11-15 18:21:00'),
-(30, 'Len York', 'Shay Benson', 'shaybenson-lenyork2859@aol.org', '(08) 6188 8798', 'enim consequat purus. Maecenas libero est, congue a, aliquet', 1, 1, '2025-10-12 07:09:29', '2025-09-14 15:12:15'),
-(31, 'Allen Marsh', 'Giselle England', 'giselleenglandallenmarsh@yahoo.net', '(06) 7222 6778', 'ante. Vivamus non lorem vitae odio sagittis', 1, 1, '2025-02-07 22:16:49', '2024-11-25 05:12:34'),
-(32, 'Chancellor Roman', 'Jelani Pruitt', 'c-jelanipruitt9126@google.com', '(08) 6158 3897', 'mollis nec, cursus a, enim. Suspendisse', 0, 1, '2024-07-21 13:25:39', '2025-06-10 19:01:27'),
-(33, 'Zephania Roberson', 'Prescott Landry', 'prescottlandry.zephaniaroberson@protonmail.com', '(04) 1255 8843', 'mauris sagittis placerat. Cras dictum ultricies ligula.', 0, 1, '2024-09-05 18:34:13', '2024-04-15 04:06:00'),
-(34, 'Graham Neal', 'Iliana Rowe', 'ilianarowe.grahamneal9123@protonmail.couk', '(07) 1618 1442', 'aliquet libero. Integer in magna. Phasellus dolor elit, pellentesque a,', 1, 0, '2026-03-09 18:21:32', '2025-09-14 14:03:20'),
-(35, 'Dorian Gallegos', 'Zelenia Hale', 'zeleniahale_doriangallegos@hotmail.edu', '(06) 9127 4694', 'ligula. Aenean gravida nunc sed pede. Cum sociis natoque', 0, 0, '2024-04-19 15:59:38', '2024-06-16 21:22:06'),
-(36, 'Candace Craig', 'Claudia Luna', 'claudialuna-candacecraig@google.ca', '(04) 6992 3267', 'ac, eleifend vitae, erat. Vivamus nisi.', 1, 1, '2024-10-17 06:00:22', '2024-06-25 06:47:58'),
-(37, 'Preston Conway', 'Sandra Tyson', 'sprestonconway@protonmail.ca', '(03) 4836 2552', 'metus urna convallis erat, eget tincidunt dui', 1, 1, '2025-12-30 08:38:16', '2025-12-10 05:42:23'),
-(38, 'Aretha Velazquez', 'Piper Barton', 'arethavelazquez.piperbarton822@yahoo.org', '(04) 1875 5802', 'diam lorem, auctor quis, tristique ac, eleifend vitae, erat. Vivamus', 0, 1, '2024-07-22 08:56:27', '2026-03-06 10:19:57'),
-(39, 'Blake Hoover', 'Vance Nielsen', 'v-blakehoover199@outlook.ca', '(04) 7458 2037', 'nulla. Integer urna. Vivamus molestie dapibus ligula. Aliquam erat', 0, 1, '2025-10-11 21:41:36', '2024-09-22 11:15:01'),
-(40, 'Mohammad Morrison', 'Lars Lowe', 'm.larslowe@protonmail.edu', '(01) 8672 2323', 'montes, nascetur ridiculus mus. Proin vel arcu', 0, 1, '2024-10-18 23:20:13', '2026-02-20 10:15:41'),
-(41, 'Olga Bennett', 'Mohammad Erickson', 'mohammaderickson_olgabennett@hotmail.couk', '(05) 5018 3186', 'Donec luctus aliquet odio. Etiam ligula tortor, dictum eu, placerat', 0, 1, '2025-08-22 00:06:17', '2024-09-05 14:15:55'),
-(42, 'Cara Weiss', 'Madeline Adkins', 'c_madelineadkins6379@outlook.net', '(06) 9777 0682', 'Ut semper pretium neque. Morbi quis', 1, 0, '2025-02-15 18:59:34', '2026-03-04 03:06:38'),
-(43, 'Blake George', 'Wilma Webster', 'wilmawebster_blakegeorge@icloud.org', '(07) 0878 4492', 'ultrices iaculis odio. Nam interdum enim', 0, 0, '2024-05-10 00:39:22', '2026-01-07 00:32:15'),
-(44, 'Neil Sanford', 'Coby Robertson', 'c_neilsanford2816@icloud.couk', '(01) 7757 5663', 'et malesuada fames ac turpis egestas.', 1, 0, '2025-04-28 16:26:49', '2024-10-13 06:19:53'),
-(45, 'Quentin Robinson', 'Mohammad Rollins', 'mohammadrollinsquentinrobinson@protonmail.org', '(07) 3613 1449', 'nec, eleifend non, dapibus rutrum, justo. Praesent luctus. Curabitur egestas', 0, 1, '2025-03-04 21:42:40', '2024-05-15 13:34:14'),
-(46, 'Ruth Robinson', 'Shafira Dudley', 'r.shafiradudley@yahoo.net', '(06) 2637 3659', 'arcu. Sed eu nibh vulputate mauris sagittis', 1, 1, '2025-01-05 20:35:20', '2026-02-20 03:39:05'),
-(47, 'Brielle Santana', 'Fuller Parsons', 'briellesantana-fullerparsons@hotmail.couk', '(03) 7723 3324', 'tortor, dictum eu, placerat eget, venenatis a, magna. Lorem ipsum', 1, 0, '2024-04-08 15:53:00', '2024-10-05 15:35:52'),
-(48, 'Dane Glenn', 'Janna Wise', 'd-jannawise@aol.edu', '(06) 3265 7009', 'imperdiet ullamcorper. Duis at lacus. Quisque purus sapien, gravida', 0, 0, '2024-06-23 19:10:29', '2024-05-13 23:34:01'),
-(49, 'Ulysses Wooten', 'Jeremy Oneil', 'jeremyoneilulysseswooten1118@aol.couk', '(06) 9175 3877', 'Cum sociis natoque penatibus et magnis dis parturient montes,', 1, 0, '2025-03-27 12:20:02', '2025-06-15 12:29:50'),
-(50, 'Veronica Guy', 'Bruno Brooks', 'brunobrooks_veronicaguy@yahoo.com', '(05) 5235 7611', 'in lobortis tellus justo sit amet nulla. Donec non justo.', 0, 1, '2024-09-01 16:56:07', '2025-04-16 14:22:43');
+(1, 'Lila Kramer', 'Zephr Cobb', 'l_zephrcobb3506@hotmail.net', '0206511347', 'imperdiet non, vestibulum nec, euismod in, dolor. Fusce feugiat. Lorem', 0, 0, '2024-09-18 04:31:12', '2024-04-09 01:29:10'),
+(2, 'Astra Rollins', 'Kaitlin Burris', 'a.kaitlinburris1979@protonmail.net', '0624756465', 'malesuada. Integer id magna et ipsum cursus vestibulum. Mauris', 0, 0, '2024-08-31 17:21:36', '2025-12-16 22:05:16'),
+(3, 'Dominic Ramirez', 'Dillon Glenn', 'ddillonglenn@google.edu', '0285118654', 'ullamcorper. Duis at lacus. Quisque', 0, 0, '2025-01-15 06:55:09', '2024-11-02 23:12:24'),
+(4, 'Hyatt Horton', 'Alden Figueroa', 'haldenfigueroa@google.ca', '0576200389', 'ut dolor dapibus gravida. Aliquam tincidunt, nunc ac', 0, 0, '2025-10-21 20:20:27', '2025-07-26 05:26:18'),
+(5, 'Carolyn Heath', 'Rachel Bates', 'r_carolynheath@hotmail.org', '0850778073', 'adipiscing lobortis risus. In mi pede, nonummy ut,', 0, 0, '2026-03-04 10:05:47', '2025-11-26 18:37:41'),
+(6, 'Steel Henson', 'Charity Bowen', 'charitybowensteelhenson@protonmail.edu', '0331213211', 'erat volutpat. Nulla facilisis. Suspendisse commodo tincidunt nibh.', 0, 0, '2024-08-23 14:37:11', '2024-05-11 02:36:32'),
+(7, 'Ivor Guerra', 'Thomas Dotson', 'ivorguerra_thomasdotson4228@icloud.org', '0994882883', 'Pellentesque ut ipsum ac mi eleifend egestas. Sed', 0, 0, '2025-12-27 16:32:13', '2025-08-23 21:40:17'),
+(8, 'Hayley Weaver', 'Rhea Ballard', 'rhayleyweaver@outlook.com', '0737915842', 'dui. Fusce diam nunc, ullamcorper', 0, 0, '2026-02-14 09:44:17', '2025-10-21 10:19:10'),
+(9, 'Dana Kinney', 'Isadora Burt', 'isadoraburt_danakinney@icloud.couk', '0471168632', 'cubilia Curae Phasellus ornare. Fusce mollis.', 0, 0, '2025-04-23 22:38:49', '2025-01-31 19:54:41'),
+(10, 'Karly Goff', 'Mufutau Mcgee', 'karlygoffmufutaumcgee998@protonmail.com', '0723025822', 'Maecenas iaculis aliquet diam. Sed diam lorem,', 0, 0, '2024-07-28 15:34:35', '2026-01-08 19:39:17'),
+(11, 'Bethany Whitaker', 'Walter Osborn', 'walterosborn-bethanywhitaker@protonmail.org', '0290569328', 'Fusce dolor quam, elementum at, egestas a, scelerisque sed,', 0, 0, '2025-02-06 22:33:50', '2024-05-09 13:25:03'),
+(12, 'Adrian Bell', 'Emi Mccullough', 'adrianbell-emimccullough@hotmail.net', '0155707769', 'velit. Cras lorem lorem, luctus ut,', 0, 0, '2025-05-30 11:27:10', '2025-07-22 08:37:47'),
+(13, 'Callum Whitehead', 'Lara Dyer', 'laradyercallumwhitehead3323@protonmail.com', '0516462952', 'magna, malesuada vel, convallis in, cursus et, eros.', 0, 0, '2025-05-09 02:07:38', '2025-10-29 19:30:28'),
+(14, 'Knox Hicks', 'Upton Holland', 'uptonhollandknoxhicks@google.org', '0494256466', 'Suspendisse non leo. Vivamus nibh dolor, nonummy ac,', 0, 0, '2026-01-19 07:06:34', '2024-04-13 06:07:57'),
+(15, 'Elvis Compton', 'Ryan Valencia', 'ryanvalencia.elviscompton7502@protonmail.net', '0126082341', 'et tristique pellentesque, tellus sem mollis dui, in', 0, 0, '2024-07-24 02:12:20', '2024-07-24 20:38:45'),
+(16, 'Tashya Macias', 'Galvin Goodwin', 'galvingoodwin_tashyamacias1519@icloud.couk', '0442122956', 'lectus, a sollicitudin orci sem eget massa. Suspendisse', 0, 0, '2024-09-13 22:44:02', '2024-11-27 20:17:37'),
+(17, 'Risa Robles', 'Keelie Rodgers', 'keelierodgers.risarobles5822@outlook.ca', '0748919234', 'torquent per conubia nostra, per inceptos hymenaeos.', 0, 0, '2024-08-05 18:24:43', '2025-02-19 18:36:47'),
+(18, 'Isaac Fischer', 'Paloma Bates', 'ipalomabates801@icloud.edu', '0741512955', 'Integer urna. Vivamus molestie dapibus ligula. Aliquam erat', 0, 0, '2025-12-23 21:04:29', '2025-03-03 11:30:19'),
+(19, 'Edan Parks', 'Kai Cabrera', 'kaicabrera_edanparks@yahoo.ca', '0909243812', 'vestibulum lorem, sit amet ultricies', 0, 0, '2025-03-21 00:03:26', '2025-04-26 22:33:34'),
+(20, 'Macy Alvarado', 'Selma Nunez', 'macyalvarado.selmanunez@aol.edu', '0448944223', 'metus facilisis lorem tristique aliquet. Phasellus', 0, 0, '2025-01-13 05:45:03', '2025-05-29 20:44:39'),
+(21, 'Adam Michael', 'Merrill Allen', 'a.merrillallen@icloud.net', '0123174423', 'quis, pede. Suspendisse dui. Fusce diam', 0, 0, '2024-12-26 13:53:42', '2025-01-02 22:06:57'),
+(22, 'Linus Anderson', 'Cole Vinson', 'colevinson_linusanderson9643@aol.org', '0546120845', 'consequat purus. Maecenas libero est,', 0, 0, '2025-12-10 23:18:29', '2024-07-13 00:23:38'),
+(23, 'Denise Reyes', 'Jordan Poole', 'jdenisereyes@hotmail.net', '0765856315', 'odio. Nam interdum enim non nisi. Aenean', 0, 0, '2025-07-14 01:06:40', '2024-12-10 01:47:16'),
+(24, 'Felix Yang', 'Fulton Sellers', 'fultonsellersfelixyang@google.edu', '0976824570', 'scelerisque neque sed sem egestas blandit. Nam nulla magna,', 0, 0, '2025-03-07 08:30:35', '2024-10-15 11:45:40'),
+(25, 'Kylee Hughes', 'Thane Finley', 'k-thanefinley@icloud.org', '0594348767', 'ipsum. Suspendisse sagittis. Nullam vitae diam. Proin dolor. Nulla semper', 0, 0, '2024-11-16 08:53:31', '2026-01-31 06:23:53'),
+(26, 'Hayden Gordon', 'Drake Butler', 'd-haydengordon@yahoo.net', '0300167464', 'pede, ultrices a, auctor non, feugiat nec,', 1, 1, '2026-01-21 03:30:55', '2025-08-01 01:04:24'),
+(27, 'Norman Klein', 'Angela Brock', 'n_angelabrock5677@aol.net', '0813876826', 'at lacus. Quisque purus sapien, gravida non,', 1, 1, '2025-05-13 23:57:09', '2024-08-08 06:53:22'),
+(28, 'Reagan Wise', 'Idola Mcintosh', 'idolamcintoshreaganwise@outlook.couk', '0341302527', 'non, lobortis quis, pede. Suspendisse dui.', 1, 1, '2026-01-07 22:13:24', '2025-12-24 07:38:37'),
+(29, 'Ima Melendez', 'Dorian Torres', 'imamelendez.doriantorres@yahoo.org', '0512264343', 'mattis velit justo nec ante. Maecenas mi felis,', 1, 1, '2024-12-26 21:55:37', '2024-11-15 18:21:00'),
+(30, 'Len York', 'Shay Benson', 'shaybenson-lenyork2859@aol.org', '0861888798', 'enim consequat purus. Maecenas libero est, congue a, aliquet', 1, 1, '2025-10-12 07:09:29', '2025-09-14 15:12:15'),
+(31, 'Allen Marsh', 'Giselle England', 'giselleenglandallenmarsh@yahoo.net', '0672226778', 'ante. Vivamus non lorem vitae odio sagittis', 1, 1, '2025-02-07 22:16:49', '2024-11-25 05:12:34'),
+(32, 'Chancellor Roman', 'Jelani Pruitt', 'c-jelanipruitt9126@google.com', '0861583897', 'mollis nec, cursus a, enim. Suspendisse', 1, 1, '2024-07-21 13:25:39', '2025-06-10 19:01:27'),
+(33, 'Zephania Roberson', 'Prescott Landry', 'prescottlandry.zephaniaroberson@protonmail.com', '0412558843', 'mauris sagittis placerat. Cras dictum ultricies ligula.', 1, 1, '2024-09-05 18:34:13', '2024-04-15 04:06:00'),
+(34, 'Graham Neal', 'Iliana Rowe', 'ilianarowe.grahamneal9123@protonmail.couk', '0716181442', 'aliquet libero. Integer in magna. Phasellus dolor elit, pellentesque a,', 1, 1, '2026-03-09 18:21:32', '2025-09-14 14:03:20'),
+(35, 'Dorian Gallegos', 'Zelenia Hale', 'zeleniahale_doriangallegos@hotmail.edu', '0691274694', 'ligula. Aenean gravida nunc sed pede. Cum sociis natoque', 1, 1, '2024-04-19 15:59:38', '2024-06-16 21:22:06'),
+(36, 'Candace Craig', 'Claudia Luna', 'claudialuna-candacecraig@google.ca', '0469923267', 'ac, eleifend vitae, erat. Vivamus nisi.', 1, 1, '2024-10-17 06:00:22', '2024-06-25 06:47:58'),
+(37, 'Preston Conway', 'Sandra Tyson', 'sprestonconway@protonmail.ca', '0348362552', 'metus urna convallis erat, eget tincidunt dui', 1, 1, '2025-12-30 08:38:16', '2025-12-10 05:42:23'),
+(38, 'Aretha Velazquez', 'Piper Barton', 'arethavelazquez.piperbarton822@yahoo.org', '0418755802', 'diam lorem, auctor quis, tristique ac, eleifend vitae, erat. Vivamus', 1, 1, '2024-07-22 08:56:27', '2026-03-06 10:19:57'),
+(39, 'Blake Hoover', 'Vance Nielsen', 'v-blakehoover199@outlook.ca', '0474582037', 'nulla. Integer urna. Vivamus molestie dapibus ligula. Aliquam erat', 1, 1, '2025-10-11 21:41:36', '2024-09-22 11:15:01'),
+(40, 'Mohammad Morrison', 'Lars Lowe', 'm.larslowe@protonmail.edu', '0186722323', 'montes, nascetur ridiculus mus. Proin vel arcu', 1, 1, '2024-10-18 23:20:13', '2026-02-20 10:15:41'),
+(41, 'Olga Bennett', 'Mohammad Erickson', 'mohammaderickson_olgabennett@hotmail.couk', '0550183186', 'Donec luctus aliquet odio. Etiam ligula tortor, dictum eu, placerat', 1, 1, '2025-08-22 00:06:17', '2024-09-05 14:15:55'),
+(42, 'Cara Weiss', 'Madeline Adkins', 'c_madelineadkins6379@outlook.net', '0697770682', 'Ut semper pretium neque. Morbi quis', 1, 1, '2025-02-15 18:59:34', '2026-03-04 03:06:38'),
+(43, 'Blake George', 'Wilma Webster', 'wilmawebster_blakegeorge@icloud.org', '0708784492', 'ultrices iaculis odio. Nam interdum enim', 1, 1, '2024-05-10 00:39:22', '2026-01-07 00:32:15'),
+(44, 'Neil Sanford', 'Coby Robertson', 'c_neilsanford2816@icloud.couk', '0177575663', 'et malesuada fames ac turpis egestas.', 1, 1, '2025-04-28 16:26:49', '2024-10-13 06:19:53'),
+(45, 'Quentin Robinson', 'Mohammad Rollins', 'mohammadrollinsquentinrobinson@protonmail.org', '0736131449', 'nec, eleifend non, dapibus rutrum, justo. Praesent luctus. Curabitur egestas', 1, 1, '2025-03-04 21:42:40', '2024-05-15 13:34:14'),
+(46, 'Ruth Robinson', 'Shafira Dudley', 'r.shafiradudley@yahoo.net', '0626373659', 'arcu. Sed eu nibh vulputate mauris sagittis', 1, 1, '2025-01-05 20:35:20', '2026-02-20 03:39:05'),
+(47, 'Brielle Santana', 'Fuller Parsons', 'briellesantana-fullerparsons@hotmail.couk', '0377233324', 'tortor, dictum eu, placerat eget, venenatis a, magna. Lorem ipsum', 1, 1, '2024-04-08 15:53:00', '2024-10-05 15:35:52'),
+(48, 'Dane Glenn', 'Janna Wise', 'd-jannawise@aol.edu', '0632657009', 'imperdiet ullamcorper. Duis at lacus. Quisque purus sapien, gravida', 1, 1, '2024-06-23 19:10:29', '2024-05-13 23:34:01'),
+(49, 'Ulysses Wooten', 'Jeremy Oneil', 'jeremyoneilulysseswooten1118@aol.couk', '0691753877', 'Cum sociis natoque penatibus et magnis dis parturient montes,', 1, 1, '2025-03-27 12:20:02', '2025-06-15 12:29:50'),
+(50, 'Veronica Guy', 'Bruno Brooks', 'brunobrooks_veronicaguy@yahoo.com', '0552357611', 'in lobortis tellus justo sit amet nulla. Donec non justo.', 1, 1, '2024-09-01 16:56:07', '2025-04-16 14:22:43');
 
 -- --------------------------------------------------------
 
@@ -212,13 +212,13 @@ INSERT INTO `contacts` (`id`, `first_name`, `last_name`, `email`, `phone_number`
 
 CREATE TABLE `content_blocks` (
   `id` int NOT NULL,
-  `parent` varchar(128) COLLATE utf8mb4_general_ci NOT NULL,
-  `slug` varchar(128) COLLATE utf8mb4_general_ci NOT NULL,
-  `label` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `description` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `type` varchar(32) COLLATE utf8mb4_general_ci NOT NULL,
-  `value` text COLLATE utf8mb4_general_ci,
-  `previous_value` text COLLATE utf8mb4_general_ci,
+  `parent` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `slug` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `label` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `type` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
+  `previous_value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
   `modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -261,7 +261,7 @@ INSERT INTO `content_blocks` (`id`, `parent`, `slug`, `label`, `description`, `t
 
 CREATE TABLE `content_blocks_phinxlog` (
   `version` bigint NOT NULL,
-  `migration_name` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `migration_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `start_time` timestamp NULL DEFAULT NULL,
   `end_time` timestamp NULL DEFAULT NULL,
   `breakpoint` tinyint(1) NOT NULL DEFAULT '0'
@@ -282,16 +282,16 @@ INSERT INTO `content_blocks_phinxlog` (`version`, `migration_name`, `start_time`
 
 CREATE TABLE `customers` (
   `id` int NOT NULL,
-  `first_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `last_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `nonce` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `first_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `last_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `nonce` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `nonce_expiry` datetime DEFAULT NULL,
   `created` datetime DEFAULT CURRENT_TIMESTAMP,
   `modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `type` varchar(50) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'customer',
-  `profile_picture` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL
+  `type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'customer',
+  `profile_picture` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -311,7 +311,7 @@ INSERT INTO `customers` (`id`, `first_name`, `last_name`, `email`, `password`, `
 
 CREATE TABLE `services` (
   `id` int NOT NULL,
-  `service_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `service_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `service_cost` decimal(10,2) NOT NULL,
   `duration_minutes` int NOT NULL DEFAULT '60'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -333,16 +333,16 @@ INSERT INTO `services` (`id`, `service_name`, `service_cost`, `duration_minutes`
 
 CREATE TABLE `stylists` (
   `id` int NOT NULL,
-  `first_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `last_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `first_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `last_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `nonce` datetime DEFAULT NULL,
   `nonce_expiry` datetime DEFAULT NULL,
   `created` datetime DEFAULT CURRENT_TIMESTAMP,
   `modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `type` varchar(50) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'stylist',
-  `profile_picture` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL
+  `type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'stylist',
+  `profile_picture` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --

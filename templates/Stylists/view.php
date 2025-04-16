@@ -30,7 +30,7 @@
                 </div>
                 <!-- Delete Stylist -->
                 <div class="col-lg-3 col-md-6 col-sm-12 mb-3 side-nav-item">
-                    <?= $this->Html->link(
+                    <?= $this->Form->postLink(
                         '<div class="card h-100">
                             <div class="card-header delete-card-header d-flex justify-content-between align-items-center flex-wrap">
                                   <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">Delete Stylist</h4>
