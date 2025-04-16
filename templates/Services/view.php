@@ -70,7 +70,7 @@
                     <?= $this->Html->link(
                         '<div class="card h-100">
                             <div class="card-header new-card-header d-flex justify-content-between align-items-center flex-wrap">
-                                 <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">Create New Service</h4>
+                                 <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">New Service</h4>
                                  <i class="material-icons view-icon ms-2">add</i>
                             </div>
                             <div class="card-body new-card-body"></div>

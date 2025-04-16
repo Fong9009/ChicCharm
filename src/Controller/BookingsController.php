@@ -26,7 +26,7 @@ class BookingsController extends AppController
         $this->Stylists = $this->getTableLocator()->get('Stylists');
         $this->BookingsStylists = $this->getTableLocator()->get('BookingsStylists');
         $this->loadComponent('Authentication.Authentication');
-        
+
         // Add this line to allow dashboard action
         $this->Authentication->addUnauthenticatedActions(['customerbooking', 'customerindex', 'customerview', 'dashboard']);
     }
@@ -277,7 +277,7 @@ class BookingsController extends AppController
             'contain' => ['BookingsStylists']
         ]);
 
-        // Delete the associated BookingsStylists records 
+        // Delete the associated BookingsStylists records
         if (!empty($booking->bookings_stylists)) {
             $bookingsStylistsTable = $this->fetchTable('BookingsStylists');
             foreach ($booking->bookings_stylists as $bookingStylist) {
@@ -300,18 +300,18 @@ class BookingsController extends AppController
         $booking = $this->Bookings->newEmptyEntity();
         if ($this->request->is('post')) {
             $data = $this->request->getData();
-            
+
             // Check if end time exceeds 5 PM
             if (isset($data['end_time'])) {
                 $endTime = new \DateTime($data['end_time']);
-                $closingTime = new \DateTime('17:00'); 
-                
+                $closingTime = new \DateTime('17:00');
+
                 if ($endTime > $closingTime) {
                     $this->Flash->error(__('Booking cannot extend past 5 PM as the shop will be closed.'));
                     return $this->redirect(['action' => 'customerbooking']);
                 }
             }
-            
+
             // Automatically set customer details
             $user = $this->Authentication->getIdentity();
             $data['customer_id'] = $user->id;
@@ -350,7 +350,7 @@ class BookingsController extends AppController
 
                         // Debug logging
                         \Cake\Log\Log::debug('Attempting to save booking service with data: ' . json_encode($bookingService->toArray()));
-                        
+
                         if (!$bookingsServicesTable->save($bookingService)) {
                             \Cake\Log\Log::error('Failed to save booking service. Errors: ' . json_encode($bookingService->getErrors()));
                             $this->Flash->error(__('The booking was saved, but some service details could not be saved.'));
@@ -412,6 +412,17 @@ class BookingsController extends AppController
 
             $data['booking_name'] = 'Booking for ' . $customer->first_name . ' ' . $customer->last_name;
 
+            // Check if end time exceeds 5 PM
+            if (isset($data['end_time'])) {
+                $endTime = new \DateTime($data['end_time']);
+                $closingTime = new \DateTime('17:00');
+
+                if ($endTime > $closingTime) {
+                    $this->Flash->error(__('Booking cannot extend past 5 PM as the shop will be closed.'));
+                    return $this->redirect(['action' => 'adminbooking']);
+                }
+            }
+
             // Format the date to Y-m-d format
             if (isset($data['booking_date'])) {
                 $date = new \DateTime($data['booking_date']);
@@ -445,7 +456,7 @@ class BookingsController extends AppController
 
                         // Debug logging
                         \Cake\Log\Log::debug('Attempting to save booking service with data: ' . json_encode($bookingService->toArray()));
-                        
+
                         if (!$bookingsServicesTable->save($bookingService)) {
                             \Cake\Log\Log::error('Failed to save booking service. Errors: ' . json_encode($bookingService->getErrors()));
                             $this->Flash->error(__('The booking was saved, but some service details could not be saved.'));
@@ -494,13 +505,7 @@ class BookingsController extends AppController
         $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
         $customersTable = $this->fetchTable('Customers');
         $customers = $customersTable->find('list', limit: 200)->all()->toArray();
-        $services = $this->fetchTable('Services')->find(
-            'list',
-            keyField: 'id',
-            valueField: function ($service) {
-                return $service->service_name . ' ($' . $service->service_cost . ')';
-            }
-        )->all();
+        $services = $this->fetchTable('Services')->find('all')->all();
         $this->set(compact('booking', 'stylists', 'services','customers'));
     }
 
@@ -608,7 +613,7 @@ class BookingsController extends AppController
         // Check if end time exceeds 5 PM
         $endTimeObj = new \DateTime($endTime);
         $closingTime = new \DateTime('17:00'); // 5 PM
-        
+
         if ($endTimeObj > $closingTime) {
             return $this->response->withStringBody(json_encode([
                 'message' => 'Note: The shop closes at 5 PM. Please select an earlier time slot.',
@@ -716,7 +721,7 @@ class BookingsController extends AppController
             ])
             ->order(['booking_date' => 'ASC'])
             ->limit(5);  // Only show the next 5 upcoming bookings
-            
+
         $bookings = $query->all();
         $this->set(compact('bookings'));
     }
@@ -767,7 +772,7 @@ class BookingsController extends AppController
             for ($hour = $startHour; $hour < $endHour; $hour++) {
                 for ($minute = 0; $minute < 60; $minute += $interval) {
                     $slotStart = sprintf('%02d:%02d', $hour, $minute);
-                    
+
                     // Calculate slot end time
                     $endTime = strtotime("+{$totalDuration} minutes", strtotime($slotStart));
                     $slotEnd = date('H:i', $endTime);
