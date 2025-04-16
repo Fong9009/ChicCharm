@@ -59,9 +59,11 @@ class CustomersController extends AppController
      */
     public function dashboard()
     {
-        $customer = $this->Customers->get($this->Authentication->getIdentity()->id, [
-            'contain' => ['Bookings']
-        ]);
+        $customer = $this->Customers->get(
+            $this->Authentication->getIdentity()->id,
+            contain: ['Bookings']
+        );
+
 
         // Get upcoming bookings with the same structure as customerindex
         $bookingsTable = $this->fetchTable('Bookings');
