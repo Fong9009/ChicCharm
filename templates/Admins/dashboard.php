@@ -212,7 +212,7 @@ $identity = $this->request->getAttribute('identity');
                     </div>
                     <div class="card-footer service-card-footer">
                         <?= $this->Html->link(
-                            '<span class="fs-5">View Stylist Lists</span><i class="material-icons">visibility</i>',
+                            '<span class="fs-5">View Service Lists</span><i class="material-icons">visibility</i>',
                             ['controller' => 'Services', 'action' => 'index'],
                             ['class' => 'service-button', 'escape' => false]
                         ) ?>

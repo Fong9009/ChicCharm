@@ -151,18 +151,18 @@ class CustomersController extends AppController
         $customer = $this->Customers->newEmptyEntity();
         if ($this->request->is('post')) {
             $data = $this->request->getData();
-            
+
             // Check if email exists in customers table
             $existingCustomer = $this->Customers->find()
                 ->where(['email' => $data['email']])
                 ->first();
-                
+
             // Check if email exists in admins table
             $adminsTable = $this->fetchTable('Admins');
             $existingAdmin = $adminsTable->find()
                 ->where(['email' => $data['email']])
                 ->first();
-            
+
             // Check if email exists in stylists table
             $stylistsTable = $this->fetchTable('Stylists');
             $existingStylist = $stylistsTable->find()
@@ -171,7 +171,7 @@ class CustomersController extends AppController
 
             if ($existingCustomer || $existingAdmin || $existingStylist) {
                 $this->Flash->error(__('This email is already registered. Please use a different email address.'));
-                return;
+                return $this->redirect(['controller' => 'Customers', 'action' =>  'registration']);
             }
 
             $customer = $this->Customers->patchEntity($customer, $data);
@@ -263,13 +263,13 @@ class CustomersController extends AppController
             } else {
                 $data['profile_picture'] = null;
             }
-            
+
             // Keep existing nonce and nonce_expiry values
             if ($customer->nonce && $customer->nonce_expiry) {
                 $data['nonce'] = $customer->nonce;
                 $data['nonce_expiry'] = $customer->nonce_expiry;
             }
-            
+
             // Patch the entity with the data
             $customer = $this->Customers->patchEntity($customer, $data);
 
