@@ -64,7 +64,7 @@ class CustomersTable extends Table
             ->requirePresence('first_name', 'create')
             ->notEmptyString('first_name')
             ->add('first_name', 'alphanumeric', [
-                'rule' => ['custom', '/^[a-zA-Z ]+$/'],
+                'rule' => ['custom', "/^[a-zA-Z' ]+$/"],
                 'message' => 'First name must be alphanumeric.',
             ]);
 
@@ -74,7 +74,7 @@ class CustomersTable extends Table
             ->requirePresence('last_name', 'create')
             ->notEmptyString('last_name')
             ->add('last_name', 'alphanumeric', [
-                'rule' => ['custom', '/^[a-zA-Z ]+$/'],
+                'rule' => ['custom', "/^[a-zA-Z' ]+$/"],
                 'message' => 'Last name must be alphanumeric.',
             ]);
 
