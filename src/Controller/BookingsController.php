@@ -519,8 +519,9 @@ class BookingsController extends AppController
      */
     public function customerview($id = null)
     {
-        $booking = $this->Bookings->get($id, [
-            'contain' => [
+        $booking = $this->Bookings->get(
+            $id,
+            contain: [
                 'Customers',
                 'BookingsStylists' => [
                     'Stylists' => [
@@ -533,7 +534,8 @@ class BookingsController extends AppController
                     ]
                 ]
             ]
-        ]);
+        );
+
 
         $this->set(compact('booking'));
     }
