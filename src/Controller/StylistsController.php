@@ -54,7 +54,32 @@ class StylistsController extends AppController
     {
         $stylist = $this->Stylists->newEmptyEntity();
         if ($this->request->is('post')) {
-            $stylist = $this->Stylists->patchEntity($stylist, $this->request->getData());
+            $data = $this->request->getData();
+            
+            // Check if email exists in stylists table
+            $existingStylist = $this->Stylists->find()
+                ->where(['email' => $data['email']])
+                ->first();
+                
+            // Check if email exists in customers table
+            $customersTable = $this->fetchTable('Customers');
+            $existingCustomer = $customersTable->find()
+                ->where(['email' => $data['email']])
+                ->first();
+                
+            // Check if email exists in admins table
+            $adminsTable = $this->fetchTable('Admins');
+            $existingAdmin = $adminsTable->find()
+                ->where(['email' => $data['email']])
+                ->first();
+
+            if ($existingStylist || $existingCustomer || $existingAdmin) {
+                $this->Flash->error(__('This email is already registered. Please use a different email address.'));
+                return;
+            }
+            
+            $data['type'] = 'stylist';
+            $stylist = $this->Stylists->patchEntity($stylist, $data);
             if ($this->Stylists->save($stylist)) {
                 $this->Flash->success(__('The stylist has been saved.'));
                 return $this->redirect(['action' => 'index']);

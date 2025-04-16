@@ -150,7 +150,31 @@ class CustomersController extends AppController
 
         $customer = $this->Customers->newEmptyEntity();
         if ($this->request->is('post')) {
-            $customer = $this->Customers->patchEntity($customer, $this->request->getData());
+            $data = $this->request->getData();
+            
+            // Check if email exists in customers table
+            $existingCustomer = $this->Customers->find()
+                ->where(['email' => $data['email']])
+                ->first();
+                
+            // Check if email exists in admins table
+            $adminsTable = $this->fetchTable('Admins');
+            $existingAdmin = $adminsTable->find()
+                ->where(['email' => $data['email']])
+                ->first();
+            
+            // Check if email exists in stylists table
+            $stylistsTable = $this->fetchTable('Stylists');
+            $existingStylist = $stylistsTable->find()
+                ->where(['email' => $data['email']])
+                ->first();
+
+            if ($existingCustomer || $existingAdmin || $existingStylist) {
+                $this->Flash->error(__('This email is already registered. Please use a different email address.'));
+                return;
+            }
+
+            $customer = $this->Customers->patchEntity($customer, $data);
             $customer->type = 'customer';
 
             if ($this->Customers->save($customer)) {

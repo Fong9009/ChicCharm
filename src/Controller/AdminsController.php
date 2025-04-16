@@ -90,6 +90,29 @@ class AdminsController extends AppController
         $admin = $this->Admins->newEmptyEntity();
         if ($this->request->is('post')) {
             $data = $this->request->getData();
+            
+            // Check if email exists in admins table
+            $existingAdmin = $this->Admins->find()
+                ->where(['email' => $data['email']])
+                ->first();
+                
+            // Check if email exists in customers table
+            $customersTable = $this->fetchTable('Customers');
+            $existingCustomer = $customersTable->find()
+                ->where(['email' => $data['email']])
+                ->first();
+                
+            // Check if email exists in stylists table
+            $stylistsTable = $this->fetchTable('Stylists');
+            $existingStylist = $stylistsTable->find()
+                ->where(['email' => $data['email']])
+                ->first();
+
+            if ($existingAdmin || $existingCustomer || $existingStylist) {
+                $this->Flash->error(__('This email is already registered. Please use a different email address.'));
+                return;
+            }
+            
             $data['type'] = 'admin';
             $admin = $this->Admins->patchEntity($admin, $data);
             if ($this->Admins->save($admin)) {

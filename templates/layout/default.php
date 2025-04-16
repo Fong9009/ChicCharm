@@ -64,26 +64,26 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
                     <?php $identity = $this->request->getAttribute('identity');
                     if ($identity) : ?>
                         <?php if ($identity->get('type') === 'admin') : ?>
-                            <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'dashboard']) ?>">
+                            <li><a class="dropdown-item" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Admins', 'action' => 'dashboard']) ?>">
                                 <i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
-                            <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Admins', 'action' => 'profile', $identity->get('id')]) ?>">
+                            <li><a class="dropdown-item" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Admins', 'action' => 'profile', $identity->get('id')]) ?>">
                                 <i class="fas fa-user-shield"></i><span>My Profile</span></a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Auth', 'action' => 'logout']) ?>" onclick="return confirmLogout()">
+                            <li><a class="dropdown-item" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Auth', 'action' => 'logout']) ?>" onclick="return confirmLogout()">
                                 <i class="fas fa-sign-out-alt"></i><span>Logout</span></a></li>
                         <?php elseif ($identity->get('type') === 'customer') : ?>
-                            <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Customers', 'action' => 'dashboard']) ?>">
+                            <li><a class="dropdown-item" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Customers', 'action' => 'dashboard']) ?>">
                                 <i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
-                            <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Customers', 'action' => 'edit', $identity->get('id')]) ?>">
+                            <li><a class="dropdown-item" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Customers', 'action' => 'edit', $identity->get('id')]) ?>">
                                 <i class="fas fa-user"></i><span>My Profile</span></a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Auth', 'action' => 'logout']) ?>" onclick="return confirmLogout()">
+                            <li><a class="dropdown-item" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Auth', 'action' => 'logout']) ?>" onclick="return confirmLogout()">
                                 <i class="fas fa-sign-out-alt"></i><span>Logout</span></a></li>
                         <?php endif; ?>
                     <?php else : ?>
-                        <li><a class="dropdown-item" href="<?= $this->Url->build('/auth/login') ?>">
+                        <li><a class="dropdown-item" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Auth', 'action' => 'login']) ?>">
                             <i class="fas fa-sign-in-alt"></i><span>Login</span></a></li>
-                        <li><a class="dropdown-item" href="<?= $this->Url->build('/customers/registration') ?>">
+                        <li><a class="dropdown-item" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Customers', 'action' => 'registration']) ?>">
                             <i class="fas fa-user-plus"></i><span>Sign Up</span></a></li>
                     <?php endif; ?>
                 </ul>
