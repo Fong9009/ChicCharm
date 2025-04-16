@@ -70,7 +70,7 @@ class ServicesTable extends Table
             ->requirePresence('service_name', 'create')
             ->notEmptyString('service_name')
             ->add('service_name', 'alphanumeric', [
-                'rule' => ['custom', '/^[a-zA-Z ]+$/'],
+                'rule' => ['custom', "/^[a-zA-Z' ]+$/"],
                 'message' => 'Service name must be alphanumeric.',
             ]);
 
@@ -92,7 +92,7 @@ class ServicesTable extends Table
                 },
                 'message' => 'Duration must be in 15-minute increments'
             ]);
-            
+
         return $validator;
     }
 }
