@@ -69,7 +69,7 @@ $this->assign('title', 'Edit Profile');
                 <div class="text-center mt-4">
                     <?= $this->Form->button(__('Update Profile'), ['class' => 'btn btn-primary']) ?>
                     <?= $this->Html->link(__('Cancel'), 
-                        ['action' => 'dashboard'], 
+                        $userType === 'admin' ? ['action' => 'index'] : ['action' => 'dashboard'], 
                         ['class' => 'btn btn-secondary ms-2', 
                         'style' => 'background-color: #6c757d; border-color: #6c757d; color: white; transition: all 0.3s;',
                         'onmouseover' => 'this.style.backgroundColor = "#5a6268"; this.style.borderColor = "#545b62";',

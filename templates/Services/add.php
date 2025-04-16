@@ -73,6 +73,20 @@
                         'error' => ['Please enter Service Cost'],
                     ]); ?>
                 </div>
+                <div class="form-group mb-3">
+                    <?= $this->Form->control('duration_minutes', [
+                        'label' => __('Duration (minutes)'),
+                        'type' => 'number',
+                        'class' => 'form-control',
+                        'required' => true,
+                        'placeholder' => __('Enter duration in minutes'),
+                        'error' => ['Please enter duration in minutes'],
+                        'min' => 15,
+                        'max' => 480,
+                        'step' => 15
+                    ]); ?>
+                    <small class="form-text text-muted">Duration must be in 15-minute increments, between 15 minutes and 8 hours.</small>
+                </div>
             </fieldset>
             <?= $this->Form->button(__('Submit'), ['class' => 'btn btn-primary']) ?>
             <?= $this->Form->end() ?>

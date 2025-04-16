@@ -42,8 +42,6 @@ $this->Html->script('custom', ['block' => true]);
                             <?= $this->Form->create(null, ['type' => 'get', 'class' => 'filter-form']) ?>
                             <?= $this->Form->select('filter', [
                                 '' => 'All Users',
-                                'active' => 'Active',
-                                'inactive' => 'Inactive'
                             ], [
                                 'class' => 'form-control',
                                 'value' => $this->request->getQuery('filter')
@@ -59,7 +57,7 @@ $this->Html->script('custom', ['block' => true]);
                                 <th><?= $this->Paginator->sort('email') ?></th>
                                 <th><?= $this->Paginator->sort('phone_number') ?></th>
                                 <th><?= $this->Paginator->sort('message') ?></th>
-                                <th><?= $this->Paginator->sort('created') ?></th>
+                                <th><?= $this->Paginator->sort('created', 'Sent At') ?></th>
                                 <th><?= $this->Paginator->sort('modified') ?></th>
                                 <th><?= $this->Paginator->sort('replied') ?></th>
                                 <th class="actions"><?= __('Actions') ?></th>

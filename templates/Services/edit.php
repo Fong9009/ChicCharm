@@ -31,7 +31,7 @@
                 </div>
                 <!-- Delete Service -->
                 <div class="col-lg-3 col-md-6 col-sm-12 mb-3 side-nav-item">
-                    <?= $this->Html->link(
+                    <?= $this->Form->postLink(
                         '<div class="card h-100">
                             <div class="card-header delete-card-header d-flex justify-content-between align-items-center flex-wrap">
                                  <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">Delete Service</h4>
@@ -108,6 +108,20 @@
                         'placeholder' => __('Service Cost'),
                         'error' => ['class' => 'invalid-feedback'],
                     ]); ?>
+                </div>
+                <div class="form-group mb-3">
+                    <?= $this->Form->control('duration_minutes', [
+                        'label' => __('Duration (minutes)'),
+                        'class' => 'form-control',
+                        'required' => true,
+                        'placeholder' => __('Enter duration in minutes'),
+                        'error' => ['class' => 'invalid-feedback'],
+                        'min' => 15,
+                        'max' => 480,
+                        'step' => 15,
+                        'type' => 'number'
+                    ]); ?>
+                    <small class="form-text text-muted">Duration must be in 15-minute increments, between 15 minutes and 8 hours.</small>
                 </div>
             </fieldset>
             <?= $this->Form->button(__('Submit'), ['class' => 'btn btn-primary']) ?>

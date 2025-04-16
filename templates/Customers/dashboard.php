@@ -8,6 +8,7 @@ $this->layout = 'default';
 <?= $this->Html->css('/landing-detail/css/styles.css') ?>
 <?= $this->Html->css(['fonts', 'cake', 'custom']) ?>
 <?= $this->Html->script('custom') ?>
+
 <div class="customer-dashboard" style="background-image: url(<?= $this->Url->image('customerbackground.jpg')?>);">
     <div class="container" style="margin-top: -5px">
         <div class="card">
@@ -15,6 +16,7 @@ $this->layout = 'default';
                 <div class="row mb-4">
                     <div class="col-12">
                         <h2>Welcome, <?= h($customer->first_name) ?> <?= h($customer->last_name) ?>!</h2>
+                        <?= $this->Flash->render() ?>
                     </div>
                 </div>
 
@@ -76,12 +78,13 @@ $this->layout = 'default';
                             <div class="card-body">
                                 <?php if (!empty($customer->bookings)): ?>
                                     <div class="table-responsive">
-                                        <table>
+                                        <table class="dashboard-table">
                                             <thead>
                                                 <tr>
                                                     <th><?= __('Booking Date') ?></th>
-                                                    <th><?= __('Services & Stylists') ?></th>
+                                                    <th><?= __('Stylists & Services') ?></th>
                                                     <th><?= __('Total Cost') ?></th>
+                                                    <th><?= __('Notes') ?></th>
                                                     <th class="actions"><?= __('Actions') ?></th>
                                                 </tr>
                                             </thead>
@@ -135,6 +138,7 @@ $this->layout = 'default';
                                                         <?php endif; ?>
                                                     </td>
                                                     <td><?= $this->Number->currency($booking->total_cost) ?></td>
+                                                    <td><?= !empty($booking->notes) ? h($booking->notes) : 'No notes' ?></td>
                                                     <td class="actions">
                                                         <?= $this->Html->link(
                                                             'View',

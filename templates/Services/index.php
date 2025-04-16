@@ -60,6 +60,7 @@
             <tr>
                 <th><?= $this->Paginator->sort('service_name') ?></th>
                 <th><?= $this->Paginator->sort('service_cost') ?></th>
+                <th><?= $this->Paginator->sort('duration_minutes', 'Duration') ?></th>
                 <th class="actions"><?= __('Actions') ?></th>
             </tr>
             </thead>
@@ -68,6 +69,7 @@
                 <tr>
                     <td><?= h($service->service_name) ?></td>
                     <td><?= $this->Number->currency($service->service_cost) ?></td>
+                    <td><?= h($service->duration_minutes) ?> mins</td>
                     <td class="actions">
                         <?= $this->Html->link(__('View'), ['action' => 'view', $service->id], ['class' => 'button']) ?>
                         <?= $this->Html->link(__('Edit'), ['action' => 'edit', $service->id], ['class' => 'button']) ?>

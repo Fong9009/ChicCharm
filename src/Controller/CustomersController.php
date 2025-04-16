@@ -86,7 +86,7 @@ class CustomersController extends AppController
                 'booking_date' => 'ASC',
                 'start_time' => 'ASC'
             ])
-            ->limit(5);  // Only show the next 5 upcoming bookings
+            ->limit(5);
 
         $this->set(compact('customer', 'bookings'));
     }
@@ -239,14 +239,25 @@ class CustomersController extends AppController
             } else {
                 $data['profile_picture'] = null;
             }
-            $data['nonce'] = null;
+            
+            // Keep existing nonce and nonce_expiry values
+            if ($customer->nonce && $customer->nonce_expiry) {
+                $data['nonce'] = $customer->nonce;
+                $data['nonce_expiry'] = $customer->nonce_expiry;
+            }
+            
             // Patch the entity with the data
             $customer = $this->Customers->patchEntity($customer, $data);
 
             if ($error !== 1) {
                 if ($this->Customers->save($customer)) {
                     $this->Flash->success(__('Your profile has been updated.'));
-                    return $this->redirect(['action' => 'dashboard']);
+                    // Redirect based on user type
+                    if ($user->type === 'admin') {
+                        return $this->redirect(['action' => 'index']);
+                    } else {
+                        return $this->redirect(['action' => 'dashboard']);
+                    }
                 }
             }
 
@@ -262,6 +273,8 @@ class CustomersController extends AppController
             }
         }
         $this->set(compact('customer'));
+        // Pass user type to view
+        $this->set('userType', $user->type);
     }
 
     /**

@@ -57,8 +57,9 @@
             <thead>
             <tr>
                 <th><?= $this->Paginator->sort('booking_date') ?></th>
-                <th><?= __('Services & Stylists') ?></th>
+                <th><?= __('Stylists & Services') ?></th>
                 <th><?= $this->Paginator->sort('total_cost') ?></th>
+                <th><?= __('Notes') ?></th>
                 <th class="actions"><?= __('Actions') ?></th>
             </tr>
             </thead>
@@ -112,6 +113,7 @@
                         <?php endif; ?>
                     </td>
                     <td><?= $this->Number->currency($booking->total_cost) ?></td>
+                    <td><?= !empty($booking->notes) ? h($booking->notes) : 'No notes' ?></td>
                     <td class="actions">
                         <?= $this->Html->link(__('View'), ['action' => 'customerview', $booking->id], ['class' => 'button']) ?>
                         <?php if ($booking->status === 'active'): ?>
