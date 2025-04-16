@@ -31,23 +31,30 @@
                     ) ?>
                 </div>
                 <!-- Delete Service -->
-                <div class="col-lg-3 col-md-6 col-sm-12 mb-3 side-nav-item">
-                    <?= $this->Html->link(
-                        '<div class="card h-100">
-                            <div class="card-header delete-card-header d-flex justify-content-between align-items-center flex-wrap">
-                                 <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">Delete Booking</h4>
-                                 <i class="material-icons view-icon ms-2">delete</i>
-                            </div>
-                            <div class="card-body delete-card-body"></div>
-                            <div class="card-footer delete-card-footer">
-                                <span class="mb-0 text-truncate">Delete Booking</span>
-                            </div>
-                        </div>',
-                        ['controller' => 'Bookings', 'action' => 'delete', $booking->id],
-                        ['escape' => false,'class' => 'card-link-wrapper d-block text-decoration-none',
-                            'confirm' => __('Are you sure you want to delete # {0}?', $booking->id)],
-                    ) ?>
-                </div>
+                <?php if ($booking->status === 'active'): ?>
+                <?php else: ?>
+                    <div class="col-lg-3 col-md-6 col-sm-12 mb-3 side-nav-item">
+                        <?= $this->Form->postLink(
+                            '<div class="card h-100">
+                                    <div class="card-header delete-card-header d-flex justify-content-between align-items-center flex-wrap">
+                                         <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">Delete Booking</h4>
+                                         <i class="material-icons view-icon ms-2">delete</i>
+                                    </div>
+                                <div class="card-body delete-card-body"></div>
+                                <div class="card-footer delete-card-footer">
+                                    <span class="mb-0 text-truncate">Delete Booking</span>
+                                </div>
+                            </div>',
+                            ['controller' => 'Bookings', 'action' => 'delete', $booking->id],
+                            [
+                                'method' => 'delete',
+                                'confirm' => __('Are you sure you want to permanently delete this cancelled booking?'),
+                                'class' => 'card-link-wrapper d-block text-decoration-none',
+                                'escape' => false, // <-- This is the key!
+                            ]
+                        ) ?>
+                    </div>
+                <?php endif; ?>
 
                 <!-- List Service -->
                 <div class="col-lg-3 col-md-6 col-sm-12 mb-3 side-nav-item">

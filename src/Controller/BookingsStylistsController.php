@@ -27,6 +27,8 @@ class BookingsStylistsController extends AppController
      *
      * @return \Cake\Http\Response|null|void Renders view
      */
+    /*
+     * Depercated for further use
     public function index()
     {
         $query = $this->BookingsStylists->find()
@@ -35,6 +37,7 @@ class BookingsStylistsController extends AppController
 
         $this->set(compact('bookingsStylists'));
     }
+    */
 
     /**
      * View method
@@ -49,27 +52,31 @@ class BookingsStylistsController extends AppController
         $this->set(compact('bookingsStylist'));
     }
 
+
     /**
      * Add method
      *
      * @return \Cake\Http\Response|null|void Redirects on successful add, renders view otherwise.
      */
-    public function add()
-    {
-        $bookingsStylist = $this->BookingsStylists->newEmptyEntity();
-        if ($this->request->is('post')) {
-            $bookingsStylist = $this->BookingsStylists->patchEntity($bookingsStylist, $this->request->getData());
-            if ($this->BookingsStylists->save($bookingsStylist)) {
-                $this->Flash->success(__('The bookings stylist has been saved.'));
+    /*
+    Replaced with booking
+  public function add()
+  {
+      $bookingsStylist = $this->BookingsStylists->newEmptyEntity();
+      if ($this->request->is('post')) {
+          $bookingsStylist = $this->BookingsStylists->patchEntity($bookingsStylist, $this->request->getData());
+          if ($this->BookingsStylists->save($bookingsStylist)) {
+              $this->Flash->success(__('The bookings stylist has been saved.'));
 
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The bookings stylist could not be saved. Please, try again.'));
-        }
-        $bookings = $this->BookingsStylists->Bookings->find('list', limit: 200)->all();
-        $stylists = $this->BookingsStylists->Stylists->find('list', limit: 200)->all();
-        $this->set(compact('bookingsStylist', 'bookings', 'stylists'));
-    }
+              return $this->redirect(['action' => 'index']);
+          }
+          $this->Flash->error(__('The bookings stylist could not be saved. Please, try again.'));
+      }
+      $bookings = $this->BookingsStylists->Bookings->find('list', limit: 200)->all();
+      $stylists = $this->BookingsStylists->Stylists->find('list', limit: 200)->all();
+      $this->set(compact('bookingsStylist', 'bookings', 'stylists'));
+  }
+  */
 
     public function customerstylistadd($booking_id = null)
     {
