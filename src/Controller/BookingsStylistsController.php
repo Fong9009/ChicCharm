@@ -84,6 +84,7 @@ class BookingsStylistsController extends AppController
         //Check if the booking ID is provided
         if (!$booking_id) {
             $this->Flash->error(__('Invalid booking missing booking ID'));
+
             return $this->redirect(['controller' => 'Bookings', 'action' => 'customerindex']);
         }
 
