@@ -69,9 +69,9 @@ class ServicesTable extends Table
             ->maxLength('service_name', 255)
             ->requirePresence('service_name', 'create')
             ->notEmptyString('service_name')
-            ->add('service_name', 'alphanumeric', [
+            ->add('service_name', 'alphabetic', [
                 'rule' => ['custom', "/^[a-zA-Z' ]+$/"],
-                'message' => 'Service name must be alphanumeric.',
+                'message' => 'Service name must be alphabetic.',
             ]);
 
         $validator
