@@ -12,6 +12,7 @@ $this->Html->script('booking', ['block' => 'script']);
 ?>
 <script>
     const apiUrl = '<?= $this->Url->build("/bookings/get-stylists") ?>';
+    const apiUrl2 = '<?= $this->Url->build("/bookings/get-available-time-slots") ?>';
 </script>
 <div class="booking-form-wrapper">
     <div class="row">
@@ -26,7 +27,6 @@ $this->Html->script('booking', ['block' => 'script']);
                     <h2 class="text-center"><?= __('Add Booking') ?></h2><br>
                     <div class="row">
                         <div class="col-md-6">
-
                             <h5>Please Select A Customer</h5>
                             <div class="service-options">
                                 <?= $this->Form->control('customer_id', [
@@ -35,27 +35,30 @@ $this->Html->script('booking', ['block' => 'script']);
                                     'empty' => 'Please select a customer...',
                                     'class' => 'form-control',
                                     'required' => true,
-                                    'error' => ['class' => 'invalid-feedback']
+                                    'error' => ['class' => 'invalid-feedback'],
                                 ]) ?>
                             </div>
                             <h5>Please Select The Services you would like to book</h5>
-                            <div class="service-options">
-                                <?php foreach ($services as $id => $service): ?>
+                            <div class="service-list">
+                                <?php foreach ($services as $service): ?>
                                     <div class="form-check">
-                                        <?= $this->Form->checkbox('service_ids[]', [
-                                            'value' => $id,
-                                            'id' => 'service-' . $id,
-                                            'hiddenField' => false,
-                                            'class' => 'form-check-input service-checkbox'
-                                        ]) ?>
-                                        <label class="form-check-label" for="service-<?= $id ?>">
-                                            <?= h($service) ?> Per Hour
+                                        <input class="form-check-input service-checkbox" type="checkbox"
+                                               name="bookings_services[<?= $service->id ?>][service_id]"
+                                               value="<?= $service->id ?>"
+                                               id="service-<?= $service->id ?>"
+                                               data-duration="<?= $service->duration_minutes ?>"
+                                               data-cost="<?= $service->service_cost ?>">
+                                        <label class="form-check-label" for="service-<?= $service->id ?>">
+                                            <?= h($service->service_name) ?>
+                                            (<?= h($service->duration_minutes) ?> mins) -
+                                            $<?= number_format($service->service_cost, 2) ?>
                                         </label>
                                     </div>
                                 <?php endforeach; ?>
                             </div>
                         </div>
                     </div>
+                    <br>
                     <div class="row">
                         <div class="col-md-4">
                             <h5>Please Select The Date</h5>
@@ -65,34 +68,50 @@ $this->Html->script('booking', ['block' => 'script']);
                                 'required' => true,
                                 'class' => 'form-control' . ($this->Form->isFieldError('booking_date') ? ' is-invalid' : ''),
                                 'id' => 'booking-date',
-                                'error' => ['class' => 'invalid-feedback']
+                                'disabled' => true,
+                                'label' => false,
+                                'error' => ['class' => 'invalid-feedback'],
                             ]);
                             ?>
+                            <small class="text-muted">Please select at least one service first</small>
                         </div>
                         <div class="col-md-4">
                             <h5>Please Select The Start Time</h5>
                             <?php
                             echo $this->Form->control('start_time', [
-                                'type' => 'time',
-                                'required' => true,
-                                'class' => 'form-control' . ($this->Form->isFieldError('start_time') ? ' is-invalid' : ''),
+                                'type' => 'select',
+                                'options' => array_reduce(
+                                    range(9 * 4, 17 * 4),
+                                    function($options, $i) {
+                                        $hour = floor($i / 4);
+                                        $minute = ($i % 4) * 15;
+                                        $timeStr = sprintf('%02d:%02d', $hour, $minute);
+                                        $displayTime = date('g:i A', strtotime($timeStr));
+                                        $options[$timeStr] = $displayTime;
+                                        return $options;
+                                    },
+                                    ['' => 'Select a time slot']
+                                ),
+                                'class' => 'form-control',
                                 'id' => 'start-time',
-                                'interval' => 15,
-                                'error' => ['class' => 'invalid-feedback']
+                                'disabled' => true,
+                                'label' => false,
+                                'required' => true,
                             ]);
                             ?>
+                            <small class="text-muted">Please select at least one service first</small>
                         </div>
                         <div class="col-md-4">
-                            <h5>Please Select The End Time</h5>
+                            <h5>End Time (Automatic)</h5>
                             <?php
-                            echo $this->Form->control('end_time', [
-                                'type' => 'time',
-                                'required' => true,
-                                'class' => 'form-control' . ($this->Form->isFieldError('end_time') ? ' is-invalid' : ''),
-                                'id' => 'end-time',
-                                'interval' => 15,
-                                'error' => ['class' => 'invalid-feedback']
+                            echo $this->Form->control('end_time_display', [
+                                'type' => 'text',
+                                'class' => 'form-control',
+                                'id' => 'end-time-display',
+                                'readonly' => true,
+                                'label' => false,
                             ]);
+                            echo $this->Form->hidden('end_time', ['id' => 'end-time']);
                             ?>
                         </div>
                     </div>
@@ -111,7 +130,7 @@ $this->Html->script('booking', ['block' => 'script']);
                                 'readonly' => true,
                                 'value' => '0.00',
                                 'class' => 'form-control' . ($this->Form->isFieldError('total_cost') ? ' is-invalid' : ''),
-                                'error' => ['class' => 'invalid-feedback']
+                                'error' => ['class' => 'invalid-feedback'],
                             ]);
                             ?>
                         </div>
@@ -124,7 +143,7 @@ $this->Html->script('booking', ['block' => 'script']);
                                 'class' => 'form-control' . ($this->Form->isFieldError('notes') ? ' is-invalid' : ''),
                                 'rows' => 3,
                                 'placeholder' => 'Add any special notes or requirements...',
-                                'error' => ['class' => 'invalid-feedback']
+                                'error' => ['class' => 'invalid-feedback'],
                             ]);
                             ?>
                         </div>
@@ -138,7 +157,7 @@ $this->Html->script('booking', ['block' => 'script']);
                 <div class="row mt-3">
                     <div class="col-md-12">
                         <?= $this->Form->button(__('Create Booking'), ['class' => 'btn btn-primary']) ?>
-                        <?= $this->Html->link(__('Cancel'), ['controller' => 'Bookings', 'action' => 'index'], ['class' => 'btn btn-secondary']) ?>
+                        <?= $this->Html->link(__('Cancel'), ['controller' => 'Customers', 'action' => 'dashboard'], ['class' => 'btn btn-secondary']) ?>
                     </div>
                 </div>
                 <?= $this->Form->end() ?>
