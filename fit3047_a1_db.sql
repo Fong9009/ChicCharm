@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 16, 2025 at 11:28 AM
+-- Generation Time: Apr 16, 2025 at 01:49 PM
 -- Server version: 9.0.1
 -- PHP Version: 8.3.12
 
@@ -72,8 +72,8 @@ CREATE TABLE `bookings` (
 --
 
 INSERT INTO `bookings` (`id`, `booking_name`, `booking_date`, `total_cost`, `remaining_cost`, `customer_id`, `status`, `start_time`, `end_time`) VALUES
-(75, 'Booking for Chay Fong Hong', '2025-04-17', 22.50, 22.50, 1, 'active', '09:00:00', '14:00:00'),
-(76, 'Booking for Chay Fong Hong', '2025-04-17', 14.00, 14.00, 1, 'active', '15:30:00', '17:00:00');
+(83, 'Booking for Chay Fong Hong', '2025-04-18', 22.50, 22.50, 1, 'cancelled', '09:00:00', '13:30:00'),
+(84, 'Booking for Chay Fong Hong', '2025-04-20', 7.50, 7.50, 1, 'cancelled', '10:45:00', '12:15:00');
 
 -- --------------------------------------------------------
 
@@ -97,11 +97,10 @@ CREATE TABLE `bookings_services` (
 --
 
 INSERT INTO `bookings_services` (`id`, `booking_id`, `service_id`, `service_cost`, `notes`, `created`, `modified`, `stylist_id`) VALUES
-(141, 75, 1, 6.50, NULL, '2025-04-15 19:13:25', '2025-04-15 19:13:25', 4),
-(142, 75, 2, 7.50, NULL, '2025-04-15 19:13:25', '2025-04-15 19:13:25', 5),
-(143, 75, 3, 8.50, NULL, '2025-04-15 19:13:25', '2025-04-15 19:13:25', 2),
-(144, 76, 1, 6.50, NULL, '2025-04-15 19:17:17', '2025-04-15 19:17:17', 4),
-(145, 76, 2, 7.50, NULL, '2025-04-15 19:17:17', '2025-04-15 19:17:17', 4);
+(158, 83, 1, 6.50, NULL, '2025-04-16 12:11:48', '2025-04-16 12:11:48', 4),
+(159, 83, 2, 7.50, NULL, '2025-04-16 12:11:48', '2025-04-16 12:11:48', 5),
+(160, 83, 3, 8.50, NULL, '2025-04-16 12:11:48', '2025-04-16 12:11:48', 2),
+(161, 84, 2, 7.50, NULL, '2025-04-16 12:12:14', '2025-04-16 12:12:14', 2);
 
 -- --------------------------------------------------------
 
@@ -118,16 +117,6 @@ CREATE TABLE `bookings_stylists` (
   `booking_id` int NOT NULL,
   `stylist_id` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `bookings_stylists`
---
-
-INSERT INTO `bookings_stylists` (`id`, `stylist_date`, `start_time`, `end_time`, `selected_cost`, `booking_id`, `stylist_id`) VALUES
-(107, '2025-04-17', '09:00:00', '14:00:00', 22.50, 75, 4),
-(108, '2025-04-17', '09:00:00', '14:00:00', 22.50, 75, 5),
-(109, '2025-04-17', '09:00:00', '14:00:00', 22.50, 75, 2),
-(110, '2025-04-17', '15:30:00', '17:00:00', 14.00, 76, 4);
 
 -- --------------------------------------------------------
 
@@ -299,9 +288,9 @@ CREATE TABLE `customers` (
 --
 
 INSERT INTO `customers` (`id`, `first_name`, `last_name`, `email`, `password`, `nonce`, `nonce_expiry`, `created`, `modified`, `type`, `profile_picture`) VALUES
-(1, 'Chay Fong', 'Hong', 'chayfong9009@gmail.com', '$2y$10$hIXeX/RjXv4ox29mSuSZiuxclpjRXzyhjO9bgG5is13uBubV8gbqq', 'cc15950b7cef51a668b0f471703d014cb0951e29a7774c49847a669a719ad4bf972d19fdc3cf2ba6ab3adfa14ec3b63a49047e642ebca46469bd429cd37b8471', '2025-04-20 13:28:57', '2025-03-26 11:10:12', '2025-04-13 13:28:57', 'customer', NULL),
-(2, 'Christian', 'Cochrane', 'cakephp@example.com', '$2y$10$4oCG2ResnEQbYk2rgtdTGe1faLZPOu29GZma4EfRmQ.B6vyHOk7u6', NULL, NULL, '2025-04-04 02:31:18', '2025-04-10 12:18:03', 'customer', '97406_Capture.PNG'),
-(57, 'Chay Fong', 'Hong', 'chayfong820@gmail.com', '$2y$10$34mKA091HcSo8K1ctw6U5ODM6gIaMrvPZC3dLfzYQzGKSgB4c6ef2', NULL, NULL, '2025-04-15 08:41:59', '2025-04-15 08:41:59', 'customer', NULL);
+(1, 'Chay Fong', 'Hong', 'chayfong9009@gmail.com', '$2y$10$hIXeX/RjXv4ox29mSuSZiuxclpjRXzyhjO9bgG5is13uBubV8gbqq', 'cc15950b7cef51a668b0f471703d014cb0951e29a7774c49847a669a719ad4bf972d19fdc3cf2ba6ab3adfa14ec3b63a49047e642ebca46469bd429cd37b8471', '2025-04-20 13:28:57', '2025-03-26 11:10:12', '2025-04-16 13:28:32', 'customer', NULL),
+(2, 'Christian', 'Cochrane', 'cakephp@example.com', '$2y$10$4oCG2ResnEQbYk2rgtdTGe1faLZPOu29GZma4EfRmQ.B6vyHOk7u6', '', NULL, '2025-04-04 02:31:18', '2025-04-16 13:25:10', 'customer', NULL),
+(58, 'Chay', 'Hong', 'chayfong820@gmail.com', '$2y$10$dHltoNqKRGRLEd1Xa4yhDOh2A89pTvzeahyRJ4aGCTGn5qs5WdL7W', NULL, NULL, '2025-04-16 13:11:13', '2025-04-16 13:13:51', 'customer', NULL);
 
 -- --------------------------------------------------------
 
@@ -386,7 +375,8 @@ INSERT INTO `stylists_services` (`id`, `stylist_id`, `service_id`) VALUES
 --
 ALTER TABLE `admins`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`);
+  ADD UNIQUE KEY `email` (`email`),
+  ADD UNIQUE KEY `unique_email` (`email`);
 
 --
 -- Indexes for table `bookings`
@@ -434,7 +424,8 @@ ALTER TABLE `content_blocks_phinxlog`
 --
 ALTER TABLE `customers`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`);
+  ADD UNIQUE KEY `email` (`email`),
+  ADD UNIQUE KEY `unique_email` (`email`);
 
 --
 -- Indexes for table `services`
@@ -447,7 +438,8 @@ ALTER TABLE `services`
 --
 ALTER TABLE `stylists`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`);
+  ADD UNIQUE KEY `email` (`email`),
+  ADD UNIQUE KEY `unique_email` (`email`);
 
 --
 -- Indexes for table `stylists_services`
@@ -471,19 +463,19 @@ ALTER TABLE `admins`
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=77;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=85;
 
 --
 -- AUTO_INCREMENT for table `bookings_services`
 --
 ALTER TABLE `bookings_services`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=146;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=162;
 
 --
 -- AUTO_INCREMENT for table `bookings_stylists`
 --
 ALTER TABLE `bookings_stylists`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=111;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=126;
 
 --
 -- AUTO_INCREMENT for table `contacts`
@@ -501,13 +493,13 @@ ALTER TABLE `content_blocks`
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
 -- AUTO_INCREMENT for table `services`
 --
 ALTER TABLE `services`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `stylists`
