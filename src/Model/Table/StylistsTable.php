@@ -77,9 +77,9 @@ class StylistsTable extends Table
             ->maxLength('first_name', 255)
             ->requirePresence('first_name', 'create')
             ->notEmptyString('first_name')
-            ->add('first_name', 'alphanumeric', [
+            ->add('first_name', 'alphabetic', [
                 'rule' => ['custom', "/^[a-zA-Z' ]+$/"],
-                'message' => 'First name must be alphanumeric.',
+                'message' => 'First name must be alphabetic.',
             ]);
 
         $validator
@@ -87,9 +87,9 @@ class StylistsTable extends Table
             ->maxLength('last_name', 255)
             ->requirePresence('last_name', 'create')
             ->notEmptyString('last_name')
-            ->add('last_name', 'alphanumeric', [
+            ->add('last_name', 'alphabetic', [
                 'rule' => ['custom', "/^[a-zA-Z' ]+$/"],
-                'message' => 'Last name must be alphanumeric.',
+                'message' => 'Last name must be alphabetic.',
             ]);
 
         $validator
