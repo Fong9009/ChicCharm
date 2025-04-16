@@ -30,7 +30,7 @@ endif;
         <a href="javascript:history.back()" class="error-btn primary">
             Go Back
         </a>
-        <a href="/" class="error-btn secondary">
+        <a href="<?= $this->Url->build('/') ?>" class="error-btn secondary">
             Go to Homepage
         </a>
     </div>
@@ -51,7 +51,7 @@ endif;
     .error-content {
         max-width: 600px;
         padding: 2rem;
-        margin: 0 auto; 
+        margin: 0 auto;
         text-align: center;
     }
 
@@ -111,4 +111,4 @@ endif;
         background-color: #5a6268;
         color: white;
     }
-</style> 
+</style>
