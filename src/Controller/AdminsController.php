@@ -148,7 +148,7 @@ class AdminsController extends AppController
                 $maxSize = 4 * 1024 * 1024;
                 if ($profile->getSize() > $maxSize) {
                     $error = 1;
-                    $this->Flash->error(__('The profile picture is too big please use something smaller than 2MB.'));
+                    $this->Flash->error(__('The profile picture is too big please use something smaller than 4MB.'));
                 }
 
                 //Check Filetype
