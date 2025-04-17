@@ -165,43 +165,53 @@ class AdminsController extends AppController
 
             //Profile Picture Upload
             $profile = $this->request->getData('profile_picture');
-            if ($profile && $profile->getClientFilename()) {
-                //Max Size to prevent massive files from being inserted
-                //This is measured in MB so max = 4MB
-                $maxSize = 4 * 1024 * 1024;
-                if ($profile->getSize() > $maxSize) {
-                    $error = 1;
-                    $this->Flash->error(__('The profile picture is too big please use something smaller than 4MB.'));
-                }
-
-                //Check Filetype
-                $allowedFileTypes = ['image/jpeg', 'image/png','image/jpg'];
-                if (!in_array($profile->getClientMediaType(), $allowedFileTypes)) {
-                    $error = 1;
-                    $this->Flash->error(__('The profile picture must be a jpeg/jpg or png format.'));
-                }
-
-                //Delete old Image if there is one
-                if ($admin->profile_picture != null && $error !== 1) {
-                    $oldPath = WWW_ROOT . 'img/profile/' . $admin->profile_picture;
-                    if (file_exists($oldPath)) {
-                        unlink($oldPath);
+            if ($profile->getClientFilename() !== '' && $profile->getClientFilename() !== null) {
+                if ($profile && $profile->getClientFilename()) {
+                    //Max Size to prevent massive files from being inserted
+                    //This is measured in MB so max = 4MB
+                    $maxSize = 4 * 1024 * 1024;
+                    if ($profile->getSize() > $maxSize) {
+                        $error = 1;
+                        $this->Flash->error(__('The profile picture is too big please use something smaller than 4MB.'));
                     }
-                    //Stores file in directory
-                    $filename = rand(10000, 99999) . '_' . strtolower($profile->getClientFilename());
-                    $profile->moveTo(WWW_ROOT . 'img/profile/' . $filename);
-                    $data['profile_picture'] = $filename;
-                }
-                if ($admin->profile_picture === null && $error !== 1) {
-                    //Stores file in directory
-                    $filename = rand(10000, 99999) . '_' . strtolower($profile->getClientFilename());
-                    $profile->moveTo(WWW_ROOT . 'img/profile/' . $filename);
-                    $data['profile_picture'] = $filename;
+
+                    //Check Filetype
+                    $allowedFileTypes = ['image/jpeg', 'image/png','image/jpg'];
+                    if (!in_array($profile->getClientMediaType(), $allowedFileTypes)) {
+                        $error = 1;
+                        $this->Flash->error(__('The profile picture must be a jpeg/jpg or png format.'));
+                    }
+
+                    //Delete old Image if there is one
+                    if ($admin->profile_picture != null && $error !== 1) {
+                        $oldPath = WWW_ROOT . 'img/profile/' . $admin->profile_picture;
+                        if (file_exists($oldPath)) {
+                            unlink($oldPath);
+                        }
+                        //Stores file in directory
+                        $filename = rand(10000, 99999) . '_' . strtolower($profile->getClientFilename());
+                        $profile->moveTo(WWW_ROOT . 'img/profile/' . $filename);
+                        $data['profile_picture'] = $filename;
+                    }
+                    if ($admin->profile_picture === null && $error !== 1) {
+                        //Stores file in directory
+                        $filename = rand(10000, 99999) . '_' . strtolower($profile->getClientFilename());
+                        $profile->moveTo(WWW_ROOT . 'img/profile/' . $filename);
+                        $data['profile_picture'] = $filename;
+                    }
+                } else {
+                    $data['profile_picture'] = null;
                 }
             } else {
-                $data['profile_picture'] = null;
+                $data['profile_picture'] = $admin->profile_picture;
             }
-            $data['nonce'] = null;
+
+            // Keep existing nonce and nonce_expiry values
+            if ($admin->nonce && $admin->nonce_expiry) {
+                $data['nonce'] = $admin->nonce;
+                $data['nonce_expiry'] = $admin->nonce_expiry;
+            }
+
             // Patch the entity with the data
             $admin = $this->Admins->patchEntity($admin, $data);
 
