@@ -149,6 +149,7 @@ class AdminsController extends AppController
         // Only allow admins to edit their own profile
         if ($currentUser->id != $id) {
             $this->Flash->error('Access denied. You can only edit your own profile.');
+
             return $this->redirect(['action' => 'index']);
         }
 
@@ -218,7 +219,8 @@ class AdminsController extends AppController
             if ($error !== 1) {
                 if ($this->Admins->save($admin)) {
                     $this->Flash->success(__('Your profile has been updated.'));
-                    return $this->redirect(['action' => 'index']);
+
+                    return $this->redirect(['action' => 'profile']);
                 }
             }
 
