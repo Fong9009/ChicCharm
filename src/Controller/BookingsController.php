@@ -26,16 +26,38 @@ class BookingsController extends AppController
         $this->Stylists = $this->getTableLocator()->get('Stylists');
         $this->BookingsStylists = $this->getTableLocator()->get('BookingsStylists');
         $this->loadComponent('Authentication.Authentication');
-
-        // Add this line to allow dashboard action
-        $this->Authentication->addUnauthenticatedActions(['customerbooking', 'customerindex', 'customerview', 'dashboard']);
     }
 
     public function beforeFilter(\Cake\Event\EventInterface $event)
     {
         parent::beforeFilter($event);
-        // Allow users to access customer-specific actions
-        $this->Authentication->addUnauthenticatedActions(['customerbooking', 'customerindex', 'customerview']);
+        
+        // Get the current user
+        $user = $this->Authentication->getIdentity();
+        
+        // Define customer-specific actions
+        $customerActions = ['customerbooking', 'customerindex', 'customerview', 'dashboard'];
+        
+        // Define admin-specific actions
+        $adminActions = ['adminbooking', 'edit', 'index', 'stylistedit', 'view'];
+        
+        // If the current action is a customer action
+        if (in_array($this->request->getParam('action'), $customerActions)) {
+            // Check if user is logged in and is a customer
+            if (!$user || $user->type !== 'customer') {
+                $this->Flash->error('Access denied. This area is for customers only.');
+                return $this->redirect(['controller' => 'Pages', 'action' => 'display', 'home']);
+            }
+        }
+        
+        // If the current action is an admin action
+        if (in_array($this->request->getParam('action'), $adminActions)) {
+            // Check if user is logged in and is an admin
+            if (!$user || $user->type !== 'admin') {
+                $this->Flash->error('Access denied. This area is for administrators only.');
+                return $this->redirect(['controller' => 'Pages', 'action' => 'display', 'home']);
+            }
+        }
     }
 
     /**
@@ -353,6 +375,7 @@ class BookingsController extends AppController
 
             $data['total_cost'] = $totalCost;
             $data['remaining_cost'] = $totalCost;
+            $data['notes'] = $data['notes'] ?? null;
 
             $booking = $this->Bookings->patchEntity($booking, $data);
             if ($this->Bookings->save($booking)) {
@@ -456,6 +479,7 @@ class BookingsController extends AppController
 
             $data['total_cost'] = $totalCost;
             $data['remaining_cost'] = $totalCost;
+            $data['notes'] = $data['notes'] ?? null;
 
             $booking = $this->Bookings->patchEntity($booking, $data);
             if ($this->Bookings->save($booking)) {
@@ -678,14 +702,14 @@ class BookingsController extends AppController
                 return $q->where([
                     'BookingsStylists.stylist_date' => $bookingDate,
                     'OR' => [
-                        // Check for overlapping time slots
+                        // Check for overlapping time slots, allowing exact end time matches
                         [
-                            'BookingsStylists.start_time <=' => $startTime,
-                            'BookingsStylists.end_time >=' => $startTime
+                            'BookingsStylists.start_time <' => $startTime,
+                            'BookingsStylists.end_time >' => $startTime
                         ],
                         [
-                            'BookingsStylists.start_time <=' => $endTime,
-                            'BookingsStylists.end_time >=' => $endTime
+                            'BookingsStylists.start_time <' => $endTime,
+                            'BookingsStylists.end_time >' => $endTime
                         ],
                         [
                             'BookingsStylists.start_time >=' => $startTime,
@@ -800,10 +824,20 @@ class BookingsController extends AppController
                     // Check if slot overlaps with any existing booking
                     $isAvailable = true;
                     foreach ($existingBookings as $booking) {
+                        $bookingStart = $booking->start_time->format('H:i');
+                        $bookingEnd = $booking->end_time->format('H:i');
+
+                        // Convert times to timestamps for comparison
+                        $slotStartTime = strtotime($slotStart);
+                        $slotEndTime = strtotime($slotEnd);
+                        $bookingStartTime = strtotime($bookingStart);
+                        $bookingEndTime = strtotime($bookingEnd);
+
+                        // Check for overlap, allowing exact end time matches
                         if (
-                            ($slotStart >= $booking->start_time->format('H:i') && $slotStart < $booking->end_time->format('H:i')) ||
-                            ($slotEnd > $booking->start_time->format('H:i') && $slotEnd <= $booking->end_time->format('H:i')) ||
-                            ($slotStart <= $booking->start_time->format('H:i') && $slotEnd >= $booking->end_time->format('H:i'))
+                            ($slotStartTime >= $bookingStartTime && $slotStartTime < $bookingEndTime) ||
+                            ($slotEndTime > $bookingStartTime && $slotEndTime <= $bookingEndTime) ||
+                            ($slotStartTime <= $bookingStartTime && $slotEndTime >= $bookingEndTime)
                         ) {
                             $isAvailable = false;
                             break;

@@ -2428,7 +2428,7 @@ footer .input-group .btn-primary:hover {
 
 /* Customer Dashboard Styles */
 .customer-dashboard {
-    padding-top: 76px;
+    padding-top: 40px;
     padding-bottom: 40px;
     min-height: 100vh;
     background-size: cover;
@@ -2438,7 +2438,6 @@ footer .input-group .btn-primary:hover {
 }
 
 .customer-dashboard .container {
-    padding: 20px;
     max-width: 1200px;
     margin: 0 auto;
     width: 100%;
@@ -2497,14 +2496,6 @@ footer .input-group .btn-primary:hover {
 
 /* Mobile Responsive Adjustments */
 @media (max-width: 768px) {
-    .customer-dashboard {
-        padding: 1rem;
-        padding-top: 90px;
-    }
-
-    .customer-dashboard .container {
-        padding: 15px;
-    }
 
     .customer-dashboard .card {
         margin-bottom: 15px;

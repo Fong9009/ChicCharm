@@ -49,7 +49,7 @@ $this->Html->script('booking', ['block' => 'script']);
                     </div>
                     <br>
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <h5>Please Select The Date</h5>
                             <?php
                                 echo $this->Form->control('booking_date', [
@@ -59,13 +59,15 @@ $this->Html->script('booking', ['block' => 'script']);
                                     'id' => 'booking-date',
                                     'disabled' => true,
                                     'label' => false,
+                                    'min' => date('Y-m-d'),
+                                    'max' => date('Y-m-d', strtotime('+1 year')),
                                     'error' => ['class' => 'invalid-feedback']
                                 ]);
                             ?>
                             <small class="text-muted">Please select at least one service first</small>
                         </div>
-                        <div class="col-md-4">
-                            <h5>Please Select The Start Time</h5>
+                        <div class="col-md-6">
+                            <h5>Please Select The Time</h5>
                             <?php
                                 echo $this->Form->control('start_time', [
                                     'type' => 'select',
@@ -89,19 +91,10 @@ $this->Html->script('booking', ['block' => 'script']);
                                 ]);
                             ?>
                             <small class="text-muted">Please select at least one service first</small>
-                        </div>
-                        <div class="col-md-4">
-                            <h5>End Time (Automatic)</h5>
-                            <?php
-                                echo $this->Form->control('end_time_display', [
-                                    'type' => 'text',
-                                    'class' => 'form-control',
-                                    'id' => 'end-time-display',
-                                    'readonly' => true,
-                                    'label' => false
-                                ]);
-                                echo $this->Form->hidden('end_time', ['id' => 'end-time']);
-                            ?>
+                            <div id="time-range-display" class="mt-2" style="display: none;" hidden>
+                                <span id="start-time-display"></span> - <span id="end-time-display"></span>
+                            </div>
+                            <?php echo $this->Form->hidden('end_time', ['id' => 'end-time']); ?>
                         </div>
                     </div>
                     <br>

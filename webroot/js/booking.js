@@ -5,13 +5,30 @@ document.addEventListener('DOMContentLoaded', function() {
     const totalCostInput = document.getElementById('total-cost');
     const bookingDateInput = document.getElementById('booking-date');
     const startTimeInput = document.getElementById('start-time');
+    const timeRangeDisplay = document.getElementById('time-range-display');
+    const startTimeDisplay = document.getElementById('start-time-display');
     const endTimeDisplay = document.getElementById('end-time-display');
     const endTimeInput = document.getElementById('end-time');
     const serviceStylistSelections = document.getElementById('service-stylist-selections');
 
+    // Get current date and time
+    const getCurrentDateTime = () => {
+        const now = new Date();
+        return {
+            date: now.toISOString().split('T')[0],
+            hours: now.getHours(),
+            minutes: now.getMinutes(),
+            fullDate: now
+        };
+    };
+
     // Set minimum date to today
-    const today = new Date().toISOString().split('T')[0];
-    bookingDateInput.min = today;
+    const today = new Date();
+    // Get today's date at start of day in local timezone
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const todayStr = todayStart.toISOString().split('T')[0];
+    bookingDateInput.min = todayStr;
+    bookingDateInput.max = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate()).toISOString().split('T')[0];
 
     // Function to get service duration from data attribute
     function getServiceDuration(serviceId) {
@@ -41,25 +58,34 @@ document.addEventListener('DOMContentLoaded', function() {
         const formattedEndTime = `${endHours.toString().padStart(2, '0')}:${endMinutes.toString().padStart(2, '0')}`;
         endTimeInput.value = formattedEndTime;
 
+        // Format the start time for display
+        let displayStartHours = hours % 12;
+        displayStartHours = displayStartHours === 0 ? 12 : displayStartHours;
+        const startAmpm = hours >= 12 ? 'PM' : 'AM';
+        const displayStartTime = `${displayStartHours}:${minutes.toString().padStart(2, '0')} ${startAmpm}`;
+        startTimeDisplay.textContent = displayStartTime;
+
         // Check if end time exceeds 5 PM (17:00)
         if (endHours > 17 || (endHours === 17 && endMinutes > 0)) {
-            endTimeDisplay.value = 'The shop closes at 5 PM';
-            endTimeDisplay.style.color = '#856404';
-            endTimeDisplay.style.backgroundColor = '#fff3cd';
-            endTimeDisplay.style.padding = '0.375rem 0.75rem';
-            endTimeDisplay.style.border = '1px solid #ffeeba';
+            endTimeDisplay.textContent = '5:00 PM (Shop Closing Time)';
+            timeRangeDisplay.style.color = '#856404';
+            timeRangeDisplay.style.backgroundColor = '#fff3cd';
+            timeRangeDisplay.style.padding = '0.375rem 0.75rem';
+            timeRangeDisplay.style.border = '1px solid #ffeeba';
         } else {
             // Format the end time in 12-hour format with AM/PM for display
-            let displayHours = endHours % 12;
-            displayHours = displayHours === 0 ? 12 : displayHours;
-            const ampm = endHours >= 12 ? 'PM' : 'AM';
-            const displayEndTime = `${displayHours}:${endMinutes.toString().padStart(2, '0')} ${ampm}`;
-            endTimeDisplay.value = displayEndTime;
-            endTimeDisplay.style.color = '';
-            endTimeDisplay.style.backgroundColor = '';
-            endTimeDisplay.style.padding = '';
-            endTimeDisplay.style.border = '';
+            let displayEndHours = endHours % 12;
+            displayEndHours = displayEndHours === 0 ? 12 : displayEndHours;
+            const endAmpm = endHours >= 12 ? 'PM' : 'AM';
+            const displayEndTime = `${displayEndHours}:${endMinutes.toString().padStart(2, '0')} ${endAmpm}`;
+            endTimeDisplay.textContent = displayEndTime;
+            timeRangeDisplay.style.color = '';
+            timeRangeDisplay.style.backgroundColor = '';
+            timeRangeDisplay.style.padding = '';
+            timeRangeDisplay.style.border = '';
         }
+
+        timeRangeDisplay.style.display = 'block';
     }
 
     // Function to get all selected service IDs
@@ -259,11 +285,20 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!hasSelectedServices) {
             bookingDateInput.value = '';
             startTimeInput.value = '';
-            endTimeDisplay.value = '';
+            endTimeDisplay.textContent = '';
             endTimeInput.value = '';
             serviceStylistSelections.innerHTML = '';
             document.getElementById('stylist-ids-container').innerHTML = '';
         }
+    }
+
+    // Function to check if a date is in the past
+    function isDateInPast(dateStr) {
+        const selectedDate = new Date(dateStr + 'T00:00:00');
+        const now = new Date();
+        // Get today's date at start of day in local timezone
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        return selectedDate < todayStart;
     }
 
     // Function to update available time slots
@@ -276,6 +311,12 @@ document.addEventListener('DOMContentLoaded', function() {
             startTimeInput.innerHTML = '<option value="">Please select date and services first</option>';
             return;
         }
+
+        // Check if selected date is today
+        const now = new Date();
+        const isToday = selectedDate === todayStr;
+        const currentHour = now.getHours();
+        const currentMinute = now.getMinutes();
 
         startTimeInput.disabled = true;
         startTimeInput.innerHTML = '<option value="">Loading available times...</option>';
@@ -302,12 +343,48 @@ document.addEventListener('DOMContentLoaded', function() {
             startTimeInput.innerHTML = '<option value="">Select a time slot</option>';
             if (availableSlots.length > 0) {
                 availableSlots.forEach(slot => {
+                    const [hours, minutes] = slot.value.split(':').map(Number);
+
+                    // Skip past times if the selected date is today
+                    if (isToday) {
+                        // Skip if hour is less than current hour
+                        if (hours < currentHour) return;
+                        // Skip if hour is current hour but minutes are less than or equal to current minutes
+                        // Adding 15 minutes buffer to current time
+                        if (hours === currentHour && minutes <= currentMinute + 15) return;
+                    }
+
                     const option = document.createElement('option');
                     option.value = slot.value;
-                    option.textContent = slot.display;
+                    
+                    // Format start time
+                    let displayHours = hours % 12;
+                    displayHours = displayHours === 0 ? 12 : displayHours;
+                    const ampm = hours >= 12 ? 'PM' : 'AM';
+                    const startTimeDisplay = `${displayHours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+                    
+                    // Calculate and format end time
+                    const startDate = new Date();
+                    startDate.setHours(hours, minutes, 0);
+                    const totalDuration = selectedServices.reduce((total, serviceId) => total + getServiceDuration(serviceId), 0);
+                    const endDate = new Date(startDate.getTime() + totalDuration * 60000);
+                    const endHours = endDate.getHours();
+                    const endMinutes = endDate.getMinutes();
+                    let displayEndHours = endHours % 12;
+                    displayEndHours = displayEndHours === 0 ? 12 : displayEndHours;
+                    const endAmpm = endHours >= 12 ? 'PM' : 'AM';
+                    const endTimeDisplay = `${displayEndHours}:${endMinutes.toString().padStart(2, '0')} ${endAmpm}`;
+                    
+                    option.textContent = `${startTimeDisplay} - ${endTimeDisplay}`;
                     startTimeInput.appendChild(option);
                 });
                 startTimeInput.disabled = false;
+
+                // If no time slots are available after filtering
+                if (startTimeInput.options.length === 1) { 
+                    startTimeInput.innerHTML = '<option value="">No available time slots for today</option>';
+                    startTimeInput.disabled = true;
+                }
             } else {
                 startTimeInput.innerHTML = '<option value="">No available time slots</option>';
                 startTimeInput.disabled = true;
@@ -348,15 +425,32 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Add event listener for date change
     bookingDateInput.addEventListener('change', () => {
+        const selectedDate = bookingDateInput.value;
+        if (isDateInPast(selectedDate)) {
+            alert('Cannot select past dates');
+            bookingDateInput.value = todayStr;
+            return;
+        }
         updateAvailableTimeSlots();
         updateStylistSelections();
+    });
+
+    // Also validate on input event to catch any direct input
+    bookingDateInput.addEventListener('input', () => {
+        const selectedDate = bookingDateInput.value;
+        if (isDateInPast(selectedDate)) {
+            alert('Cannot select past dates');
+            bookingDateInput.value = todayStr;
+            return;
+        }
     });
 
     startTimeInput.addEventListener('change', () => {
         if (!startTimeInput.value) {
             endTimeInput.value = '';
-            endTimeDisplay.value = '';
+            endTimeDisplay.textContent = '';
             return;
         }
 
