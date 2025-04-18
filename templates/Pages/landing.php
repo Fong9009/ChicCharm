@@ -51,7 +51,7 @@ if ($identity) {
                             <?= $this->ContentBlock->text('title-catch'); ?>
                         </p>
                         <div class="text-center text-md-start">
-                            <a class="btn btn-primary btn-xl fade-in-para" href="#about"> <?= $this->ContentBlock->text('discover-button'); ?></a>
+                            <a> <?= $this->Html->link($bookingButton, $link, ['class' => 'btn btn-primary btn-xl']) ?></a>
                         </div>
                     </div>
                 </div>
