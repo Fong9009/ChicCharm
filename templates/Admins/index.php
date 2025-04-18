@@ -7,6 +7,7 @@ $this->Html->css('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css
 $this->Html->script('https://code.jquery.com/jquery-3.6.0.min.js', ['block' => true]);
 $this->Html->css('custom', ['block' => true]);
 $this->Html->script('custom', ['block' => true]);
+$adminId = $this->request->getAttribute('identity')->id
 ?>
 <?= $this->Html->css('/utility/indexes/indexes.css') ?>
 <?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
@@ -103,16 +104,20 @@ $this->Html->script('custom', ['block' => true]);
                             <td><?= h($admin->modified) ?></td>
                             <td class="actions">
                                 <?= $this->Html->link(__('View'), ['action' => 'view', $admin->id], ['class' => 'button']) ?>
-                                <?= $this->Html->link(__('Edit'), ['action' => 'edit', $admin->id], ['class' => 'button']) ?>
-                                <?= $this->Form->postLink(
-                                    __('Delete'),
-                                    ['action' => 'delete', $admin->id],
-                                    [
-                                        'method' => 'delete',
-                                        'confirm' => __('Are you sure you want to delete # {0}?', $admin->id),
-                                        'class' => 'button'
-                                    ]
-                                ) ?>
+                                <?php if ($admin->id == $adminId): ?>
+                                    <?= $this->Html->link(__('Edit'), ['action' => 'edit', $admin->id], ['class' => 'button']) ?>
+                                <?php endif; ?>
+                                <?php if ($admin->id != $adminId): ?>
+                                    <?= $this->Form->postLink(
+                                        __('Delete'),
+                                        ['action' => 'delete', $admin->id],
+                                        [
+                                            'method' => 'post',
+                                            'confirm' => __('Are you sure you want to delete # {0}?', ($admin->first_name . ' '. $admin->last_name)),
+                                            'class' => 'button',
+                                        ]
+                                    ) ?>
+                                <?php endif; ?>
                             </td>
                         </tr>
                         <?php endforeach; ?>

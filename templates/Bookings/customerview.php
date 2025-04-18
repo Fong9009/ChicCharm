@@ -7,7 +7,7 @@
 <div class="booking-details-wrapper">
     <div class="booking-details">
         <h2><?= __('Booking Details') ?></h2>
-        
+
         <div class="booking-info">
             <div class="info-group">
                 <label><?= __('Booking Name') ?></label>
@@ -31,14 +31,14 @@
                     <?php foreach ($booking->bookings_stylists as $bookingStylist): ?>
                         <div class="stylist-item">
                             <p class="stylist-service">
-                                <strong><?= h($bookingStylist->stylist->first_name) ?> <?= h($bookingStylist->stylist->last_name) ?></strong>: 
-                                <?php 
+                                <strong><?= h($bookingStylist->stylist->first_name) ?> <?= h($bookingStylist->stylist->last_name) ?></strong>:
+                                <?php
                                 $stylistServices = collection($booking->bookings_services)
                                     ->filter(function ($bookingService) use ($bookingStylist) {
                                         return $bookingService->stylist_id === $bookingStylist->stylist_id;
                                     })
                                     ->toArray();
-                                
+
                                 if (!empty($stylistServices)) {
                                     $serviceNames = [];
                                     foreach ($stylistServices as $bookingService) {
@@ -59,6 +59,10 @@
             <div class="info-group">
                 <label><?= __('Total Cost') ?></label>
                 <p class="form-control-static">$<?= number_format($booking->total_cost, 2) ?></p>
+            </div>
+            <div class="info-group">
+                <label><?= __('Booking Notes') ?></label>
+                <p class="form-control-static"><?= h($booking->notes) ?></p>
             </div>
         </div>
 
