@@ -50,7 +50,7 @@ $adminId = $this->request->getAttribute('identity')->id
                         </div>',
                             ['controller' => 'Admins', 'action' => 'delete', $admin->id],
                             ['escape' => false,'class' => 'card-link-wrapper d-block text-decoration-none',
-                                'confirm' => __('Are you sure you want to delete # {0}?', $admin->id)],
+                                'confirm' => __('Are you sure you want to delete # {0}?', ($admin->first_name . ' '. $admin->last_name))],
                         ) ?>
                     </div>
                     <!-- List Admin -->

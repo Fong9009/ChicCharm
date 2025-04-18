@@ -82,7 +82,7 @@
                             ['action' => 'delete', $stylist->id],
                             [
                                 'method' => 'delete',
-                                'confirm' => __('Are you sure you want to delete # {0}?', $stylist->id),
+                                'confirm' => __('Are you sure you want to delete # {0}? You will not be able to get them back!', ($stylist->first_name . ' ' . $stylist->last_name)),
                                 'class' => 'button'
                             ]
                         ) ?>

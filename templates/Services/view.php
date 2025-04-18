@@ -43,7 +43,7 @@
                         </div>',
                         ['controller' => 'Services', 'action' => 'delete', $service->id],
                         ['escape' => false,'class' => 'card-link-wrapper d-block text-decoration-none',
-                            'confirm' => __('Are you sure you want to delete # {0}?', $service->id)],
+                            'confirm' => __('Are you sure you want to delete # {0}? You will not be able to get them back!', $service->service_name)],
                     ) ?>
                 </div>
 

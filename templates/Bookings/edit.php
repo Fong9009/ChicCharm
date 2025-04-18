@@ -50,7 +50,7 @@
                                 'method' => 'delete',
                                 'confirm' => __('Are you sure you want to permanently delete this cancelled booking?'),
                                 'class' => 'card-link-wrapper d-block text-decoration-none',
-                                'escape' => false, // <-- This is the key!
+                                'escape' => false,
                             ]
                         ) ?>
                     </div>
@@ -128,7 +128,14 @@
                                 <td><?= h($stylist->profile_picture) ?></td>
                                 <td class="actions">
                                     <?= $this->Html->link(__('View'), ['controller' => 'Stylists', 'action' => 'view', $stylist->id], ['class' => 'button']) ?>
-                                    <?= $this->Html->link(__('Remove Stylist'), ['controller' => 'Bookings', 'action' => 'removeStylist', $stylist->id, $booking->id], ['class' => 'button']) ?>
+                                    <?= $this->Html->link(
+                                        __('Remove Stylist'),
+                                        ['controller' => 'Bookings', 'action' => 'removeStylist', $stylist->id, $booking->id],
+                                        [
+                                            'class' => 'button',
+                                            'confirm' => __('Are you sure you want to remove # {0} from booking?', ($stylist->first_name . ' ' . $stylist->last_name)),
+                                        ]
+                                    ) ?>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
