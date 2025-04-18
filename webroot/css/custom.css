@@ -1926,11 +1926,11 @@ footer .input-group .btn-primary:hover {
     footer .newsletter-signup {
         max-width: 300px;
     }
-    
+
     footer .input-group {
         max-width: 300px;
     }
-    
+
     footer .input-group input[type="email"],
     footer .input-group .btn-primary {
         height: 36px;
@@ -1941,7 +1941,7 @@ footer .input-group .btn-primary:hover {
 
 /* Form wrapper styling */
 .form-wrapper {
-    padding-top: 76px; 
+    padding-top: 76px;
     padding: 76px 20px 76px;
     background-color: #f8f9fa;
     min-height: 75vh;
@@ -2022,7 +2022,7 @@ footer .input-group .btn-primary:hover {
     .mobile-icons-nav {
         display: none;
     }
-    
+
     .mobile-profile-icon {
         display: none;
     }
@@ -2055,7 +2055,7 @@ footer .input-group .btn-primary:hover {
 
 /* Registration Form Wrapper */
 .registration-wrapper {
-    padding-top: 120px; 
+    padding-top: 120px;
     padding: 120px 20px 20px 20px;
     background-color: #f8f9fa;
     min-height: auto;
@@ -2066,7 +2066,7 @@ footer .input-group .btn-primary:hover {
 
 @media (max-width: 768px) {
     .registration-wrapper {
-        padding-top: 120px; 
+        padding-top: 120px;
         padding-left: 15px;
         padding-right: 15px;
         padding-bottom: 15px;
@@ -2171,19 +2171,19 @@ footer .input-group .btn-primary:hover {
 /* Forget Password Form Wrapper */
 .forget-password-wrapper {
     background-color: #f8f9fa;
-    min-height: calc(100vh - 250px); 
+    min-height: calc(100vh - 250px);
     display: flex;
-    align-items: center; 
+    align-items: center;
     justify-content: center;
-    margin-bottom: 10px; 
+    margin-bottom: 10px;
 }
 
 @media (max-width: 768px) {
     .forget-password-wrapper {
-        padding-top: 140px; 
+        padding-top: 140px;
         padding-left: 15px;
         padding-right: 15px;
-        padding-bottom: 20px; 
+        padding-bottom: 20px;
         margin-bottom: 10px;
     }
 }
@@ -2287,8 +2287,8 @@ footer .input-group .btn-primary:hover {
 
 /* Reset Password Form Wrapper */
 .reset-password-wrapper {
-    padding-top: 76px; 
-    padding: 76px 20px 76px; 
+    padding-top: 76px;
+    padding: 76px 20px 76px;
     background-color: #f8f9fa;
     min-height: auto;
     display: flex;
@@ -2298,7 +2298,7 @@ footer .input-group .btn-primary:hover {
 
 @media (max-width: 768px) {
     .reset-password-wrapper {
-        padding-top: 76px; 
+        padding-top: 76px;
         padding-left: 15px;
         padding-right: 15px;
         padding-bottom: 15px;
@@ -3403,7 +3403,7 @@ footer .input-group .btn-primary:hover {
     #mainNav {
         padding: 10px 0 !important;
     }
-    
+
     .mobile-icons-nav {
         display: flex;
         justify-content: space-between;
@@ -3623,4 +3623,41 @@ footer .input-group .btn-primary:hover {
 }
 .dashboard-table tbody tr:last-child {
     border-bottom: 1px solid #dee2e6;
+}
+
+.customer-index-dashboard {
+    padding-top: 76px;
+    padding-bottom: 40px;
+    min-height: 100vh;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+.customer-index-dashboard .actions {
+    white-space: nowrap;
+    text-align: center;
+    min-width: 100px;
+}
+
+.customer-index-dashboard .actions .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    margin: 0 0.25rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    min-width: 60px;
+    background-color: #0d6efd;
+    color: white;
+    border: 1px solid #0d6efd;
+}
+
+.customer-index-dashboard .actions .button:hover {
+    background-color: #0b5ed7;
+    border-color: #0b5ed7;
 }
