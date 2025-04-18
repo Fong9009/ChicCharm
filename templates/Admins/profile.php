@@ -33,6 +33,10 @@ $this->layout = 'default';
                                             <img src="<?= $this->Url->image('profile/' . $admin->profile_picture) ?>"
                                                  alt="Profile Picture"
                                                  class="profile-picture img-fluid rounded mx-auto d-block">
+                                        <?php else : ?>
+                                            <img src="<?= $this->Url->image('profile/blank-profile.png') ?>"
+                                                 alt="Profile Picture"
+                                                 class="profile-picture img-fluid rounded mx-auto d-block">
                                         <?php endif; ?>
                                     </div>
                                 </div>
