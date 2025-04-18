@@ -204,7 +204,7 @@ class AdminsController extends AppController
                     $data['profile_picture'] = null;
                 }
             } else {
-                $data['profile_picture'] = $admin->profile_picture;
+                    $data['profile_picture'] = $admin->profile_picture;
             }
 
             // Keep existing nonce and nonce_expiry values
