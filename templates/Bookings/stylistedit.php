@@ -13,7 +13,7 @@
             <?= $this->Form->postLink(
                 __('Delete'),
                 ['action' => 'delete', $booking->id],
-                ['confirm' => __('Are you sure you want to delete # {0}?', $booking->id), 'class' => 'side-nav-item']
+                ['confirm' => __('Are you sure you want to delete # {0}?', $booking->booking_name), 'class' => 'side-nav-item']
             ) ?>
             <?= $this->Html->link(__('List Bookings'), ['action' => 'index'], ['class' => 'side-nav-item']) ?>
         </div>

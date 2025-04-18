@@ -125,6 +125,10 @@
                             <th><?= __('Booking Date') ?></th>
                             <td><?= h($booking->booking_date) ?></td>
                         </tr>
+                        <tr>
+                            <th><?= __('Notes from Customer') ?></th>
+                            <td><?= h($booking->notes) ?></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

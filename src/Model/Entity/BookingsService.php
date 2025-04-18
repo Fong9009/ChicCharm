@@ -13,10 +13,8 @@ use Cake\ORM\Entity;
  * @property int $service_id
  * @property int $stylist_id
  * @property string $service_cost
- * @property string|null $notes
  * @property \Cake\I18n\DateTime|null $created
  * @property \Cake\I18n\DateTime|null $modified
- *
  * @property \App\Model\Entity\Booking $booking
  * @property \App\Model\Entity\Service $service
  * @property \App\Model\Entity\Stylist $stylist
@@ -43,4 +41,4 @@ class BookingsService extends Entity
         'service' => true,
         'stylist' => true,
     ];
-} 
+}
