@@ -37,7 +37,6 @@ class BookingsService extends Entity
         'service_id' => true,
         'stylist_id' => true,
         'service_cost' => true,
-        'notes' => true,
         'created' => true,
         'modified' => true,
         'booking' => true,

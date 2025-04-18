@@ -131,7 +131,18 @@ class ServicesController extends AppController
     public function delete($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
-        $service = $this->Services->get($id);
+        $service = $this->Services->get($id, [
+            'contain' => ['Bookings' => function ($q) {
+                return $q->where(['Bookings.status' => 'active']);
+            }]
+        ]);
+
+        // Check if service has any active bookings
+        if (!empty($service->bookings)) {
+            $this->Flash->error(__('Cannot delete service as it has active bookings.'));
+            return $this->redirect(['action' => 'index']);
+        }
+
         if ($this->Services->delete($service)) {
             $this->Flash->success(__('The service has been deleted.'));
         } else {

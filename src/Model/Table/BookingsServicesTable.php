@@ -83,10 +83,6 @@ class BookingsServicesTable extends Table
             ->requirePresence('service_cost', 'create')
             ->notEmptyString('service_cost');
 
-        $validator
-            ->scalar('notes')
-            ->allowEmptyString('notes');
-
         return $validator;
     }
 

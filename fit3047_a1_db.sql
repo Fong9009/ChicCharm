@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 16, 2025 at 01:49 PM
+-- Generation Time: Apr 18, 2025 at 06:13 AM
 -- Server version: 9.0.1
 -- PHP Version: 8.3.12
 
@@ -64,16 +64,9 @@ CREATE TABLE `bookings` (
   `customer_id` int DEFAULT NULL,
   `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'active',
   `start_time` time DEFAULT NULL,
-  `end_time` time DEFAULT NULL
+  `end_time` time DEFAULT NULL,
+  `notes` text COLLATE utf8mb4_general_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `bookings`
---
-
-INSERT INTO `bookings` (`id`, `booking_name`, `booking_date`, `total_cost`, `remaining_cost`, `customer_id`, `status`, `start_time`, `end_time`) VALUES
-(83, 'Booking for Chay Fong Hong', '2025-04-18', 22.50, 22.50, 1, 'cancelled', '09:00:00', '13:30:00'),
-(84, 'Booking for Chay Fong Hong', '2025-04-20', 7.50, 7.50, 1, 'cancelled', '10:45:00', '12:15:00');
 
 -- --------------------------------------------------------
 
@@ -86,21 +79,10 @@ CREATE TABLE `bookings_services` (
   `booking_id` int NOT NULL,
   `service_id` int NOT NULL,
   `service_cost` decimal(10,2) NOT NULL,
-  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created` datetime DEFAULT CURRENT_TIMESTAMP,
   `modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `stylist_id` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `bookings_services`
---
-
-INSERT INTO `bookings_services` (`id`, `booking_id`, `service_id`, `service_cost`, `notes`, `created`, `modified`, `stylist_id`) VALUES
-(158, 83, 1, 6.50, NULL, '2025-04-16 12:11:48', '2025-04-16 12:11:48', 4),
-(159, 83, 2, 7.50, NULL, '2025-04-16 12:11:48', '2025-04-16 12:11:48', 5),
-(160, 83, 3, 8.50, NULL, '2025-04-16 12:11:48', '2025-04-16 12:11:48', 2),
-(161, 84, 2, 7.50, NULL, '2025-04-16 12:12:14', '2025-04-16 12:12:14', 2);
 
 -- --------------------------------------------------------
 
@@ -185,7 +167,7 @@ INSERT INTO `contacts` (`id`, `first_name`, `last_name`, `email`, `phone_number`
 (41, 'Olga Bennett', 'Mohammad Erickson', 'mohammaderickson_olgabennett@hotmail.couk', '0550183186', 'Donec luctus aliquet odio. Etiam ligula tortor, dictum eu, placerat', 1, 1, '2025-08-22 00:06:17', '2024-09-05 14:15:55'),
 (42, 'Cara Weiss', 'Madeline Adkins', 'c_madelineadkins6379@outlook.net', '0697770682', 'Ut semper pretium neque. Morbi quis', 1, 1, '2025-02-15 18:59:34', '2026-03-04 03:06:38'),
 (43, 'Blake George', 'Wilma Webster', 'wilmawebster_blakegeorge@icloud.org', '0708784492', 'ultrices iaculis odio. Nam interdum enim', 1, 1, '2024-05-10 00:39:22', '2026-01-07 00:32:15'),
-(44, 'Neil Sanford', 'Coby Robertson', 'c_neilsanford2816@icloud.couk', '0177575663', 'et malesuada fames ac turpis egestas.', 1, 1, '2025-04-28 16:26:49', '2024-10-13 06:19:53'),
+(44, 'Neil Sanford', 'Coby Robertson', 'c_neilsanford2816@icloud.couk', '0177575663', 'et malesuada fames ac turpis egestas.', 1, 0, '2025-04-28 16:26:49', '2025-04-17 03:46:26'),
 (45, 'Quentin Robinson', 'Mohammad Rollins', 'mohammadrollinsquentinrobinson@protonmail.org', '0736131449', 'nec, eleifend non, dapibus rutrum, justo. Praesent luctus. Curabitur egestas', 1, 1, '2025-03-04 21:42:40', '2024-05-15 13:34:14'),
 (46, 'Ruth Robinson', 'Shafira Dudley', 'r.shafiradudley@yahoo.net', '0626373659', 'arcu. Sed eu nibh vulputate mauris sagittis', 1, 1, '2025-01-05 20:35:20', '2026-02-20 03:39:05'),
 (47, 'Brielle Santana', 'Fuller Parsons', 'briellesantana-fullerparsons@hotmail.couk', '0377233324', 'tortor, dictum eu, placerat eget, venenatis a, magna. Lorem ipsum', 1, 1, '2024-04-08 15:53:00', '2024-10-05 15:35:52'),
@@ -288,9 +270,47 @@ CREATE TABLE `customers` (
 --
 
 INSERT INTO `customers` (`id`, `first_name`, `last_name`, `email`, `password`, `nonce`, `nonce_expiry`, `created`, `modified`, `type`, `profile_picture`) VALUES
-(1, 'Chay Fong', 'Hong', 'chayfong9009@gmail.com', '$2y$10$hIXeX/RjXv4ox29mSuSZiuxclpjRXzyhjO9bgG5is13uBubV8gbqq', 'cc15950b7cef51a668b0f471703d014cb0951e29a7774c49847a669a719ad4bf972d19fdc3cf2ba6ab3adfa14ec3b63a49047e642ebca46469bd429cd37b8471', '2025-04-20 13:28:57', '2025-03-26 11:10:12', '2025-04-16 13:28:32', 'customer', NULL),
+(1, 'Chay Fong', 'Hong', 'chayfong9009@gmail.com', '$2y$10$hIXeX/RjXv4ox29mSuSZiuxclpjRXzyhjO9bgG5is13uBubV8gbqq', 'cc15950b7cef51a668b0f471703d014cb0951e29a7774c49847a669a719ad4bf972d19fdc3cf2ba6ab3adfa14ec3b63a49047e642ebca46469bd429cd37b8471', '2025-04-20 13:28:57', '2025-03-26 11:10:12', '2025-04-18 04:50:05', 'customer', '11662_sung-jin-woo.png'),
 (2, 'Christian', 'Cochrane', 'cakephp@example.com', '$2y$10$4oCG2ResnEQbYk2rgtdTGe1faLZPOu29GZma4EfRmQ.B6vyHOk7u6', '', NULL, '2025-04-04 02:31:18', '2025-04-16 13:25:10', 'customer', NULL),
-(58, 'Chay', 'Hong', 'chayfong820@gmail.com', '$2y$10$dHltoNqKRGRLEd1Xa4yhDOh2A89pTvzeahyRJ4aGCTGn5qs5WdL7W', NULL, NULL, '2025-04-16 13:11:13', '2025-04-16 13:13:51', 'customer', NULL);
+(59, 'Chay Fong', 'Hong', 'chayfong820@gmail.com', '$2y$10$MYT4tNwYnBExv5VKPy1HrOc1DF0tWSB7Sb3g..0kI6UADfYnFPJHe', NULL, NULL, '2025-04-17 05:00:13', '2025-04-17 05:00:13', 'customer', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `payment_history`
+--
+
+CREATE TABLE `payment_history` (
+  `id` int NOT NULL,
+  `booking_id` int NOT NULL,
+  `amount` decimal(10,2) NOT NULL,
+  `payment_method` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `transaction_id` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created` datetime NOT NULL,
+  `modified` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `phinxlog`
+--
+
+CREATE TABLE `phinxlog` (
+  `version` bigint NOT NULL,
+  `migration_name` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `start_time` timestamp NULL DEFAULT NULL,
+  `end_time` timestamp NULL DEFAULT NULL,
+  `breakpoint` tinyint(1) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `phinxlog`
+--
+
+INSERT INTO `phinxlog` (`version`, `migration_name`, `start_time`, `end_time`, `breakpoint`) VALUES
+(20250418044655, 'RemoveNotesFromBookingsServices', '2025-04-18 04:47:08', '2025-04-18 04:47:08', 0);
 
 -- --------------------------------------------------------
 
@@ -339,9 +359,9 @@ CREATE TABLE `stylists` (
 --
 
 INSERT INTO `stylists` (`id`, `first_name`, `last_name`, `email`, `password`, `nonce`, `nonce_expiry`, `created`, `modified`, `type`, `profile_picture`) VALUES
-(2, 'Lucy', 'Reig', 'lucyr@chiccharm.com.au', '$2y$10$UaR/Z4ljlvG1LztxsODz8uWljiN0Hv8MpN8mKZjZ5NEBOfchCFwei', NULL, NULL, '2025-04-05 11:51:05', '2025-04-05 15:24:22', 'stylist', NULL),
-(4, 'Michael ', 'Jackson', 'hehe@gmail.com', '$2y$10$QAXdlH9eRlnPjL83P300BuDDNzHyDjchXuSxfoJTVNg3Suv8Me/UW', NULL, NULL, '2025-04-05 04:23:35', '2025-04-05 04:23:35', 'stylist', NULL),
-(5, 'Michelle', 'Yang', 'Michelleyang01@gmail.com', '$2y$10$/2Ya/xrRlHOry9uwG8Nh3OtfmSj3pCQJ/phKdkbt0KAVz0kCRaCza', NULL, NULL, '2025-04-05 14:48:30', '2025-04-05 14:48:30', 'stylist', NULL);
+(2, 'Lucy', 'Reig', 'lucyr@chiccharm.com.au', '$2y$10$UaR/Z4ljlvG1LztxsODz8uWljiN0Hv8MpN8mKZjZ5NEBOfchCFwei', NULL, NULL, '2025-04-05 11:51:05', '2025-04-18 06:09:00', 'stylist', NULL),
+(4, 'Michael ', 'Jackson', 'hehe@gmail.com', '$2y$10$QAXdlH9eRlnPjL83P300BuDDNzHyDjchXuSxfoJTVNg3Suv8Me/UW', NULL, NULL, '2025-04-05 04:23:35', '2025-04-18 06:09:03', 'stylist', NULL),
+(5, 'Michelle', 'Yang', 'Michelleyang01@gmail.com', '$2y$10$fAokVzWnNpCP.yZ7VkmsxeKgXY7tJ0l0UNFZZQ4RJfioBRwS0eIyW', NULL, NULL, '2025-04-05 14:48:30', '2025-04-18 06:09:07', 'stylist', NULL);
 
 -- --------------------------------------------------------
 
@@ -361,10 +381,14 @@ CREATE TABLE `stylists_services` (
 
 INSERT INTO `stylists_services` (`id`, `stylist_id`, `service_id`) VALUES
 (3, 2, 2),
-(4, 2, 3),
 (7, 4, 1),
 (8, 4, 2),
-(12, 5, 2);
+(15, 5, 1),
+(16, 2, 3),
+(17, 5, 3),
+(18, 2, 1),
+(19, 4, 3),
+(20, 5, 2);
 
 --
 -- Indexes for dumped tables
@@ -428,6 +452,19 @@ ALTER TABLE `customers`
   ADD UNIQUE KEY `unique_email` (`email`);
 
 --
+-- Indexes for table `payment_history`
+--
+ALTER TABLE `payment_history`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `booking_id` (`booking_id`);
+
+--
+-- Indexes for table `phinxlog`
+--
+ALTER TABLE `phinxlog`
+  ADD PRIMARY KEY (`version`);
+
+--
 -- Indexes for table `services`
 --
 ALTER TABLE `services`
@@ -463,19 +500,19 @@ ALTER TABLE `admins`
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=85;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=119;
 
 --
 -- AUTO_INCREMENT for table `bookings_services`
 --
 ALTER TABLE `bookings_services`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=162;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=212;
 
 --
 -- AUTO_INCREMENT for table `bookings_stylists`
 --
 ALTER TABLE `bookings_stylists`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=126;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=175;
 
 --
 -- AUTO_INCREMENT for table `contacts`
@@ -493,7 +530,13 @@ ALTER TABLE `content_blocks`
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
+
+--
+-- AUTO_INCREMENT for table `payment_history`
+--
+ALTER TABLE `payment_history`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `services`
@@ -511,7 +554,7 @@ ALTER TABLE `stylists`
 -- AUTO_INCREMENT for table `stylists_services`
 --
 ALTER TABLE `stylists_services`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- Constraints for dumped tables
@@ -536,6 +579,12 @@ ALTER TABLE `bookings_services`
 ALTER TABLE `bookings_stylists`
   ADD CONSTRAINT `bookingForeignKey` FOREIGN KEY (`booking_id`) REFERENCES `bookings` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `stylistBookingForeignKey` FOREIGN KEY (`stylist_id`) REFERENCES `stylists` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `payment_history`
+--
+ALTER TABLE `payment_history`
+  ADD CONSTRAINT `payment_history_ibfk_1` FOREIGN KEY (`booking_id`) REFERENCES `bookings` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `stylists_services`

@@ -86,7 +86,7 @@
                                     <table class="dashboard-table">
                                         <thead>
                                             <tr>
-                                                <th><?= $this->Paginator->sort('booking_date') ?></th>
+                                                <th><?= $this->Paginator->sort('booking_date & time') ?></th>
                                                 <th><?= __('Stylists & Services') ?></th>
                                                 <th><?= $this->Paginator->sort('total_cost') ?></th>
                                                 <th><?= __('Notes') ?></th>

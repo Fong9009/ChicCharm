@@ -153,7 +153,20 @@ class StylistsController extends AppController
     public function delete($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
-        $stylist = $this->Stylists->get($id);
+        $stylist = $this->Stylists->get($id, [
+            'contain' => ['BookingsStylists' => function ($q) {
+                return $q->innerJoinWith('Bookings', function ($q) {
+                    return $q->where(['Bookings.status' => 'active']);
+                });
+            }]
+        ]);
+
+        // Check if stylist has any active bookings
+        if (!empty($stylist->bookings_stylists)) {
+            $this->Flash->error(__('Cannot delete stylist as they have active bookings.'));
+            return $this->redirect(['action' => 'index']);
+        }
+
         if ($this->Stylists->delete($stylist)) {
             $this->Flash->success(__('The stylist has been deleted.'));
         } else {

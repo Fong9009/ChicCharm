@@ -41,5 +41,6 @@ class Booking extends Entity
         'stylists' => true,
         'services' => true,
         'status' => true,
+        'notes' => true,
     ];
 }

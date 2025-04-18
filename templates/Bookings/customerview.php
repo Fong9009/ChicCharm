@@ -15,7 +15,7 @@
             </div>
 
             <div class="info-group">
-                <label><?= __('Booking Date') ?></label>
+                <label><?= __('Booking Date & Time') ?></label>
                 <p class="form-control-static">
                     <?= h($booking->booking_date->format('F j, Y')) ?><br>
                     <?php if ($booking->start_time && $booking->end_time): ?>
