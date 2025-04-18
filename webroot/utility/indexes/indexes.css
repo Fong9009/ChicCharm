@@ -20,6 +20,27 @@
     justify-content: center;
 }
 
+.homepage-card-header {
+    background-color: #00a4cd;
+    border:none;
+}
+.homepage-card-body {
+    background-color: #00a4cd;
+}
+.homepage-card-footer {
+    background-color: #0185a8;
+    color: white;
+    display: flex;
+    justify-content: center;
+}
+
+.homepage-footer .view-button {
+    background-color: #0185a8;
+    color: white;
+    display: flex;
+    justify-content: center;
+}
+
 .view-card-h4 {
     font-size: 28px;
     font-weight: bold;
@@ -85,4 +106,5 @@
     display: flex;
     justify-content: center;
 }
+
 
