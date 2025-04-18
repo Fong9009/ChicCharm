@@ -109,7 +109,7 @@ $this->Html->script('custom', ['block' => true]);
                                     ['action' => 'delete', $customer->id],
                                     [
                                         'method' => 'delete',
-                                        'confirm' => __('Are you sure you want to delete # {0}?', $customer->id),
+                                        'confirm' => __('Are you sure you want to delete # {0}? You will not be able to get them back', ($customer->first_name . ' ' . $customer->last_name)),
                                         'class' => 'button'
                                     ]
                                 ) ?>

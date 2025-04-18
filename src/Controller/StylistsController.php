@@ -55,18 +55,18 @@ class StylistsController extends AppController
         $stylist = $this->Stylists->newEmptyEntity();
         if ($this->request->is('post')) {
             $data = $this->request->getData();
-            
+
             // Check if email exists in stylists table
             $existingStylist = $this->Stylists->find()
                 ->where(['email' => $data['email']])
                 ->first();
-                
+
             // Check if email exists in customers table
             $customersTable = $this->fetchTable('Customers');
             $existingCustomer = $customersTable->find()
                 ->where(['email' => $data['email']])
                 ->first();
-                
+
             // Check if email exists in admins table
             $adminsTable = $this->fetchTable('Admins');
             $existingAdmin = $adminsTable->find()
@@ -77,7 +77,7 @@ class StylistsController extends AppController
                 $this->Flash->error(__('This email is already registered. Please use a different email address.'));
                 return;
             }
-            
+
             $data['type'] = 'stylist';
             $stylist = $this->Stylists->patchEntity($stylist, $data);
             if ($this->Stylists->save($stylist)) {

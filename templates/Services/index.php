@@ -75,7 +75,7 @@
                         <?= $this->Html->link(__('Edit'), ['action' => 'edit', $service->id], ['class' => 'button']) ?>
                         <?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $service->id], [
                             'method' => 'delete',
-                            'confirm' => __('Are you sure you want to delete # {0}?', $service->id),
+                            'confirm' => __('Are you sure you want to delete # {0}? You will not be able to get it back', $service->service_name),
                             'class' => 'button',
                         ]) ?>
                     </td>
