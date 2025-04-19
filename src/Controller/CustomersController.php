@@ -64,10 +64,9 @@ class CustomersController extends AppController
             contain: ['Bookings']
         );
 
-
         // Get upcoming bookings with the same structure as customerindex
         $bookingsTable = $this->fetchTable('Bookings');
-        $bookings = $bookingsTable->find()
+        $activeBookings = $bookingsTable->find()
             ->where([
                 'customer_id' => $this->Authentication->getIdentity()->id,
                 'status' => 'active'
@@ -88,7 +87,29 @@ class CustomersController extends AppController
             ])
             ->limit(5);
 
-        $this->set(compact('customer', 'bookings'));
+        // Get past bookings (finished and cancelled)
+        $pastBookings = $bookingsTable->find()
+            ->where([
+                'customer_id' => $this->Authentication->getIdentity()->id,
+                'status IN' => ['finished', 'cancelled']
+            ])
+            ->contain([
+                'BookingsServices' => [
+                    'Services',
+                    'Stylists' => [
+                        'fields' => ['id', 'first_name', 'last_name']
+                    ]
+                ],
+                'BookingsStylists' => [
+                    'Stylists' => [
+                        'fields' => ['id', 'first_name', 'last_name']
+                    ]
+                ]
+            ])
+            ->order(['booking_date' => 'DESC'])
+            ->limit(5);  // Show only the 5 most recent past bookings
+
+        $this->set(compact('customer', 'activeBookings', 'pastBookings'));
     }
 
     /**

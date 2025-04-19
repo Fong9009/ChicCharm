@@ -58,6 +58,20 @@ class BookingsController extends AppController
                 return $this->redirect(['controller' => 'Pages', 'action' => 'display', 'home']);
             }
         }
+
+        // Automatically update booking statuses for past bookings
+        $now = new \Cake\I18n\DateTime();
+        $pastBookings = $this->Bookings->find()
+            ->where([
+                'status' => 'active',
+                'booking_date <=' => $now->format('Y-m-d'),
+                'end_time <' => $now->format('H:i:s')
+            ]);
+
+        foreach ($pastBookings as $booking) {
+            $booking->status = 'finished';
+            $this->Bookings->save($booking);
+        }
     }
 
     /**
@@ -75,10 +89,25 @@ class BookingsController extends AppController
         }
 
         $query = $this->Bookings->find()
+            ->select([
+                'Bookings.id',
+                'Bookings.booking_name',
+                'Bookings.booking_date',
+                'Bookings.start_time',
+                'Bookings.end_time',
+                'Bookings.total_cost',
+                'Bookings.status',
+                'Bookings.notes'
+            ])
+            ->where(['status' => 'active'])
             ->contain([
-                'Customers',
+                'Customers' => [
+                    'fields' => ['id', 'first_name', 'last_name']
+                ],
                 'BookingsServices' => [
-                    'Services',
+                    'Services' => [
+                        'fields' => ['id', 'service_name', 'service_cost']
+                    ],
                     'Stylists' => [
                         'fields' => ['id', 'first_name', 'last_name']
                     ]
@@ -89,7 +118,7 @@ class BookingsController extends AppController
                     ]
                 ]
             ])
-            ->order(['status' => 'ASC', 'booking_date' => 'DESC']);
+            ->order(['booking_date' => 'ASC']);
         $bookings = $this->paginate($query);
 
         $this->set(compact('bookings'));
@@ -290,9 +319,9 @@ class BookingsController extends AppController
         $this->request->allowMethod(['post', 'delete']);
         $booking = $this->Bookings->get($id);
 
-        // Only allow deletion of cancelled bookings
-        if ($booking->status !== 'cancelled') {
-            $this->Flash->error(__('Only cancelled bookings can be deleted.'));
+        // Allow deletion of both cancelled and finished bookings
+        if ($booking->status !== 'cancelled' && $booking->status !== 'finished') {
+            $this->Flash->error(__('Only cancelled or finished bookings can be deleted.'));
             return $this->redirect(['action' => 'index']);
         }
 
@@ -302,7 +331,7 @@ class BookingsController extends AppController
             $this->Flash->error(__('The booking could not be deleted. Please, try again.'));
         }
 
-        return $this->redirect(['action' => 'index']);
+        return $this->redirect(['action' => 'adminPastBookings']);
     }
 
     public function customerdelete($id = null)
@@ -443,14 +472,6 @@ class BookingsController extends AppController
         if ($this->request->is('post')) {
             $data = $this->request->getData();
 
-            //Obtains the Customer's first and last name
-            $customersTable = $this->fetchTable('Customers');
-            $customer = $customersTable->get($data['customer_id'], [
-                'fields' => ['id', 'first_name', 'last_name']
-            ]);
-
-            $data['booking_name'] = 'Booking for ' . $customer->first_name . ' ' . $customer->last_name;
-
             // Check if end time exceeds 5 PM
             if (isset($data['end_time'])) {
                 $endTime = new \DateTime($data['end_time']);
@@ -466,6 +487,12 @@ class BookingsController extends AppController
             if (isset($data['booking_date'])) {
                 $date = new \DateTime($data['booking_date']);
                 $data['booking_date'] = $date->format('Y-m-d');
+            }
+
+            // Get customer details and set booking name
+            if (isset($data['customer_id'])) {
+                $customer = $this->Bookings->Customers->get($data['customer_id']);
+                $data['booking_name'] = 'Booking for ' . $customer->first_name . ' ' . $customer->last_name;
             }
 
             // Calculate total cost from all selected services
@@ -537,13 +564,10 @@ class BookingsController extends AppController
             $this->Flash->error(__('The booking could not be saved. Please, try again.'));
         }
 
-
-
         $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
-        $customersTable = $this->fetchTable('Customers');
-        $customers = $customersTable->find('list', limit: 200)->all()->toArray();
+        $customers = $this->Bookings->Customers->find('list', limit: 200)->all();
         $services = $this->fetchTable('Services')->find('all')->all();
-        $this->set(compact('booking', 'stylists', 'services','customers'));
+        $this->set(compact('booking', 'stylists', 'services', 'customers'));
     }
 
 
@@ -568,11 +592,13 @@ class BookingsController extends AppController
                 'BookingsServices' => [
                     'Services' => [
                         'fields' => ['id', 'service_name', 'service_cost']
+                    ],
+                    'Stylists' => [
+                        'fields' => ['id', 'first_name', 'last_name']
                     ]
                 ]
             ]
         );
-
 
         $this->set(compact('booking'));
     }
@@ -860,5 +886,113 @@ class BookingsController extends AppController
             return $this->response->withStatus(500)
                 ->withStringBody(json_encode(['error' => 'An error occurred while fetching available time slots']));
         }
+    }
+
+    /**
+     * Update booking statuses to finished for past bookings
+     *
+     * @return void
+     */
+    public function updateBookingStatuses()
+    {
+        $now = new \Cake\I18n\DateTime();
+        
+        // Find all active bookings that have ended
+        $pastBookings = $this->Bookings->find()
+            ->where([
+                'status' => 'active',
+                'booking_date <=' => $now->format('Y-m-d'),
+                'end_time <' => $now->format('H:i:s')
+            ]);
+
+        foreach ($pastBookings as $booking) {
+            $booking->status = 'finished';
+            $this->Bookings->save($booking);
+        }
+    }
+
+    /**
+     * View past bookings (Admin only)
+     *
+     * @return \Cake\Http\Response|null|void Renders view
+     */
+    public function adminPastBookings()
+    {
+        // Check if user is admin
+        $user = $this->Authentication->getIdentity();
+        if (!$user || $user->type !== 'admin') {
+            $this->Flash->error('Access denied. Admin only area.');
+            return $this->redirect(['action' => 'customerindex']);
+        }
+
+        $query = $this->Bookings->find()
+            ->select([
+                'Bookings.id',
+                'Bookings.booking_name',
+                'Bookings.booking_date',
+                'Bookings.start_time',
+                'Bookings.end_time',
+                'Bookings.total_cost',
+                'Bookings.status',
+                'Bookings.notes'
+            ])
+            ->where(['status IN' => ['finished', 'cancelled']])
+            ->contain([
+                'BookingsServices' => [
+                    'Services' => [
+                        'fields' => ['id', 'service_name', 'service_cost']
+                    ],
+                    'Stylists' => [
+                        'fields' => ['id', 'first_name', 'last_name']
+                    ]
+                ],
+                'BookingsStylists' => [
+                    'Stylists' => [
+                        'fields' => ['id', 'first_name', 'last_name']
+                    ]
+                ]
+            ])
+            ->order(['booking_date' => 'DESC']);
+        $bookings = $this->paginate($query);
+
+        $this->set(compact('bookings'));
+    }
+
+    /**
+     * View customer's past bookings
+     *
+     * @return \Cake\Http\Response|null|void Renders view
+     */
+    public function customerPastBookings()
+    {
+        // Get the current logged-in customer
+        $user = $this->Authentication->getIdentity();
+        if (!$user || $user->type !== 'customer') {
+            $this->Flash->error('Access denied. Please log in as a customer.');
+            return $this->redirect(['controller' => 'Pages', 'action' => 'display', 'home']);
+        }
+
+        $query = $this->Bookings->find()
+            ->where([
+                'customer_id' => $user->id,
+                'status IN' => ['finished', 'cancelled']
+            ])
+            ->contain([
+                'BookingsServices' => [
+                    'Services',
+                    'Stylists' => [
+                        'fields' => ['id', 'first_name', 'last_name']
+                    ]
+                ],
+                'BookingsStylists' => [
+                    'Stylists' => [
+                        'fields' => ['id', 'first_name', 'last_name']
+                    ]
+                ]
+            ])
+            ->order(['booking_date' => 'DESC']);
+        $bookings = $this->paginate($query);
+
+        $this->set(compact('bookings'));
     }
 }

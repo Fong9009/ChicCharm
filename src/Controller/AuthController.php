@@ -449,6 +449,11 @@ class AuthController extends AppController
         $this->request->allowMethod(['get', 'post']);
         $result = $this->Authentication->getResult();
 
+        // Check if redirected from booking button
+        if ($this->request->getQuery('redirect') === 'booking') {
+            $this->Flash->info('Please login to make a booking.');
+        }
+
         if ($result && $result->isValid()) {
             $user = $result->getData();
 

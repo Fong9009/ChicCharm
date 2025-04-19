@@ -204,13 +204,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const serviceLabel = document.querySelector(`label[for="service-${serviceId}"]`).textContent;
             const container = document.createElement('div');
             container.className = 'service-stylist-selection mb-3';
+            container.dataset.serviceId = serviceId;
 
             const label = document.createElement('h6');
             label.textContent = serviceLabel;
             container.appendChild(label);
 
             const select = document.createElement('select');
-            select.className = 'form-control';
+            select.className = 'form-control stylist-select';
             select.name = `bookings_services[${serviceId}][stylist_id]`;
             select.required = true;
 
@@ -242,7 +243,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     select.appendChild(option);
                 });
             } else {
-                select.innerHTML = '<option value="">No available services for this stylist at this time</option>';
+                select.innerHTML = '<option value="">No available stylists for this time slot</option>';
                 select.disabled = true;
             }
         }
