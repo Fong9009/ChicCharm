@@ -289,9 +289,11 @@ class AdminsController extends AppController
         $stylistsTable = $this->fetchTable('Stylists');
         $stylistCount = $stylistsTable->find()->count();
 
-        //Provides Booking Count
+        //Provides Active Booking Count
         $bookingsTable = $this->fetchTable('Bookings');
-        $bookingCount = $bookingsTable->find()->count();
+        $bookingCount = $bookingsTable->find()
+            ->where(['status' => 'active'])
+            ->count();
 
         //Provides Service Count
         $servicesTable = $this->fetchTable('Services');

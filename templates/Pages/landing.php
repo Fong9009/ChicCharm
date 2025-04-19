@@ -6,13 +6,13 @@ if ($identity) {
     if ($identity->type === 'customer') {
         $link = ['controller' => 'Bookings', 'action' => 'customerbooking'];
     } elseif ($identity->type === 'admin') {
-        $link = ['controller' => 'Bookings', 'action' => 'index'];
+        $link = ['controller' => 'Pages', 'action' => 'display', 'landing'];
+        $this->Flash->error('This feature is for customers only.');
     } else {
-        //For expandability
         $link = ['controller' => 'Pages', 'action' => 'display', 'landing'];
     }
 } else {
-    $link = ['controller' => 'Auth', 'action' => 'login'];
+    $link = ['controller' => 'Auth', 'action' => 'login', '?' => ['redirect' => 'booking']];
 }
 ?>
 <!DOCTYPE html>
@@ -51,7 +51,10 @@ if ($identity) {
                             <?= $this->ContentBlock->text('title-catch'); ?>
                         </p>
                         <div class="text-center text-md-start">
-                            <a> <?= $this->Html->link($bookingButton, $link, ['class' => 'btn btn-primary btn-xl']) ?></a>
+                            <?php if ($message): ?>
+                                <div class="alert alert-info mb-3"><?= h($message) ?></div>
+                            <?php endif; ?>
+                            <a> <?= $this->Html->link($bookingButton, $link, ['class' => 'btn btn-primary btn-xl', 'onclick' => 'handleBookingClick(event)']) ?></a>
                         </div>
                     </div>
                 </div>
@@ -162,7 +165,10 @@ if ($identity) {
                 <hr class="flex-grow-1 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
                 <div class="row gx-4 gx-lg-5">
                     <div class="d-flex justify-content-center mb-4">
-                        <?= $this->Html->link($bookingButton, $link, ['class' => 'btn btn-primary btn-xl']) ?>
+                        <?php if ($message): ?>
+                            <div class="alert alert-info mb-3"><?= h($message) ?></div>
+                        <?php endif; ?>
+                        <?= $this->Html->link($bookingButton, $link, ['class' => 'btn btn-primary btn-xl', 'onclick' => 'handleBookingClick(event)']) ?>
                     </div>
                 </div>
             </div>

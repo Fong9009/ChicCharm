@@ -175,12 +175,12 @@ $identity = $this->request->getAttribute('identity');
                 <div class="card h-100">
                     <div class="card-header booking-card-header d-flex justify-content-between align-items-center">
                         <div>
-                            <h4 class="booking-card-h4">Bookings</h4>
+                            <h4 class="booking-card-h4">Active Bookings</h4>
                         </div>
                         <i class="material-icons booking-icon">event</i>
                     </div>
                     <div class="card-body booking-card-body">
-                        <h3 class="booking-card-h3">Total Bookings</h3>
+                        <h3 class="booking-card-h3">Total Active Bookings</h3>
                         <div class="total-value-container">
                             <p class="booking-card-count"><?= h($bookingCount) ?></p>
                         </div>

@@ -25,7 +25,7 @@
                                 <span class="mb-0 text-truncate">Back To Dashboard</span>
                             </div>
                         </div>',
-                        ['controller' => 'Admins', 'action' => 'dashboard'],
+                        ['controller' => 'Customers', 'action' => 'dashboard'],
                         ['escape' => false, 'class' => 'card-link-wrapper d-block text-decoration-none']
                     ) ?>
                 </div>
@@ -33,31 +33,15 @@
                     <?= $this->Html->link(
                         '<div class="card h-100">
                             <div class="card-header new-card-header d-flex justify-content-between align-items-center flex-wrap">
-                                <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">New Booking</h4>
-                                <i class="material-icons view-icon ms-2">add</i>
+                                <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">Current Bookings</h4>
+                                <i class="material-icons view-icon ms-2">list</i>
                             </div>
                             <div class="card-body new-card-body"></div>
                             <div class="card-footer new-card-footer">
-                                <span  class="mb-0 text-truncate">Add Booking</span>
+                                <span class="mb-0 text-truncate">View Current Bookings</span>
                             </div>
                         </div>',
-                        ['controller' => 'Bookings', 'action' => 'adminbooking'],
-                        ['escape' => false, 'class' => 'card-link-wrapper d-block text-decoration-none']
-                    ) ?>
-                </div>
-                <div class="col-lg-4 col-md-6 col-sm-12 mb-3 side-nav-item">
-                    <?= $this->Html->link(
-                        '<div class="card h-100">
-                            <div class="card-header new-card-header d-flex justify-content-between align-items-center flex-wrap">
-                                <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">Past Bookings</h4>
-                                <i class="material-icons view-icon ms-2">history</i>
-                            </div>
-                            <div class="card-body new-card-body"></div>
-                            <div class="card-footer new-card-footer">
-                                <span class="mb-0 text-truncate">View Past Bookings</span>
-                            </div>
-                        </div>',
-                        ['action' => 'adminPastBookings'],
+                        ['action' => 'customerindex'],
                         ['escape' => false, 'class' => 'card-link-wrapper d-block text-decoration-none']
                     ) ?>
                 </div>
@@ -67,7 +51,7 @@
     <div class="table-responsive mt-4">
         <div class="container">
             <div class="row align-items-center">
-                <h3><?= __('Active Bookings') ?></h3>
+                <h3><?= __('My Booking History') ?></h3>
             </div>
         </div>
         <table>
@@ -76,9 +60,9 @@
                 <th><?= $this->Paginator->sort('booking_name') ?></th>
                 <th><?= $this->Paginator->sort('booking_date') ?></th>
                 <th><?= __('Stylists & Services') ?></th>
-                <th><?= __('Notes') ?></th>
                 <th><?= $this->Paginator->sort('total_cost') ?></th>
                 <th><?= $this->Paginator->sort('status') ?></th>
+                <th><?= __('Notes') ?></th>
                 <th class="actions"><?= __('Actions') ?></th>
             </tr>
             </thead>
@@ -91,7 +75,7 @@
                             <?= h($booking->booking_date->format('Y-m-d')) ?><br>
                         <?php endif; ?>
                         <?php if ($booking->start_time && $booking->end_time): ?>
-                            <?= h($booking->start_time->format('g:i A')) ?> - <?= h($booking->end_time->format('g:i A')) ?>
+                            <?= h($booking->start_time->format('H:i')) ?> - <?= h($booking->end_time->format('H:i')) ?>
                         <?php endif; ?>
                     </td>
                     <td>
@@ -130,32 +114,17 @@
                             <p>No services booked</p>
                         <?php endif; ?>
                     </td>
-                    <td><?= !empty($booking->notes) ? h($booking->notes) : 'No notes' ?></td>
                     <td><?= $this->Number->currency($booking->total_cost) ?></td>
                     <td>
-                        <span class="badge <?= $booking->status === 'active' ? 'bg-success' : 'bg-secondary' ?>">
+                        <span class="badge <?= 
+                            $booking->status === 'finished' ? 'bg-info' : 'bg-secondary' 
+                        ?>">
                             <?= h($booking->status) ?>
                         </span>
                     </td>
+                    <td><?= !empty($booking->notes) ? h($booking->notes) : 'No notes' ?></td>
                     <td class="actions">
-                        <?= $this->Html->link(__('View'), ['action' => 'view', $booking->id], ['class' => 'button']) ?>
-                        <?php if ($booking->status === 'active'): ?>
-                            <?= $this->Html->link(__('Add Stylist'), [
-                                'controller' => 'bookingsStylists',
-                                'action' => 'customerstylistadd', $booking->id], ['class' => 'button']) ?>
-                            <?= $this->Html->link(__('Edit'), ['action' => 'edit', $booking->id], ['class' => 'button']) ?>
-                            <span class="text-muted small">Cannot delete active bookings</span>
-                        <?php else: ?>
-                            <?= $this->Form->postLink(
-                                __('Delete'),
-                                ['action' => 'delete', $booking->id],
-                                [
-                                    'method' => 'delete',
-                                    'confirm' => __('Are you sure you want to permanently delete this {0} booking?', $booking->status),
-                                    'class' => 'button btn-danger',
-                                ]
-                            ) ?>
-                        <?php endif; ?>
+                        <?= $this->Html->link(__('View'), ['action' => 'customerview', $booking->id], ['class' => 'button']) ?>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -172,4 +141,4 @@
         </ul>
         <p><?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} record(s) out of {{count}} total')) ?></p>
     </div>
-</div>
+</div> 

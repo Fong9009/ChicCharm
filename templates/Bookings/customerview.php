@@ -72,15 +72,17 @@
                 ['controller' => 'Customers', 'action' => 'dashboard'],
                 ['class' => 'btn btn-secondary']
             ) ?>
-            <?= $this->Form->postLink(
-                __('Cancel Booking'),
-                ['action' => 'customerdelete', $booking->id],
-                [
-                    'method' => 'delete',
-                    'confirm' => __('Are you sure you want to cancel this booking?'),
-                    'class' => 'btn btn-danger',
-                ]
-            ) ?>
+            <?php if ($booking->status === 'active'): ?>
+                <?= $this->Form->postLink(
+                    __('Cancel Booking'),
+                    ['action' => 'customerdelete', $booking->id],
+                    [
+                        'method' => 'delete',
+                        'confirm' => __('Are you sure you want to cancel this booking?'),
+                        'class' => 'btn btn-danger',
+                    ]
+                ) ?>
+            <?php endif; ?>
         </div>
     </div>
 </div>
