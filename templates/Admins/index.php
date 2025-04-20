@@ -105,7 +105,8 @@ $adminId = $this->request->getAttribute('identity')->id
                             <td class="actions">
                                 <?= $this->Html->link(__('View'), ['action' => 'view', $admin->id], ['class' => 'button']) ?>
                                 <?php if ($admin->id == $adminId): ?>
-                                    <?= $this->Html->link(__('Edit'), ['action' => 'edit', $admin->id], ['class' => 'button']) ?>
+                                    <?= $this->Html->link(__('Edit'), ['action' => 'edit', $admin->id], ['class' => 'button btn-primary']) ?>
+                                    <span class="text-muted small">Cannot delete your own account</span>
                                 <?php endif; ?>
                                 <?php if ($admin->id != $adminId): ?>
                                     <?= $this->Form->postLink(

@@ -10,16 +10,53 @@
 // Add the JavaScript file
 $this->Html->script('booking', ['block' => 'script']);
 ?>
+<?= $this->Html->css('/utility/indexes/indexes.css') ?>
+<?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
 <script>
     const apiUrl = '<?= $this->Url->build("/bookings/get-stylists") ?>';
     const apiUrl2 = '<?= $this->Url->build("/bookings/get-available-time-slots") ?>';
 </script>
 <div class="booking-form-wrapper">
     <div class="row">
-        <div class="side-nav">
-        <h4 class="heading"><?= __('Actions') ?></h4>
-        <?= $this->Html->link(__('My Bookings'), ['action' => 'customerindex'], ['class' => 'side-nav-item']) ?>
-        </div>
+        <aside class="column">
+            <div class="side-nav">
+                <h4 class="heading"><?= __('Actions') ?></h4>
+                <div class="row gx-2">
+                    <div class="col-lg-4 col-md-6 col-sm-12 mb-3 side-nav-item">
+                        <?= $this->Html->link(
+                            '<div class="card h-100">
+                                <div class="card-header dashboard-card-header d-flex justify-content-between align-items-center flex-wrap">
+                                    <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">Dashboard</h4>
+                                    <i class="material-icons view-icon ms-2">person</i>
+                                </div>
+                                <div class="card-body dashboard-card-body"></div>
+                                <div class="card-footer dashboard-card-footer">
+                                    <span class="mb-0 text-truncate">Back To Dashboard</span>
+                                </div>
+                            </div>',
+                            ['controller' => 'Admins', 'action' => 'dashboard'],
+                            ['escape' => false, 'class' => 'card-link-wrapper d-block text-decoration-none']
+                        ) ?>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12 mb-3 side-nav-item">
+                        <?= $this->Html->link(
+                            '<div class="card h-100">
+                                <div class="card-header list-card-header d-flex justify-content-between align-items-center flex-wrap">
+                                    <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">List Bookings</h4>
+                                    <i class="material-icons view-icon ms-2">menu</i>
+                                </div>
+                                <div class="card-body list-card-body"></div>
+                                <div class="card-footer list-card-footer">
+                                    <span class="mb-0 text-truncate">View All Bookings</span>
+                                </div>
+                            </div>',
+                            ['action' => 'index'],
+                            ['escape' => false, 'class' => 'card-link-wrapper d-block text-decoration-none']
+                        ) ?>
+                    </div>
+                </div>
+            </div>
+        </aside>
         <div class="column-edit">
             <div class="bookings form content">
                 <?= $this->Form->create($booking) ?>

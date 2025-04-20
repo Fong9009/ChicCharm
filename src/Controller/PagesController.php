@@ -74,7 +74,9 @@ class PagesController extends AppController
         if (!empty($path[1])) {
             $subpage = $path[1];
         }
-        $this->set(compact('page', 'subpage'));
+
+        $message = $this->request->getSession()->read('Flash.flash');
+        $this->set(compact('page', 'subpage', 'message'));
 
         try {
             return $this->render(implode('/', $path));

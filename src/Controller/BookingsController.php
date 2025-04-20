@@ -243,8 +243,114 @@ class BookingsController extends AppController
             $this->Flash->error('Access denied. Admin only area.');
             return $this->redirect(['action' => 'customerindex']);
         }
-        $booking = $this->Bookings->get($id, contain: ['Stylists', 'Services']);
-        $this->set(compact('booking'));
+
+        $booking = $this->Bookings->get($id, contain: [
+            'Customers',
+            'BookingsStylists' => ['Stylists'],
+            'BookingsServices' => ['Services', 'Stylists']
+        ]);
+
+        if ($this->request->is(['patch', 'post', 'put'])) {
+            $data = $this->request->getData();
+
+            // Check if end time exceeds 5 PM
+            if (isset($data['end_time'])) {
+                $endTime = new \DateTime($data['end_time']);
+                $closingTime = new \DateTime('17:00');
+
+                if ($endTime > $closingTime) {
+                    $this->Flash->error(__('Booking cannot extend past 5 PM as the shop will be closed.'));
+                    return $this->redirect(['action' => 'edit', $id]);
+                }
+            }
+
+            // Format the date to Y-m-d format
+            if (isset($data['booking_date'])) {
+                $date = new \DateTime($data['booking_date']);
+                $data['booking_date'] = $date->format('Y-m-d');
+            }
+
+            // Get customer details and set booking name
+            if (isset($data['customer_id'])) {
+                $customer = $this->Bookings->Customers->get($data['customer_id']);
+                $data['booking_name'] = 'Booking for ' . $customer->first_name . ' ' . $customer->last_name;
+            }
+
+            // Calculate total cost from all selected services
+            $totalCost = 0;
+            if (!empty($data['bookings_services'])) {
+                foreach ($data['bookings_services'] as $serviceData) {
+                    $totalCost += floatval($serviceData['service_cost']);
+                }
+            }
+
+            $data['total_cost'] = $totalCost;
+            $data['remaining_cost'] = $totalCost;
+            $data['notes'] = $data['notes'] ?? null;
+
+            // Delete existing BookingsServices and BookingsStylists
+            $bookingsServicesTable = $this->fetchTable('BookingsServices');
+            $bookingsStylistsTable = $this->fetchTable('BookingsStylists');
+            
+            $bookingsServicesTable->deleteAll(['booking_id' => $booking->id]);
+            $bookingsStylistsTable->deleteAll(['booking_id' => $booking->id]);
+
+            $booking = $this->Bookings->patchEntity($booking, $data);
+            if ($this->Bookings->save($booking)) {
+                // Save BookingsServices records with stylist assignments
+                if (!empty($data['bookings_services'])) {
+                    foreach ($data['bookings_services'] as $serviceData) {
+                        $bookingService = $bookingsServicesTable->newEntity([
+                            'booking_id' => $booking->id,
+                            'service_id' => $serviceData['service_id'],
+                            'stylist_id' => $serviceData['stylist_id'],
+                            'service_cost' => $serviceData['service_cost']
+                        ]);
+
+                        if (!$bookingsServicesTable->save($bookingService)) {
+                            \Cake\Log\Log::error('Failed to save booking service. Errors: ' . json_encode($bookingService->getErrors()));
+                            $this->Flash->error(__('The booking was updated, but some service details could not be saved.'));
+                        }
+                    }
+                }
+
+                // Create BookingsStylists records for each selected stylist
+                if (!empty($data['bookings_services'])) {
+                    $processedStylists = [];
+
+                    foreach ($data['bookings_services'] as $serviceData) {
+                        $stylistId = $serviceData['stylist_id'];
+
+                        // Only create one BookingsStylists record per stylist
+                        if (!in_array($stylistId, $processedStylists)) {
+                            $bookingStylist = $bookingsStylistsTable->newEntity([
+                                'booking_id' => $booking->id,
+                                'stylist_id' => $stylistId,
+                                'stylist_date' => $booking->booking_date,
+                                'start_time' => $booking->start_time,
+                                'end_time' => $booking->end_time,
+                                'selected_cost' => $booking->total_cost
+                            ]);
+
+                            if (!$bookingsStylistsTable->save($bookingStylist)) {
+                                $this->Flash->error(__('The booking was updated, but some stylist details could not be saved.'));
+                            }
+
+                            $processedStylists[] = $stylistId;
+                        }
+                    }
+                }
+
+                $this->Flash->success(__('The booking has been updated successfully.'));
+                return $this->redirect(['action' => 'index']);
+            }
+            $this->Flash->error(__('The booking could not be updated. Please, try again.'));
+        }
+
+        $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
+        $customers = $this->Bookings->Customers->find('list', limit: 200)->all();
+        $services = $this->fetchTable('Services')->find('all')->all();
+        $this->set(compact('booking', 'stylists', 'services', 'customers'));
     }
 
     //Remove Stylists from a booking
