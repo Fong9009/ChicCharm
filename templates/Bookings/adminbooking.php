@@ -151,7 +151,7 @@ $this->Html->script('booking', ['block' => 'script']);
                 <div class="row mt-3">
                     <div class="col-md-12">
                         <?= $this->Form->button(__('Create Booking'), ['class' => 'btn btn-primary']) ?>
-                        <?= $this->Html->link(__('Cancel'), ['controller' => 'Customers', 'action' => 'dashboard'], ['class' => 'btn btn-secondary']) ?>
+                        <?= $this->Html->link(__('Cancel'), ['controller' => 'Bookings', 'action' => 'index'], ['class' => 'btn btn-secondary']) ?>
                     </div>
                 </div>
                 <?= $this->Form->end() ?>

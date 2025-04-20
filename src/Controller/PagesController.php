@@ -35,9 +35,15 @@ class PagesController extends AppController
     public function initialize(): void
     {
         parent::initialize();
-
-        $this->loadComponent('Authentication.Authentication');
+        // Allow all users to access the display action
         $this->Authentication->allowUnauthenticated(['display']);
+    }
+
+    public function beforeFilter(\Cake\Event\EventInterface $event)
+    {
+        parent::beforeFilter($event);
+        // Allow access to all actions in this controller
+        $this->Authentication->addUnauthenticatedActions(['display']);
     }
 
     /**

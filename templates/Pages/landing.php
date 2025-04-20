@@ -2,16 +2,18 @@
 $this->layout = 'publiclayout';
 $identity = $this->request->getAttribute('identity');
 $bookingButton = $this->ContentBlock->text('booking-button');
+
+// Set up the booking link based on user type
 if ($identity) {
     if ($identity->type === 'customer') {
         $link = ['controller' => 'Bookings', 'action' => 'customerbooking'];
     } elseif ($identity->type === 'admin') {
-        $link = ['controller' => 'Pages', 'action' => 'display', 'landing'];
-        $this->Flash->error('This feature is for customers only.');
+        $link = ['controller' => 'Bookings', 'action' => 'adminbooking'];
     } else {
-        $link = ['controller' => 'Pages', 'action' => 'display', 'landing'];
+        $link = '#';
     }
 } else {
+    // For non-logged in users, redirect to login with return URL
     $link = ['controller' => 'Auth', 'action' => 'login', '?' => ['redirect' => 'booking']];
 }
 ?>
