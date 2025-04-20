@@ -167,7 +167,7 @@ if ($identity) {
                 <hr class="flex-grow-1 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
                 <div class="row gx-4 gx-lg-5">
                     <div class="d-flex justify-content-center mb-4">
-                        <?php if ($message): ?>
+                        <?php if (isset($message) && $message): ?>
                             <div class="alert alert-info mb-3"><?= h($message) ?></div>
                         <?php endif; ?>
                         <?= $this->Html->link($bookingButton, $link, ['class' => 'btn btn-primary btn-xl', 'onclick' => 'handleBookingClick(event)']) ?>

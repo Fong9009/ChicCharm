@@ -140,9 +140,6 @@
                     <td class="actions">
                         <?= $this->Html->link(__('View'), ['action' => 'view', $booking->id], ['class' => 'button']) ?>
                         <?php if ($booking->status === 'active'): ?>
-                            <?= $this->Html->link(__('Add Stylist'), [
-                                'controller' => 'bookingsStylists',
-                                'action' => 'customerstylistadd', $booking->id], ['class' => 'button']) ?>
                             <?= $this->Html->link(__('Edit'), ['action' => 'edit', $booking->id], ['class' => 'button']) ?>
                             <span class="text-muted small">Cannot delete active bookings</span>
                         <?php else: ?>
