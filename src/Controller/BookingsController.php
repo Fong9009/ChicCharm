@@ -26,6 +26,8 @@ class BookingsController extends AppController
         $this->Stylists = $this->getTableLocator()->get('Stylists');
         $this->BookingsStylists = $this->getTableLocator()->get('BookingsStylists');
         $this->loadComponent('Authentication.Authentication');
+        // Allow unauthenticated access to the booking route
+        $this->Authentication->addUnauthenticatedActions(['booking']);
     }
 
     public function beforeFilter(\Cake\Event\EventInterface $event)
@@ -994,5 +996,23 @@ class BookingsController extends AppController
         $bookings = $this->paginate($query);
 
         $this->set(compact('bookings'));
+    }
+
+    public function booking()
+    {
+        $user = $this->Authentication->getIdentity();
+        if (!$user) {
+            $this->Flash->error('Please login to make a booking.');
+            return $this->redirect(['controller' => 'Auth', 'action' => 'login']);
+        }
+
+        if ($user->type === 'customer') {
+            return $this->redirect(['action' => 'customerbooking']);
+        } elseif ($user->type === 'admin') {
+            return $this->redirect(['action' => 'adminbooking']);
+        } else {
+            $this->Flash->error('Invalid user type for booking.');
+            return $this->redirect(['controller' => 'Pages', 'action' => 'display', 'landing']);
+        }
     }
 }

@@ -449,15 +449,24 @@ class AuthController extends AppController
         $this->request->allowMethod(['get', 'post']);
         $result = $this->Authentication->getResult();
 
-        // Check if redirected from booking button
-        if ($this->request->getQuery('redirect') === 'booking') {
+        // Only show the message if not logged in and coming from booking
+        if (!$result->isValid() && $this->request->getQuery('redirect') === 'booking') {
             $this->Flash->info('Please login to make a booking.');
         }
 
         if ($result && $result->isValid()) {
             $user = $result->getData();
+            
+            // If redirected from booking, send to appropriate booking page
+            if ($this->request->getQuery('redirect') === 'booking') {
+                if ($user->type === 'customer') {
+                    return $this->redirect(['controller' => 'Bookings', 'action' => 'customerbooking']);
+                } elseif ($user->type === 'admin') {
+                    return $this->redirect(['controller' => 'Bookings', 'action' => 'adminbooking']);
+                }
+            }
 
-            // Check user type and redirect accordingly
+            // Default redirects if not from booking
             if ($user->type === 'admin') {
                 $fallbackLocation = ['controller' => 'Admins', 'action' => 'dashboard'];
             } else {

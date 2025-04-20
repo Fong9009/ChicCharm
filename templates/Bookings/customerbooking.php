@@ -61,6 +61,7 @@ $this->Html->script('booking', ['block' => 'script']);
                                     'label' => false,
                                     'min' => date('Y-m-d'),
                                     'max' => date('Y-m-d', strtotime('+1 year')),
+                                    'value' => date('Y-m-d'),
                                     'error' => ['class' => 'invalid-feedback']
                                 ]);
                             ?>
@@ -69,20 +70,32 @@ $this->Html->script('booking', ['block' => 'script']);
                         <div class="col-md-6">
                             <h5>Please Select The Time</h5>
                             <?php
+                                $currentHour = (int)date('H');
+                                $currentMinute = (int)date('i');
+                                $nextInterval = ceil(($currentMinute + 15) / 15) * 15;
+                                $startHour = $currentHour;
+                                if ($nextInterval >= 60) {
+                                    $startHour++;
+                                    $nextInterval = 0;
+                                }
+
+                                $timeOptions = ['' => 'Select a time slot'];
+                                for ($hour = 9; $hour < 17; $hour++) {
+                                    for ($minute = 0; $minute < 60; $minute += 15) {
+                                        if (date('Y-m-d') === date('Y-m-d') && 
+                                            ($hour < $startHour || 
+                                            ($hour === $startHour && $minute < $nextInterval))) {
+                                            continue;
+                                        }
+                                        $timeStr = sprintf('%02d:%02d', $hour, $minute);
+                                        $displayTime = date('g:i A', strtotime($timeStr));
+                                        $timeOptions[$timeStr] = $displayTime;
+                                    }
+                                }
+
                                 echo $this->Form->control('start_time', [
                                     'type' => 'select',
-                                    'options' => array_reduce(
-                                        range(9 * 4, 17 * 4),
-                                        function($options, $i) {
-                                            $hour = floor($i / 4);
-                                            $minute = ($i % 4) * 15;
-                                            $timeStr = sprintf('%02d:%02d', $hour, $minute);
-                                            $displayTime = date('g:i A', strtotime($timeStr));
-                                            $options[$timeStr] = $displayTime;
-                                            return $options;
-                                        },
-                                        ['' => 'Select a time slot']
-                                    ),
+                                    'options' => $timeOptions,
                                     'class' => 'form-control',
                                     'id' => 'start-time',
                                     'disabled' => true,

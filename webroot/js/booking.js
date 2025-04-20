@@ -24,11 +24,43 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Set minimum date to today
     const today = new Date();
-    // Get today's date at start of day in local timezone
-    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const todayStr = todayStart.toISOString().split('T')[0];
+    const todayStr = today.toISOString().split('T')[0];
+    
+    // Ensure the date input is properly restricted
     bookingDateInput.min = todayStr;
     bookingDateInput.max = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate()).toISOString().split('T')[0];
+    bookingDateInput.value = todayStr;
+
+    // Function to get next available 15-minute interval
+    function getNextTimeSlot() {
+        const now = new Date();
+        const minutes = now.getMinutes();
+        const nextInterval = Math.ceil((minutes + 15) / 15) * 15;
+        const hours = now.getHours() + Math.floor(nextInterval / 60);
+        return {
+            hours: hours,
+            minutes: nextInterval % 60
+        };
+    }
+
+    // Function to check if a time is in the past
+    function isTimeInPast(dateStr, timeStr) {
+        const now = new Date();
+        const [hours, minutes] = timeStr.split(':').map(Number);
+        const selectedDateTime = new Date(dateStr);
+        selectedDateTime.setHours(hours, minutes, 0, 0);
+        
+        // Add 15 minutes buffer to current time
+        const bufferedTime = new Date(now.getTime() + 15 * 60000);
+
+        // Compare full datetime (not just time) to handle future dates correctly
+        if (selectedDateTime < bufferedTime) {
+            return true;
+        }
+
+        // Check business hours (9 AM to 5 PM)
+        return hours < 9 || (hours === 17 && minutes > 0) || hours > 17;
+    }
 
     // Function to get service duration from data attribute
     function getServiceDuration(serviceId) {
@@ -295,10 +327,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to check if a date is in the past
     function isDateInPast(dateStr) {
-        const selectedDate = new Date(dateStr + 'T00:00:00');
+        const selectedDate = new Date(dateStr);
         const now = new Date();
-        // Get today's date at start of day in local timezone
+        
+        // Set both dates to start of day for comparison
+        selectedDate.setHours(0, 0, 0, 0);
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        
         return selectedDate < todayStart;
     }
 
@@ -312,12 +347,6 @@ document.addEventListener('DOMContentLoaded', function() {
             startTimeInput.innerHTML = '<option value="">Please select date and services first</option>';
             return;
         }
-
-        // Check if selected date is today
-        const now = new Date();
-        const isToday = selectedDate === todayStr;
-        const currentHour = now.getHours();
-        const currentMinute = now.getMinutes();
 
         startTimeInput.disabled = true;
         startTimeInput.innerHTML = '<option value="">Loading available times...</option>';
@@ -336,64 +365,66 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error('Network response was not ok');
             }
 
-            const availableSlots = await response.json();
-
+            const slots = await response.json();
             startTimeInput.innerHTML = '<option value="">Select a time slot</option>';
-            if (availableSlots.length > 0) {
-                availableSlots.forEach(slot => {
-                    const [hours, minutes] = slot.value.split(':').map(Number);
+            startTimeInput.disabled = false;
 
-                    // Skip past times if the selected date is today
-                    if (isToday) {
-                        // Skip if hour is less than current hour
-                        if (hours < currentHour) return;
-                        // Skip if hour is current hour but minutes are less than or equal to current minutes
-                        // Adding 15 minutes buffer to current time
-                        if (hours === currentHour && minutes <= currentMinute + 15) return;
-                    }
-
-                    const option = document.createElement('option');
-                    option.value = slot.value;
-                    
-                    // Format start time
-                    let displayHours = hours % 12;
-                    displayHours = displayHours === 0 ? 12 : displayHours;
-                    const ampm = hours >= 12 ? 'PM' : 'AM';
-                    const startTimeDisplay = `${displayHours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
-                    
-                    // Calculate and format end time
-                    const startDate = new Date();
-                    startDate.setHours(hours, minutes, 0);
-                    const totalDuration = selectedServices.reduce((total, serviceId) => total + getServiceDuration(serviceId), 0);
-                    const endDate = new Date(startDate.getTime() + totalDuration * 60000);
-                    const endHours = endDate.getHours();
-                    const endMinutes = endDate.getMinutes();
-                    let displayEndHours = endHours % 12;
-                    displayEndHours = displayEndHours === 0 ? 12 : displayEndHours;
-                    const endAmpm = endHours >= 12 ? 'PM' : 'AM';
-                    const endTimeDisplay = `${displayEndHours}:${endMinutes.toString().padStart(2, '0')} ${endAmpm}`;
-                    
-                    option.textContent = `${startTimeDisplay} - ${endTimeDisplay}`;
-                    startTimeInput.appendChild(option);
-                });
-                startTimeInput.disabled = false;
-
-                // If no time slots are available after filtering
-                if (startTimeInput.options.length === 1) { 
-                    startTimeInput.innerHTML = '<option value="">No available time slots for today</option>';
-                    startTimeInput.disabled = true;
+            // Get the next available time slot for today
+            const nextSlot = getNextTimeSlot();
+            
+            // Filter slots based on business hours and availability
+            const validSlots = slots.filter(slot => {
+                const [hours, minutes] = slot.value.split(':').map(Number);
+                
+                // For today, only show times after the next available slot
+                if (selectedDate === todayStr) {
+                    if (hours < nextSlot.hours) return false;
+                    if (hours === nextSlot.hours && minutes < nextSlot.minutes) return false;
                 }
-            } else {
+                
+                // Always filter based on business hours
+                if (hours < 9 || hours >= 17) return false;
+                
+                return true;
+            });
+
+            validSlots.forEach(slot => {
+                const option = document.createElement('option');
+                option.value = slot.value;
+                
+                // Format start time
+                const [hours, minutes] = slot.value.split(':').map(Number);
+                let displayHours = hours % 12;
+                displayHours = displayHours === 0 ? 12 : displayHours;
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                const startTimeDisplay = `${displayHours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+                
+                // Calculate and format end time
+                const startDate = new Date(selectedDate);
+                startDate.setHours(hours, minutes, 0);
+                const totalDuration = selectedServices.reduce((total, serviceId) => total + getServiceDuration(serviceId), 0);
+                const endDate = new Date(startDate.getTime() + totalDuration * 60000);
+                const endHours = endDate.getHours();
+                const endMinutes = endDate.getMinutes();
+                let displayEndHours = endHours % 12;
+                displayEndHours = displayEndHours === 0 ? 12 : displayEndHours;
+                const endAmpm = endHours >= 12 ? 'PM' : 'AM';
+                const endTimeDisplay = `${displayEndHours}:${endMinutes.toString().padStart(2, '0')} ${endAmpm}`;
+                
+                option.textContent = `${startTimeDisplay} - ${endTimeDisplay}`;
+                startTimeInput.appendChild(option);
+            });
+
+            if (validSlots.length === 0) {
                 startTimeInput.innerHTML = '<option value="">No available time slots</option>';
-                startTimeInput.disabled = true;
             }
+
         } catch (error) {
-            console.error('Error fetching available time slots:', error);
+            console.error('Error:', error);
             startTimeInput.innerHTML = '<option value="">Error loading time slots</option>';
-            startTimeInput.disabled = true;
         }
     }
 
