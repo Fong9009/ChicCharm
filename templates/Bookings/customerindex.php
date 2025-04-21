@@ -69,6 +69,22 @@
                                     ['escape' => false, 'class' => 'card-link-wrapper d-block text-decoration-none']
                                 ) ?>
                             </div>
+                            <div class="col-lg-4 col-md-6 col-sm-12 mb-3 side-nav-item">
+                                <?= $this->Html->link(
+                                    '<div class="card h-100">
+                                    <div class="card-header new-card-header d-flex justify-content-between align-items-center flex-wrap">
+                                        <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">Past Bookings</h4>
+                                        <i class="material-icons view-icon ms-2">history</i>
+                                    </div>
+                                    <div class="card-body new-card-body"></div>
+                                    <div class="card-footer new-card-footer">
+                                        <span class="mb-0 text-truncate">View Past Bookings</span>
+                                    </div>
+                                </div>',
+                                    ['action' => 'customerPastBookings'],
+                                    ['escape' => false, 'class' => 'card-link-wrapper d-block text-decoration-none']
+                                ) ?>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -80,9 +96,6 @@
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive mt-4">
-                                    <div class="row align-items-center">
-                                        <h3><?= __('My Bookings') ?></h3>
-                                    </div>
                                     <table class="dashboard-table">
                                         <thead>
                                             <tr>
@@ -90,6 +103,7 @@
                                                 <th><?= __('Stylists & Services') ?></th>
                                                 <th><?= $this->Paginator->sort('total_cost') ?></th>
                                                 <th><?= __('Notes') ?></th>
+                                                <th><?= __('Status') ?></th>
                                                 <th class="actions"><?= __('Actions') ?></th>
                                             </tr>
                                         </thead>
@@ -144,11 +158,19 @@
                                                 </td>
                                                 <td><?= $this->Number->currency($booking->total_cost) ?></td>
                                                 <td><?= !empty($booking->notes) ? h($booking->notes) : 'No notes' ?></td>
+                                                <td>
+                                                    <span class="badge <?= $booking->status === 'active' ? 'bg-success' : 'bg-secondary' ?>">
+                                                        <?= strtoupper(h($booking->status)) ?>
+                                                    </span>
+                                                </td>
                                                 <td class="actions">
                                                     <?= $this->Html->link(
                                                         'View',
                                                         ['action' => 'customerview', $booking->id],
-                                                        ['class' => 'button', 'style' => 'background-color: rgb(40, 167, 69); border-color: rgb(40, 167, 69);']
+                                                        ['class' => 'button', 'style' => 'background-color: #59B3B3; border-color: #59B3B3; transition: background-color 0.2s;', 
+                                                        'onmouseover' => 'this.style.backgroundColor="#4A9595"; this.style.borderColor="#4A9595"', 
+                                                        'onmouseout' => 'this.style.backgroundColor="#59B3B3"; this.style.borderColor="#59B3B3"'
+                                                        ]
                                                     ) ?>
                                                     <?php if ($booking->status === 'active'): ?>
                                                         <?= $this->Form->postLink(
@@ -157,8 +179,10 @@
                                                             [
                                                                 'method' => 'delete',
                                                                 'confirm' => __('Are you sure you want to cancel this booking?'),
-                                                                'class' => 'button',
-                                                                'style' => 'background-color: rgb(220, 53, 69); border-color: rgb(220, 53, 69);',
+                                                                'class' => 'button',    
+                                                                'style' => 'background-color: #dc3545; border-color: #dc3545; transition: background-color 0.2s;',
+                                                                'onmouseover' => 'this.style.backgroundColor="#bb2d3b"; this.style.borderColor="#bb2d3b"',
+                                                                'onmouseout' => 'this.style.backgroundColor="#dc3545"; this.style.borderColor="#dc3545"'
                                                             ]
                                                         ) ?>
                                                     <?php else: ?>
