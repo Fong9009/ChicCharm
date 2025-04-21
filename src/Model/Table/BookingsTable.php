@@ -62,11 +62,13 @@ class BookingsTable extends Table
         $this->hasMany('BookingsStylists', [
             'foreignKey' => 'booking_id',
             'dependent' => true,
+            'cascadeCallbacks' => true,
         ]);
 
         $this->hasMany('BookingsServices', [
             'foreignKey' => 'booking_id',
             'dependent' => true,
+            'cascadeCallbacks' => true,
         ]);
     }
 
@@ -86,7 +88,13 @@ class BookingsTable extends Table
         $validator
             ->date('booking_date')
             ->requirePresence('booking_date', 'create')
-            ->notEmptyDate('booking_date');
+            ->notEmptyDate('booking_date')
+            ->add('booking_date', 'notPast', [
+                'rule' => function ($date) {
+                    return $date >= new \DateTime('today');
+                },
+                'message' => 'Booking date cannot be in the past.'
+            ]);
 
         $validator
             ->time('start_time')
@@ -105,6 +113,12 @@ class BookingsTable extends Table
                     return $value > $context['data']['start_time'];
                 },
                 'message' => 'End time must be after start time'
+            ])
+            ->add('end_time', 'closingTime', [
+                'rule' => function ($time) {
+                    return $time <= new \DateTime('17:00');
+                },
+                'message' => 'Shop closes at 5 PM.'
             ]);
 
         $validator
@@ -134,7 +148,12 @@ class BookingsTable extends Table
     public function buildRules(RulesChecker $rules): RulesChecker
     {
         $rules->add($rules->existsIn(['customer_id'], 'Customers'), ['errorField' => 'customer_id']);
-
+        $rules->add(function ($entity) {
+            return !empty($entity->bookings_services);
+        }, 'hasServices', [
+            'errorField' => 'bookings_services',
+            'message' => 'Select at least one service.'
+        ]);
         return $rules;
     }
 }
