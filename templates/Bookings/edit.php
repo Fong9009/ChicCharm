@@ -148,6 +148,10 @@ $this->Html->script('booking', ['block' => 'script']);
                         <div class="col-md-6">
                             <h5>Please Select The Date</h5>
                             <?php
+                            $bookingDate = $booking->booking_date instanceof \Cake\I18n\FrozenDate 
+                                ? $booking->booking_date->format('Y-m-d') 
+                                : $booking->booking_date;
+                            
                             echo $this->Form->control('booking_date', [
                                 'type' => 'date',
                                 'required' => true,
@@ -155,9 +159,8 @@ $this->Html->script('booking', ['block' => 'script']);
                                 'id' => 'booking-date',
                                 'label' => false,
                                 'min' => date('Y-m-d'),
-                                'max' => date('Y-m-d', strtotime('+1 year')),
-                                'error' => ['class' => 'invalid-feedback'],
-                                'value' => $booking->booking_date->format('Y-m-d')
+                                'value' => $bookingDate,
+                                'error' => ['class' => 'invalid-feedback']
                             ]);
                             ?>
                             <small class="text-muted">Please select at least one service first</small>
@@ -283,34 +286,3 @@ $this->Html->script('booking', ['block' => 'script']);
         </div>
     </div>
 </div>
-
-<script>
-// Initialize the service count and total on page load
-document.addEventListener('DOMContentLoaded', function() {
-    updateServiceSummary();
-});
-
-function updateServiceSummary() {
-    const checkedServices = document.querySelectorAll('.service-checkbox:checked');
-    const serviceCount = checkedServices.length;
-    let total = 0;
-    const selectedServicesList = document.getElementById('selected-services-list');
-    selectedServicesList.innerHTML = '';
-
-    checkedServices.forEach(service => {
-        const cost = parseFloat(service.dataset.cost);
-        total += cost;
-        const serviceName = service.nextElementSibling.textContent.trim();
-        selectedServicesList.innerHTML += `<div>${serviceName}</div>`;
-    });
-
-    document.getElementById('service-count').textContent = serviceCount;
-    document.getElementById('service-total').textContent = total.toFixed(2);
-    document.getElementById('total_cost').value = total.toFixed(2);
-}
-
-// Add event listeners to service checkboxes
-document.querySelectorAll('.service-checkbox').forEach(checkbox => {
-    checkbox.addEventListener('change', updateServiceSummary);
-});
-</script>

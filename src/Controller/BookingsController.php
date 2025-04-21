@@ -264,12 +264,6 @@ class BookingsController extends AppController
                 }
             }
 
-            // Format the date to Y-m-d format
-            if (isset($data['booking_date'])) {
-                $date = new \DateTime($data['booking_date']);
-                $data['booking_date'] = $date->format('Y-m-d');
-            }
-
             // Get customer details and set booking name
             if (isset($data['customer_id'])) {
                 $customer = $this->Bookings->Customers->get($data['customer_id']);
@@ -347,6 +341,7 @@ class BookingsController extends AppController
             $this->Flash->error(__('The booking could not be updated. Please, try again.'));
         }
 
+        // No need to format the date here as CakePHP will handle it through the form helper
         $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
         $customers = $this->Bookings->Customers->find('list', limit: 200)->all();
         $services = $this->fetchTable('Services')->find('all')->all();

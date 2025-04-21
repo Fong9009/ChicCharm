@@ -6,14 +6,9 @@
 ?>
 <div class="booking-details-wrapper">
     <div class="booking-details">
-        <h2><?= __('Booking Details') ?></h2>
+        <h2><?= __('My Booking Details') ?></h2>
 
         <div class="booking-info">
-            <div class="info-group">
-                <label><?= __('Booking Name') ?></label>
-                <p class="form-control-static"><?= h($booking->booking_name) ?></p>
-            </div>
-
             <div class="info-group">
                 <label><?= __('Booking Date & Time') ?></label>
                 <p class="form-control-static">

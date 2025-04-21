@@ -29,7 +29,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Ensure the date input is properly restricted
     bookingDateInput.min = todayStr;
     bookingDateInput.max = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate()).toISOString().split('T')[0];
-    bookingDateInput.value = todayStr;
+    if (!bookingDateInput.value) {
+        bookingDateInput.value = todayStr;
+    }
 
     // Function to get next available 15-minute interval
     function getNextTimeSlot() {
