@@ -112,7 +112,7 @@ $this->layout = 'default';
                                                             <div>
                                                                 <div class="status-badge">
                                                                     <span class="status-text <?= $booking->status === 'active' ? 'active' : '' ?>">
-                                                                        <?= ucfirst(h($booking->status)) ?>
+                                                                        <?= strtoupper(h($booking->status)) ?>
                                                                     </span>
                                                                 </div>
                                                                 
@@ -154,7 +154,7 @@ $this->layout = 'default';
                                                                 ) ?>
                                                                 <?php if ($booking->status === 'active'): ?>
                                                                     <?= $this->Form->postLink(
-                                                                        'Cancel',
+                                                                        'Cancel Booking',
                                                                         ['controller' => 'Bookings', 'action' => 'customerdelete', $booking->id],
                                                                         [
                                                                             'method' => 'delete',
@@ -226,7 +226,7 @@ $this->layout = 'default';
                                                                 <div>
                                                                     <div class="status-badge">
                                                                         <span class="status-text <?= $booking->status === 'finished' ? 'finished' : 'cancelled' ?>">
-                                                                            <?= ucfirst(h($booking->status)) ?>
+                                                                            <?= strtoupper(h($booking->status)) ?>
                                                                         </span>
                                                                     </div>
                                                                     

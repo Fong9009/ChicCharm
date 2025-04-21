@@ -134,7 +134,7 @@
                     <td><?= $this->Number->currency($booking->total_cost) ?></td>
                     <td>
                         <span class="badge <?= $booking->status === 'active' ? 'bg-success' : 'bg-secondary' ?>">
-                            <?= h($booking->status) ?>
+                            <?= strtoupper(h($booking->status)) ?>
                         </span>
                     </td>
                     <td class="actions">
