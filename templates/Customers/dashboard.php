@@ -17,7 +17,7 @@ $this->layout = 'default';
             <div class="card-body background-colour">
                 <div class="card h-100 mb-4">
                     <div class="card-header d-flex justify-content-between customer-card-header" style="background-color:#D7CCC8">
-                        <h2 class="fw-bold">Welcome, <?= h($customer->first_name) ?> <?= h($customer->last_name) ?>!</h2>
+                        <h2 class="fw-bold">Welcome, <?= h($customer->first_name) ?>!</h2>
                     </div>
                     <?= $this->Flash->render() ?>
                     <div class="card-body">
