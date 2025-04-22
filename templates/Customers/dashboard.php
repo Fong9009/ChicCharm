@@ -144,6 +144,9 @@ $this->layout = 'default';
                                                                         </div>
                                                                     <?php endforeach; ?>
                                                                 </div>
+                                                                <div class="total-cost">
+                                                                    <?= 'Total Cost: ' . $this->Number->currency($booking->total_cost) ?>
+                                                                </div>
                                                             </div>
 
                                                             <div class="booking-actions">
@@ -257,6 +260,9 @@ $this->layout = 'default';
                                                                                 <?php endforeach; ?>
                                                                             </div>
                                                                         <?php endforeach; ?>
+                                                                    </div>
+                                                                    <div class="total-cost">
+                                                                    <?= 'Total Cost: ' . $this->Number->currency($booking->total_cost) ?>
                                                                     </div>
                                                                 </div>
 

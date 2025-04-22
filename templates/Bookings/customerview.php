@@ -57,7 +57,9 @@
             </div>
             <div class="info-group">
                 <label><?= __('Booking Notes') ?></label>
-                <p class="form-control-static"><?= h($booking->notes) ?></p>
+                <p class="form-control-static">
+                    <?= !empty($booking->notes) ? h($booking->notes) : 'No Notes' ?>
+                </p>
             </div>
         </div>
 

@@ -2960,7 +2960,7 @@ footer .input-group .btn-primary:hover {
     font-weight: 500;
     color: #6c757d;
     margin-bottom: 0.75rem;
-    font-size: 0.9rem;
+    font-size: 20px;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
@@ -3067,7 +3067,7 @@ footer .input-group .btn-primary:hover {
     }
 
     .booking-details .info-group label {
-        font-size: 0.85rem;
+        font-size: 18px;
     }
 
     .booking-details .info-group .form-control-static {
