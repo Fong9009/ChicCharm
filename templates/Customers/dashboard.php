@@ -66,8 +66,8 @@ $this->layout = 'default';
                 <div class="row">
                     <div class="col-12 mb-4">
                         <div class="card">
-                            <div class="bookings-header">
-                                <h3>Current Bookings</h3>
+                            <div class="bookings-header" style="background-color:#D7CCC8">
+                                <h3 class="card-title">Current Bookings</h3>
                                 <div class="header-actions">
                                     <?= $this->Html->link(
                                         '<i class="material-icons">add</i> Make a Booking',
@@ -101,7 +101,7 @@ $this->layout = 'default';
                                                             </div>
                                                             <div class="time">
                                                                 <?php if ($booking->start_time && $booking->end_time): ?>
-                                                                    <?= h($booking->start_time->format('h:i A')) ?> 
+                                                                    <?= h($booking->start_time->format('h:i A')) ?>
                                                                     <div class="time-separator">-</div>
                                                                     <?= h($booking->end_time->format('h:i A')) ?>
                                                                 <?php endif; ?>
@@ -115,7 +115,7 @@ $this->layout = 'default';
                                                                         <?= strtoupper(h($booking->status)) ?>
                                                                     </span>
                                                                 </div>
-                                                                
+
                                                                 <div class="service-details">
                                                                     <?php
                                                                     // Group services by stylist
@@ -130,7 +130,7 @@ $this->layout = 'default';
                                                                         }
                                                                         $stylistServices[$stylistId]['services'][] = $bookingService->service;
                                                                     }
-                                                                    
+
                                                                     foreach ($stylistServices as $stylistData): ?>
                                                                         <div class="stylist-section">
                                                                             <div class="stylist-name">
@@ -187,8 +187,8 @@ $this->layout = 'default';
                 <div class="row">
                     <div class="col-12 mb-4">
                         <div class="card">
-                            <div class="bookings-header">
-                                <h3>Past Bookings</h3>
+                            <div class="bookings-header" style="background-color:#D7CCC8">
+                                <h3 class="card-title">Past Bookings</h3>
                                 <div class="header-actions">
                                     <?= $this->Html->link(
                                         '<i class="material-icons">visibility</i> View All Past Bookings',
@@ -218,7 +218,7 @@ $this->layout = 'default';
                                                                 </div>
                                                                 <div class="time">
                                                                     <?php if ($booking->start_time && $booking->end_time): ?>
-                                                                        <?= h($booking->start_time->format('h:i A')) ?> 
+                                                                        <?= h($booking->start_time->format('h:i A')) ?>
                                                                         <div class="time-separator">-</div>
                                                                         <?= h($booking->end_time->format('h:i A')) ?>
                                                                     <?php endif; ?>
@@ -232,7 +232,7 @@ $this->layout = 'default';
                                                                             <?= strtoupper(h($booking->status)) ?>
                                                                         </span>
                                                                     </div>
-                                                                    
+
                                                                     <div class="service-details">
                                                                         <?php
                                                                         // Group services by stylist
@@ -247,7 +247,7 @@ $this->layout = 'default';
                                                                             }
                                                                             $stylistServices[$stylistId]['services'][] = $bookingService->service;
                                                                         }
-                                                                        
+
                                                                         foreach ($stylistServices as $stylistData): ?>
                                                                             <div class="stylist-section">
                                                                                 <div class="stylist-name">
