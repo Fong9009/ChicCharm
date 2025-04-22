@@ -425,7 +425,7 @@
 }
 
 .service-details {
-    margin-bottom: 32px;
+    margin-bottom: 20px;
 }
 
 .stylist-section {
@@ -451,6 +451,13 @@
 
 .service-item:last-child {
     margin-bottom: 0;
+}
+
+.total-cost {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 14px;
+    font-weight: 500;
 }
 
 @media screen and (max-width: 425px) {

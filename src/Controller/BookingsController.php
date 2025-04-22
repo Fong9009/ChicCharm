@@ -1116,4 +1116,30 @@ class BookingsController extends AppController
             return $this->redirect(['controller' => 'Pages', 'action' => 'display', 'landing']);
         }
     }
+
+    /**
+     * Delete All Past Bookings method
+     *
+     * @return \Cake\Http\Response|null Redirects to adminPastBookings
+     */
+    public function deleteAllPastBookings()
+    {
+        // Check if user is admin
+        $user = $this->Authentication->getIdentity();
+        if (!$user || $user->type !== 'admin') {
+            $this->Flash->error('Access denied. Admin only area.');
+            return $this->redirect(['action' => 'customerindex']);
+        }
+
+        // Only delete bookings with status finished or cancelled
+        $deletedCount = $this->Bookings->deleteAll(['status IN' => ['finished', 'cancelled']]);
+
+        if ($deletedCount) {
+            $this->Flash->success(__('{0} past booking(s) have been deleted.', $deletedCount));
+        } else {
+            $this->Flash->error(__('No past bookings to delete.'));
+        }
+
+        return $this->redirect(['action' => 'adminPastBookings']);
+    }
 }

@@ -49,9 +49,19 @@
         </div>
     </aside>
     <div class="table-responsive mt-4">
-        <div class="container">
+        <div class="container mb-4">
             <div class="row align-items-center">
                 <h3><?= __('Past Bookings') ?></h3>
+                <div class="col-md-12" style="text-align: right;">
+                    <?= $this->Form->postLink(
+                        __('Delete All Past Bookings'),
+                        ['action' => 'deleteAllPastBookings'],
+                        [
+                            'confirm' => __('Are you sure you want to permanently delete all past bookings?'),
+                            'class' => 'btn btn-danger'
+                        ]
+                    ) ?>
+                </div>
             </div>
         </div>
         <table>

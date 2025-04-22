@@ -85,7 +85,7 @@ class CustomersController extends AppController
                 'booking_date' => 'ASC',
                 'start_time' => 'ASC'
             ])
-            ->limit(5);
+            ->limit(3);
 
         // Get past bookings (finished and cancelled)
         $pastBookings = $bookingsTable->find()
@@ -107,7 +107,7 @@ class CustomersController extends AppController
                 ]
             ])
             ->order(['booking_date' => 'DESC'])
-            ->limit(5);  // Show only the 5 most recent past bookings
+            ->limit(3); 
 
         $this->set(compact('customer', 'activeBookings', 'pastBookings'));
     }

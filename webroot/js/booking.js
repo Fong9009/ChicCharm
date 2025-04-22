@@ -248,6 +248,8 @@ document.addEventListener('DOMContentLoaded', function() {
             select.className = 'form-control stylist-select';
             select.name = `bookings_services[${serviceId}][stylist_id]`;
             select.required = true;
+            select.setAttribute('oninvalid', "this.setCustomValidity('Please Select a Stylist')");
+            select.setAttribute('oninput', "this.setCustomValidity('')");
 
             // Add hidden inputs
             const serviceInput = document.createElement('input');

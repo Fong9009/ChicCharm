@@ -55,6 +55,8 @@ $this->Html->script('booking', ['block' => 'script']);
                                 echo $this->Form->control('booking_date', [
                                     'type' => 'date',
                                     'required' => true,
+                                    'oninvalid' => "this.setCustomValidity('Please select a Date')",
+                                    'oninput' => "this.setCustomValidity('')",
                                     'class' => 'form-control' . ($this->Form->isFieldError('booking_date') ? ' is-invalid' : ''),
                                     'id' => 'booking-date',
                                     'disabled' => true,
@@ -100,7 +102,9 @@ $this->Html->script('booking', ['block' => 'script']);
                                     'id' => 'start-time',
                                     'disabled' => true,
                                     'label' => false,
-                                    'required' => true
+                                    'required' => true,
+                                    'oninvalid' => "this.setCustomValidity('Please select a Time')",
+                                    'oninput' => "this.setCustomValidity('')"
                                 ]);
                             ?>
                             <small class="text-muted">Please select at least one service first</small>
