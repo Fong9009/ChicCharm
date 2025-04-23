@@ -117,6 +117,18 @@ $this->Html->script('booking', ['block' => 'script']);
                             <h5>Please Select The Services you would like to book</h5>
                             <div class="service-list">
                                 <?php foreach ($services as $service): ?>
+                                    <?php
+                                        // Determine if service is selected and get associated stylist
+                                        $isChecked = false;
+                                        $selectedStylistId = '';
+                                        foreach ($booking->bookings_services as $bs) {
+                                            if ($bs->service_id == $service->id) {
+                                                $isChecked = true;
+                                                $selectedStylistId = $bs->stylist_id;
+                                                break;
+                                            }
+                                        }
+                                    ?>
                                     <div class="form-check">
                                         <input class="form-check-input service-checkbox" type="checkbox"
                                                name="bookings_services[<?= $service->id ?>][service_id]"
@@ -124,15 +136,9 @@ $this->Html->script('booking', ['block' => 'script']);
                                                id="service-<?= $service->id ?>"
                                                data-duration="<?= $service->duration_minutes ?>"
                                                data-cost="<?= $service->service_cost ?>"
-                                               <?php
-                                               // Check if this service is already selected in the booking
-                                               foreach ($booking->bookings_services as $booking_service) {
-                                                   if ($booking_service->service_id == $service->id) {
-                                                       echo 'checked';
-                                                       break;
-                                                   }
-                                               }
-                                               ?>>
+                                               data-selected-stylist-id="<?= $selectedStylistId ?>"
+                                               <?= $isChecked ? 'checked' : '' ?>
+                                        >
                                         <label class="form-check-label" for="service-<?= $service->id ?>">
                                             <?= h($service->service_name) ?>
                                             (<?= h($service->duration_minutes) ?> mins) -
@@ -225,9 +231,9 @@ $this->Html->script('booking', ['block' => 'script']);
                             <h5>Select Stylists for Each Service</h5>
                             <div id="service-stylist-selections">
                                 <?php foreach ($booking->bookings_services as $booking_service): ?>
-                                    <div class="stylist-selection mb-3" data-service-id="<?= $booking_service->service_id ?>">
+                                    <div class="service-stylist-selection mb-3" data-service-id="<?= $booking_service->service_id ?>">
                                         <label>Stylist for <?= $booking_service->service->service_name ?>:</label>
-                                        <select name="bookings_services[<?= $booking_service->service_id ?>][stylist_id]" class="form-control" required>
+                                        <select name="bookings_services[<?= $booking_service->service_id ?>][stylist_id]" class="form-control stylist-select" required>
                                             <option value="">Select a stylist...</option>
                                             <?php foreach ($stylists as $id => $name): ?>
                                                 <option value="<?= $id ?>" <?= $booking_service->stylist_id == $id ? 'selected' : '' ?>>

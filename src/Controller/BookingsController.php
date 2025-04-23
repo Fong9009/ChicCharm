@@ -282,18 +282,35 @@ class BookingsController extends AppController
             $data['remaining_cost'] = $totalCost;
             $data['notes'] = $data['notes'] ?? null;
 
-            // Delete existing BookingsServices and BookingsStylists
-            $bookingsServicesTable = $this->fetchTable('BookingsServices');
-            $bookingsStylistsTable = $this->fetchTable('BookingsStylists');
-            
-            $bookingsServicesTable->deleteAll(['booking_id' => $booking->id]);
-            $bookingsStylistsTable->deleteAll(['booking_id' => $booking->id]);
+            // Check if service data was submitted
+            $hasServiceData = isset($data['bookings_services']);
 
-            $booking = $this->Bookings->patchEntity($booking, $data);
+            // Delete existing BookingsServices and BookingsStylists
+            if ($hasServiceData) {
+                $bookingsServicesTable = $this->fetchTable('BookingsServices');
+                $bookingsStylistsTable = $this->fetchTable('BookingsStylists');
+                $bookingsServicesTable->deleteAll(['booking_id' => $booking->id]);
+                $bookingsStylistsTable->deleteAll(['booking_id' => $booking->id]);
+            }
+
+            // Patch main entity, exclude associations if no service data submitted
+            $booking = $this->Bookings->patchEntity($booking, $data, [
+                'associated' => $hasServiceData ? [] : [] // Adjust if needed, main point is to control association patching
+            ]);
+
             if ($this->Bookings->save($booking)) {
                 // Save BookingsServices records with stylist assignments
-                if (!empty($data['bookings_services'])) {
+                if ($hasServiceData && !empty($data['bookings_services']) && is_array($data['bookings_services'])) {
+                    $bookingsServicesTable = $this->fetchTable('BookingsServices');
+                    $bookingsStylistsTable = $this->fetchTable('BookingsStylists');
                     foreach ($data['bookings_services'] as $serviceData) {
+                        // Validate structure
+                        if (!isset($serviceData['service_id'], $serviceData['stylist_id'], $serviceData['service_cost'])) {
+                            \Cake\Log\Log::error('Invalid serviceData structure on edit: ' . json_encode($serviceData));
+                            $this->Flash->error(__('Invalid data submitted for one or more services.'));
+                            continue; // Skip this entry
+                        }
+
                         $bookingService = $bookingsServicesTable->newEntity([
                             'booking_id' => $booking->id,
                             'service_id' => $serviceData['service_id'],
@@ -309,10 +326,12 @@ class BookingsController extends AppController
                 }
 
                 // Create BookingsStylists records for each selected stylist
-                if (!empty($data['bookings_services'])) {
+                if ($hasServiceData && !empty($data['bookings_services'])) {
                     $processedStylists = [];
-
                     foreach ($data['bookings_services'] as $serviceData) {
+                        // Basic validation again
+                        if (!isset($serviceData['stylist_id'])) continue;
+
                         $stylistId = $serviceData['stylist_id'];
 
                         // Only create one BookingsStylists record per stylist
@@ -339,6 +358,7 @@ class BookingsController extends AppController
                 return $this->redirect(['action' => 'index']);
             }
             $this->Flash->error(__('The booking could not be updated. Please, try again.'));
+            \Cake\Log\Log::error('Failed to save main booking on edit: ' . json_encode($booking->getErrors()));
         }
 
         // No need to format the date here as CakePHP will handle it through the form helper

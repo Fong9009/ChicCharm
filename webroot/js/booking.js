@@ -278,6 +278,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     option.textContent = stylist.name;
                     select.appendChild(option);
                 });
+                // Pre-select existing stylist if present
+                const checkbox = document.querySelector(`#service-${serviceId}`);
+                const preselectedId = checkbox ? checkbox.dataset.selectedStylistId : null;
+                if (preselectedId) {
+                    select.value = preselectedId;
+                }
             } else {
                 select.innerHTML = '<option value="">No available stylists for this time slot</option>';
                 select.disabled = true;
@@ -309,6 +315,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 stylistInput.name = `bookings_services[${serviceId}][stylist_id]`;
                 stylistInput.value = stylistId;
                 container.appendChild(stylistInput);
+
+                // Create hidden input for service_cost
+                const costInput = document.createElement('input');
+                costInput.type = 'hidden';
+                costInput.name = `bookings_services[${serviceId}][service_cost]`;
+                costInput.value = getServiceCost(serviceId);
+                container.appendChild(costInput);
             }
         });
     }
@@ -538,12 +551,60 @@ document.addEventListener('DOMContentLoaded', function() {
         return true;
     }
 
-    // Add form submission handler
-    document.querySelector('form').addEventListener('submit', function(e) {
-        if (!validateForm()) {
-            e.preventDefault();
-        }
-    });
+    // Add form submission handler (validate and prepare nested data)
+    const bookingFormElem = document.getElementById('booking-form');
+    if (bookingFormElem) {
+        bookingFormElem.addEventListener('submit', function(e) {
+            // Populate hidden inputs for service-stylist pairings
+            updateStylistIdsContainer();
+            if (!validateForm()) {
+                e.preventDefault();
+            }
+        });
+        // On page load (edit), pre-populate dynamic stylist selects and hidden inputs
+        (async () => {
+            // If static selects exist (edit page), just prepare hidden inputs and skip dynamic generation
+            if (serviceStylistSelections.querySelectorAll('select').length > 0) {
+                updateStylistIdsContainer();
+                return;
+            }
+            // Otherwise, dynamic init for new bookings
+            const initialStartTime = startTimeInput.value;
+            const selectedServices = getSelectedServiceIds();
+            if (selectedServices.length > 0) {
+                try {
+                    // Fetch and populate time slots
+                    await updateAvailableTimeSlots();
+                    // Preserve and restore existing time slot if needed
+                    if (initialStartTime && !startTimeInput.querySelector(`option[value=\"${initialStartTime}\"]`)) {
+                        const totalDuration = selectedServices.reduce((sum, id) => sum + getServiceDuration(id), 0);
+                        const [h, m] = initialStartTime.split(':').map(Number);
+                        const startDate = new Date(); startDate.setHours(h, m, 0);
+                        const endDate = new Date(startDate.getTime() + totalDuration * 60000);
+                        const format12 = d => {
+                            let hrs = d.getHours() % 12 || 12;
+                            let mins = d.getMinutes().toString().padStart(2, '0');
+                            let ampm = d.getHours() >= 12 ? 'PM' : 'AM';
+                            return `${hrs}:${mins} ${ampm}`;
+                        };
+                        const option = document.createElement('option');
+                        option.value = initialStartTime;
+                        option.textContent = `${format12(startDate)} - ${format12(endDate)}`;
+                        startTimeInput.appendChild(option);
+                    }
+                    if (initialStartTime) {
+                        startTimeInput.value = initialStartTime;
+                        const totalDuration = selectedServices.reduce((sum, id) => sum + getServiceDuration(id), 0);
+                        updateEndTime(initialStartTime, totalDuration);
+                    }
+                    await updateStylistSelections();
+                    updateStylistIdsContainer();
+                } catch (err) {
+                    console.error('Error initializing booking edits:', err);
+                }
+            }
+        })();
+    }
 
     // Initialize input states
     updateInputStates();
