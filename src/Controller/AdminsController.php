@@ -119,17 +119,6 @@ class AdminsController extends AppController
                 $this->Flash->success(__('The admin has been saved.'), ['key' => 'admin_notify']);
                 return $this->redirect(['action' => 'index']);
             }
-
-            // Show specific error messages for each field
-            if ($admin->getErrors()) {
-                foreach ($admin->getErrors() as $field => $errors) {
-                    foreach ($errors as $error) {
-                        $this->Flash->error(__("{0}: {1}", ucfirst($field), $error));
-                    }
-                }
-            } else {
-                $this->Flash->error(__('The admin could not be saved. Please, try again.'));
-            }
         }
         $this->set(compact('admin'));
     }

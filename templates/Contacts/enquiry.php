@@ -16,6 +16,7 @@
                     'class' => 'form-control',
                     'required' => true,
                     'placeholder' => 'Enter your first name',
+                    'error' => ['class' => 'invalid-feedback']
                 ]) ?>
             </div>
             <div class="col-md-6">
@@ -24,6 +25,7 @@
                     'class' => 'form-control',
                     'required' => true,
                     'placeholder' => 'Enter your last name',
+                    'error' => ['class' => 'invalid-feedback']
                 ]) ?>
             </div>
         </div>
@@ -34,7 +36,8 @@
                     'class' => 'form-control',
                     'required' => true,
                     'placeholder' => 'Enter your email',
-                    'type' => 'email'
+                    'type' => 'email',
+                    'error' => ['class' => 'invalid-feedback']
                 ]) ?>
             </div>
             <div class="col-md-6">
@@ -45,6 +48,7 @@
                     'pattern' => '[0-9]{10}',
                     'title' => 'Please enter a valid 10-digit phone number',
                     'placeholder' => 'Enter your 10-digit phone number',
+                    'error' => ['class' => 'invalid-feedback']
                 ]) ?>
             </div>
         </div>
@@ -54,6 +58,8 @@
             'required' => true,
             'rows' => 5,
             'placeholder' => 'Enter your message',
+            'error' => ['class' => 'invalid-feedback'],
+            'maxlength' => 3000,
         ]) ?>
         <div class="text-center mt-4">
             <?= $this->Recaptcha->display(['class' => 'mb-3 d-flex justify-content-center'])?>

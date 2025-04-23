@@ -174,7 +174,8 @@ $this->Html->script('booking', ['block' => 'script']);
                                     'class' => 'form-control' . ($this->Form->isFieldError('notes') ? ' is-invalid' : ''),
                                     'rows' => 3,
                                     'placeholder' => 'Add any special notes or requirements...',
-                                    'error' => ['class' => 'invalid-feedback']
+                                    'error' => ['class' => 'invalid-feedback'],
+                                    'maxlength' => 2000,
                                 ]);
                             ?>
                         </div>
