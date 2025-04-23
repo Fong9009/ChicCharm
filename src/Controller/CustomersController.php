@@ -202,17 +202,6 @@ class CustomersController extends AppController
                 $this->Flash->success(__('Registration successful! Please login with your credentials.'));
                 return $this->redirect(['controller' => 'Auth', 'action' =>  'login']);
             }
-
-            // Show specific error messages for each field
-            if ($customer->getErrors()) {
-                foreach ($customer->getErrors() as $field => $errors) {
-                    foreach ($errors as $error) {
-                        $this->Flash->error(__("{0}: {1}", ucfirst($field), $error));
-                    }
-                }
-            } else {
-                $this->Flash->error(__('Registration failed. Please, try again.'));
-            }
         }
         $this->set(compact('customer'));
     }

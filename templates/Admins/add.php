@@ -10,9 +10,9 @@
             <div class="admins form content">
                 <h2>Register New Admin</h2>
                 <?= $this->Form->create($admin) ?>
-                <?= $this->Flash->render() ?>
                 <div class="form-group">
                     <?= $this->Form->control('email', [
+                        'type' => 'email',
                         'label' => 'Email',
                         'class' => 'form-control' . ($this->Form->isFieldError('email') ? ' is-invalid' : ''),
                         'required' => true,
@@ -22,6 +22,7 @@
                 </div>
                 <div class="form-group">
                     <?= $this->Form->control('first_name', [
+                        'type' => 'text',
                         'label' => 'First Name',
                         'class' => 'form-control' . ($this->Form->isFieldError('first_name') ? ' is-invalid' : ''),
                         'required' => true,
@@ -31,6 +32,7 @@
                 </div>
                 <div class="form-group">
                     <?= $this->Form->control('last_name', [
+                        'type' => 'text',
                         'label' => 'Last Name',
                         'class' => 'form-control' . ($this->Form->isFieldError('last_name') ? ' is-invalid' : ''),
                         'required' => true,
@@ -40,6 +42,7 @@
                 </div>
                 <div class="form-group">
                     <?= $this->Form->control('password', [
+                        'type' => 'password',
                         'label' => 'Password',
                         'class' => 'form-control' . ($this->Form->isFieldError('password') ? ' is-invalid' : ''),
                         'required' => true,
@@ -62,10 +65,7 @@
                         <h6>Password Requirements:</h6>
                         <ul>
                             <li>At least 8 characters long</li>
-                            <li>At least one uppercase letter</li>
-                            <li>At least one lowercase letter</li>
-                            <li>At least one number</li>
-                            <li>At least one special character</li>
+                            <li>At least one uppercase letter, one number and one special character (@$!%*?&)</li>
                         </ul>
                     </small>
                 </div>

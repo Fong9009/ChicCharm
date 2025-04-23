@@ -35,7 +35,7 @@ $adminId = $this->request->getAttribute('identity')->id
                     </div>
                     <!-- Delete Admin -->
                     <div class="col-lg-3 mb-4 side-nav-item" <?= ($admin->id == $adminId) ? 'hidden' : '' ?>>
-                        <?= $this->Html->link(
+                        <?= $this->Form->postLink(
                             '<div class="card h-100">
                             <div class="card-header delete-card-header d-flex justify-content-between align-items-center">
                                 <div>
@@ -50,7 +50,7 @@ $adminId = $this->request->getAttribute('identity')->id
                         </div>',
                             ['controller' => 'Admins', 'action' => 'delete', $admin->id],
                             ['escape' => false,'class' => 'card-link-wrapper d-block text-decoration-none',
-                                'confirm' => __('Are you sure you want to delete # {0}?', ($admin->first_name . ' '. $admin->last_name))],
+                                'confirm' => __('Are you sure you want to delete # {0}? You will not be able to get them back', ($admin->first_name . ' ' . $admin->last_name))],
                         ) ?>
                     </div>
                     <!-- List Admin -->
