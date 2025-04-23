@@ -37,10 +37,10 @@ $titleDescription = 'Landing Page';
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            
+
             <!-- Brand/Logo -->
             <a class="navbar-brand" href="<?= $this->Url->build('/') ?>">ChicCharm</a>
-            
+
             <!-- Profile Icon -->
             <div class="mobile-profile-icon">
                 <button class="btn btn-link" type="button" id="mobileProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
