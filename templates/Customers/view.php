@@ -132,14 +132,6 @@
                         <td><?= h($customer->email) ?></td>
                     </tr>
                     <tr>
-                        <th><?= __('Nonce') ?></th>
-                        <td><?= h($customer->nonce) ?></td>
-                    </tr>
-                    <tr>
-                        <th><?= __('Nonce Expiry') ?></th>
-                        <td><?= h($customer->nonce_expiry) ?></td>
-                    </tr>
-                    <tr>
                         <th><?= __('Created') ?></th>
                         <td><?= h($customer->created) ?></td>
                     </tr>

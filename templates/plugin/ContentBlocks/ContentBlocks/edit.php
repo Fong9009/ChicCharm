@@ -34,13 +34,15 @@ $this->Html->css('ContentBlocks.content-blocks', ['block' => true]);
                     'value' => html_entity_decode($contentBlock->value),
                     'label' => false,
                     'rows' => '6',
+                    'maxlength' => 2000,
                 ]);
             } else if ($contentBlock->type === 'html') {
                 echo $this->Form->control('value', [
                     'type' => 'textarea',
                     'class' => 'form-control',
                     'label' => false,
-                    'id' => 'content-value-input'
+                    'id' => 'content-value-input',
+                    'maxlength' => 2000,
                 ]);
                 ?>
                 <!-- Load CKEditor. -->
