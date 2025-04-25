@@ -65,7 +65,7 @@ $identity = $this->request->getAttribute('identity');
         <!-- First Row: Customers and Admins -->
         <div class="row">
             <!-- Customers Card -->
-            <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
                 <div class="card h-100">
                     <div class="card-header customer-card-header d-flex justify-content-between align-items-center">
                         <div>
@@ -90,7 +90,7 @@ $identity = $this->request->getAttribute('identity');
             </div>
 
             <!-- Admins Card -->
-            <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
                 <div class="card h-100">
                     <div class="card-header admin-card-header d-flex justify-content-between align-items-center">
                         <div>
@@ -113,12 +113,9 @@ $identity = $this->request->getAttribute('identity');
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Second Row: Stylists and Contacts -->
-        <div class="row">
             <!-- Stylists Card -->
-            <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
                 <div class="card h-100">
                     <div class="card-header contractor-card-header d-flex justify-content-between align-items-center">
                         <div>
@@ -141,18 +138,21 @@ $identity = $this->request->getAttribute('identity');
                     </div>
                 </div>
             </div>
+        </div>
 
+        <!-- Second Row: Stylists and Contacts -->
+        <div class="row">
             <!-- Contacts Card -->
-            <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
                 <div class="card h-100">
                     <div class="card-header contact-card-header d-flex justify-content-between align-items-center">
                         <div>
-                            <h4 class="contact-card-h4">Contacts</h4>
+                            <h4 class="contact-card-h4">Messages</h4>
                         </div>
                         <i class="material-icons contact-icon">chat</i>
                     </div>
                     <div class="card-body contact-card-body">
-                        <h3 class="contact-card-h3">Total Contacts</h3>
+                        <h3 class="contact-card-h3">Total Messages</h3>
                         <div class="total-value-container">
                             <p class="contact-card-count"><?= h($contactCount) ?></p>
                         </div>
@@ -166,12 +166,9 @@ $identity = $this->request->getAttribute('identity');
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Third Row: Bookings and Payments -->
-        <div class="row">
             <!-- Bookings Card -->
-            <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
                 <div class="card h-100">
                     <div class="card-header booking-card-header d-flex justify-content-between align-items-center">
                         <div>
@@ -196,7 +193,7 @@ $identity = $this->request->getAttribute('identity');
             </div>
 
             <!-- Services Card -->
-            <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
                 <div class="card h-100">
                     <div class="card-header service-card-header d-flex justify-content-between align-items-center">
                         <div>
@@ -219,6 +216,9 @@ $identity = $this->request->getAttribute('identity');
                     </div>
                 </div>
             </div>
+
+
+        </div>
         </div>
     </div>
 </main>
