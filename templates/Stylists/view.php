@@ -124,7 +124,7 @@
                             <th><?= __('Booking Date') ?></th>
                             <th><?= __('Total Cost') ?></th>
                             <th><?= __('Remaining Cost') ?></th>
-                            <th><?= __('Customer Id') ?></th>
+                            <th><?= __('Booking Name') ?></th>
                             <th class="actions"><?= __('Actions') ?></th>
                         </tr>
                         <?php foreach ($stylist->bookings as $booking) : ?>
