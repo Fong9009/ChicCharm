@@ -90,9 +90,6 @@
                         <?php if ($booking->booking_date): ?>
                             <?= h($booking->booking_date->format('Y-m-d')) ?><br>
                         <?php endif; ?>
-                        <?php if ($booking->start_time && $booking->end_time): ?>
-                            <?= h($booking->start_time->format('g:i A')) ?> - <?= h($booking->end_time->format('g:i A')) ?>
-                        <?php endif; ?>
                     </td>
                     <td>
                         <?php if (!empty($booking->bookings_services)): ?>
@@ -101,25 +98,37 @@
                             // Group services by stylist
                             $stylistServices = [];
                             foreach ($booking->bookings_services as $bookingService) {
+                                // Ensure service and stylist data are loaded
+                                if (empty($bookingService->stylist) || empty($bookingService->service)) continue;
                                 $stylistId = $bookingService->stylist->id;
                                 if (!isset($stylistServices[$stylistId])) {
                                     $stylistServices[$stylistId] = [
                                         'stylist' => $bookingService->stylist,
-                                        'services' => []
+                                        'booking_services' => [] 
                                     ];
                                 }
-                                $stylistServices[$stylistId]['services'][] = $bookingService;
+                                $stylistServices[$stylistId]['booking_services'][] = $bookingService;
                             }
                             ?>
                             <?php foreach ($stylistServices as $stylistData): ?>
                                 <li class="mb-2">
                                     <?= h($stylistData['stylist']->first_name) ?> 
-                                    <?= h($stylistData['stylist']->last_name) ?>
+                                    <?= h($stylistData['stylist']->last_name) ?>:
                                     <ul style="list-style: none; padding-left: 1rem; margin-top: 0.25rem;">
-                                        <?php foreach ($stylistData['services'] as $bookingService): ?>
+                                        <?php foreach ($stylistData['booking_services'] as $bookingService): ?>
                                             <li>
-                                                • <?= h($bookingService->service->service_name) ?> 
-                                                (<?= $this->Number->currency($bookingService->service->service_cost) ?>)
+                                                <small>
+                                                     <?= h($bookingService->service->service_name) ?> 
+                                                    (<?= $this->Number->currency($bookingService->service->service_cost) ?>):
+                                                    <?php // Time Slot ?>
+                                                    <?php if ($bookingService->start_time && $bookingService->end_time): ?>
+                                                        <span class="service-time">
+                                                            <?= h($bookingService->start_time->format('h:i A')) ?> - <?= h($bookingService->end_time->format('h:i A')) ?>
+                                                        </span>
+                                                    <?php elseif ($bookingService->start_time): ?>
+                                                        <span class="service-time"><?= h($bookingService->start_time->format('h:i A')) ?></span>
+                                                    <?php endif; ?>
+                                                </small>
                                             </li>
                                         <?php endforeach; ?>
                                     </ul>
@@ -130,7 +139,9 @@
                             <p>No services booked</p>
                         <?php endif; ?>
                     </td>
-                    <td><?= !empty($booking->notes) ? h($booking->notes) : 'No notes' ?></td>
+                    <td style="word-wrap: break-word; overflow-wrap: break-word; white-space: normal; max-width: 250px;">
+                        <?= !empty($booking->notes) ? nl2br(h($booking->notes)) : 'No notes' ?>
+                    </td>
                     <td><?= $this->Number->currency($booking->total_cost) ?></td>
                     <td>
                         <span class="badge <?= $booking->status === 'active' ? 'bg-success' : 'bg-secondary' ?>">

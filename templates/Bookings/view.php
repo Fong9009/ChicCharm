@@ -48,7 +48,7 @@
                                 'method' => 'delete',
                                 'confirm' => __('Are you sure you want to permanently delete this cancelled booking?'),
                                 'class' => 'card-link-wrapper d-block text-decoration-none',
-                                'escape' => false, // <-- This is the key!
+                                'escape' => false,
                             ]
                         ) ?>
                     </div>
@@ -127,7 +127,9 @@
                         </tr>
                         <tr>
                             <th><?= __('Notes from Customer') ?></th>
-                            <td><?= h($booking->notes) ?></td>
+                            <td style="white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">
+                                <?= !empty($booking->notes) ? nl2br(h($booking->notes)) : 'No notes' ?>
+                            </td>
                         </tr>
                     </tbody>
                 </table>

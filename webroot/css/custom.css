@@ -892,11 +892,6 @@ body {
         font-size: 0.95rem;
     }
 
-    /* Add spacing between form elements */
-    .contacts.form.content .input {
-        margin-bottom: 15px;
-    }
-
     /* Improve touch target sizes */
     .contacts.form.content input,
     .contacts.form.content textarea,
@@ -1970,7 +1965,6 @@ footer .input-group .btn-primary:hover {
 
 /* Form Fields */
 .contacts.form.content .input {
-    margin-bottom: 30px;
     position: relative;
 }
 
@@ -2044,10 +2038,6 @@ footer .input-group .btn-primary:hover {
 
     .contacts.form.content h2 {
         font-size: 1.5rem;
-        margin-bottom: 1rem;
-    }
-
-    .contacts.form.content .input {
         margin-bottom: 1rem;
     }
 }
