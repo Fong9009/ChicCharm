@@ -23,7 +23,7 @@ $this->Html->script('booking', ['block' => 'script']);
                 <fieldset>
                     <h2 class="text-center"><?= __('Add Booking') ?></h2><br>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-8">
                             <h4>Select Services</h4>
                             <div class="service-list">
                                 <?php foreach ($services as $service): ?>
@@ -46,12 +46,6 @@ $this->Html->script('booking', ['block' => 'script']);
                     <br>
                     <div class="row">
                         <div class="col-md-12">
-                            <h4>Select Stylists for Each Service</h4>
-                            <div id="service-stylist-selections"></div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
                             <h4>Please Select The Date</h4>
                             <?php
                                 echo $this->Form->control('booking_date', [
@@ -66,32 +60,16 @@ $this->Html->script('booking', ['block' => 'script']);
                                     'error' => ['class' => 'invalid-feedback']
                                 ]);
                             ?>
-                            <small class="text-muted">Please select service(s) and stylist(s) first</small>
-                        </div>
-                        <div class="col-md-6">
-                            <h4>Please Select The Time</h4>
-                            <?php
-                                echo $this->Form->control('start_time', [
-                                    'type' => 'select',
-                                    'options' => ['' => 'Select Date and Service(s)'],
-                                    'class' => 'form-control',
-                                    'id' => 'start-time',
-                                    'disabled' => true,
-                                    'label' => false,
-                                    'required' => true,
-                                    'oninvalid' => "this.setCustomValidity('Please select a Time')",
-                                    'oninput' => "this.setCustomValidity('')"
-                                ]);
-                            ?>
-                            <small class="text-muted">Please select service(s) and stylist(s) first</small>
-                            <div id="time-range-display" class="mt-2" style="display: none;" hidden>
-                                Selected Time: <span id="start-time-display"></span> - <span id="end-time-display"></span>
-                            </div>
-                            <?php echo $this->Form->hidden('end_time', ['id' => 'end-time']); ?>
+                            <small class="text-muted">Please select service(s) first</small>
                         </div>
                     </div>
-                    <div id="closing-time-warning-container" class="mt-3"></div>
                     <br>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4>Select Stylists for Each Service</h4>
+                            <div id="service-stylist-selections"></div>
+                        </div>
+                    </div>
                     <div class="row" style="display: none;">
                         <div class="col-md-6">
                             <?php
@@ -114,7 +92,7 @@ $this->Html->script('booking', ['block' => 'script']);
                                     'rows' => 3,
                                     'placeholder' => 'Add any special notes or requirements...',
                                     'error' => ['class' => 'invalid-feedback'],
-                                    'maxlength' => 2000,
+                                    'maxlength' => 1000,
                                 ]);
                             ?>
                         </div>

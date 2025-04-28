@@ -359,7 +359,7 @@
         justify-content: flex-start;
         padding: 16px;
         gap: 8px;
-        border-top: 1px solid #eee;
+        border-bottom: 1px solid #eee;
     }
 
     .booking-info {
@@ -472,4 +472,8 @@
     .service-details {
         margin-bottom: 24px;
     }
+}
+
+.service-item .service-time {
+    font-weight: 500;    
 }

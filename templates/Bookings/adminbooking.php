@@ -63,7 +63,7 @@ $this->Html->script('booking', ['block' => 'script']);
                 <fieldset>
                     <h2 class="text-center"><?= __('Add Booking') ?></h2>
                     <div class="row">
-                        <div class="col-md-8">
+                        <div class="col-md-12">
                             <h5>Please Select A Customer</h5>
                             <div class="service-options">
                                 <?= $this->Form->control('customer_id', [
@@ -113,37 +113,7 @@ $this->Html->script('booking', ['block' => 'script']);
                                     'error' => ['class' => 'invalid-feedback']
                                 ]);
                             ?>
-                            <small class="text-muted">Please select at least one service first</small>
-                        </div>
-                        <div class="col-md-6">
-                            <h5>Please Select The Time</h5>
-                            <?php
-                                echo $this->Form->control('start_time', [
-                                    'type' => 'select',
-                                    'options' => array_reduce(
-                                        range(9 * 4, 17 * 4),
-                                        function($options, $i) {
-                                            $hour = floor($i / 4);
-                                            $minute = ($i % 4) * 15;
-                                            $timeStr = sprintf('%02d:%02d', $hour, $minute);
-                                            $displayTime = date('g:i A', strtotime($timeStr));
-                                            $options[$timeStr] = $displayTime;
-                                            return $options;
-                                        },
-                                        ['' => 'Select a time slot']
-                                    ),
-                                    'class' => 'form-control',
-                                    'id' => 'start-time',
-                                    'disabled' => true,
-                                    'label' => false,
-                                    'required' => true
-                                ]);
-                            ?>
-                            <small class="text-muted">Please select at least one service first</small>
-                            <div id="time-range-display" class="mt-2" style="display: none;" hidden>
-                                <span id="start-time-display"></span> - <span id="end-time-display"></span>
-                            </div>
-                            <?php echo $this->Form->hidden('end_time', ['id' => 'end-time']); ?>
+                            <small class="text-muted">Please select at least one service and stylist first</small>
                         </div>
                     </div>
                     <br>
@@ -175,7 +145,7 @@ $this->Html->script('booking', ['block' => 'script']);
                                     'rows' => 3,
                                     'placeholder' => 'Add any special notes or requirements...',
                                     'error' => ['class' => 'invalid-feedback'],
-                                    'maxlength' => 2000,
+                                    'maxlength' => 1000,
                                 ]);
                             ?>
                         </div>

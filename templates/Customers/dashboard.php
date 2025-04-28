@@ -99,13 +99,6 @@ $this->layout = 'default';
                                                                     <?= h($booking->booking_date->format('d')) ?>
                                                                 <?php endif; ?>
                                                             </div>
-                                                            <div class="time">
-                                                                <?php if ($booking->start_time && $booking->end_time): ?>
-                                                                    <?= h($booking->start_time->format('h:i A')) ?>
-                                                                    <div class="time-separator">-</div>
-                                                                    <?= h($booking->end_time->format('h:i A')) ?>
-                                                                <?php endif; ?>
-                                                            </div>
                                                         </div>
 
                                                         <div class="booking-info d-flex flex-column justify-content-between">
@@ -125,22 +118,33 @@ $this->layout = 'default';
                                                                         if (!isset($stylistServices[$stylistId])) {
                                                                             $stylistServices[$stylistId] = [
                                                                                 'stylist' => $bookingService->stylist,
-                                                                                'services' => []
+                                                                                'booking_services' => []
                                                                             ];
                                                                         }
-                                                                        $stylistServices[$stylistId]['services'][] = $bookingService->service;
+                                                                        $stylistServices[$stylistId]['booking_services'][] = $bookingService;
                                                                     }
 
                                                                     foreach ($stylistServices as $stylistData): ?>
                                                                         <div class="stylist-section">
-                                                                            <div class="stylist-name">
-                                                                                <?= h($stylistData['stylist']->first_name) ?> <?= h($stylistData['stylist']->last_name) ?>
+                                                                            <div class="stylist-name" style="color: black;">
+                                                                                <?= h($stylistData['stylist']->first_name) ?> <?= h($stylistData['stylist']->last_name) ?>:
                                                                             </div>
-                                                                            <?php foreach ($stylistData['services'] as $service): ?>
-                                                                                <div class="service-item">
-                                                                                    • <?= h($service->service_name) ?> (<?= $this->Number->currency($service->service_cost) ?>)
-                                                                                </div>
-                                                                            <?php endforeach; ?>
+                                                                            <ul style="list-style: disc; padding-left: 1.5rem; margin-bottom: 0;">
+                                                                                <?php foreach ($stylistData['booking_services'] as $bookingService): ?>
+                                                                                    <li class="service-item" style="color: black;">
+                                                                                        <?= h($bookingService->service->service_name) ?>
+                                                                                        (<?= $this->Number->currency($bookingService->service->service_cost) ?>):
+
+                                                                                        <?php if ($bookingService->start_time && $bookingService->end_time): ?>
+                                                                                            <span class="service-time">
+                                                                                                <?= h($bookingService->start_time->format('h:i A')) ?> - <?= h($bookingService->end_time->format('h:i A')) ?>
+                                                                                            </span>
+                                                                                        <?php elseif ($bookingService->start_time): ?>
+                                                                                            <span class="service-time"><?= h($bookingService->start_time->format('h:i A')) ?></span>
+                                                                                        <?php endif; ?>
+                                                                                    </li>
+                                                                                <?php endforeach; ?>
+                                                                            </ul>
                                                                         </div>
                                                                     <?php endforeach; ?>
                                                                 </div>
@@ -149,7 +153,7 @@ $this->layout = 'default';
                                                                 </div>
                                                             </div>
 
-                                                            <div class="booking-actions">
+                                                            <div class="booking-actions d-flex flex-column flex-sm-row gap-2">
                                                                 <?= $this->Html->link(
                                                                     'View',
                                                                     ['controller' => 'Bookings', 'action' => 'customerview', $booking->id],
@@ -216,13 +220,6 @@ $this->layout = 'default';
                                                                         <?= h($booking->booking_date->format('d')) ?>
                                                                     <?php endif; ?>
                                                                 </div>
-                                                                <div class="time">
-                                                                    <?php if ($booking->start_time && $booking->end_time): ?>
-                                                                        <?= h($booking->start_time->format('h:i A')) ?>
-                                                                        <div class="time-separator">-</div>
-                                                                        <?= h($booking->end_time->format('h:i A')) ?>
-                                                                    <?php endif; ?>
-                                                                </div>
                                                             </div>
 
                                                             <div class="booking-info d-flex flex-column justify-content-between">
@@ -242,22 +239,33 @@ $this->layout = 'default';
                                                                             if (!isset($stylistServices[$stylistId])) {
                                                                                 $stylistServices[$stylistId] = [
                                                                                     'stylist' => $bookingService->stylist,
-                                                                                    'services' => []
+                                                                                    'booking_services' => []
                                                                                 ];
                                                                             }
-                                                                            $stylistServices[$stylistId]['services'][] = $bookingService->service;
+                                                                            $stylistServices[$stylistId]['booking_services'][] = $bookingService;
                                                                         }
 
                                                                         foreach ($stylistServices as $stylistData): ?>
                                                                             <div class="stylist-section">
-                                                                                <div class="stylist-name">
-                                                                                    <?= h($stylistData['stylist']->first_name) ?> <?= h($stylistData['stylist']->last_name) ?>
+                                                                                <div class="stylist-name" style="color: black;">
+                                                                                    <?= h($stylistData['stylist']->first_name) ?> <?= h($stylistData['stylist']->last_name) ?>:
                                                                                 </div>
-                                                                                <?php foreach ($stylistData['services'] as $service): ?>
-                                                                                    <div class="service-item">
-                                                                                        • <?= h($service->service_name) ?> (<?= $this->Number->currency($service->service_cost) ?>)
-                                                                                    </div>
-                                                                                <?php endforeach; ?>
+                                                                                <ul style="list-style: disc; padding-left: 1.5rem; margin-bottom: 0;">
+                                                                                    <?php foreach ($stylistData['booking_services'] as $bookingService): ?>
+                                                                                        <li class="service-item" style="color: black;">
+                                                                                            <?= h($bookingService->service->service_name) ?>
+                                                                                            (<?= $this->Number->currency($bookingService->service->service_cost) ?>):
+
+                                                                                            <?php if ($bookingService->start_time && $bookingService->end_time): ?>
+                                                                                                <span class="service-time">
+                                                                                                    <?= h($bookingService->start_time->format('h:i A')) ?> - <?= h($bookingService->end_time->format('h:i A')) ?>
+                                                                                                </span>
+                                                                                            <?php elseif ($bookingService->start_time): ?>
+                                                                                                <span class="service-time"><?= h($bookingService->start_time->format('h:i A')) ?></span>
+                                                                                            <?php endif; ?>
+                                                                                        </li>
+                                                                                    <?php endforeach; ?>
+                                                                                </ul>
                                                                             </div>
                                                                         <?php endforeach; ?>
                                                                     </div>
@@ -266,7 +274,7 @@ $this->layout = 'default';
                                                                     </div>
                                                                 </div>
 
-                                                                <div class="booking-actions">
+                                                                <div class="booking-actions d-flex flex-column flex-sm-row gap-2">
                                                                     <?= $this->Html->link(
                                                                         'View',
                                                                         ['controller' => 'Bookings', 'action' => 'customerview', $booking->id],

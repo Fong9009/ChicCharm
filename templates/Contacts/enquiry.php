@@ -10,7 +10,7 @@
         <p class="text-center mb-4">We'd love to hear from you. Please fill out the form below.</p>
         <?= $this->Form->create($contact) ?>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-6" style="margin-bottom: 16px;">
                 <?= $this->Form->control('first_name', [
                     'label' => 'First Name',
                     'class' => 'form-control',
@@ -19,7 +19,7 @@
                     'error' => ['class' => 'invalid-feedback']
                 ]) ?>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6" style="margin-bottom: 16px;">
                 <?= $this->Form->control('last_name', [
                     'label' => 'Last Name',
                     'class' => 'form-control',
@@ -30,7 +30,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-6" style="margin-bottom: 16px;">
                 <?= $this->Form->control('email', [
                     'label' => 'Email',
                     'class' => 'form-control',
@@ -40,7 +40,7 @@
                     'error' => ['class' => 'invalid-feedback']
                 ]) ?>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6" style="margin-bottom: 16px;">
                 <?= $this->Form->control('phone_number', [
                     'label' => 'Phone Number',
                     'class' => 'form-control',
@@ -61,7 +61,8 @@
             'error' => ['class' => 'invalid-feedback'],
             'maxlength' => 3000,
         ]) ?>
-        <div class="text-center mt-4">
+        <div id="message-char-count" class="char-count-display text-muted text-start small mb-2"></div>
+        <div class="text-center" style="margin-top: 20px;">
             <?= $this->Recaptcha->display(['class' => 'mb-3 d-flex justify-content-center'])?>
             <?= $this->Form->button(__('Submit Enquiry'), [
                 'class' => 'submit-button mt-3'
@@ -70,5 +71,37 @@
         <?= $this->Form->end() ?>
     </div>
 </div>
+
+<?php $this->append('script'); ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const messageTextarea = document.getElementById('message');
+    const charCountDisplay = document.getElementById('message-char-count');
+    const maxLength = messageTextarea ? parseInt(messageTextarea.getAttribute('maxlength'), 10) : 0;
+
+    function updateCharCount() {
+        if (!messageTextarea || !charCountDisplay || !maxLength) return;
+
+        const currentLength = messageTextarea.value.length;
+        const remaining = maxLength - currentLength;
+
+        charCountDisplay.textContent = `${currentLength}/${maxLength}`;
+
+        if (remaining < 0) {
+            charCountDisplay.style.color = 'red';
+        } else if (remaining < 50) {
+             charCountDisplay.style.color = 'orange';
+        } else {
+            charCountDisplay.style.color = '';
+        }
+    }
+
+    if (messageTextarea) {
+        messageTextarea.addEventListener('input', updateCharCount);
+        updateCharCount();
+    }
+});
+</script>
+<?php $this->end(); ?>
 
 

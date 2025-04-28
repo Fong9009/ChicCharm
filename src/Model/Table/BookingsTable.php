@@ -92,16 +92,14 @@ class BookingsTable extends Table
 
         $validator
             ->time('start_time')
-            ->requirePresence('start_time', 'create')
-            ->notEmptyTime('start_time');
+            ->allowEmptyTime('start_time', null, 'create');
 
         $validator
             ->time('end_time')
-            ->requirePresence('end_time', 'create')
-            ->notEmptyTime('end_time')
+            ->allowEmptyTime('end_time', null, 'create')
             ->add('end_time', 'compareWithStartTime', [
                 'rule' => function ($value, $context) {
-                    if (empty($context['data']['start_time'])) {
+                    if (empty($context['data']['start_time']) || empty($value)) {
                         return true;
                     }
                     return $value > $context['data']['start_time'];

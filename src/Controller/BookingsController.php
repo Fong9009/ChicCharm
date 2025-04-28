@@ -252,114 +252,176 @@ class BookingsController extends AppController
 
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
+            $bookingId = $booking->id;
 
-            // Check if end time exceeds 5 PM
-            if (isset($data['end_time'])) {
-                $endTime = new \DateTime($data['end_time']);
-                $closingTime = new \DateTime('17:00');
-
-                if ($endTime > $closingTime) {
-                    $this->Flash->error(__('Booking cannot extend past 5 PM as the shop will be closed.'));
-                    return $this->redirect(['action' => 'edit', $id]);
-                }
+            // Format the date to Y-m-d format
+            if (isset($data['booking_date'])) {
+                $bookingDate = new \DateTime($data['booking_date']);
+                $data['booking_date_formatted'] = $bookingDate->format('Y-m-d');
+            } else {
+                $this->Flash->error(__('Booking date is missing.'));
+                return $this->redirect(['action' => 'edit', $bookingId]);
             }
 
             // Get customer details and set booking name
             if (isset($data['customer_id'])) {
-                $customer = $this->Bookings->Customers->get($data['customer_id']);
-                $data['booking_name'] = 'Booking for ' . $customer->first_name . ' ' . $customer->last_name;
+                try {
+                    $customer = $this->Bookings->Customers->get($data['customer_id']);
+                    $data['booking_name'] = 'Booking for ' . $customer->first_name . ' ' . $customer->last_name;
+                } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
+                    $this->Flash->error(__('Selected customer not found.'));
+                    return $this->redirect(['action' => 'edit', $bookingId]);
+                }
+            } else {
+                // Use existing customer if not provided in form (should usually be there)
+                 if ($booking->customer_id) {
+                    $data['customer_id'] = $booking->customer_id;
+                    $data['booking_name'] = $booking->booking_name; // Keep existing name
+                 } else {
+                    $this->Flash->error(__('Customer ID is missing.'));
+                    return $this->redirect(['action' => 'edit', $bookingId]);
+                 }
             }
 
             // Calculate total cost from all selected services
             $totalCost = 0;
             if (!empty($data['bookings_services'])) {
                 foreach ($data['bookings_services'] as $serviceData) {
-                    $totalCost += floatval($serviceData['service_cost']);
+                    $totalCost += floatval($serviceData['service_cost'] ?? 0);
                 }
             }
-
             $data['total_cost'] = $totalCost;
-            $data['remaining_cost'] = $totalCost;
+            $data['remaining_cost'] = $totalCost; // Recalculate remaining cost based on new total
             $data['notes'] = $data['notes'] ?? null;
 
-            // Check if service data was submitted
-            $hasServiceData = isset($data['bookings_services']);
+            // Check if any service data was submitted (might be empty if all services unchecked)
+            $hasServiceData = !empty($data['bookings_services']);
 
-            // Delete existing BookingsServices and BookingsStylists
-            if ($hasServiceData) {
+            // --- Start Transaction (Recommended for multi-table operations) ---
+            $connection = $this->Bookings->getConnection();
+            try {
+                $connection->begin();
+
+                // Delete existing BookingsServices and BookingsStylists
                 $bookingsServicesTable = $this->fetchTable('BookingsServices');
                 $bookingsStylistsTable = $this->fetchTable('BookingsStylists');
-                $bookingsServicesTable->deleteAll(['booking_id' => $booking->id]);
-                $bookingsStylistsTable->deleteAll(['booking_id' => $booking->id]);
-            }
+                $bookingsServicesTable->deleteAll(['booking_id' => $bookingId]);
+                $bookingsStylistsTable->deleteAll(['booking_id' => $bookingId]);
 
-            // Patch main entity, exclude associations if no service data submitted
-            $booking = $this->Bookings->patchEntity($booking, $data, [
-                'associated' => $hasServiceData ? [] : [] 
-            ]);
+                // Patch main booking entity with non-time fields first
+                 $booking = $this->Bookings->patchEntity($booking, [
+                    'customer_id' => $data['customer_id'],
+                    'booking_name' => $data['booking_name'],
+                    'booking_date' => $data['booking_date_formatted'],
+                    'total_cost' => $data['total_cost'],
+                    'remaining_cost' => $data['remaining_cost'],
+                    'notes' => $data['notes']
+                    // Keep existing status unless explicitly changed
+                ], ['associated' => []]); // Don't process associations yet
 
-            if ($this->Bookings->save($booking)) {
-                // Save BookingsServices records with stylist assignments
-                if ($hasServiceData && !empty($data['bookings_services']) && is_array($data['bookings_services'])) {
-                    $bookingsServicesTable = $this->fetchTable('BookingsServices');
-                    $bookingsStylistsTable = $this->fetchTable('BookingsStylists');
-                    foreach ($data['bookings_services'] as $serviceData) {
-                        // Validate structure
-                        if (!isset($serviceData['service_id'], $serviceData['stylist_id'], $serviceData['service_cost'])) {
-                            \Cake\Log\Log::error('Invalid serviceData structure on edit: ' . json_encode($serviceData));
-                            $this->Flash->error(__('Invalid data submitted for one or more services.'));
-                            continue; // Skip this entry
+                // Save main booking changes (without times yet)
+                if (!$this->Bookings->save($booking)) {
+                    throw new \Exception('Failed to save main booking updates.');
+                }
+
+                $allServicesTimes = []; // To store start/end times
+                // Fetch service durations if we have services
+                $servicesDetails = [];
+                if ($hasServiceData) {
+                    $serviceIds = array_column($data['bookings_services'], 'service_id');
+                    if (!empty($serviceIds)) {
+                        $servicesDetails = $this->Services->find('list', [
+                            'keyField' => 'id',
+                            'valueField' => 'duration_minutes'
+                        ])->where(['id IN' => $serviceIds])->toArray();
+                    }
+
+                    // Re-Save BookingsServices records with individual start/end times
+                    foreach ($data['bookings_services'] as $serviceIdKey => $serviceData) {
+                        if (!isset($serviceData['service_id'], $serviceData['stylist_id'], $serviceData['start_time'], $serviceData['service_cost'])) {
+                            \Cake\Log\Log::warning('[Edit] Skipping incomplete service data: ' . json_encode($serviceData));
+                            continue;
                         }
+                        $serviceId = (int)$serviceData['service_id'];
+                        $startTimeString = $serviceData['start_time'];
+                        $duration = $servicesDetails[$serviceId] ?? 0;
+                        if ($duration <= 0) {
+                            \Cake\Log\Log::warning("[Edit] Skipping service ID {$serviceId} with zero duration.");
+                            continue;
+                        }
+                        $startTime = new \DateTime($data['booking_date_formatted'] . ' ' . $startTimeString);
+                        $endTime = clone $startTime;
+                        $endTime->modify("+{$duration} minutes");
 
                         $bookingService = $bookingsServicesTable->newEntity([
-                            'booking_id' => $booking->id,
-                            'service_id' => $serviceData['service_id'],
-                            'stylist_id' => $serviceData['stylist_id'],
+                            'booking_id' => $bookingId,
+                            'service_id' => $serviceId,
+                            'stylist_id' => (int)$serviceData['stylist_id'],
+                            'start_time' => $startTime->format('H:i:s'),
+                            'end_time' => $endTime->format('H:i:s'),
                             'service_cost' => $serviceData['service_cost']
                         ]);
-
                         if (!$bookingsServicesTable->save($bookingService)) {
-                            \Cake\Log\Log::error('Failed to save booking service. Errors: ' . json_encode($bookingService->getErrors()));
-                            $this->Flash->error(__('The booking was updated, but some service details could not be saved.'));
+                            // Rollback on failure
+                            throw new \Exception('Failed to save updated booking service details.');
                         }
-                    }
+                         $allServicesTimes[] = ['start' => $startTime, 'end' => $endTime];
+                    } // end foreach bookings_services
+                } // end if hasServiceData
+
+                // Calculate and update overall start/end time
+                $overallStartTime = null;
+                $overallEndTime = null;
+                if (!empty($allServicesTimes)) {
+                    $overallStartTime = min(array_column($allServicesTimes, 'start'));
+                    $overallEndTime = max(array_column($allServicesTimes, 'end'));
                 }
+                 // Update booking with potentially null times if no services selected
+                 $booking->start_time = $overallStartTime ? $overallStartTime->format('H:i:s') : null;
+                 $booking->end_time = $overallEndTime ? $overallEndTime->format('H:i:s') : null;
+                 if (!$this->Bookings->save($booking)) {
+                     throw new \Exception('Failed to save overall times on booking update.');
+                 }
 
-                // Create BookingsStylists records for each selected stylist
-                if ($hasServiceData && !empty($data['bookings_services'])) {
-                    $processedStylists = [];
-                    foreach ($data['bookings_services'] as $serviceData) {
-                        // Basic validation again
-                        if (!isset($serviceData['stylist_id'])) continue;
+                // Re-Create BookingsStylists records
+                if ($hasServiceData) {
+                     $processedStylists = [];
+                     foreach ($data['bookings_services'] as $serviceData) {
+                         if (!isset($serviceData['stylist_id'])) continue;
+                         $stylistId = (int)$serviceData['stylist_id'];
+                         if (!in_array($stylistId, $processedStylists)) {
+                             $bookingStylist = $bookingsStylistsTable->newEntity([
+                                 'booking_id' => $bookingId,
+                                 'stylist_id' => $stylistId,
+                                 'stylist_date' => $booking->booking_date->format('Y-m-d'),
+                                 'start_time' => $booking->start_time, // Use new overall time
+                                 'end_time' => $booking->end_time,
+                                 'selected_cost' => $booking->total_cost
+                             ]);
+                             if (!$bookingsStylistsTable->save($bookingStylist)) {
+                                 throw new \Exception('Failed to save updated booking stylist details.');
+                             }
+                             $processedStylists[] = $stylistId;
+                         }
+                     }
+                 }
 
-                        $stylistId = $serviceData['stylist_id'];
-
-                        // Only create one BookingsStylists record per stylist
-                        if (!in_array($stylistId, $processedStylists)) {
-                            $bookingStylist = $bookingsStylistsTable->newEntity([
-                                'booking_id' => $booking->id,
-                                'stylist_id' => $stylistId,
-                                'stylist_date' => $booking->booking_date,
-                                'start_time' => $booking->start_time,
-                                'end_time' => $booking->end_time,
-                                'selected_cost' => $booking->total_cost
-                            ]);
-
-                            if (!$bookingsStylistsTable->save($bookingStylist)) {
-                                $this->Flash->error(__('The booking was updated, but some stylist details could not be saved.'));
-                            }
-
-                            $processedStylists[] = $stylistId;
-                        }
-                    }
-                }
-
+                // Commit transaction
+                $connection->commit();
                 $this->Flash->success(__('The booking has been updated successfully.'));
                 return $this->redirect(['action' => 'index']);
+
+            } catch (\Exception $e) {
+                // Rollback transaction on any error
+                $connection->rollback();
+                \Cake\Log\Log::error('[Edit] Booking update failed: ' . $e->getMessage() . ' Booking ID: ' . $bookingId . ' Data: ' . json_encode($data));
+                $this->Flash->error(__('The booking could not be updated. Please, try again. Error: {0}', $e->getMessage()));
+                 // Repopulate form data for rendering
+                 $booking->setErrors(json_decode($e->getMessage(), true) ?: []); // Attempt to set specific errors if available
             }
-            $this->Flash->error(__('The booking could not be updated. Please, try again.'));
-            \Cake\Log\Log::error('Failed to save main booking on edit: ' . json_encode($booking->getErrors()));
-        }
+            // --- End Transaction ---
+
+        } // end if request is post/put/patch
 
         // No need to format the date here as CakePHP will handle it through the form helper
         $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
@@ -529,59 +591,126 @@ class BookingsController extends AppController
             $data['remaining_cost'] = $totalCost;
             $data['notes'] = $data['notes'] ?? null;
 
-            $booking = $this->Bookings->patchEntity($booking, $data);
+            // Create a temporary booking entity without associations first
+            $booking = $this->Bookings->newEntity([
+                'customer_id' => $data['customer_id'],
+                'booking_name' => $data['booking_name'],
+                'booking_date' => $data['booking_date'],
+                'total_cost' => $data['total_cost'],
+                'remaining_cost' => $data['remaining_cost'],
+                'notes' => $data['notes'] ?? null,
+                'status' => 'active' 
+            ]);
+
+            // Try saving the main booking record
             if ($this->Bookings->save($booking)) {
-                // Save BookingsServices records with stylist assignments
+                $bookingId = $booking->id;
+                $allServicesTimes = [];
+
+                // Fetch service durations
+                $serviceIds = array_column($data['bookings_services'] ?? [], 'service_id');
+                $servicesDetails = [];
+                if (!empty($serviceIds)) {
+                    $servicesDetails = $this->Services->find('list', [
+                        'keyField' => 'id',
+                        'valueField' => 'duration_minutes'
+                    ])->where(['id IN' => $serviceIds])->toArray();
+                }
+
+                // Save BookingsServices records with individual start/end times
                 if (!empty($data['bookings_services'])) {
                     $bookingsServicesTable = $this->fetchTable('BookingsServices');
-                    foreach ($data['bookings_services'] as $serviceData) {
-                        $bookingService = $bookingsServicesTable->newEntity([
-                            'booking_id' => $booking->id,
-                            'service_id' => $serviceData['service_id'],
-                            'stylist_id' => $serviceData['stylist_id'],
-                            'service_cost' => $serviceData['service_cost']
-                        ]);
-
-                        if (!$bookingsServicesTable->save($bookingService)) {
-                            \Cake\Log\Log::error('Failed to save booking service. Errors: ' . json_encode($bookingService->getErrors()));
-                            $this->Flash->error(__('The booking was saved, but some service details could not be saved.'));
-                        } else {
-                            \Cake\Log\Log::debug('Successfully saved booking service');
+                    foreach ($data['bookings_services'] as $serviceIdKey => $serviceData) {
+                        // Ensure all needed keys exist
+                        if (!isset($serviceData['service_id'], $serviceData['stylist_id'], $serviceData['start_time'], $serviceData['service_cost'])) {
+                            \Cake\Log\Log::warning('Skipping incomplete service data: ' . json_encode($serviceData));
+                            continue;
                         }
-                    }
-                }
 
-                // Create BookingsStylists records for each selected stylist
-                if (!empty($data['bookings_services'])) {
-                    $bookingsStylistsTable = $this->fetchTable('BookingsStylists');
-                    $processedStylists = [];
+                        $serviceId = (int)$serviceData['service_id'];
+                        $startTimeString = $serviceData['start_time']; 
+                        $duration = $servicesDetails[$serviceId] ?? 0;
 
-                    foreach ($data['bookings_services'] as $serviceData) {
-                        $stylistId = $serviceData['stylist_id'];
+                        if ($duration <= 0) {
+                            \Cake\Log\Log::warning("Skipping service ID {$serviceId} with zero or invalid duration.");
+                            continue;
+                        }
 
-                        // Only create one BookingsStylists record per stylist
-                        if (!in_array($stylistId, $processedStylists)) {
-                            $bookingStylist = $bookingsStylistsTable->newEntity([
-                                'booking_id' => $booking->id,
-                                'stylist_id' => $stylistId,
-                                'stylist_date' => $booking->booking_date,
-                                'start_time' => $booking->start_time,
-                                'end_time' => $booking->end_time,
-                                'selected_cost' => $booking->total_cost
+                        try {
+                            $startTime = new \DateTime($data['booking_date'] . ' ' . $startTimeString);
+                            $endTime = clone $startTime;
+                            $endTime->modify("+{$duration} minutes");
+
+                            $bookingService = $bookingsServicesTable->newEntity([
+                                'booking_id' => $bookingId,
+                                'service_id' => $serviceId,
+                                'stylist_id' => (int)$serviceData['stylist_id'],
+                                'start_time' => $startTime->format('H:i:s'),
+                                'end_time' => $endTime->format('H:i:s'),
+                                'service_cost' => $serviceData['service_cost']
                             ]);
 
-                            if (!$bookingsStylistsTable->save($bookingStylist)) {
-                                $this->Flash->error(__('Your booking was saved, but some stylist details could not be saved.'));
+                            if ($bookingsServicesTable->save($bookingService)) {
+                                $allServicesTimes[] = ['start' => $startTime, 'end' => $endTime];
+                                \Cake\Log\Log::debug('Successfully saved booking service with times');
+                            } else {
+                                \Cake\Log\Log::error('Failed to save booking service. Errors: ' . json_encode($bookingService->getErrors()));
+                                // Decide if we should rollback or just flag the error
                             }
-
-                            $processedStylists[] = $stylistId;
+                        } catch (\Exception $e) {
+                            \Cake\Log\Log::error("Error processing time for service {$serviceId}: " . $e->getMessage());
                         }
                     }
                 }
+
+                // Calculate overall start/end time
+                $overallStartTime = null;
+                $overallEndTime = null;
+                if (!empty($allServicesTimes)) {
+                    $overallStartTime = min(array_column($allServicesTimes, 'start'));
+                    $overallEndTime = max(array_column($allServicesTimes, 'end'));
+                }
+
+                // Update the main booking record with overall times
+                if ($overallStartTime && $overallEndTime) {
+                    $booking->start_time = $overallStartTime->format('H:i:s');
+                    $booking->end_time = $overallEndTime->format('H:i:s');
+                    $this->Bookings->save($booking);
+                } else {
+                     \Cake\Log\Log::warning("Could not determine overall start/end times for booking ID {$bookingId}");
+                }
+
+                // Create BookingsStylists records (using overall times for now)
+                if (!empty($data['bookings_services'])) {
+                     $bookingsStylistsTable = $this->fetchTable('BookingsStylists');
+                     $processedStylists = [];
+                     foreach ($data['bookings_services'] as $serviceData) {
+                         if (!isset($serviceData['stylist_id'])) continue;
+                         $stylistId = (int)$serviceData['stylist_id'];
+
+                         if (!in_array($stylistId, $processedStylists)) {
+                             $bookingStylist = $bookingsStylistsTable->newEntity([
+                                 'booking_id' => $bookingId,
+                                 'stylist_id' => $stylistId,
+                                 'stylist_date' => $booking->booking_date->format('Y-m-d'),
+                                 'start_time' => $booking->start_time,
+                                 'end_time' => $booking->end_time,
+                                 'selected_cost' => $booking->total_cost
+                             ]);
+                             if (!$bookingsStylistsTable->save($bookingStylist)) {
+                                  \Cake\Log\Log::error('Failed to save booking stylist record for stylist ' . $stylistId . ' Errors: ' . json_encode($bookingStylist->getErrors()));
+                                 $this->Flash->error(__('Your booking was saved, but some stylist details could not be saved.'));
+                             }
+                             $processedStylists[] = $stylistId;
+                         }
+                     }
+                 }
 
                 $this->Flash->success(__('Your booking has been saved successfully.'));
                 return $this->redirect(['controller' => 'Customers', 'action' => 'dashboard']);
             }
+
+            \Cake\Log\Log::error('Failed to save initial booking. Errors: ' . json_encode($booking->getErrors()));
             $this->Flash->error(__('The booking could not be saved. Please, try again.'));
         }
         $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
@@ -595,102 +724,174 @@ class BookingsController extends AppController
         if ($this->request->is('post')) {
             $data = $this->request->getData();
 
-            // Check if end time exceeds 5 PM
-            if (isset($data['end_time'])) {
-                $endTime = new \DateTime($data['end_time']);
-                $closingTime = new \DateTime('17:00');
-
-                if ($endTime > $closingTime) {
-                    $this->Flash->error(__('Booking cannot extend past 5 PM as the shop will be closed.'));
-                    return $this->redirect(['action' => 'adminbooking']);
-                }
-            }
-
             // Format the date to Y-m-d format
             if (isset($data['booking_date'])) {
-                $date = new \DateTime($data['booking_date']);
-                $data['booking_date'] = $date->format('Y-m-d');
+                $bookingDate = new \DateTime($data['booking_date']);
+                $data['booking_date_formatted'] = $bookingDate->format('Y-m-d');
+            } else {
+                $this->Flash->error(__('Booking date is missing.'));
+                return $this->redirect(['action' => 'adminbooking']);
             }
 
             // Get customer details and set booking name
             if (isset($data['customer_id'])) {
-                $customer = $this->Bookings->Customers->get($data['customer_id']);
-                $data['booking_name'] = 'Booking for ' . $customer->first_name . ' ' . $customer->last_name;
+                try {
+                    $customer = $this->Bookings->Customers->get($data['customer_id']);
+                    $data['booking_name'] = 'Booking for ' . $customer->first_name . ' ' . $customer->last_name;
+                } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
+                    $this->Flash->error(__('Selected customer not found.'));
+                    return $this->redirect(['action' => 'adminbooking']);
+                }
+            } else {
+                 $this->Flash->error(__('Customer ID is missing.'));
+                 return $this->redirect(['action' => 'adminbooking']);
             }
 
             // Calculate total cost from all selected services
             $totalCost = 0;
-
             if (!empty($data['bookings_services'])) {
                 foreach ($data['bookings_services'] as $serviceData) {
-                    $totalCost += floatval($serviceData['service_cost']);
+                    // Ensure service_cost exists before adding
+                    $totalCost += floatval($serviceData['service_cost'] ?? 0);
                 }
             }
-
             $data['total_cost'] = $totalCost;
-            $data['remaining_cost'] = $totalCost;
+            $data['remaining_cost'] = $totalCost; // Assuming full cost is remaining initially
             $data['notes'] = $data['notes'] ?? null;
 
-            $booking = $this->Bookings->patchEntity($booking, $data);
+            // Create a temporary booking entity without associations first
+            $booking = $this->Bookings->newEntity([
+                'customer_id' => $data['customer_id'],
+                'booking_name' => $data['booking_name'],
+                'booking_date' => $data['booking_date_formatted'],
+                'total_cost' => $data['total_cost'],
+                'remaining_cost' => $data['remaining_cost'],
+                'notes' => $data['notes'] ?? null,
+                'status' => 'active'
+            ]);
+
+            // Try saving the main booking record
             if ($this->Bookings->save($booking)) {
-                // Save BookingsServices records with stylist assignments
+                $bookingId = $booking->id;
+                $allServicesTimes = [];
+
+                // Fetch service durations
+                $serviceIds = array_column($data['bookings_services'] ?? [], 'service_id');
+                $servicesDetails = [];
+                if (!empty($serviceIds)) {
+                    $servicesDetails = $this->Services->find('list', [
+                        'keyField' => 'id',
+                        'valueField' => 'duration_minutes'
+                    ])->where(['id IN' => $serviceIds])->toArray();
+                }
+
+                // Save BookingsServices records with individual start/end times
                 if (!empty($data['bookings_services'])) {
                     $bookingsServicesTable = $this->fetchTable('BookingsServices');
-                    foreach ($data['bookings_services'] as $serviceData) {
-                        $bookingService = $bookingsServicesTable->newEntity([
-                            'booking_id' => $booking->id,
-                            'service_id' => $serviceData['service_id'],
-                            'stylist_id' => $serviceData['stylist_id'],
-                            'service_cost' => $serviceData['service_cost']
-                        ]);
-
-                        if (!$bookingsServicesTable->save($bookingService)) {
-                            \Cake\Log\Log::error('Failed to save booking service. Errors: ' . json_encode($bookingService->getErrors()));
-                            $this->Flash->error(__('The booking was saved, but some service details could not be saved.'));
-                        } else {
-                            \Cake\Log\Log::debug('Successfully saved booking service');
+                    foreach ($data['bookings_services'] as $serviceIdKey => $serviceData) {
+                        // Ensure all needed keys exist
+                        if (!isset($serviceData['service_id'], $serviceData['stylist_id'], $serviceData['start_time'], $serviceData['service_cost'])) {
+                            \Cake\Log\Log::warning('[Admin] Skipping incomplete service data: ' . json_encode($serviceData));
+                            continue;
                         }
-                    }
-                }
 
-                // Create BookingsStylists records for each selected stylist
-                if (!empty($data['bookings_services'])) {
-                    $bookingsStylistsTable = $this->fetchTable('BookingsStylists');
-                    $processedStylists = [];
+                        $serviceId = (int)$serviceData['service_id'];
+                        $startTimeString = $serviceData['start_time'];
+                        $duration = $servicesDetails[$serviceId] ?? 0;
 
-                    foreach ($data['bookings_services'] as $serviceData) {
-                        $stylistId = $serviceData['stylist_id'];
+                        if ($duration <= 0) {
+                            \Cake\Log\Log::warning("[Admin] Skipping service ID {$serviceId} with zero or invalid duration.");
+                            continue;
+                        }
 
-                        // Only create one BookingsStylists record per stylist
-                        if (!in_array($stylistId, $processedStylists)) {
-                            $bookingStylist = $bookingsStylistsTable->newEntity([
-                                'booking_id' => $booking->id,
-                                'stylist_id' => $stylistId,
-                                'stylist_date' => $booking->booking_date,
-                                'start_time' => $booking->start_time,
-                                'end_time' => $booking->end_time,
-                                'selected_cost' => $booking->total_cost
+                        try {
+                            // Use the already formatted date
+                            $startTime = new \DateTime($data['booking_date_formatted'] . ' ' . $startTimeString);
+                            $endTime = clone $startTime;
+                            $endTime->modify("+{$duration} minutes");
+
+                            $bookingService = $bookingsServicesTable->newEntity([
+                                'booking_id' => $bookingId,
+                                'service_id' => $serviceId,
+                                'stylist_id' => (int)$serviceData['stylist_id'],
+                                'start_time' => $startTime->format('H:i:s'),
+                                'end_time' => $endTime->format('H:i:s'),
+                                'service_cost' => $serviceData['service_cost']
                             ]);
 
-                            if (!$bookingsStylistsTable->save($bookingStylist)) {
-                                $this->Flash->error(__('Your booking was saved, but some stylist details could not be saved.'));
+                            if ($bookingsServicesTable->save($bookingService)) {
+                                $allServicesTimes[] = ['start' => $startTime, 'end' => $endTime];
+                                \Cake\Log\Log::debug('[Admin] Successfully saved booking service with times');
+                            } else {
+                                \Cake\Log\Log::error('[Admin] Failed to save booking service. Errors: ' . json_encode($bookingService->getErrors()));
+                                // Consider adding a flash message here too
                             }
-
-                            $processedStylists[] = $stylistId;
+                        } catch (\Exception $e) {
+                            \Cake\Log\Log::error("[Admin] Error processing time for service {$serviceId}: " . $e->getMessage());
                         }
                     }
                 }
 
-                $this->Flash->success(__('Your booking for the customer has been saved successfully.'));
+                // Calculate overall start/end time
+                $overallStartTime = null;
+                $overallEndTime = null;
+                if (!empty($allServicesTimes)) {
+                    $overallStartTime = min(array_column($allServicesTimes, 'start'));
+                    $overallEndTime = max(array_column($allServicesTimes, 'end'));
+                }
+
+                // Update the main booking record with overall times
+                if ($overallStartTime && $overallEndTime) {
+                    $booking->start_time = $overallStartTime->format('H:i:s');
+                    $booking->end_time = $overallEndTime->format('H:i:s');
+                    if (!$this->Bookings->save($booking)) {
+                         \Cake\Log\Log::error("[Admin] Failed to save overall times for booking ID {$bookingId}. Errors: " . json_encode($booking->getErrors()));
+                         $this->Flash->error(__('Booking saved, but failed to update overall time window.'));
+                    }
+                } else {
+                     \Cake\Log\Log::warning("[Admin] Could not determine overall start/end times for booking ID {$bookingId}");
+                }
+
+                // Create BookingsStylists records (using overall times)
+                if (!empty($data['bookings_services'])) {
+                     $bookingsStylistsTable = $this->fetchTable('BookingsStylists');
+                     $processedStylists = [];
+                     foreach ($data['bookings_services'] as $serviceData) {
+                         if (!isset($serviceData['stylist_id'])) continue;
+                         $stylistId = (int)$serviceData['stylist_id'];
+
+                         if (!in_array($stylistId, $processedStylists)) {
+                             $bookingStylist = $bookingsStylistsTable->newEntity([
+                                 'booking_id' => $bookingId,
+                                 'stylist_id' => $stylistId,
+                                 'stylist_date' => $booking->booking_date->format('Y-m-d'),
+                                 'start_time' => $booking->start_time,
+                                 'end_time' => $booking->end_time,
+                                 'selected_cost' => $booking->total_cost
+                             ]);
+                             if (!$bookingsStylistsTable->save($bookingStylist)) {
+                                  \Cake\Log\Log::error('[Admin] Failed to save booking stylist record for stylist ' . $stylistId . ' Errors: ' . json_encode($bookingStylist->getErrors()));
+                                 // Use a different flash message for admin
+                                 $this->Flash->error(__('The booking was created, but some stylist assignment details could not be saved.'));
+                             }
+                             $processedStylists[] = $stylistId;
+                         }
+                     }
+                 }
+
+                // Use a different success message for admin
+                $this->Flash->success(__('Booking for {0} has been saved successfully.', $customer->first_name . ' ' . $customer->last_name));
                 return $this->redirect(['action' => 'index']);
             }
+            // Log the errors if the initial save fails
+            \Cake\Log\Log::error('[Admin] Failed to save initial booking. Errors: ' . json_encode($booking->getErrors()));
             $this->Flash->error(__('The booking could not be saved. Please, try again.'));
         }
 
-        $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
-        $customers = $this->Bookings->Customers->find('list', limit: 200)->all();
+        // Pass variables needed for the form
+        $customers = $this->Bookings->Customers->find('list', ['limit' => 200])->all();
         $services = $this->fetchTable('Services')->find('all')->all();
-        $this->set(compact('booking', 'stylists', 'services', 'customers'));
+        $this->set(compact('booking', 'customers', 'services'));
     }
 
 
@@ -800,7 +1001,7 @@ class BookingsController extends AppController
 
         // Check if end time exceeds 5 PM
         $endTimeObj = new \DateTime($endTime);
-        $closingTime = new \DateTime('17:00'); // 5 PM
+        $closingTime = new \DateTime('17:00'); 
 
         if ($endTimeObj > $closingTime) {
             return $this->response->withStringBody(json_encode([
