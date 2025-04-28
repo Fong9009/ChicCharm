@@ -10,10 +10,7 @@
 // Add the JavaScript file
 $this->Html->script('booking', ['block' => 'script']);
 ?>
-<script>
-    const apiUrl = '<?= $this->Url->build("/bookings/get-stylists") ?>';
-    const apiUrl2 = '<?= $this->Url->build("/bookings/get-available-time-slots") ?>';
-</script>
+
 <div class="booking-form-wrapper">
     <div class="row">
         <div class="side-nav">
@@ -21,18 +18,17 @@ $this->Html->script('booking', ['block' => 'script']);
         <?= $this->Html->link(__('My Bookings'), ['action' => 'customerindex'], ['class' => 'side-nav-item']) ?>
         </div>
         <div class="column-edit">
-            <div class="bookings form content">
+            <div class="bookings form content" id="booking-form">
                 <?= $this->Form->create($booking) ?>
                 <fieldset>
                     <h2 class="text-center"><?= __('Add Booking') ?></h2><br>
                     <div class="row">
                         <div class="col-md-6">
-                            <h3>Select Services</h3>
+                            <h4>Select Services</h4>
                             <div class="service-list">
                                 <?php foreach ($services as $service): ?>
                                     <div class="form-check">
                                         <input class="form-check-input service-checkbox" type="checkbox"
-                                               name="bookings_services[<?= $service->id ?>][service_id]"
                                                value="<?= $service->id ?>"
                                                id="service-<?= $service->id ?>"
                                                data-duration="<?= $service->duration_minutes ?>"
@@ -49,8 +45,14 @@ $this->Html->script('booking', ['block' => 'script']);
                     </div>
                     <br>
                     <div class="row">
+                        <div class="col-md-12">
+                            <h4>Select Stylists for Each Service</h4>
+                            <div id="service-stylist-selections"></div>
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6">
-                            <h5>Please Select The Date</h5>
+                            <h4>Please Select The Date</h4>
                             <?php
                                 echo $this->Form->control('booking_date', [
                                     'type' => 'date',
@@ -61,43 +63,17 @@ $this->Html->script('booking', ['block' => 'script']);
                                     'id' => 'booking-date',
                                     'disabled' => true,
                                     'label' => false,
-                                    'min' => date('Y-m-d'),
-                                    'max' => date('Y-m-d', strtotime('+1 year')),
-                                    'value' => date('Y-m-d'),
                                     'error' => ['class' => 'invalid-feedback']
                                 ]);
                             ?>
-                            <small class="text-muted">Please select at least one service first</small>
+                            <small class="text-muted">Please select service(s) and stylist(s) first</small>
                         </div>
                         <div class="col-md-6">
-                            <h5>Please Select The Time</h5>
+                            <h4>Please Select The Time</h4>
                             <?php
-                                $currentHour = (int)date('H');
-                                $currentMinute = (int)date('i');
-                                $nextInterval = ceil(($currentMinute + 15) / 15) * 15;
-                                $startHour = $currentHour;
-                                if ($nextInterval >= 60) {
-                                    $startHour++;
-                                    $nextInterval = 0;
-                                }
-
-                                $timeOptions = ['' => 'Select a time slot'];
-                                for ($hour = 9; $hour < 17; $hour++) {
-                                    for ($minute = 0; $minute < 60; $minute += 15) {
-                                        if (date('Y-m-d') === date('Y-m-d') && 
-                                            ($hour < $startHour || 
-                                            ($hour === $startHour && $minute < $nextInterval))) {
-                                            continue;
-                                        }
-                                        $timeStr = sprintf('%02d:%02d', $hour, $minute);
-                                        $displayTime = date('g:i A', strtotime($timeStr));
-                                        $timeOptions[$timeStr] = $displayTime;
-                                    }
-                                }
-
                                 echo $this->Form->control('start_time', [
                                     'type' => 'select',
-                                    'options' => $timeOptions,
+                                    'options' => ['' => 'Select Date and Service(s)'],
                                     'class' => 'form-control',
                                     'id' => 'start-time',
                                     'disabled' => true,
@@ -107,27 +83,22 @@ $this->Html->script('booking', ['block' => 'script']);
                                     'oninput' => "this.setCustomValidity('')"
                                 ]);
                             ?>
-                            <small class="text-muted">Please select at least one service first</small>
+                            <small class="text-muted">Please select service(s) and stylist(s) first</small>
                             <div id="time-range-display" class="mt-2" style="display: none;" hidden>
-                                <span id="start-time-display"></span> - <span id="end-time-display"></span>
+                                Selected Time: <span id="start-time-display"></span> - <span id="end-time-display"></span>
                             </div>
                             <?php echo $this->Form->hidden('end_time', ['id' => 'end-time']); ?>
                         </div>
                     </div>
+                    <div id="closing-time-warning-container" class="mt-3"></div>
                     <br>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h5>Select Stylists for Each Service</h5>
-                            <div id="service-stylist-selections"></div>
-                            <div id="stylist-ids-container"></div>
-                        </div>
-                    </div>
                     <div class="row" style="display: none;">
                         <div class="col-md-6">
                             <?php
                                 echo $this->Form->control('total_cost', [
                                     'readonly' => true,
                                     'value' => '0.00',
+                                    'id' => 'total-cost',
                                     'class' => 'form-control' . ($this->Form->isFieldError('total_cost') ? ' is-invalid' : ''),
                                     'error' => ['class' => 'invalid-feedback']
                                 ]);
@@ -149,7 +120,7 @@ $this->Html->script('booking', ['block' => 'script']);
                         </div>
                     </div>
                 </fieldset>
-                <div class="selected-services-summary mt-3">
+                <div class="selected-services-summary mt-4 p-3 border rounded">
                     <h5>Selected Services: <span id="service-count">0</span></h5>
                     <div id="selected-services-list"></div><br>
                     <h5>Total: $<span id="service-total">0.00</span></h5>

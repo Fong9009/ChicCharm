@@ -295,7 +295,7 @@ class BookingsController extends AppController
 
             // Patch main entity, exclude associations if no service data submitted
             $booking = $this->Bookings->patchEntity($booking, $data, [
-                'associated' => $hasServiceData ? [] : [] // Adjust if needed, main point is to control association patching
+                'associated' => $hasServiceData ? [] : [] 
             ]);
 
             if ($this->Bookings->save($booking)) {
@@ -917,7 +917,10 @@ class BookingsController extends AppController
     /**
      * Get Available Time Slots method
      *
-     * @return \Cake\Http\Response|null|void Returns JSON response with available time slots
+     * Handles sequential service bookings with potentially different stylists.
+     * Expects input format: { date: 'YYYY-MM-DD', selected_services: [{service_id: X, stylist_id: Y|'any'}, ...] }
+     *
+     * @return \Cake\Http\Response|null|void Returns JSON response with available start times
      */
     public function getAvailableTimeSlots()
     {
@@ -927,87 +930,197 @@ class BookingsController extends AppController
 
         $data = $this->request->getData();
         $date = $data['date'] ?? null;
-        $serviceIds = $data['service_ids'] ?? [];
+        // Expecting structure like: [{service_id: 1, stylist_id: 5}, {service_id: 2, stylist_id: 'any'}]
+        $selectedServicesInput = $data['selected_services'] ?? [];
 
-        if (!$date || empty($serviceIds)) {
+        if (!$date || empty($selectedServicesInput)) {
             return $this->response->withStringBody(json_encode([]));
         }
 
+        // --- Basic Validation ---
+        if (!is_array($selectedServicesInput)) {
+             return $this->response->withStatus(400)->withStringBody(json_encode(['error' => 'Invalid selected_services format.']));
+        }
+        foreach ($selectedServicesInput as $item) {
+            if (!isset($item['service_id']) || !isset($item['stylist_id'])) {
+                 return $this->response->withStatus(400)->withStringBody(json_encode(['error' => 'Each service must have service_id and stylist_id.']));
+            }
+            if ($item['stylist_id'] === 'any' || !is_numeric($item['stylist_id'])) {
+                 return $this->response->withStatus(400)->withStringBody(json_encode(['error' => 'Invalid stylist_id format. Must be a specific stylist ID.']));
+            }
+             if (!is_numeric($item['service_id'])) {
+                  return $this->response->withStatus(400)->withStringBody(json_encode(['error' => 'Invalid service_id format. Must be integer.']));
+             }
+        }
+
+
         try {
-            // Get all services to calculate total duration
+            // --- Fetch Service Details and Calculate Total Duration ---
+            $serviceIds = array_column($selectedServicesInput, 'service_id');
+            $servicesDetails = $this->Services->find('list', [
+                'keyField' => 'id',
+                'valueField' => 'duration_minutes'
+            ])->where(['id IN' => $serviceIds])->toArray();
+
             $totalDuration = 0;
             foreach ($serviceIds as $serviceId) {
-                $service = $this->Services->get($serviceId);
-                $totalDuration += $service->duration_minutes;
+                if (!isset($servicesDetails[$serviceId])) {
+                    return $this->response->withStatus(404)->withStringBody(json_encode(['error' => 'Service not found: ID ' . $serviceId]));
+                }
+                $totalDuration += $servicesDetails[$serviceId];
             }
+             if ($totalDuration <= 0) {
+                 $this->log('Total duration is zero or negative, returning empty slots.');
+                 return $this->response->withStringBody(json_encode([]));
+             }
 
-            // Get all bookings for the selected date
-            $existingBookings = $this->BookingsStylists->find()
-                ->where([
-                    'stylist_date' => $date,
-                    'BookingsStylists.start_time IS NOT NULL',
-                    'BookingsStylists.end_time IS NOT NULL'
-                ])
-                ->select(['start_time', 'end_time'])
-                ->toArray();
 
-            // Generate all possible time slots from 9 AM to 5 PM in 15-minute intervals
+            // --- Generate and Check Time Slots ---
             $availableSlots = [];
             $startHour = 9;
-            $endHour = 17;
-            $interval = 15;
+            $endHour = 17; // 5 PM
+            $interval = 15; // minutes
+            $closingTime = new \DateTime($date . ' 17:00:00');
 
             for ($hour = $startHour; $hour < $endHour; $hour++) {
                 for ($minute = 0; $minute < 60; $minute += $interval) {
-                    $slotStart = sprintf('%02d:%02d', $hour, $minute);
+                    $slotStartString = sprintf('%02d:%02d:00', $hour, $minute); // Use H:i:s
+                    $potentialStartTime = new \DateTime($date . ' ' . $slotStartString);
+                    $this->log("--- Checking potential start time: " . $potentialStartTime->format('Y-m-d H:i:s') . " ---", 'debug'); 
 
-                    // Calculate slot end time
-                    $endTime = strtotime("+{$totalDuration} minutes", strtotime($slotStart));
-                    $slotEnd = date('H:i', $endTime);
+                    // Calculate potential end time for the whole sequence
+                    $potentialEndTime = clone $potentialStartTime;
+                    $potentialEndTime->modify("+{$totalDuration} minutes");
 
-                    // Allow bookings that end at exactly 5 PM (17:00)
-                    if (strtotime($slotEnd) > strtotime('17:00')) {
-                        continue;
+                    // Check if the *entire sequence* finishes by closing time
+                    if ($potentialEndTime > $closingTime) {
+                         $this->log("Slot {$slotStartString} skipped: ends at " . $potentialEndTime->format('H:i:s') . " (after closing time {$closingTime->format('H:i:s')})", 'debug');
+                        continue; // This start time is too late
                     }
 
-                    // Check if slot overlaps with any existing booking
-                    $isAvailable = true;
-                    foreach ($existingBookings as $booking) {
-                        $bookingStart = $booking->start_time->format('H:i');
-                        $bookingEnd = $booking->end_time->format('H:i');
+                    // --- Check availability for each service sequentially ---
+                    $currentServiceStartTime = clone $potentialStartTime;
+                    $isSlotAvailable = true;
 
-                        // Convert times to timestamps for comparison
-                        $slotStartTime = strtotime($slotStart);
-                        $slotEndTime = strtotime($slotEnd);
-                        $bookingStartTime = strtotime($bookingStart);
-                        $bookingEndTime = strtotime($bookingEnd);
+                    foreach ($selectedServicesInput as $index => $serviceSelection) {
+                        $serviceId = (int)$serviceSelection['service_id'];
+                        $stylistId = (int)$serviceSelection['stylist_id'];
+                        $serviceDuration = $servicesDetails[$serviceId];
 
-                        // Check for overlap, allowing exact end time matches
-                        if (
-                            ($slotStartTime >= $bookingStartTime && $slotStartTime < $bookingEndTime) ||
-                            ($slotEndTime > $bookingStartTime && $slotEndTime <= $bookingEndTime) ||
-                            ($slotStartTime <= $bookingStartTime && $slotEndTime >= $bookingEndTime)
-                        ) {
-                            $isAvailable = false;
-                            break;
+                        // Prevent zero-duration service issues
+                        if ($serviceDuration <= 0) {
+                            $this->log("Segment {$index}: Service ID {$serviceId} has zero or negative duration. Skipping segment check.", 'debug');
+                            continue;
                         }
+
+                        $currentServiceEndTime = clone $currentServiceStartTime;
+                        $currentServiceEndTime->modify("+{$serviceDuration} minutes");
+
+                        $this->log("Segment {$index}: Checking Service={$serviceId}, Stylist={$stylistId} from " . $currentServiceStartTime->format('H:i:s') . " to " . $currentServiceEndTime->format('H:i:s'), 'debug');
+
+                        // *** Core Availability Check Logic for [currentServiceStartTime, currentServiceEndTime] ***
+                        $isSegmentAvailable = $this->checkSegmentAvailability(
+                            $date,
+                            $currentServiceStartTime->format('H:i:s'),
+                            $currentServiceEndTime->format('H:i:s'),
+                            $serviceId,
+                            $stylistId 
+                        );
+
+                         $this->log("Segment {$index}: Availability result: " . ($isSegmentAvailable ? 'Available' : 'NOT Available'), 'debug');
+
+                        if (!$isSegmentAvailable) {
+                            $isSlotAvailable = false;
+                             // Log specific failure point
+                             $this->log("Slot {$slotStartString} failed: Segment {$index} (Service: {$serviceId}, Stylist: {$stylistId}) is unavailable between " . $currentServiceStartTime->format('H:i:s') . "-" . $currentServiceEndTime->format('H:i:s') . ")", 'debug');
+                            break; // Stop checking services for this slotStart
+                        }
+
+                        // Prepare start time for the next service
+                        $currentServiceStartTime = $currentServiceEndTime;
+                    } // End foreach selected service
+
+                    // Log final decision for the slot
+                    if ($isSlotAvailable) {
+                         $this->log("Slot {$slotStartString} SUCCESS: All segments available.", 'debug');
+                        $formattedSlot = $potentialStartTime->format('h:i A'); 
+                        $valueSlot = $potentialStartTime->format('H:i'); 
+                        $availableSlots[] = ['value' => $valueSlot, 'text' => $formattedSlot];
+                    } else {
+                         $this->log("Slot {$slotStartString} FAILURE: Not added.", 'debug');
                     }
 
-                    if ($isAvailable) {
-                        $availableSlots[] = [
-                            'value' => $slotStart,
-                            'display' => date('g:i A', strtotime($slotStart))
-                        ];
-                    }
-                }
-            }
+                } // End minute loop
+            } // End hour loop
+
 
             return $this->response->withStringBody(json_encode($availableSlots));
 
-        } catch (\Exception $e) {
-            $this->log('Error in getAvailableTimeSlots: ' . $e->getMessage());
-            return $this->response->withStatus(500)
-                ->withStringBody(json_encode(['error' => 'An error occurred while fetching available time slots']));
+        } catch (\Throwable $e) {
+            // Log error
+            $this->log('Error in getAvailableTimeSlots (multi-stylist): ' . $e->getMessage() . ' on line ' . $e->getLine() . ' in file ' . $e->getFile() . ' Trace: ' . $e->getTraceAsString());
+            // Return a generic error message to the client
+            return $this->response->withStatus(500)->withStringBody(json_encode(['error' => 'An internal error occurred while fetching time slots. Please try again later. Error details logged.']));
+        }
+    }
+
+    /**
+     * Helper function to check if a specific service segment is available for a SPECIFIC stylist.
+     *
+     * @param string $date Date string (Y-m-d)
+     * @param string $startTimeString Start time (H:i:s)
+     * @param string $endTimeString End time (H:i:s)
+     * @param int $serviceId Service ID
+     * @param int $stylistId Specific Stylist ID
+     * @return bool True if available, false otherwise
+     */
+    private function checkSegmentAvailability(string $date, string $startTimeString, string $endTimeString, int $serviceId, int $stylistId): bool
+    {
+        try {
+            $this->log("checkSegmentAvailability: Checking Svc={$serviceId}, Stylist={$stylistId}, Date={$date}, Time={$startTimeString}-{$endTimeString}", 'debug');
+
+            // 1. Check qualification using matching for better relationship handling
+             $this->log("checkSegmentAvailability: Checking qualification...", 'debug');
+            $isQualified = $this->Stylists->find()
+                ->where(['Stylists.id' => $stylistId])
+                ->matching('Services', function ($q) use ($serviceId) {
+                    return $q->where(['Services.id' => $serviceId]);
+                })
+                ->count() > 0;
+
+             $this->log("checkSegmentAvailability: Qualification result: " . ($isQualified ? 'Qualified' : 'NOT Qualified'), 'debug');
+            if (!$isQualified) {
+                // Log kept from previous version is good
+                $this->log("Stylist {$stylistId} not qualified for service {$serviceId}", 'debug');
+                return false; 
+            }
+
+            // 2. Check availability (if qualified)
+             $this->log("checkSegmentAvailability: Checking for booking conflicts...", 'debug');
+            $conflictCount = $this->BookingsStylists->find()
+                ->where([
+                    'stylist_id' => $stylistId,
+                    'stylist_date' => $date,
+                    'OR' => [
+                         ['start_time' => $startTimeString, 'end_time' => $endTimeString],
+                         ['start_time <' => $startTimeString, 'end_time >' => $startTimeString],
+                         ['start_time <' => $endTimeString, 'end_time >' => $endTimeString],
+                         ['start_time >=' => $startTimeString, 'end_time <=' => $endTimeString],
+                         ['start_time <' => $startTimeString, 'end_time >' => $endTimeString],
+                    ],
+                    'start_time IS NOT NULL',
+                    'end_time IS NOT NULL'
+                ])
+                ->count(); 
+
+            $hasConflict = $conflictCount > 0;
+            $this->log("checkSegmentAvailability: Conflict check result: " . ($hasConflict ? 'Conflict Found' : 'No Conflict'), 'debug');
+
+            return !$hasConflict; 
+
+        } catch (\Throwable $e) {
+            $this->log('Error in checkSegmentAvailability: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString(), 'error'); 
+            return false; 
         }
     }
 
@@ -1161,5 +1274,67 @@ class BookingsController extends AppController
         }
 
         return $this->redirect(['action' => 'adminPastBookings']);
+    }
+
+    /**
+     * Get Stylists for a specific service method
+     *
+     * Returns a list of stylists qualified to perform the given service.
+     *
+     * @param int|null $serviceId Service ID
+     * @return \Cake\Http\Response|null|void Returns JSON response with stylists
+     */
+    public function getStylistsForService($serviceId = null)
+    {
+        // Ensure serviceId is provided and numeric
+        if ($serviceId === null || !is_numeric($serviceId)) {
+            return $this->response->withStatus(400)
+                ->withType('application/json')
+                ->withStringBody(json_encode(['error' => 'Valid Service ID is required.']));
+        }
+        $serviceId = (int)$serviceId;
+
+        // Check if the service actually exists
+        if (!$this->Services->exists(['id' => $serviceId])) {
+             return $this->response->withStatus(404)
+                ->withType('application/json')
+                ->withStringBody(json_encode(['error' => 'Service not found.']));
+        }
+
+        $this->autoRender = false;
+        $this->response = $this->response->withType('application/json');
+
+        try {
+            $stylists = $this->Stylists->find()
+                ->select([
+                    'Stylists.id',
+                    'Stylists.first_name',
+                    'Stylists.last_name'
+                ])
+                ->distinct(['Stylists.id'])
+                ->innerJoinWith('Services', function ($q) use ($serviceId) {
+                    return $q->where(['Services.id' => $serviceId]);
+                })
+                ->order([
+                    'Stylists.first_name' => 'ASC',
+                    'Stylists.last_name' => 'ASC'
+                ])
+                ->toArray();
+
+            // Format the results for easy use in a dropdown/select list
+            $formattedStylists = array_map(function ($stylist) {
+                return [
+                    'id' => $stylist->id,
+                    'name' => $stylist->first_name . ' ' . $stylist->last_name
+                ];
+            }, $stylists);
+
+            return $this->response->withStringBody(json_encode($formattedStylists));
+
+        } catch (\Throwable $e) {
+            $this->log('Error in getStylistsForService: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
+            return $this->response->withStatus(500)
+                ->withStringBody(json_encode(['error' => 'An internal error occurred while fetching stylists for the service.']));
+        }
     }
 }
