@@ -144,7 +144,7 @@
         </div>
         <!-- Services found in booking -->
         <div class="row">
-            <?php if (!empty($booking->services)) : ?>
+            <?php if (!empty($booking->bookings_services)) : ?>
                 <div class="table-responsive">
                     <table class="table">
                         <thead>
@@ -155,12 +155,12 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($booking->services as $service) : ?>
+                            <?php foreach ($booking->bookings_services as $service) : ?>
                             <tr>
-                                <td><?= h($service->service_name) ?></td>
+                                <td><?= h($service->service->service_name) ?></td>
                                 <td><?= $this->Number->currency($service->service_cost) ?></td>
                                 <td class="actions">
-                                    <?= $this->Html->link(__('View'), ['controller' => 'Services', 'action' => 'view', $service->id] , ['class' => 'button']) ?>
+                                    <?= $this->Html->link(__('View'), ['controller' => 'Services', 'action' => 'view', $service->service_id] , ['class' => 'button']) ?>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
@@ -177,7 +177,7 @@
             </div>
         </div>
         <div class="row">
-            <?php if (!empty($booking->stylists)) : ?>
+            <?php if (!empty($booking->bookings_stylists)) : ?>
                 <div class="table-responsive">
                     <table class="table">
                         <thead>
@@ -187,24 +187,22 @@
                                 <th><?= __('Email') ?></th>
                                 <th><?= __('Created') ?></th>
                                 <th><?= __('Modified') ?></th>
-                                <th><?= __('Type') ?></th>
                                 <th><?= __('Profile Picture') ?></th>
                                 <th class="actions"><?= __('Actions') ?></th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($booking->stylists as $stylist) : ?>
+                            <?php foreach ($booking->bookings_stylists as $stylist) : ?>
                             <tr>
-                                <td><?= h($stylist->first_name) ?></td>
-                                <td><?= h($stylist->last_name) ?></td>
-                                <td><?= h($stylist->email) ?></td>
-                                <td><?= h($stylist->created) ?></td>
-                                <td><?= h($stylist->modified) ?></td>
-                                <td><?= h($stylist->type) ?></td>
-                                <td><?= h($stylist->profile_picture) ?></td>
+                                <td><?= h($stylist->stylist->first_name) ?></td>
+                                <td><?= h($stylist->stylist->last_name) ?></td>
+                                <td><?= h($stylist->stylist->email) ?></td>
+                                <td><?= h($stylist->stylist->created) ?></td>
+                                <td><?= h($stylist->stylist->modified) ?></td>
+                                <td><?= h($stylist->stylist->profile_picture) ?></td>
                                 <td class="actions">
-                                    <?= $this->Html->link(__('View'), ['controller' => 'Stylists', 'action' => 'view', $stylist->id], ['class' => 'button']) ?>
-                                    <?= $this->Html->link(__('Edit'), ['controller' => 'Stylists', 'action' => 'edit', $stylist->id], ['class' => 'button']) ?>
+                                    <?= $this->Html->link(__('View'), ['controller' => 'Stylists', 'action' => 'view', $stylist->stylist->id], ['class' => 'button']) ?>
+                                    <?= $this->Html->link(__('Edit'), ['controller' => 'Stylists', 'action' => 'edit', $stylist->stylist->id], ['class' => 'button']) ?>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
