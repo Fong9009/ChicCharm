@@ -872,7 +872,7 @@ class BookingsController extends AppController
         }
 
         // Pass variables needed for the form
-        $customers = $this->Bookings->Customers->find('list', ['limit' => 200])->all();
+        $customers = $this->Bookings->Customers->find('list', limit: 200)->all();
         $services = $this->fetchTable('Services')->find('all')->all();
         $this->set(compact('booking', 'customers', 'services'));
     }
