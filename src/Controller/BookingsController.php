@@ -89,7 +89,7 @@ class BookingsController extends AppController
             foreach ($booking->bookings_services as $bs) {
                 if ($bs->end_time) {
                     $currentServiceEndTime = \Cake\I18n\FrozenTime::parse($bs->end_time->format('H:i:s')); // Ensure it's Time object
-                    if ($latestEndTime === null || $currentServiceEndTime->gt($latestEndTime)) {
+                    if ($latestEndTime === null || $currentServiceEndTime > $latestEndTime) {
                         $latestEndTime = $currentServiceEndTime;
                     }
                 }
