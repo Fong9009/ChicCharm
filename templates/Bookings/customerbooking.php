@@ -10,7 +10,11 @@
 // Add the JavaScript file
 $this->Html->script('booking', ['block' => 'script']);
 ?>
-
+<script>
+    const apiUrl = '<?= $this->Url->build("/bookings/get-stylists-for-service/") ?>';
+    const apiUrl2 = '<?= $this->Url->build("/bookings/get-available-time-slots") ?>';
+    const apiUrl3 = '<?= $this->Url->build("/bookings/get-availability-count") ?>';
+</script>
 <div class="booking-form-wrapper">
     <div class="row">
         <div class="side-nav">

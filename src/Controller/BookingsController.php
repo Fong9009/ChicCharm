@@ -33,16 +33,16 @@ class BookingsController extends AppController
     public function beforeFilter(\Cake\Event\EventInterface $event)
     {
         parent::beforeFilter($event);
-        
+
         // Get the current user
         $user = $this->Authentication->getIdentity();
-        
+
         // Define customer-specific actions
         $customerActions = ['customerbooking', 'customerindex', 'customerview', 'dashboard'];
-        
+
         // Define admin-specific actions
         $adminActions = ['adminbooking', 'edit', 'index', 'stylistedit', 'view'];
-        
+
         // If the current action is a customer action
         if (in_array($this->request->getParam('action'), $customerActions)) {
             // Check if user is logged in and is a customer
@@ -51,7 +51,7 @@ class BookingsController extends AppController
                 return $this->redirect(['controller' => 'Pages', 'action' => 'display', 'home']);
             }
         }
-        
+
         // If the current action is an admin action
         if (in_array($this->request->getParam('action'), $adminActions)) {
             // Check if user is logged in and is an admin
@@ -76,7 +76,7 @@ class BookingsController extends AppController
             ->all();
 
         foreach ($potentiallyFinishedBookings as $booking) {
-            if ($booking->bookings_services->isEmpty()) {
+            if (empty($booking->bookings_services)) {
                 // If an active booking somehow has no services, mark as finished if date is past
                 if ($booking->booking_date->format('Y-m-d') < $dateString) {
                     $booking->status = 'finished';
@@ -196,7 +196,7 @@ class BookingsController extends AppController
             return $this->redirect(['action' => 'customerindex']);
         }
 
-        $booking = $this->Bookings->get($id, contain: ['Customers', 'BookingsServices', 'BookingsStylists']);
+        $booking = $this->Bookings->get($id, contain: ['Customers', 'BookingsServices.Services', 'BookingsStylists.Stylists']);
         $this->set(compact('booking'));
     }
 
@@ -623,7 +623,7 @@ class BookingsController extends AppController
                 'total_cost' => $data['total_cost'],
                 'remaining_cost' => $data['remaining_cost'],
                 'notes' => $data['notes'] ?? null,
-                'status' => 'active' 
+                'status' => 'active'
             ]);
 
             // Try saving the main booking record
@@ -652,7 +652,7 @@ class BookingsController extends AppController
                         }
 
                         $serviceId = (int)$serviceData['service_id'];
-                        $startTimeString = $serviceData['start_time']; 
+                        $startTimeString = $serviceData['start_time'];
                         $duration = $servicesDetails[$serviceId] ?? 0;
 
                         if ($duration <= 0) {
@@ -984,7 +984,7 @@ class BookingsController extends AppController
 
         // Check if end time exceeds 5 PM
         $endTimeObj = new \DateTime($endTime);
-        $closingTime = new \DateTime('17:00'); 
+        $closingTime = new \DateTime('17:00');
 
         if ($endTimeObj > $closingTime) {
             return $this->response->withStringBody(json_encode([
@@ -1155,7 +1155,7 @@ class BookingsController extends AppController
                               $this->log("Slot {$slotStartString} for Svc {$serviceId} skipped: time is in the past.", 'debug');
                              continue; // Skip past time slots
                          }
-                        
+
                         $availableSlots[] = $potentialStartTime->format('H:i'); // Store as H:i
                     }
                 } // End minute loop
@@ -1277,7 +1277,7 @@ class BookingsController extends AppController
                     // Also ensure the booking itself isn't cancelled
                     return $q->where([
                         'Bookings.booking_date' => $date,
-                        'Bookings.status !=' => 'cancelled' 
+                        'Bookings.status !=' => 'cancelled'
                     ]);
                 })
                 ->where([
@@ -1319,7 +1319,7 @@ class BookingsController extends AppController
     public function updateBookingStatuses()
     {
         $now = new \Cake\I18n\DateTime();
-        
+
         // Find all active bookings that have ended
         $pastBookings = $this->Bookings->find()
             ->where([
@@ -1543,7 +1543,7 @@ class BookingsController extends AppController
         $responseData = [];
 
         if (!$serviceId || !$stylistId || !$date) {
-            $this->response = $this->response->withStatus(400); 
+            $this->response = $this->response->withStatus(400);
             $responseData['error'] = 'Missing required parameters (service_id, stylist_id, date).';
         } else {
             try {
@@ -1562,7 +1562,7 @@ class BookingsController extends AppController
             } catch (\Exception $e) {
                 // Log the detailed error on the server
                 \Cake\Log\Log::error('Error in getAvailabilityCount: ' . $e->getMessage() . ' | Trace: ' . $e->getTraceAsString());
-                
+
                 $this->response = $this->response->withStatus(500); // Internal Server Error
                 $responseData['error'] = 'An internal error occurred while checking availability.';
             }
