@@ -1,15 +1,16 @@
 /* Customer Booking Functionality */
 document.addEventListener('DOMContentLoaded', function() {
     // --- Configuration ---
-    const GET_STYLISTS_URL_BASE = '/bookings/get-stylists-for-service/'; 
-    const GET_TIMESLOTS_URL = '/bookings/get-available-time-slots';
-    const CSRF_TOKEN = document.querySelector('input[name="_csrfToken"]')?.value; 
+    const GET_STYLISTS_URL_BASE = apiUrl;
+    const GET_TIMESLOTS_URL = apiUrl2;
+    const GET_AVAILABILITY_URL = apiUrl3;
+    const CSRF_TOKEN = document.querySelector('input[name="_csrfToken"]')?.value;
 
     // --- DOM Elements ---
     const serviceCheckboxes = document.querySelectorAll('.service-checkbox');
-    const totalCostInput = document.getElementById('total-cost'); 
+    const totalCostInput = document.getElementById('total-cost');
     const bookingDateInput = document.getElementById('booking-date');
-    const serviceStylistSelectionsContainer = document.getElementById('service-stylist-selections'); 
+    const serviceStylistSelectionsContainer = document.getElementById('service-stylist-selections');
     const serviceCountDisplay = document.getElementById('service-count');
     const serviceTotalDisplay = document.getElementById('service-total');
     const selectedServicesListDisplay = document.getElementById('selected-services-list');
@@ -17,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const closingTimeWarningContainer = document.getElementById('closing-time-warning-container');
 
     // --- State ---
-    let serviceSelections = []; 
+    let serviceSelections = [];
 
     // --- Initialization ---
 
@@ -116,9 +117,9 @@ document.addEventListener('DOMContentLoaded', function() {
             bookingDateInput.disabled = false;
         } else {
             bookingDateInput.disabled = true;
-            bookingDateInput.value = ''; 
+            bookingDateInput.value = '';
             // Also clear stylist dropdowns and time slots if no services are selected
-            serviceStylistSelectionsContainer.innerHTML = ''; 
+            serviceStylistSelectionsContainer.innerHTML = '';
         }
 
         // If no services are selected at all, reset date input (redundant now, but safe)
@@ -143,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let totalCost = 0;
         let totalDuration = 0;
 
-        selectedServicesListDisplay.innerHTML = ''; 
+        selectedServicesListDisplay.innerHTML = '';
 
         serviceSelections.forEach(selection => {
             totalCost += selection.cost;
@@ -156,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function() {
             selectedServicesListDisplay.appendChild(listItem);
         });
 
-        totalCostInput.value = totalCost.toFixed(2); 
+        totalCostInput.value = totalCost.toFixed(2);
         serviceCountDisplay.textContent = serviceSelections.length;
         serviceTotalDisplay.textContent = totalCost.toFixed(2);
     }
@@ -178,30 +179,30 @@ document.addEventListener('DOMContentLoaded', function() {
     // Fetch available stylists for ONE service
     async function getStylistsForService(serviceId) {
         const url = `${GET_STYLISTS_URL_BASE}${serviceId}`;
-        console.log("Fetching stylists for service:", serviceId, "URL:", url); 
+        console.log("Fetching stylists for service:", serviceId, "URL:", url);
         try {
             const response = await fetch(url, {
-                method: 'GET', 
+                method: 'GET',
                 headers: {
                     'Accept': 'application/json',
-                    'X-CSRF-Token': getCsrfToken() 
+                    'X-CSRF-Token': getCsrfToken()
                 }
             });
             if (!response.ok) {
-                 const errorData = await response.json().catch(() => ({})); 
+                 const errorData = await response.json().catch(() => ({}));
                  console.error(`HTTP error fetching stylists for ${serviceId}: ${response.status}`, errorData);
                  throw new Error(`HTTP error! Status: ${response.status}`);
              }
             return await response.json();
         } catch (error) {
             console.error('Error fetching stylists for service:', serviceId, error);
-            return []; 
+            return [];
         }
     }
 
     // Render the service/stylist selection rows
     async function renderServiceStylistSelections() {
-        serviceStylistSelectionsContainer.innerHTML = ''; 
+        serviceStylistSelectionsContainer.innerHTML = '';
 
         if (serviceSelections.length === 0) return;
 
@@ -220,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
             select.className = 'form-control stylist-select';
             select.name = `bookings_services[${selection.serviceId}][stylist_id]`;
             select.required = true;
-            select.dataset.serviceId = selection.serviceId; 
+            select.dataset.serviceId = selection.serviceId;
             select.setAttribute('oninvalid', "this.setCustomValidity('Please Select a Stylist')");
             select.setAttribute('oninput', "this.setCustomValidity('')");
             select.disabled = true;
@@ -261,7 +262,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!bookingDateInput.value || serviceSelections.length === 0 || !allStylistsSelected) {
             return;
         }
-        
+
         startTimeInput.disabled = true;
         startTimeInput.innerHTML = '<option value="">Loading available times...</option>';
 
@@ -273,7 +274,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 stylist_id: parseInt(s.selectedStylistId, 10)
             }))
         };
-        
+
         // Validate before sending - ensure all stylist IDs are valid integers
         if (dataToSend.selected_services.some(s => isNaN(s.stylist_id))) {
              console.error("Attempted to fetch time slots with invalid stylist ID.");
@@ -281,7 +282,7 @@ document.addEventListener('DOMContentLoaded', function() {
              return;
          }
 
-        console.log("Fetching time slots with data:", JSON.stringify(dataToSend)); 
+        console.log("Fetching time slots with data:", JSON.stringify(dataToSend));
 
         try {
             const response = await fetch(GET_TIMESLOTS_URL, {
@@ -321,7 +322,7 @@ document.addEventListener('DOMContentLoaded', function() {
              }
 
 
-            startTimeInput.innerHTML = '<option value="">Select a start time</option>'; 
+            startTimeInput.innerHTML = '<option value="">Select a start time</option>';
             startTimeInput.disabled = false;
 
              // Filter slots based on whether they are in the past for *today*
@@ -346,8 +347,8 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 validSlots.forEach(slot => {
                     const option = document.createElement('option');
-                    option.value = slot.value; 
-                    option.textContent = slot.text; 
+                    option.value = slot.value;
+                    option.textContent = slot.text;
                     startTimeInput.appendChild(option);
                 });
             }
@@ -358,7 +359,7 @@ document.addEventListener('DOMContentLoaded', function() {
              } else {
                  startTimeInput.value = "";
              }
-             delete startTimeInput.dataset.previousValue; 
+             delete startTimeInput.dataset.previousValue;
 
         } catch (error) {
             console.error('Error updating available time slots:', error);
@@ -376,7 +377,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectionIndex = serviceSelections.findIndex(s => s.serviceId === serviceId);
         if (selectionIndex === -1) {
             console.error("Cannot find service selection in state for ID:", serviceId);
-            return; 
+            return;
         }
 
         // Create the time select dropdown if it doesn't exist
@@ -384,7 +385,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const label = document.createElement('label');
             label.textContent = 'Start Time';
             label.htmlFor = `service-time-${serviceId}`;
-            label.className = 'mt-2'; 
+            label.className = 'mt-2';
             container.appendChild(label);
 
             timeSelect = document.createElement('select');
@@ -392,7 +393,7 @@ document.addEventListener('DOMContentLoaded', function() {
             timeSelect.className = 'form-control service-time-select';
             timeSelect.name = `bookings_services[${serviceId}][start_time]`;
             timeSelect.required = true;
-            timeSelect.dataset.serviceId = serviceId; 
+            timeSelect.dataset.serviceId = serviceId;
             timeSelect.setAttribute('oninvalid', "this.setCustomValidity('Please Select a Time Slot')");
             timeSelect.setAttribute('oninput', "this.setCustomValidity('')");
             container.appendChild(timeSelect);
@@ -437,7 +438,7 @@ document.addEventListener('DOMContentLoaded', function() {
             serviceSelections[selectionIndex].availableSlots = slots;
 
             // Render the initial (unfiltered) slots
-            renderTimeSlotOptions(serviceId, slots); 
+            renderTimeSlotOptions(serviceId, slots);
 
         } catch (e) {
             console.error('Error loading slots for service', serviceId, e);
@@ -545,19 +546,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Update UI
-        updateInputStates(); 
-        renderServiceStylistSelections(); 
+        updateInputStates();
+        renderServiceStylistSelections();
         calculateAndUpdateSummary();
 
         // Reset Date and Stylist/Time selections if services change and at least one service remains selected
         if (serviceSelections.length > 0) {
-            if (bookingDateInput.value) { 
+            if (bookingDateInput.value) {
                 bookingDateInput.value = '';
                  console.log("Services changed, resetting date and stylist/time selections.");
                  // Clear stylist/time slots visually
-                serviceStylistSelectionsContainer.innerHTML = ''; 
+                serviceStylistSelectionsContainer.innerHTML = '';
                  // Need to re-render the containers for stylists
-                 renderServiceStylistSelections(); 
+                 renderServiceStylistSelections();
             }
         } else {
              serviceStylistSelectionsContainer.innerHTML = '';
@@ -579,7 +580,7 @@ document.addEventListener('DOMContentLoaded', function() {
             serviceSelections[selectionIndex].selectedStartTime = null; // Reset time when stylist changes
 
             // Render time slots for the *newly selected* stylist
-            updateAvailableTimeSlotsForService(serviceId, stylistId, date); 
+            updateAvailableTimeSlotsForService(serviceId, stylistId, date);
 
             // Fetch availability count for this service/stylist/date
             fetchAndDisplayAvailabilityCount(serviceId, stylistId, date);
@@ -677,7 +678,7 @@ document.addEventListener('DOMContentLoaded', function() {
         serviceSelections[currentIndex].selectedStartTime = selectedTime;
         const currentStylistId = serviceSelections[currentIndex].selectedStylistId;
 
-        if (!currentStylistId) return;  
+        if (!currentStylistId) return;
 
         // Helper to parse H:i string to minutes since midnight
         const timeToMinutes = (timeStr) => {
@@ -783,7 +784,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Check if every service has a specific stylist selected (not null or empty string)
-        if (!serviceSelections.every(s => s.selectedStylistId && s.selectedStylistId !== 'any')) { 
+        if (!serviceSelections.every(s => s.selectedStylistId && s.selectedStylistId !== 'any')) {
              alert('Please select a stylist for each service.');
              // Find the first offending select and focus it
              const firstInvalidStylistSelect = serviceStylistSelectionsContainer.querySelector('.stylist-select:invalid, .stylist-select option[value=""]:checked');
@@ -796,7 +797,7 @@ document.addEventListener('DOMContentLoaded', function() {
         serviceStylistSelectionsContainer.querySelectorAll('.service-time-select').forEach(timeSelect => {
             if (!timeSelect.value) {
                 allTimesSelected = false;
-                timeSelect.focus(); 
+                timeSelect.focus();
             }
         });
         if (!allTimesSelected) {
@@ -804,14 +805,14 @@ document.addEventListener('DOMContentLoaded', function() {
              return false;
          }
 
-        return true; 
+        return true;
     }
 
 
     // Form submission handler
     function handleFormSubmit(event) {
         if (!validateForm()) {
-            event.preventDefault(); 
+            event.preventDefault();
             console.log("Form validation failed.");
         } else {
             console.log("Form validation passed. Submitting...");
@@ -934,7 +935,7 @@ document.addEventListener('DOMContentLoaded', function() {
         availabilityDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...'; // Loading indicator
         availabilityDiv.className = 'availability-info mt-2 small text-muted';
 
-        const url = `/bookings/get-availability-count?service_id=${serviceId}&stylist_id=${stylistId}&date=${date}`;
+        const url = `${GET_AVAILABILITY_URL}?service_id=${serviceId}&stylist_id=${stylistId}&date=${date}`;
 
         try {
             const response = await fetch(url, {
