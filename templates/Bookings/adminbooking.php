@@ -13,8 +13,9 @@ $this->Html->script('booking', ['block' => 'script']);
 <?= $this->Html->css('/utility/indexes/indexes.css') ?>
 <?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
 <script>
-    const apiUrl = '<?= $this->Url->build("/bookings/get-stylists") ?>';
+    const apiUrl = '<?= $this->Url->build("/bookings/get-stylists-for-service/") ?>';
     const apiUrl2 = '<?= $this->Url->build("/bookings/get-available-time-slots") ?>';
+    const apiUrl3 = '<?= $this->Url->build("/bookings/get-availability-count") ?>';
 </script>
 <div class="booking-form-wrapper">
     <div class="row">
