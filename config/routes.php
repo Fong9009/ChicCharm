@@ -58,6 +58,9 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/', ['controller' => 'Pages', 'action' => 'display', 'landing']);
         //TESTING
         $builder->connect('/bookings/getAvailableStylists', ['controller' => 'Bookings', 'action' => 'getAvailableStylists']);
+        // Route for getting stylist availability count via AJAX
+        $builder->connect('/bookings/get-availability-count', ['controller' => 'Bookings', 'action' => 'getAvailabilityCount'])
+            ->setMethods(['GET']);
         /*
          * ...and connect the rest of 'Pages' controller's URLs.
          */

@@ -82,8 +82,7 @@ class CustomersController extends AppController
             ])
             ->order([
                 'ABS(DATEDIFF(booking_date, CURDATE()))' => 'ASC',
-                'booking_date' => 'ASC',
-                'start_time' => 'ASC'
+                'booking_date' => 'ASC'
             ])
             ->limit(3);
 
@@ -299,16 +298,9 @@ class CustomersController extends AppController
                 }
             }
 
-            // Show specific error messages for each field
-            if ($customer->getErrors()) {
-                foreach ($customer->getErrors() as $field => $errors) {
-                    foreach ($errors as $error) {
-                        $this->Flash->error(__("{0}: {1}", ucfirst($field), $error));
-                    }
-                }
-            } else {
-                $this->Flash->error(__('The profile could not be updated. Please, try again.'));
-            }
+            // Always show the generic message if saving failed or if there was a non-validation error ($error === 1)
+            $this->Flash->error(__('Could not update the profile. Please check the form and try again.'));
+
         }
         $this->set(compact('customer'));
         // Pass user type to view

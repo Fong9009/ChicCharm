@@ -31,12 +31,10 @@ class BookingsStylist extends Entity
      * @var array<string, bool>
      */
     protected array $_accessible = [
-        'stylist_date' => true,
-        'start_time' => true,
-        'end_time' => true,
-        'selected_cost' => true,
         'booking_id' => true,
         'stylist_id' => true,
+        'stylist_date' => true,
+        'selected_cost' => true,
         'booking' => true,
         'stylist' => true,
     ];

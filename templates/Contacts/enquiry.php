@@ -16,7 +16,8 @@
                     'class' => 'form-control',
                     'required' => true,
                     'placeholder' => 'Enter your first name',
-                    'error' => ['class' => 'invalid-feedback']
+                    'error' => ['class' => 'invalid-feedback'],
+                    'maxlength' => 100
                 ]) ?>
             </div>
             <div class="col-md-6" style="margin-bottom: 16px;">
@@ -25,7 +26,8 @@
                     'class' => 'form-control',
                     'required' => true,
                     'placeholder' => 'Enter your last name',
-                    'error' => ['class' => 'invalid-feedback']
+                    'error' => ['class' => 'invalid-feedback'],
+                    'maxlength' => 100
                 ]) ?>
             </div>
         </div>
