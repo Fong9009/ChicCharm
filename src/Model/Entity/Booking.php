@@ -14,9 +14,17 @@ use Cake\ORM\Entity;
  * @property string $total_cost
  * @property string $remaining_cost
  * @property int|null $customer_id
+ * @property string $status
+ * @property string|null $notes
+ * @property \Cake\I18n\DateTime|null $created
+ * @property \Cake\I18n\DateTime|null $modified
+ * @property \Cake\Collection\CollectionInterface|\App\Model\Entity\BookingsService[] $bookings_services
+ * @property \Cake\Collection\CollectionInterface|\App\Model\Entity\BookingsStylist[] $bookings_stylists
+ * @property \Cake\Collection\CollectionInterface|\App\Model\Entity\Invoice[] $invoices
  *
  * @property \App\Model\Entity\Customer $customer
  * @property \App\Model\Entity\Stylist[] $stylists
+ * @property \App\Model\Entity\Service[] $services
  */
 class Booking extends Entity
 {
@@ -30,17 +38,20 @@ class Booking extends Entity
      * @var array<string, bool>
      */
     protected array $_accessible = [
+        'customer_id' => true,
         'booking_name' => true,
         'booking_date' => true,
-        'start_time' => true,
-        'end_time' => true,
         'total_cost' => true,
         'remaining_cost' => true,
-        'customer_id' => true,
+        'status' => true,
+        'notes' => true,
+        'created' => true,
+        'modified' => true,
         'customer' => true,
         'stylists' => true,
         'services' => true,
-        'status' => true,
-        'notes' => true,
+        'bookings_services' => true,
+        'bookings_stylists' => true,
+        'invoices' => true,
     ];
 }

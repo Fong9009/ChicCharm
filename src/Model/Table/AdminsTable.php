@@ -80,6 +80,19 @@ class AdminsTable extends Table
                 'rule' => 'validateUnique',
                 'provider' => 'table',
                 'message' => 'This email is already in use.',
+            ])
+            ->add('email', 'mxRecord', [
+                'rule' => function ($value, $context) {
+                    if (empty($value) || !is_string($value) || strpos($value, '@') === false) {
+                        return false;
+                    }
+                    $domain = substr(strrchr($value, "@"), 1);
+                    if ($domain === false || empty($domain)) {
+                        return false;
+                    }
+                    return checkdnsrr($domain . '.', 'MX');
+                },
+                'message' => 'The email domain does not appear valid (e.g., must be like @gmail.com or @outlook.com).'
             ]);
 
         $validator

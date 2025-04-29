@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 28, 2025 at 06:32 PM
+-- Generation Time: Apr 29, 2025 at 04:13 AM
 -- Server version: 9.3.0
 -- PHP Version: 8.4.6
 
@@ -63,19 +63,8 @@ CREATE TABLE `bookings` (
   `remaining_cost` decimal(10,2) NOT NULL,
   `customer_id` int DEFAULT NULL,
   `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'active',
-  `start_time` time DEFAULT NULL,
-  `end_time` time DEFAULT NULL,
   `notes` text COLLATE utf8mb4_general_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `bookings`
---
-
-INSERT INTO `bookings` (`id`, `booking_name`, `booking_date`, `total_cost`, `remaining_cost`, `customer_id`, `status`, `start_time`, `end_time`, `notes`) VALUES
-(158, 'Booking for Chay Fong Hong', '2025-04-30', 14.00, 14.00, 1, 'cancelled', '09:00:00', '10:30:00', 'rgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbgrgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbgrgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbgrgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbgrgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbgrgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbgrgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbgrgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbgrgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbgrgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbgrgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbgrgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbgrgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbgrgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbgrgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbgrgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbgrgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbgrgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbgrgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbgrgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbgrgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbgrgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbgrgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbgrgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbgrgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbgrgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbgrgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbgrgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbgrgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbgrgfdxgrxfxgfxfgxghffgxgfxgrxgrxfgxfbg'),
-(159, 'Booking for Chay Fong Hong', '2025-04-30', 14.00, 14.00, 1, 'cancelled', '09:00:00', '11:30:00', 'qne;orfqjkwnrjkfnqjrwnfjk;qnwre;klnfjkqenrfjknqejknrf.nqer.kfkqjerf '),
-(160, 'Booking for Chay Fong Hong', '2025-05-01', 22.50, 22.50, 1, 'active', '09:00:00', '13:30:00', '');
 
 -- --------------------------------------------------------
 
@@ -95,19 +84,6 @@ CREATE TABLE `bookings_services` (
   `end_time` time DEFAULT NULL COMMENT 'End time specific to this service within the booking'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `bookings_services`
---
-
-INSERT INTO `bookings_services` (`id`, `booking_id`, `service_id`, `service_cost`, `created`, `modified`, `stylist_id`, `start_time`, `end_time`) VALUES
-(304, 158, 1, 6.50, '2025-04-28 14:36:24', '2025-04-28 14:36:24', 4, '09:00:00', '10:00:00'),
-(305, 158, 2, 7.50, '2025-04-28 14:36:24', '2025-04-28 14:36:24', 2, '09:00:00', '10:30:00'),
-(308, 159, 1, 6.50, '2025-04-28 16:13:29', '2025-04-28 16:13:29', 2, '09:00:00', '10:00:00'),
-(309, 159, 2, 7.50, '2025-04-28 16:13:29', '2025-04-28 16:13:29', 2, '10:00:00', '11:30:00'),
-(310, 160, 1, 6.50, '2025-04-28 16:32:42', '2025-04-28 16:32:42', 2, '11:00:00', '12:00:00'),
-(311, 160, 2, 7.50, '2025-04-28 16:32:42', '2025-04-28 16:32:42', 4, '12:00:00', '13:30:00'),
-(312, 160, 3, 8.50, '2025-04-28 16:32:42', '2025-04-28 16:32:42', 5, '09:00:00', '11:00:00');
-
 -- --------------------------------------------------------
 
 --
@@ -117,21 +93,10 @@ INSERT INTO `bookings_services` (`id`, `booking_id`, `service_id`, `service_cost
 CREATE TABLE `bookings_stylists` (
   `id` int NOT NULL,
   `stylist_date` date NOT NULL,
-  `start_time` time NOT NULL,
-  `end_time` time NOT NULL,
   `selected_cost` decimal(10,2) NOT NULL,
   `booking_id` int NOT NULL,
   `stylist_id` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `bookings_stylists`
---
-
-INSERT INTO `bookings_stylists` (`id`, `stylist_date`, `start_time`, `end_time`, `selected_cost`, `booking_id`, `stylist_id`) VALUES
-(281, '2025-05-01', '09:00:00', '13:30:00', 22.50, 160, 2),
-(282, '2025-05-01', '09:00:00', '13:30:00', 22.50, 160, 4),
-(283, '2025-05-01', '09:00:00', '13:30:00', 22.50, 160, 5);
 
 -- --------------------------------------------------------
 
@@ -361,9 +326,9 @@ CREATE TABLE `services` (
 --
 
 INSERT INTO `services` (`id`, `service_name`, `service_cost`, `duration_minutes`) VALUES
-(1, 'Makeup', 6.50, 60),
-(2, 'Hair Dressing', 7.50, 90),
-(3, 'Dress Making', 8.50, 120);
+(1, 'Makeup', 150.00, 60),
+(2, 'Hair Dressing', 220.00, 90),
+(3, 'Dress Making', 500.00, 120);
 
 -- --------------------------------------------------------
 
@@ -531,19 +496,19 @@ ALTER TABLE `admins`
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=161;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=168;
 
 --
 -- AUTO_INCREMENT for table `bookings_services`
 --
 ALTER TABLE `bookings_services`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=313;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=325;
 
 --
 -- AUTO_INCREMENT for table `bookings_stylists`
 --
 ALTER TABLE `bookings_stylists`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=284;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=291;
 
 --
 -- AUTO_INCREMENT for table `contacts`

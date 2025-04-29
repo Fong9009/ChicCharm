@@ -397,9 +397,18 @@ document.addEventListener('DOMContentLoaded', function() {
             timeSelect.setAttribute('oninput', "this.setCustomValidity('')");
             container.appendChild(timeSelect);
 
+            // Add the availability info placeholder *after* the time select
+            const availabilityDiv = document.createElement('div');
+            availabilityDiv.className = 'availability-info mt-2 small text-muted'; // Start muted
+            availabilityDiv.id = `availability-info-${serviceId}`; // Unique ID for this service
+            container.appendChild(availabilityDiv);
+
             // Add the change listener *once* when creating the element
             timeSelect.addEventListener('change', handleTimeSelectionChange);
         }
+
+        // Clear existing availability message before loading new slots
+        updateAvailabilityDisplay(serviceId, null);
 
         timeSelect.disabled = true;
         timeSelect.innerHTML = '<option value="">Loading times...</option>';
@@ -557,119 +566,102 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Stylist dropdown change
     function handleStylistSelectionChange(event) {
-        const select = event.target;
-        const serviceId = select.dataset.serviceId;
-        const selectedStylistId = select.value; 
+        const stylistSelect = event.target;
+        const serviceId = stylistSelect.dataset.serviceId;
+        const stylistId = stylistSelect.value; // This will be the selected stylist ID or ""
+        const date = bookingDateInput.value;
 
-        const index = serviceSelections.findIndex(s => s.serviceId === serviceId);
-        if (index !== -1) {
-            serviceSelections[index].selectedStylistId = selectedStylistId ? parseInt(selectedStylistId, 10) : null;
+        console.log(`Stylist changed for service ${serviceId}: ${stylistId}`);
+
+        const selectionIndex = serviceSelections.findIndex(s => s.serviceId == serviceId);
+        if (selectionIndex !== -1) {
+            serviceSelections[selectionIndex].selectedStylistId = stylistId ? parseInt(stylistId, 10) : null;
+            serviceSelections[selectionIndex].selectedStartTime = null; // Reset time when stylist changes
+
+            // Render time slots for the *newly selected* stylist
+            updateAvailableTimeSlotsForService(serviceId, stylistId, date); 
+
+            // Fetch availability count for this service/stylist/date
+            fetchAndDisplayAvailabilityCount(serviceId, stylistId, date);
+
+        } else {
+            console.error("Could not find service selection state for ID:", serviceId);
+             // Clear availability if state is inconsistent
+            updateAvailabilityDisplay(serviceId, null);
         }
-
-        // Clear previous time slot for this service
-        const existingTimeSelect = serviceStylistSelectionsContainer.querySelector(`.service-time-select[name*="[${serviceId}][start_time]"]`);
-        if (existingTimeSelect) existingTimeSelect.parentElement.removeChild(existingTimeSelect);
-        const existingTimeLabel = serviceStylistSelectionsContainer.querySelector(`label[for="service-time-${serviceId}"]`);
-        if (existingTimeLabel) existingTimeLabel.parentElement.removeChild(existingTimeLabel);
-
-        // Fetch new time slots *only if* a stylist is selected and a date is selected
-        if (selectedStylistId && bookingDateInput.value) {
-            updateAvailableTimeSlotsForService(serviceId, selectedStylistId, bookingDateInput.value);
-        } 
     }
 
     // Date input change
     async function handleDateInputChange() {
-         const selectedDate = bookingDateInput.value;
+        const selectedDate = bookingDateInput.value;
+        console.log("Date changed:", selectedDate);
 
-        // Clear existing stylist options and time slots
-        serviceStylistSelectionsContainer.querySelectorAll('.stylist-select').forEach(select => {
-            select.innerHTML = '<option value="">Loading Stylists...</option>';
-            select.disabled = true;
-            const serviceId = select.dataset.serviceId;
-            const timeSelect = serviceStylistSelectionsContainer.querySelector(`.service-time-select[name*="[${serviceId}][start_time]"]`);
-            if(timeSelect) timeSelect.parentElement.removeChild(timeSelect);
-            const timeLabel = serviceStylistSelectionsContainer.querySelector(`label[for="service-time-${serviceId}"]`);
-            if(timeLabel) timeLabel.parentElement.removeChild(timeLabel);
-            // Reset selected stylist in state, BUT KEEP selectedStartTime for pre-selection attempt
-            const stateIndex = serviceSelections.findIndex(s => s.serviceId === serviceId);
-            if(stateIndex !== -1) {
-                serviceSelections[stateIndex].selectedStylistId = null;
-                // serviceSelections[stateIndex].selectedStartTime = null; // DO NOT RESET TIME HERE
-            }
-        });
-
-        if (!selectedDate) {
-            // If date is cleared, just disable stylists
+        if (!selectedDate || isDateInPast(selectedDate)) {
+            // Clear all stylist dropdowns and time slots if date is invalid or past
             serviceStylistSelectionsContainer.querySelectorAll('.stylist-select').forEach(select => {
                 select.innerHTML = '<option value="">Select Date First...</option>';
                 select.disabled = true;
             });
-            updateInputStates(); 
-            return;
-        }
-
-        if (isDateInPast(selectedDate)) {
-            alert('Please select future dates');
-            bookingDateInput.value = ''; // Clear the invalid date
-            // Clear stylist/time sections as well
-             serviceStylistSelectionsContainer.querySelectorAll('.stylist-select').forEach(select => {
-                select.innerHTML = '<option value="">Select Date First...</option>';
-                select.disabled = true;
+            serviceStylistSelectionsContainer.querySelectorAll('.time-slot-container').forEach(container => container.innerHTML = '');
+             // **NEW**: Clear all availability displays
+            serviceSelections.forEach(selection => {
+                updateAvailabilityDisplay(selection.serviceId, null);
             });
             return;
         }
 
-        // Fetch stylists for all currently selected services
-        for (const selection of serviceSelections) {
-            const serviceId = selection.serviceId;
-            const select = serviceStylistSelectionsContainer.querySelector(`.stylist-select[data-service-id="${serviceId}"]`);
-            if (!select) continue;
+        clearClosingTimeWarning(); // Clear any previous warnings
 
-            // --- EDIT MODE: Remember initial stylist --- //
-            const initialStylistId = selection.initialStylistId;
-
-            try {
-                const availableStylists = await getStylistsForService(serviceId);
-                select.innerHTML = '<option value="">Select Stylist...</option>';
-                let canPreselectStylist = false;
-
-                if (Array.isArray(availableStylists)) {
-                    availableStylists.forEach(stylist => {
-                        const option = document.createElement('option');
-                        option.value = stylist.id;
-                        option.textContent = stylist.name;
-                        select.appendChild(option);
-                        // Check if this stylist matches the initial one for pre-selection
-                        if (initialStylistId && stylist.id == initialStylistId) {
-                            canPreselectStylist = true;
-                        }
-                    });
-                }
-                select.disabled = false;
-
-                // --- EDIT MODE: Pre-select Stylist and Trigger Time Load --- //
-                if (canPreselectStylist) {
-                    select.value = initialStylistId;
-                    selection.selectedStylistId = parseInt(initialStylistId, 10);
-                    // Now that stylist is selected, fetch times
-                    await updateAvailableTimeSlotsForService(serviceId, initialStylistId, selectedDate);
-                } else {
-                    // If initial stylist not available/found, reset state
-                    selection.selectedStylistId = null;
-                    selection.selectedStartTime = null;
-                    select.value = '';
-                }
-                // Clear initialStylistId after attempting pre-selection so it doesn't interfere later
-                selection.initialStylistId = null;
-
-            } catch (error) {
-                console.error(`Error loading stylists for service ${serviceId} on date change:`, error);
-                select.innerHTML = '<option value="">Error loading stylists</option>';
-                select.disabled = true;
+        // Enable all stylist selects now that a valid date is chosen
+        serviceStylistSelectionsContainer.querySelectorAll('.stylist-select').forEach(select => {
+            select.disabled = false;
+            // Keep existing selection if possible, otherwise show placeholder
+            if (!select.value) {
+                 select.innerHTML = '<option value="">Select Stylist...</option>';
             }
-        }
-        // updateInputStates(); // Not needed here
+        });
+
+        // Fetch stylists AND time slots for ALL selected services concurrently
+        const updatePromises = serviceSelections.map(async (selection) => {
+            const select = serviceStylistSelectionsContainer.querySelector(`.stylist-select[data-service-id="${selection.serviceId}"]`);
+            if (!select) return; // Skip if element not found
+
+            // 1. Fetch and populate stylists
+            const stylists = await getStylistsForService(selection.serviceId);
+            select.innerHTML = '<option value="">Select Stylist...</option>'; // Reset options
+            stylists.forEach(stylist => {
+                const option = document.createElement('option');
+                option.value = stylist.id;
+                option.textContent = stylist.name;
+                // Re-select previous stylist if still valid
+                if (selection.selectedStylistId && stylist.id === selection.selectedStylistId) {
+                    option.selected = true;
+                }
+                select.appendChild(option);
+            });
+             // Ensure state matches the potentially re-selected stylist in the dropdown
+            selection.selectedStylistId = select.value ? parseInt(select.value, 10) : null;
+
+
+            // 2. Fetch Time Slots (if stylist is selected)
+            if (selection.selectedStylistId) {
+                await updateAvailableTimeSlotsForService(selection.serviceId, selection.selectedStylistId, selectedDate);
+                 // **NEW**: Fetch availability count after potentially getting stylists/slots
+                await fetchAndDisplayAvailabilityCount(selection.serviceId, selection.selectedStylistId, selectedDate);
+            } else {
+                 // **NEW**: Clear availability if no stylist selected
+                 updateAvailabilityDisplay(selection.serviceId, null);
+                 // Clear time slots if no stylist is selected after fetching
+                 const timeSlotsContainer = document.getElementById(`time-slots-${selection.serviceId}`);
+                 if (timeSlotsContainer) timeSlotsContainer.innerHTML = '';
+            }
+        });
+
+        await Promise.all(updatePromises);
+        console.log("Finished updating stylists and time slots after date change.");
+
+        // Apply conflicts after all updates are done
+        // recalculateAndApplyConflicts();
     }
 
     // Time selection change for a specific service
@@ -905,5 +897,77 @@ document.addEventListener('DOMContentLoaded', function() {
             }); // End targetSelection loop
         }); // End stylist loop
     }
+
+    // --- NEW FUNCTION: Update the display for availability count ---
+    function updateAvailabilityDisplay(serviceId, count) {
+        const availabilityDiv = document.getElementById(`availability-info-${serviceId}`);
+        if (!availabilityDiv) return; // Exit if placeholder not found
+
+        if (count === null || count === undefined) {
+            // Clear message if count is invalid or not yet fetched
+            availabilityDiv.innerHTML = '';
+            availabilityDiv.className = 'availability-info mt-2 small text-muted'; // Reset class
+        } else if (count === 0) {
+            availabilityDiv.innerHTML = `
+                <i class="fas fa-exclamation-circle text-warning"></i> All time slots booked.
+            `;
+            availabilityDiv.className = 'availability-info mt-2 alert alert-warning p-1'; // Warning style
+        } else {
+            availabilityDiv.innerHTML = `
+                <i class="fas fa-check-circle text-success"></i> ${count} time slot${count === 1 ? '' : 's'} available.
+            `;
+            availabilityDiv.className = 'availability-info mt-2 text-success small'; // Success style
+        }
+    }
+    // --- END NEW FUNCTION ---
+
+    // --- NEW FUNCTION: Fetch and display availability count ---
+    async function fetchAndDisplayAvailabilityCount(serviceId, stylistId, date) {
+        const availabilityDiv = document.getElementById(`availability-info-${serviceId}`);
+        if (!availabilityDiv) return;
+
+        if (!serviceId || !stylistId || !date || isDateInPast(date)) {
+            updateAvailabilityDisplay(serviceId, null); // Clear if data is incomplete or date is past
+            return;
+        }
+
+        availabilityDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...'; // Loading indicator
+        availabilityDiv.className = 'availability-info mt-2 small text-muted';
+
+        const url = `/bookings/get-availability-count?service_id=${serviceId}&stylist_id=${stylistId}&date=${date}`;
+
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest', // Important for CakePHP AJAX detection
+                    'X-CSRF-Token': getCsrfToken()
+                }
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error(`HTTP error fetching availability count for service ${serviceId}: ${response.status}`, errorText);
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (data.availableSlotsCount !== undefined) {
+                updateAvailabilityDisplay(serviceId, data.availableSlotsCount);
+            } else {
+                console.error('Invalid response format from getAvailabilityCount:', data);
+                updateAvailabilityDisplay(serviceId, null); // Clear on bad response
+            }
+        } catch (error) {
+            console.error('Error fetching availability count for service:', serviceId, error);
+            if (availabilityDiv) {
+                availabilityDiv.innerHTML = '<i class="fas fa-exclamation-triangle text-danger"></i> Error checking availability';
+                availabilityDiv.className = 'availability-info mt-2 small text-danger';
+            }
+             // updateAvailabilityDisplay(serviceId, null); // Optionally clear on error
+        }
+    }
+    // --- END NEW FUNCTION ---
 
 });

@@ -75,7 +75,20 @@ class ContactsTable extends Table
         $validator
             ->email('email')
             ->requirePresence('email', 'create')
-            ->notEmptyString('email');
+            ->notEmptyString('email')
+            ->add('email', 'mxRecord', [
+                'rule' => function ($value, $context) {
+                    if (empty($value) || !is_string($value) || strpos($value, '@') === false) {
+                        return false;
+                    }
+                    $domain = substr(strrchr($value, "@"), 1);
+                    if ($domain === false || empty($domain)) {
+                        return false;
+                    }
+                    return checkdnsrr($domain . '.', 'MX');
+                },
+                'message' => 'The email domain does not appear valid (e.g., must be like @gmail.com or @outlook.com).'
+            ]);
 
         $validator
             ->scalar('phone_number')
@@ -83,8 +96,8 @@ class ContactsTable extends Table
             ->requirePresence('phone_number', 'create')
             ->notEmptyString('phone_number')
             ->add('phone_number', 'validFormat', [
-                'rule' => ['custom', '/^[0-9]{10}$/'],
-                'message' => 'Please enter a valid 10-digit phone number'
+                'rule' => ['custom', '/^0[0-9]{9}$/'],
+                'message' => 'Please enter a valid 10-digit phone number starting with 0.'
             ]);
 
         $validator
