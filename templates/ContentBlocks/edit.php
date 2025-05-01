@@ -31,11 +31,17 @@ $this->Html->css('ContentBlocks.content-blocks', ['block' => true]);
                 echo $this->Form->control('value', [
                     'type' => 'textarea',
                     'class' => 'form-control',
+                    'id' => 'value',
                     'value' => html_entity_decode($contentBlock->value),
                     'label' => false,
                     'rows' => '6',
                     'maxlength' => 2000,
                 ]);
+                ?>
+                <div class="row">
+                    <div id="message-char-count" class="char-count-display text-muted text-start small mb-2"></div>
+                </div>
+            <?php
             } else if ($contentBlock->type === 'html') {
                 echo $this->Form->control('value', [
                     'type' => 'textarea',
@@ -107,5 +113,36 @@ $this->Html->css('ContentBlocks.content-blocks', ['block' => true]);
             <?= $this->Form->end() ?>
         </div>
     </div>
+    <?php $this->append('script'); ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const messageTextarea = document.getElementById('value');
+            const charCountDisplay = document.getElementById('message-char-count');
+            const maxLength = messageTextarea ? parseInt(messageTextarea.getAttribute('maxlength'), 10) : 0;
+
+            function updateCharCount() {
+                if (!messageTextarea || !charCountDisplay || !maxLength) return;
+
+                const currentLength = messageTextarea.value.length;
+                const remaining = maxLength - currentLength;
+
+                charCountDisplay.textContent = `${currentLength}/${maxLength}`;
+
+                if (remaining < 0) {
+                    charCountDisplay.style.color = 'red';
+                } else if (remaining < 50) {
+                    charCountDisplay.style.color = 'orange';
+                } else {
+                    charCountDisplay.style.color = '';
+                }
+            }
+
+            if (messageTextarea) {
+                messageTextarea.addEventListener('input', updateCharCount);
+                updateCharCount();
+            }
+        });
+    </script>
+    <?php $this->end(); ?>
 </div>
 
