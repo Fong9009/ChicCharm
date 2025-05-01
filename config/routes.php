@@ -70,6 +70,36 @@ return function (RouteBuilder $routes): void {
             ['controller' => 'Bookings', 'action' => 'getStylists'],
             ['_method' => 'POST']
         );
+
+
+        /*
+         * ROUTES FOR CONTENT BLOCKS
+         */
+        $builder->connect('/blocks/edit/*', [
+            'controller' => 'ContentBlocks',
+            'action' => 'edit',
+        ]);
+
+        $builder->connect('/blocks/view/*', [
+            'controller' => 'ContentBlocks',
+            'action' => 'view',
+        ]);
+
+        $builder->connect('/blocks/', [
+            'controller' => 'ContentBlocks',
+            'action' => 'index',
+        ]);
+
+        $builder->connect('/blocks/restore/*', [
+            'controller' => 'ContentBlocks',
+            'action' => 'restore',
+        ]);
+        /*
+         * END OF ROUTES FOR CONTENT BLOCKS
+         */
+
+
+
         /*
          * Connect catchall routes for all controllers.
          *
