@@ -143,7 +143,7 @@ $this->layout = 'default';
                                                                                             <span class="service-time"><?= h($bookingService->start_time->format('h:i A')) ?></span>
                                                                                         <?php endif; ?>
                                                                                     </li>
-                                                                                <?php endforeach; ?>
+                                                                            <?php endforeach; ?>
                                                                             </ul>
                                                                         </div>
                                                                     <?php endforeach; ?>
@@ -264,7 +264,7 @@ $this->layout = 'default';
                                                                                                 <span class="service-time"><?= h($bookingService->start_time->format('h:i A')) ?></span>
                                                                                             <?php endif; ?>
                                                                                         </li>
-                                                                                    <?php endforeach; ?>
+                                                                                <?php endforeach; ?>
                                                                                 </ul>
                                                                             </div>
                                                                         <?php endforeach; ?>
