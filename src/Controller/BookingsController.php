@@ -751,10 +751,12 @@ class BookingsController extends AppController
 
             // Try saving the main booking record
             if ($this->Bookings->save($booking)) {
+                \Cake\Log\Log::debug('[CustomerBooking] Initial booking save successful. ID: ' . $booking->id);
                 $bookingId = $booking->id;
                 $allServicesTimes = [];
 
                 // Fetch service durations
+                \Cake\Log\Log::debug('[CustomerBooking] Fetching service durations...');
                 $serviceIds = array_column($data['bookings_services'] ?? [], 'service_id');
                 $servicesDetails = [];
                 if (!empty($serviceIds)) {
@@ -762,12 +764,17 @@ class BookingsController extends AppController
                         'keyField' => 'id',
                         'valueField' => 'duration_minutes'
                     ])->where(['id IN' => $serviceIds])->toArray();
+                    \Cake\Log\Log::debug('[CustomerBooking] Durations fetched: ' . json_encode($servicesDetails));
+                } else {
+                    \Cake\Log\Log::debug('[CustomerBooking] No service IDs found for duration fetch.');
                 }
 
                 // Save BookingsServices records with individual start/end times
                 if (!empty($data['bookings_services'])) {
+                     \Cake\Log\Log::debug('[CustomerBooking] Starting loop to save BookingsServices...');
                     $bookingsServicesTable = $this->fetchTable('BookingsServices');
                     foreach ($data['bookings_services'] as $serviceIdKey => $serviceData) {
+                         \Cake\Log\Log::debug('[CustomerBooking] Processing service data: ' . json_encode($serviceData));
                         // Ensure all needed keys exist
                         if (!isset($serviceData['service_id'], $serviceData['stylist_id'], $serviceData['start_time'], $serviceData['service_cost'])) {
                             \Cake\Log\Log::warning('Skipping incomplete service data: ' . json_encode($serviceData));
@@ -798,6 +805,7 @@ class BookingsController extends AppController
                             ]);
 
                             if ($bookingsServicesTable->save($bookingService)) {
+                                 \Cake\Log\Log::debug('[CustomerBooking] Saved BookingsService for Service ID: ' . $serviceId);
                                 $allServicesTimes[] = ['start' => $startTime, 'end' => $endTime];
                                 \Cake\Log\Log::debug('Successfully saved booking service with times');
                             } else {
@@ -808,10 +816,14 @@ class BookingsController extends AppController
                             \Cake\Log\Log::error("Error processing time for service {$serviceId}: " . $e->getMessage());
                         }
                     }
+                    \Cake\Log\Log::debug('[CustomerBooking] Finished loop saving BookingsServices.');
+                } else {
+                     \Cake\Log\Log::debug('[CustomerBooking] No bookings_services data found to save.');
                 }
 
                 // Create BookingsStylists records (without overall times)
                 if (!empty($data['bookings_services'])) {
+                     \Cake\Log\Log::debug('[CustomerBooking] Starting loop to save BookingsStylists...');
                      $bookingsStylistsTable = $this->fetchTable('BookingsStylists');
                      $processedStylists = [];
                      foreach ($data['bookings_services'] as $serviceData) {
@@ -832,9 +844,46 @@ class BookingsController extends AppController
                              $processedStylists[] = $stylistId;
                          }
                      }
+                     \Cake\Log\Log::debug('[CustomerBooking] Finished loop saving BookingsStylists.');
+                 } else {
+                      \Cake\Log\Log::debug('[CustomerBooking] No bookings_services data found for saving BookingsStylists.');
                  }
 
+                // --- Calculate and Update Overall Booking Times --- 
+                 \Cake\Log\Log::debug('[CustomerBooking] Calculating overall times...');
+                $overallStartTime = null;
+                $overallEndTime = null;
+                if (!empty($allServicesTimes)) {
+                    $startTimestamps = array_map(function($t) { return $t['start']->getTimestamp(); }, $allServicesTimes);
+                    $endTimestamps = array_map(function($t) { return $t['end']->getTimestamp(); }, $allServicesTimes);
+                    
+                    if (!empty($startTimestamps)) {
+                        $minStartTs = min($startTimestamps);
+                        $overallStartTime = (new \DateTime())->setTimestamp($minStartTs);
+                    }
+                    if (!empty($endTimestamps)) {
+                        $maxEndTs = max($endTimestamps);
+                        $overallEndTime = (new \DateTime())->setTimestamp($maxEndTs);
+                    }
+                }
+                
+                // Patch and save the overall times to the main booking record
+                 \Cake\Log\Log::debug('[CustomerBooking] Patching overall times: Start=' . ($overallStartTime ? $overallStartTime->format('H:i:s') : 'NULL') . ', End=' . ($overallEndTime ? $overallEndTime->format('H:i:s') : 'NULL'));
+                $booking = $this->Bookings->patchEntity($booking, [
+                    'start_time' => $overallStartTime ? $overallStartTime->format('H:i:s') : null,
+                    'end_time' => $overallEndTime ? $overallEndTime->format('H:i:s') : null
+                ]);
+                 \Cake\Log\Log::debug('[CustomerBooking] Attempting to save overall times...');
+                if (!$this->Bookings->save($booking, ['checkRules' => false])) { 
+                    \Cake\Log\Log::error('Failed to save overall times to booking ID: ' . $bookingId);
+                     $this->Flash->warning('Booking saved, but failed to update overall times.'); 
+                } else {
+                     \Cake\Log\Log::debug('[CustomerBooking] Successfully saved overall times.');
+                }
+                // --- End Overall Time Calculation ---
+
                 $this->Flash->success(__('Your booking has been saved successfully.'));
+                 \Cake\Log\Log::debug('[CustomerBooking] Redirecting to dashboard...');
                 return $this->redirect(['controller' => 'Customers', 'action' => 'dashboard']);
             }
 

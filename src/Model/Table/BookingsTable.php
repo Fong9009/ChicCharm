@@ -45,6 +45,8 @@ class BookingsTable extends Table
         $this->setDisplayField('id');
         $this->setPrimaryKey('id');
 
+        $this->addBehavior('Timestamp');
+
         $this->belongsTo('Customers', [
             'foreignKey' => 'customer_id',
         ]);
