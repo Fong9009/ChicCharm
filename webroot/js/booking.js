@@ -1,6 +1,5 @@
 /* Customer Booking Functionality */
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Booking JS Loaded');
 
     // --- Configuration ---
     const GET_STYLISTS_URL_BASE = apiUrl;
@@ -78,12 +77,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize state from potentially pre-checked boxes (edit mode)
     function initializeBookingState() {
-        console.log("[Init] Initializing booking state...");
         serviceSelections = [];
         serviceCheckboxes.forEach(checkbox => {
             if (checkbox.checked) {
                 const serviceIdStr = checkbox.value;
-                console.log(`[Init] Found checked service: ${serviceIdStr}`);
                 const details = getServiceDetails(serviceIdStr);
                 if (details) {
                     const serviceIdNum = parseInt(details.id, 10);
@@ -91,7 +88,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         console.error("[Init] Invalid service ID encountered:", details.id);
                         return;
                     }
-                    console.log(`[Init] Details for ${serviceIdNum}:`, details);
                     serviceSelections.push({
                         serviceId: serviceIdNum,
                         name: details.name,
@@ -106,13 +102,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
-        console.log("[Init] Initial serviceSelections state:", JSON.parse(JSON.stringify(serviceSelections)));
         // Initial UI setup based on loaded state
         updateInputStates();
         renderServiceStylistSelections().then(() => {
             // Instead, directly populate stylists if date is present
             if (bookingDateInput.value && !bookingDateInput.disabled) {
-                console.log("[Init] Date input has value, populating stylists...");
                 populateAllStylistDropdowns(bookingDateInput.value);
             }
         });
@@ -190,8 +184,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Fetch available stylists for ONE service
     async function getStylistsForService(serviceId) {
-        const url = `${GET_STYLISTS_URL_BASE}${serviceId}`;
-        console.log("Fetching stylists for service:", serviceId, "URL:", url); 
+        const url = `${GET_STYLISTS_URL_BASE}${serviceId}`; 
         try {
             const response = await fetch(url, {
                 method: 'GET', 
@@ -326,10 +319,7 @@ document.addEventListener('DOMContentLoaded', function() {
              console.error("Attempted to fetch time slots with invalid stylist ID.");
              startTimeInput.innerHTML = '<option value="">Error: Invalid stylist selection</option>';
              return;
-         }
-
-        console.log("Fetching time slots with data:", JSON.stringify(dataToSend)); 
-
+        }
         try {
             const response = await fetch(GET_TIMESLOTS_URL, {
                 method: 'POST',
@@ -360,12 +350,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
             const slots = await response.json();
-            console.log("Received slots:", slots);
 
-             // Check for closing time message from backend (though unlikely with new logic)
-             if (slots.message) {
-                 displayClosingTimeWarning(slots.message);
-             }
+             // Check for closing time message from backend 
+            if (slots.message) {
+                displayClosingTimeWarning(slots.message);
+            }
 
 
             startTimeInput.innerHTML = '<option value="">Select a start time</option>'; 
@@ -496,8 +485,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const timeSelect = serviceStylistSelectionsContainer.querySelector(`#time-select-${serviceId}`);
         if (!timeSelect) return;
 
-        console.log(`Rendering time slots for Service ${serviceId}. Available slots from backend:`, JSON.stringify(slotsToRender)); // Log available slots
-
         const currentVal = timeSelect.value;
 
         timeSelect.innerHTML = '<option value="">Select Time</option>';
@@ -518,11 +505,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const preSelectedTime = selectionState ? selectionState.initialStartTime : null;
             let preselectionSuccessful = false;
 
-            console.log(`Service ${serviceId} - Checking pre-selection. InitialStartTime from state:`, preSelectedTime);
-
             if (preSelectedTime) {
                 const existsInAvailable = slotsToRender.some(slot => slot.value === preSelectedTime);
-                console.log(`Service ${serviceId} - Does initialStartTime (${preSelectedTime}) exist in available slots?`, existsInAvailable);
 
                 if (existsInAvailable) {
                     // If we have a pre-selected time from the state/HTML and it exists in the list, select it
@@ -575,16 +559,14 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!details) return;
 
         if (checkbox.checked) {
-            // --- Service Added ---
-            console.log(`[ServiceChange] Adding service ${serviceId}`);
             // 1. Add to state
              const newSelection = {
                  serviceId: serviceId,
                  name: details.name,
                  duration: details.duration,
                  cost: details.cost,
-                 selectedStylistId: null, // Start with null
-                 initialStylistId: null, // No initial values when adding dynamically
+                 selectedStylistId: null,
+                 initialStylistId: null, 
                  initialStartTime: null,
                  selectedStartTime: null,
                  availableSlots: []
@@ -597,38 +579,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // 3. If date is already selected, populate stylists for this new row
             if (bookingDateInput.value && !bookingDateInput.disabled) {
-                 console.log(`[ServiceChange] Date exists, populating stylists for new row (Service ${serviceId})`);
-                 // We need a way to populate just ONE row's stylist dropdown
-                 // Let's reuse populateAllStylistDropdowns for now, but it needs the check
-                 // added previously to avoid resetting existing selections.
-                 populateAllStylistDropdowns(bookingDateInput.value);
+                populateAllStylistDropdowns(bookingDateInput.value);
             }
 
         } else {
             // --- Service Removed ---
-             console.log(`[ServiceChange] Removing service ${serviceId}`);
             // 1. Remove from state
             serviceSelections = serviceSelections.filter(s => s.serviceId !== serviceId);
 
             // 2. Remove the corresponding DOM row
-             const rowToRemove = serviceStylistSelectionsContainer.querySelector(`.service-stylist-selection[data-service-id="${serviceId}"]`);
-             if (rowToRemove) {
-                 rowToRemove.remove();
-                 console.log(`[ServiceChange] Removed DOM row for service ${serviceId}`);
-             } else {
-                  console.warn(`[ServiceChange] Could not find DOM row to remove for service ${serviceId}`);
-             }
+            const rowToRemove = serviceStylistSelectionsContainer.querySelector(`.service-stylist-selection[data-service-id="${serviceId}"]`);
+            if (rowToRemove) {
+            rowToRemove.remove();
+            } else {
+            console.warn(`[ServiceChange] Could not find DOM row to remove for service ${serviceId}`);
+            }
 
-             // 3. Recalculate conflicts
-             disableConflictingTimeSlots();
+            // 3. Recalculate conflicts
+            disableConflictingTimeSlots();
         }
-
-        // Update UI elements that depend on the overall selection state
         updateInputStates();
         calculateAndUpdateSummary();
-
-        // REMOVED: The logic that called renderServiceStylistSelections().then(...) is replaced by above add/remove logic.
-
     }
 
     // Stylist dropdown change
@@ -639,8 +610,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const bookingDate = bookingDateInput.value;
         const serviceRow = stylistSelect.closest('.service-stylist-selection');
         const timeSelect = serviceRow.querySelector('.time-select');
-
-        console.log(`Stylist changed for Service ${serviceId} to Stylist ${stylistId}`);
 
         // Update state
         const selection = serviceSelections.find(s => s.serviceId === serviceId);
@@ -678,14 +647,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Date input change
     async function handleDateInputChange() {
-         const selectedDate = bookingDateInput.value;
-        console.log(`Date changed to: ${selectedDate}`);
+        const selectedDate = bookingDateInput.value;
 
         // Clear any previous closing time warnings
         clearClosingTimeWarning();
 
         if (!selectedDate || isDateInPast(selectedDate)) {
-            console.log("Date is invalid or in the past. Disabling stylist/time selects.");
             // Disable all stylist and time selects if date is invalid/past
              serviceStylistSelectionsContainer.querySelectorAll('.stylist-select, .time-select').forEach(select => {
                  select.disabled = true;
@@ -698,11 +665,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Date is valid and not in the past, proceed to populate stylists
-        console.log("Date is valid. Populating all stylist dropdowns...");
         await populateAllStylistDropdowns(selectedDate);
 
          // After populating stylists, potentially fetch times ONLY IF a stylist is already selected (e.g. edit mode)
-         console.log("Checking if initial times need fetching after date change...");
          for (const selection of serviceSelections) {
             const serviceRow = serviceStylistSelectionsContainer.querySelector(`.service-stylist-selection[data-service-id="${selection.serviceId}"]`);
             if (!serviceRow) continue;
@@ -712,7 +677,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const currentStylistId = stylistSelect.value ? parseInt(stylistSelect.value, 10) : null;
 
             if (currentStylistId && timeSelect) {
-                 console.log(`Fetching initial times for Svc ${selection.serviceId}, Stylist ${currentStylistId}`);
                  // Fetch availability count
                  fetchAndDisplayAvailabilityCount(selection.serviceId, currentStylistId, selectedDate);
                  // Fetch time slots
@@ -723,12 +687,10 @@ document.addEventListener('DOMContentLoaded', function() {
                      const initialTimeValue = selection.initialStartTime.substring(0, 5); 
                       if (Array.isArray(availableSlots) && availableSlots.some(slot => slot.value === initialTimeValue)) {
                          timeSelect.value = initialTimeValue;
-                         console.log(`Restored initial time ${initialTimeValue} for Svc ${selection.serviceId}`);
                          selection.selectedStartTime = initialTimeValue; 
                          // Manually trigger change to run conflict checks
                          timeSelect.dispatchEvent(new Event('change'));
                       } else {
-                          console.log(`Initial time ${initialTimeValue} no longer available for Svc ${selection.serviceId}`);
                           selection.selectedStartTime = null; 
                       }
                  }
@@ -747,142 +709,125 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Populate ALL stylist dropdowns for the currently selected services and date
     async function populateAllStylistDropdowns(date) {
-         if (!date || isDateInPast(date)) {
-             console.warn("[PopulateStylists] Skipping stylist population: Invalid or past date.");
-            return;
+        if (!date || isDateInPast(date)) {
+            console.warn("[PopulateStylists] Skipping stylist population: Invalid or past date.");
+        return;
+    }
+
+        const stylistPromises = serviceSelections.map(selection => getStylistsForService(selection.serviceId));
+        const results = await Promise.all(stylistPromises);
+
+        let needsTimeFetching = false; 
+
+        serviceSelections.forEach((selection, index) => {
+            const serviceRow = serviceStylistSelectionsContainer.querySelector(`.service-stylist-selection[data-service-id="${selection.serviceId}"]`);
+            if (!serviceRow) {
+                console.warn(`[PopulateStylists] Row not found for service ${selection.serviceId}, skipping.`);
+                return; 
+            }
+
+            const select = serviceRow.querySelector('.stylist-select');
+            const timeSelect = serviceRow.querySelector('.time-select');
+
+            if (select.value && select.value !== '') {
+                // Ensure state matches dropdown, though it should already
+                selection.selectedStylistId = parseInt(select.value, 10);
+                // Still might need to trigger time fetching if times aren't loaded yet
+                if (timeSelect && timeSelect.options.length <= 1 && selection.selectedStylistId) { 
+                    needsTimeFetching = true;
+                }
+                return; 
+            }
+
+            const stylists = results[index]; 
+
+            // Preserve the currently selected value OR use initial value
+            const previouslySelectedStylist = select.value;
+            const initialStylistToSelect = selection.initialStylistId;
+            let valueToRestore = null;
+
+
+            select.innerHTML = ''; 
+
+            if (!stylists || stylists.length === 0) {
+                select.innerHTML = '<option value="">No Stylists Available</option>';
+                select.disabled = true;
+                timeSelect.innerHTML = '<option value="">No Stylists Available</option>';
+                timeSelect.disabled = true;
+                timeSelect.value = ''; 
+                updateAvailabilityDisplay(selection.serviceId, null); 
+            } else {
+                select.innerHTML = '<option value="">Select Stylist...</option>'; 
+                let foundInitialStylist = false;
+                stylists.forEach(stylist => {
+                    const option = document.createElement('option');
+                    option.value = stylist.id;
+                    option.textContent = stylist.name;
+                    select.appendChild(option);
+                    // Check if this stylist matches the previously selected OR the initial one
+                    if (stylist.id == previouslySelectedStylist) {
+                        valueToRestore = stylist.id;
+                    }
+                    if (stylist.id == initialStylistToSelect) { 
+                        foundInitialStylist = true;
+                    }
+                });
+                select.disabled = false;
+
+                // Prioritize initial value if it exists and is valid
+                if (initialStylistToSelect && foundInitialStylist) {
+                    valueToRestore = initialStylistToSelect;
+                } else if (initialStylistToSelect && !foundInitialStylist) {
+                    console.warn(`[PopulateStylists] Service ${selection.serviceId}: Initial stylist ${initialStylistToSelect} is no longer available.`);
+                }
+
+                // Restore the selection (either previous or initial)
+                if (valueToRestore) {
+                    select.value = valueToRestore;
+                    selection.selectedStylistId = parseInt(valueToRestore, 10); 
+                    needsTimeFetching = true; 
+                } else {
+                    // If previous/initial selection invalid, reset time slot too
+                    timeSelect.innerHTML = '<option value="">Select Stylist First...</option>';
+                    timeSelect.disabled = true;
+                    timeSelect.value = '';
+                    selection.selectedStylistId = null;
+                    updateAvailabilityDisplay(selection.serviceId, null);
+                }
+            }
+            // Clear the initial stylist ID now that we've used it
+            selection.initialStylistId = null;
+        });
+
+        // Now, after all stylists are potentially selected, fetch times if needed
+        if (needsTimeFetching) {
+            await fetchInitialTimesForSelectedStylists(date);
         }
-
-         console.log("[PopulateStylists] Populating stylist dropdowns for date:", date);
-         const stylistPromises = serviceSelections.map(selection => getStylistsForService(selection.serviceId));
-         const results = await Promise.all(stylistPromises);
-
-         let needsTimeFetching = false; 
-
-         serviceSelections.forEach((selection, index) => {
-             const serviceRow = serviceStylistSelectionsContainer.querySelector(`.service-stylist-selection[data-service-id="${selection.serviceId}"]`);
-             if (!serviceRow) {
-                  console.warn(`[PopulateStylists] Row not found for service ${selection.serviceId}, skipping.`);
-                  return; // Skip if the row doesnt exist in the DOM yet/anymore
-             }
-
-             const select = serviceRow.querySelector('.stylist-select');
-             const timeSelect = serviceRow.querySelector('.time-select');
-
-             // --- ADD CHECK: If stylist already selected, skip re-population --- 
-             if (select.value && select.value !== '') {
-                 console.log(`[PopulateStylists] Service ${selection.serviceId} already has stylist ${select.value} selected. Skipping repopulation.`);
-                 // Ensure state matches dropdown, though it should already
-                 selection.selectedStylistId = parseInt(select.value, 10);
-                 // Still might need to trigger time fetching if times aren't loaded yet
-                 if (timeSelect && timeSelect.options.length <= 1 && selection.selectedStylistId) { // If only placeholder exists
-                     needsTimeFetching = true;
-                 }
-                 return; // Skip the rest of the loop for this service
-             }
-             // --- END CHECK ---
-
-             const stylists = results[index]; // Get stylists for this specific service
-
-             // Preserve the currently selected value OR use initial value
-             const previouslySelectedStylist = select.value;
-             const initialStylistToSelect = selection.initialStylistId;
-             let valueToRestore = null;
-
-             console.log(`[PopulateStylists] Service ${selection.serviceId}: Previously selected: ${previouslySelectedStylist}, Initial from data: ${initialStylistToSelect}`);
-
-             select.innerHTML = ''; 
-
-             if (!stylists || stylists.length === 0) {
-                 select.innerHTML = '<option value="">No Stylists Available</option>';
-                 select.disabled = true;
-                 timeSelect.innerHTML = '<option value="">No Stylists Available</option>';
-                 timeSelect.disabled = true;
-                 timeSelect.value = ''; 
-                 updateAvailabilityDisplay(selection.serviceId, null); 
-             } else {
-                 select.innerHTML = '<option value="">Select Stylist...</option>'; 
-                 let foundInitialStylist = false;
-                 stylists.forEach(stylist => {
-                     const option = document.createElement('option');
-                     option.value = stylist.id;
-                     option.textContent = stylist.name;
-                     select.appendChild(option);
-                      // Check if this stylist matches the previously selected OR the initial one
-                      if (stylist.id == previouslySelectedStylist) {
-                         valueToRestore = stylist.id;
-                      }
-                      if (stylist.id == initialStylistToSelect) { 
-                         foundInitialStylist = true;
-                      }
-                 });
-                 select.disabled = false;
-
-                  // Prioritize initial value if it exists and is valid
-                 if (initialStylistToSelect && foundInitialStylist) {
-                     valueToRestore = initialStylistToSelect;
-                     console.log(`[PopulateStylists] Service ${selection.serviceId}: Found initial stylist ${initialStylistToSelect} in list, will restore.`);
-                 } else if (initialStylistToSelect && !foundInitialStylist) {
-                     console.warn(`[PopulateStylists] Service ${selection.serviceId}: Initial stylist ${initialStylistToSelect} is no longer available.`);
-                 }
-
-                  // Restore the selection (either previous or initial)
-                  if (valueToRestore) {
-                     select.value = valueToRestore;
-                     selection.selectedStylistId = parseInt(valueToRestore, 10); 
-                     console.log(`[PopulateStylists] Service ${selection.serviceId}: Restored stylist selection to ${valueToRestore}. State updated.`);
-                     needsTimeFetching = true; 
-                  } else {
-                      // If previous/initial selection invalid, reset time slot too
-                      timeSelect.innerHTML = '<option value="">Select Stylist First...</option>';
-                      timeSelect.disabled = true;
-                      timeSelect.value = '';
-                      selection.selectedStylistId = null;
-                      updateAvailabilityDisplay(selection.serviceId, null);
-                  }
-             }
-             // Clear the initial stylist ID now that we've used it
-             selection.initialStylistId = null;
-         });
-
-         // Now, after all stylists are potentially selected, fetch times if needed
-         if (needsTimeFetching) {
-             console.log("[PopulateStylists] Fetching initial times for services with restored stylists...");
-             await fetchInitialTimesForSelectedStylists(date);
-         }
     }
 
-    // --- NEW HELPER FUNCTION ---
-    // Fetches initial time slots only for services that have a selected stylist (likely from initialization/edit)
+    // Fetches initial time slots only for services that have a selected stylist
     async function fetchInitialTimesForSelectedStylists(date) {
-         console.log("[FetchInitialTimes] Starting fetch for date:", date);
-         for (const selection of serviceSelections) {
-             if (selection.selectedStylistId && !selection.selectedStartTime) { 
-                 console.log(`[FetchInitialTimes] Fetching for Service ${selection.serviceId}, Stylist ${selection.selectedStylistId}`);
-                 // Fetch availability count first
-                 fetchAndDisplayAvailabilityCount(selection.serviceId, selection.selectedStylistId, date);
-                 // Fetch the actual time slots
-                 const availableSlots = await fetchAvailableTimeSlotsForService(selection.serviceId, selection.selectedStylistId, date);
-                 // Find the dropdown
-                 const serviceRow = serviceStylistSelectionsContainer.querySelector(`.service-stylist-selection[data-service-id="${selection.serviceId}"]`);
-                 const timeSelect = serviceRow?.querySelector('.time-select');
-                 if (timeSelect) {
-                    console.log(`[FetchInitialTimes] Populating dropdown and attempting pre-selection for Service ${selection.serviceId}. Initial time: ${selection.initialStartTime}`);
-                    // Populate dropdown and attempt pre-selection
-                    populateTimeSlotDropdown(timeSelect, availableSlots, selection.initialStartTime);
-                    // Clear initial time after attempting pre-selection
-                    selection.initialStartTime = null;
-                 }
-             }
-         }
-         // After all times are fetched and potentially pre-selected, apply conflict disabling
-         console.log("[FetchInitialTimes] Finished fetching initial times, applying conflict disabling.");
-         applyInitialConflictDisabling();
+        for (const selection of serviceSelections) {
+            if (selection.selectedStylistId && !selection.selectedStartTime) { 
+                // Fetch availability count first
+                fetchAndDisplayAvailabilityCount(selection.serviceId, selection.selectedStylistId, date);
+                // Fetch the actual time slots
+                const availableSlots = await fetchAvailableTimeSlotsForService(selection.serviceId, selection.selectedStylistId, date);
+                // Find the dropdown
+                const serviceRow = serviceStylistSelectionsContainer.querySelector(`.service-stylist-selection[data-service-id="${selection.serviceId}"]`);
+                const timeSelect = serviceRow?.querySelector('.time-select');
+                if (timeSelect) {
+                populateTimeSlotDropdown(timeSelect, availableSlots, selection.initialStartTime);
+                selection.initialStartTime = null;
+                }
+            }
+        }
+        // After all times are fetched and potentially pre-selected, apply conflict disabling
+        applyInitialConflictDisabling();
     }
-    // --- END NEW HELPER FUNCTION ---
 
     // Populate a specific time slot dropdown
     function populateTimeSlotDropdown(timeSelectElement, slots, initialTime = null) {
-         console.log(`[PopulateTimes] Populating dropdown for Service ${timeSelectElement.dataset.serviceId}. Initial time to select: ${initialTime}`);
          // Preserve the currently selected value if it exists in the new slots
          const previouslySelectedTime = timeSelectElement.value;
          let valueToRestore = null;
@@ -900,56 +845,48 @@ document.addEventListener('DOMContentLoaded', function() {
                 option.value = slot.value; 
                 option.textContent = slot.text; 
                 timeSelectElement.appendChild(option);
-                 // Check if this slot matches the previously selected one
-                 if (slot.value === previouslySelectedTime) {
-                    valueToRestore = slot.value;
-                 }
+                // Check if this slot matches the previously selected one
+                if (slot.value === previouslySelectedTime) {
+                valueToRestore = slot.value;
+                }
             });
             timeSelectElement.disabled = false;
 
-            // --- Attempt Pre-selection using initialTime --- //
-             console.log(`[PopulateTimes] Service ${timeSelectElement.dataset.serviceId} - Checking pre-selection. initialTime:`, initialTime);
 
              if (initialTime) {
-                 const existsInAvailable = slots.some(slot => slot.value === initialTime);
-                 console.log(`[PopulateTimes] Service ${timeSelectElement.dataset.serviceId} - Does initialTime (${initialTime}) exist in available slots?`, existsInAvailable);
+                const existsInAvailable = slots.some(slot => slot.value === initialTime);
 
-                 if (existsInAvailable) {
-                     // If the initial time exists in the list, select it
-                     timeSelectElement.value = initialTime;
-                     valueToRestore = initialTime; 
-                     preselectionSuccessful = true;
-                     console.log(`[PopulateTimes] Service ${timeSelectElement.dataset.serviceId} - Pre-selected available time: ${initialTime}`);
-                 } else {
-                     // Saved time is NOT in the available list, create a special option for it
-                      console.log(`[PopulateTimes] Service ${timeSelectElement.dataset.serviceId} - initialTime (${initialTime}) not in available slots. Creating special option.`);
-                     const savedOption = document.createElement('option');
-                     savedOption.value = initialTime;
-                     savedOption.textContent = `${formatTimeForDisplay(initialTime)}`;
-                     savedOption.style.fontStyle = 'italic';
-                     savedOption.style.color = '#6c757d';
-                     // Insert it after the "Select Time" placeholder
-                     if (timeSelectElement.options[0]) {
-                          timeSelectElement.insertBefore(savedOption, timeSelectElement.options[1]);
-                     } else {
-                          timeSelectElement.appendChild(savedOption);
-                     }
-                     // Select this newly added option
-                     timeSelectElement.value = initialTime;
-                     valueToRestore = initialTime; 
-                     preselectionSuccessful = true;
-                 }
-             }
-             // --- End Pre-selection --- //
+                if (existsInAvailable) {
+                    // If the initial time exists in the list, select it
+                    timeSelectElement.value = initialTime;
+                    valueToRestore = initialTime; 
+                    preselectionSuccessful = true;
+                } else {
+                    // Saved time is NOT in the available list, create a special option for it
+                    const savedOption = document.createElement('option');
+                    savedOption.value = initialTime;
+                    savedOption.textContent = `${formatTimeForDisplay(initialTime)}`;
+                    savedOption.style.fontStyle = 'italic';
+                    savedOption.style.color = '#6c757d';
+                    // Insert it after the "Select Time" placeholder
+                    if (timeSelectElement.options[0]) {
+                        timeSelectElement.insertBefore(savedOption, timeSelectElement.options[1]);
+                    } else {
+                        timeSelectElement.appendChild(savedOption);
+                    }
+                    // Select this newly added option
+                    timeSelectElement.value = initialTime;
+                    valueToRestore = initialTime; 
+                    preselectionSuccessful = true;
+                }
+            }
 
-             // Restore the previous selection if it's still valid and no initial pre-selection happened
-             if (!preselectionSuccessful && valueToRestore) {
-                timeSelectElement.value = valueToRestore;
-                console.log(`[PopulateTimes] Service ${timeSelectElement.dataset.serviceId} - Restored previously selected time: ${valueToRestore}`);
-             } else if (!valueToRestore) {
-                 timeSelectElement.value = ''; 
-                 console.log(`[PopulateTimes] Service ${timeSelectElement.dataset.serviceId} - Resetting time selection.`);
-             }
+            // Restore the previous selection if it's still valid and no initial pre-selection happened
+            if (!preselectionSuccessful && valueToRestore) {
+            timeSelectElement.value = valueToRestore;
+            } else if (!valueToRestore) {
+                timeSelectElement.value = ''; 
+            }
         }
 
          // Update state based on the final selected value
@@ -958,12 +895,10 @@ document.addEventListener('DOMContentLoaded', function() {
          const selectionState = serviceSelections.find(s => s.serviceId === serviceId);
          if(selectionState) {
              selectionState.selectedStartTime = finalSelectedTime;
-             console.log(`[PopulateTimes] Service ${serviceId} - Final state update. selectedStartTime: ${finalSelectedTime}`);
          }
 
          // Trigger change event manually if a value was selected/restored, so conflict check runs
          if (timeSelectElement.value) {
-              console.log(`[PopulateTimes] Service ${serviceId} - Triggering change event.`);
              timeSelectElement.dispatchEvent(new Event('change', { bubbles: true }));
          }
     }
@@ -977,25 +912,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const serviceId = parseInt(serviceIdStr, 10);
         if (isNaN(serviceId)) {
-             console.error("[handleTimeSelectionChange] Invalid or missing serviceId in dataset:", serviceIdStr);
-             return;
-         }
+            console.error("[handleTimeSelectionChange] Invalid or missing serviceId in dataset:", serviceIdStr);
+            return;
+        }
 
         const currentIndex = serviceSelections.findIndex(s => s.serviceId === serviceId);
         if (currentIndex === -1) {
-             console.error("[handleTimeSelectionChange] Could not find service in state for ID:", serviceId);
+            console.error("[handleTimeSelectionChange] Could not find service in state for ID:", serviceId);
             return;
         }
 
         serviceSelections[currentIndex].selectedStartTime = selectedTime;
         const currentStylistId = serviceSelections[currentIndex].selectedStylistId;
 
-        console.log(`[handleTimeSelectionChange] Service ID: ${serviceId}, Stylist ID: ${currentStylistId}, Selected Time: ${selectedTime}`);
 
         if (!currentStylistId) {
-             console.log("[handleTimeSelectionChange] No stylist selected for this service, skipping conflict check.");
-             return;
-         }
+            return;
+        }
 
         disableConflictingTimeSlots();
     }
@@ -1047,10 +980,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleFormSubmit(event) {
         if (!validateForm()) {
             event.preventDefault(); 
-            console.log("Form validation failed.");
-        } else {
-            console.log("Form validation passed. Submitting...");
-        }
+        } 
     }
 
 
@@ -1070,7 +1000,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to apply disabling logic based on current state
     function applyInitialConflictDisabling() {
-        console.log("Applying initial conflict disabling...");
         const stylistsInBooking = new Set();
         serviceSelections.forEach(sel => {
             if (sel.selectedStylistId) {
@@ -1206,7 +1135,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Fetch available time slots for ONE service/stylist/date combination
     async function fetchAvailableTimeSlotsForService(serviceId, stylistId, date) {
-        console.log(`Fetching time slots for Service: ${serviceId}, Stylist: ${stylistId}, Date: ${date}`);
         if (!serviceId || !stylistId || !date) {
             console.warn("Skipping time slot fetch: Missing serviceId, stylistId, or date.");
             return []; 
@@ -1233,7 +1161,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             const slots = await response.json();
-            console.log(`Received slots for Svc ${serviceId}, Stylist ${stylistId}:`, slots);
 
             // Update the specific service selection state
             const selection = serviceSelections.find(s => s.serviceId == serviceId);
@@ -1251,7 +1178,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Disable conflicting time slots
     function disableConflictingTimeSlots() {
-        console.log("Disabling conflicting time slots...");
         const stylistsInBooking = new Set();
         serviceSelections.forEach(sel => {
             if (sel.selectedStylistId) {
@@ -1260,7 +1186,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         stylistsInBooking.forEach(stylistId => {
-            console.log(`[Conflict Check] Checking stylist ID: ${stylistId}`);
             // 1. Find all currently selected time windows for this stylist
             const occupiedWindows = [];
             serviceSelections.forEach((sel) => {
@@ -1284,8 +1209,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 const targetDuration = targetSelection.duration;
                 const targetTimeSelect = serviceStylistSelectionsContainer.querySelector(`#time-select-${targetServiceId}`);
 
-                console.log(`[Conflict Check] Checking options for target service ID: ${targetServiceId} (Duration: ${targetDuration} mins) - Found select element:`, targetTimeSelect ? 'Yes' : 'No');
-
                 if (!targetTimeSelect || targetDuration <= 0) return;
 
                 // 3. Iterate through each OPTION in the target service's dropdown
@@ -1306,18 +1229,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     const slotEndMin = slotStartMin + targetDuration;
                     let conflictsWithOther = false;
                     for (const window of occupiedWindows) {
-                        // IMPORTANT: Check conflict ONLY if the window belongs to a DIFFERENT service
+                        // Check conflict ONLY if the window belongs to a DIFFERENT service
                         if (window.serviceId !== targetServiceId) {
                             // Check for overlap: [slotStartMin, slotEndMin) vs [window.start, window.end)
                             if (slotStartMin < window.end && slotEndMin > window.start) {
                                 conflictsWithOther = true;
-                                break; // One conflict is enough
+                                break; 
                             }
                         }
                     }
-
-                    // Log the specific option being checked and the conflict result
-                    console.log(`[Conflict Check]   Option: ${option.value} (${slotStartMin}-${slotEndMin}), Conflicts: ${conflictsWithOther}`);
 
                     // 5. Disable/Enable the option based on conflict status
                     option.disabled = conflictsWithOther;

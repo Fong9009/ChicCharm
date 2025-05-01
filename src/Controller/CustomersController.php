@@ -59,13 +59,10 @@ class CustomersController extends AppController
      */
     public function dashboard()
     {
-        $customer = $this->Customers->get(
-            $this->Authentication->getIdentity()->id,
-            contain: ['Bookings']
-        );
-
-        // Get upcoming bookings with the same structure as customerindex
+        $customer = $this->Customers->get($this->Authentication->getIdentity()->id);
         $bookingsTable = $this->fetchTable('Bookings');
+
+        // Get upcoming active bookings (limited to 3)
         $activeBookings = $bookingsTable->find()
             ->where([
                 'customer_id' => $this->Authentication->getIdentity()->id,
@@ -86,11 +83,11 @@ class CustomersController extends AppController
             ])
             ->limit(3);
 
-        // Get past bookings (finished and cancelled)
-        $pastBookings = $bookingsTable->find()
+        // Get recent cancelled bookings (limited to 3)
+        $cancelledBookings = $bookingsTable->find()
             ->where([
                 'customer_id' => $this->Authentication->getIdentity()->id,
-                'status IN' => ['finished', 'cancelled']
+                'status' => 'cancelled'
             ])
             ->contain([
                 'BookingsServices' => [
@@ -99,16 +96,11 @@ class CustomersController extends AppController
                         'fields' => ['id', 'first_name', 'last_name']
                     ]
                 ],
-                'BookingsStylists' => [
-                    'Stylists' => [
-                        'fields' => ['id', 'first_name', 'last_name']
-                    ]
-                ]
             ])
-            ->order(['booking_date' => 'DESC'])
-            ->limit(3); 
+            ->order(['Bookings.modified' => 'DESC']) 
+            ->limit(3);
 
-        $this->set(compact('customer', 'activeBookings', 'pastBookings'));
+        $this->set(compact('customer', 'activeBookings', 'cancelledBookings'));
     }
 
     /**
