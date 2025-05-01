@@ -71,21 +71,35 @@ return function (RouteBuilder $routes): void {
             ['_method' => 'POST']
         );
 
+
+        /*
+         * ROUTES FOR CONTENT BLOCKS
+         */
         $builder->connect('/blocks/edit/*', [
-            'controller' => 'ContentBlocks', // This now points to the app's Controller folder
+            'controller' => 'ContentBlocks',
             'action' => 'edit',
         ]);
 
-        // Custom route for viewing a block
         $builder->connect('/blocks/view/*', [
-            'controller' => 'ContentBlocks', // This now points to the app's Controller folder
+            'controller' => 'ContentBlocks',
             'action' => 'view',
         ]);
 
         $builder->connect('/blocks/', [
-            'controller' => 'ContentBlocks', // This now points to the app's Controller folder
+            'controller' => 'ContentBlocks',
             'action' => 'index',
         ]);
+
+        $builder->connect('/blocks/restore/*', [
+            'controller' => 'ContentBlocks',
+            'action' => 'restore',
+        ]);
+        /*
+         * END OF ROUTES FOR CONTENT BLOCKS
+         */
+
+
+
         /*
          * Connect catchall routes for all controllers.
          *

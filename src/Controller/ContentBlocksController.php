@@ -2,7 +2,6 @@
 declare(strict_types=1);
 
 namespace App\Controller;
-use Authorization\AuthorizationService;
 use Cake\Core\Configure;
 use Cake\Event\EventInterface;
 use Cake\Log\Log;
