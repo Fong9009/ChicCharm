@@ -88,13 +88,8 @@ class BookingsController extends AppController
             $latestEndTime = null;
             foreach ($booking->bookings_services as $bs) {
                 if ($bs->end_time) {
-<<<<<<< Updated upstream
-                    $currentServiceEndTime = \Cake\I18n\FrozenTime::parse($bs->end_time->format('H:i:s')); // Ensure it's Time object
+                    $currentServiceEndTime = \Cake\I18n\FrozenTime::parse($bs->end_time->format('H:i:s'));
                     if ($latestEndTime === null || $currentServiceEndTime > $latestEndTime) {
-=======
-                    $currentServiceEndTime = \Cake\I18n\FrozenTime::parse($bs->end_time->format('H:i:s')); 
-                    if ($latestEndTime === null || $currentServiceEndTime->gt($latestEndTime)) {
->>>>>>> Stashed changes
                         $latestEndTime = $currentServiceEndTime;
                     }
                 }
@@ -630,7 +625,9 @@ class BookingsController extends AppController
     public function customerbooking() {
         $booking = $this->Bookings->newEmptyEntity();
         if ($this->request->is('post')) {
+            \Cake\Log\Log::debug('[CustomerBooking] POST request received.'); // <-- ADD LOG
             $data = $this->request->getData();
+            \Cake\Log\Log::debug('[CustomerBooking] Request Data: ' . json_encode($data)); // <-- ADD LOG
 
             // Check if end time exceeds 5 PM
             if (isset($data['end_time'])) {
@@ -679,6 +676,7 @@ class BookingsController extends AppController
             ]);
 
             // --- Server-Side Time Conflict Validation ---
+            \Cake\Log\Log::debug('[CustomerBooking] Entering Time Conflict Validation Block.'); // <-- ADD LOG
             $stylistTimeSlots = [];
             $hasConflict = false;
             $conflictMessage = '';
