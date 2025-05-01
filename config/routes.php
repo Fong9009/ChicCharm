@@ -70,6 +70,22 @@ return function (RouteBuilder $routes): void {
             ['controller' => 'Bookings', 'action' => 'getStylists'],
             ['_method' => 'POST']
         );
+
+        $builder->connect('/blocks/edit/*', [
+            'controller' => 'ContentBlocks', // This now points to the app's Controller folder
+            'action' => 'edit',
+        ]);
+
+        // Custom route for viewing a block
+        $builder->connect('/blocks/view/*', [
+            'controller' => 'ContentBlocks', // This now points to the app's Controller folder
+            'action' => 'view',
+        ]);
+
+        $builder->connect('/blocks/', [
+            'controller' => 'ContentBlocks', // This now points to the app's Controller folder
+            'action' => 'index',
+        ]);
         /*
          * Connect catchall routes for all controllers.
          *
