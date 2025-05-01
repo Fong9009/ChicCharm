@@ -51,7 +51,7 @@ $identity = $this->request->getAttribute('identity');
                     <div class="card-footer payment-card-footer">
                         <?= $this->Html->link(
                             '<span class="fs-5">View Content Blocks</span><i class="material-icons">visibility</i>',
-                            ['plugin' => 'ContentBlocks', 'controller' => 'ContentBlocks', 'action' => 'index'],
+                            ['controller' => 'ContentBlocks', 'action' => 'index'],
                             ['class' => 'payment-button', 'escape' => false]
                         ) ?>
                     </div>
