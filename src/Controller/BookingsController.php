@@ -88,8 +88,13 @@ class BookingsController extends AppController
             $latestEndTime = null;
             foreach ($booking->bookings_services as $bs) {
                 if ($bs->end_time) {
+<<<<<<< Updated upstream
                     $currentServiceEndTime = \Cake\I18n\FrozenTime::parse($bs->end_time->format('H:i:s')); // Ensure it's Time object
                     if ($latestEndTime === null || $currentServiceEndTime > $latestEndTime) {
+=======
+                    $currentServiceEndTime = \Cake\I18n\FrozenTime::parse($bs->end_time->format('H:i:s')); 
+                    if ($latestEndTime === null || $currentServiceEndTime->gt($latestEndTime)) {
+>>>>>>> Stashed changes
                         $latestEndTime = $currentServiceEndTime;
                     }
                 }
@@ -362,6 +367,53 @@ class BookingsController extends AppController
                         ])->where(['id IN' => $serviceIds])->toArray();
                     }
 
+                    // --- START Server-Side Time Conflict Validation (Edit) ---
+                    $stylistTimeSlotsEdit = [];
+                    $hasConflictEdit = false;
+                    $conflictMessageEdit = '';
+
+                    foreach ($data['bookings_services'] as $serviceData) {
+                        if (!isset($serviceData['stylist_id'], $serviceData['start_time'], $serviceData['service_id'])) {
+                            continue;
+                        }
+                        $stylistIdEdit = (int)$serviceData['stylist_id'];
+                        $serviceIdEdit = (int)$serviceData['service_id'];
+                        $startTimeStrEdit = $serviceData['start_time'];
+                        $bookingDateStrEdit = $data['booking_date_formatted'];
+                        // Use the $servicesDetails array fetched just above
+                        $durationEdit = $servicesDetails[$serviceIdEdit] ?? 0;
+
+                        if ($durationEdit <= 0) continue;
+
+                        try {
+                             $startTimeEdit = new \DateTime($bookingDateStrEdit . ' ' . $startTimeStrEdit);
+                             $endTimeEdit = clone $startTimeEdit;
+                             $endTimeEdit->modify("+{$durationEdit} minutes");
+                             $newSlotEdit = ['start' => $startTimeEdit->getTimestamp(), 'end' => $endTimeEdit->getTimestamp(), 'service_id' => $serviceIdEdit];
+
+                            if (isset($stylistTimeSlotsEdit[$stylistIdEdit])) {
+                                foreach ($stylistTimeSlotsEdit[$stylistIdEdit] as $existingSlotEdit) {
+                                    if ($newSlotEdit['start'] < $existingSlotEdit['end'] && $newSlotEdit['end'] > $existingSlotEdit['start']) {
+                                        $hasConflictEdit = true;
+                                        $conflictMessageEdit = "Time conflict detected for one of the selected stylists. Please ensure service times do not overlap.";
+                                        break 2;
+                                    }
+                                }
+                            }
+                             $stylistTimeSlotsEdit[$stylistIdEdit][] = $newSlotEdit;
+
+                        } catch (\Exception $e) {
+                            // Throw exception to trigger transaction rollback
+                             throw new \Exception('Validation time processing error: ' . $e->getMessage());
+                        }
+                    }
+
+                    if ($hasConflictEdit) {
+                        // Throw exception to trigger transaction rollback
+                        throw new \Exception($conflictMessageEdit ?: 'A time conflict was detected. Please ensure service times for the same stylist do not overlap.');
+                    }
+                    // --- END Server-Side Time Conflict Validation (Edit) ---
+
                     // Re-Save BookingsServices records with individual start/end times
                     foreach ($data['bookings_services'] as $serviceIdKey => $serviceData) {
                         if (!isset($serviceData['service_id'], $serviceData['stylist_id'], $serviceData['start_time'], $serviceData['service_cost'])) {
@@ -626,6 +678,79 @@ class BookingsController extends AppController
                 'status' => 'active'
             ]);
 
+            // --- Server-Side Time Conflict Validation ---
+            $stylistTimeSlots = [];
+            $hasConflict = false;
+            $conflictMessage = '';
+
+            if (!empty($data['bookings_services'])) {
+                // Fetch service durations needed for validation
+                $serviceIdsForValidation = array_column($data['bookings_services'], 'service_id');
+                $servicesDetailsForValidation = [];
+                if (!empty($serviceIdsForValidation)) {
+                     $servicesDetailsForValidation = $this->fetchTable('Services')->find('list', [
+                        'keyField' => 'id',
+                        'valueField' => 'duration_minutes'
+                    ])->where(['id IN' => $serviceIdsForValidation])->toArray();
+                }
+
+                foreach ($data['bookings_services'] as $serviceData) {
+                    if (!isset($serviceData['stylist_id'], $serviceData['start_time'], $serviceData['service_id'])) {
+                         continue; // Skip incomplete data
+                    }
+                    $stylistId = (int)$serviceData['stylist_id'];
+                    $serviceId = (int)$serviceData['service_id'];
+                    $startTimeStr = $serviceData['start_time'];
+                    $duration = $servicesDetailsForValidation[$serviceId] ?? 0;
+
+                    if ($duration <= 0) continue; 
+
+                    try {
+                         $startTime = new \DateTime($data['booking_date'] . ' ' . $startTimeStr);
+                         $endTime = clone $startTime;
+                         $endTime->modify("+{$duration} minutes");
+                         $newSlot = ['start' => $startTime->getTimestamp(), 'end' => $endTime->getTimestamp(), 'service_id' => $serviceId];
+
+                        // Check for conflicts with existing slots for THIS stylist in THIS request
+                        if (isset($stylistTimeSlots[$stylistId])) {
+                            foreach ($stylistTimeSlots[$stylistId] as $existingSlot) {
+                                // Check for overlap: new start is before existing end AND new end is after existing start
+                                if ($newSlot['start'] < $existingSlot['end'] && $newSlot['end'] > $existingSlot['start']) {
+                                    $hasConflict = true;
+                                    $conflictMessage = "Time conflict detected for one of the selected stylists. Please ensure service times do not overlap.";
+                                    break 2; 
+                                }
+                            }
+                        }
+                         // Add the new slot if no conflict found yet for this stylist
+                         $stylistTimeSlots[$stylistId][] = $newSlot;
+
+                    } catch (\Exception $e) {
+                         \Cake\Log\Log::error("Validation time processing error: " . $e->getMessage());
+                         $this->Flash->error(__('An error occurred while validating booking times. Please check the selected times.'));
+                         // Reload necessary data for the view and render again
+                         $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
+                         $services = $this->fetchTable('Services')->find('all')->all();
+                         $this->set(compact('booking', 'stylists', 'services')); 
+                         return $this->render('customerbooking'); 
+                    }
+                }
+            }
+
+            if ($hasConflict) {
+                $this->Flash->error($conflictMessage ?: __('A time conflict was detected. Please ensure service times for the same stylist do not overlap.'));
+                // Reload necessary data for the view and render again
+                $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
+                $services = $this->fetchTable('Services')->find('all')->all();
+                // Patch the entity with the data *attempted* to be saved so the form repopulates
+                $booking = $this->Bookings->patchEntity($booking, $data, ['associated' => []]);
+                $this->set(compact('booking', 'stylists', 'services'));
+                // Add the submitted service data back to the request scope for the template
+                $this->request = $this->request->withParsedBody($data);
+                 return $this->render('customerbooking'); // Re-render the form
+            }
+             // --- Server-Side Time Conflict Validation ---
+
             // Try saving the main booking record
             if ($this->Bookings->save($booking)) {
                 $bookingId = $booking->id;
@@ -761,7 +886,7 @@ class BookingsController extends AppController
                 }
             }
             $data['total_cost'] = $totalCost;
-            $data['remaining_cost'] = $totalCost; // Assuming full cost is remaining initially
+            $data['remaining_cost'] = $totalCost;
             $data['notes'] = $data['notes'] ?? null;
 
             // Create a temporary booking entity without associations first
@@ -774,6 +899,75 @@ class BookingsController extends AppController
                 'notes' => $data['notes'] ?? null,
                 'status' => 'active'
             ]);
+
+            // --- START Server-Side Time Conflict Validation ---
+            $stylistTimeSlotsAdmin = [];
+            $hasConflictAdmin = false;
+            $conflictMessageAdmin = '';
+
+            if (!empty($data['bookings_services'])) {
+                $serviceIdsForValidationAdmin = array_column($data['bookings_services'], 'service_id');
+                $servicesDetailsForValidationAdmin = [];
+                if (!empty($serviceIdsForValidationAdmin)) {
+                     $servicesDetailsForValidationAdmin = $this->fetchTable('Services')->find('list', [
+                        'keyField' => 'id',
+                        'valueField' => 'duration_minutes'
+                    ])->where(['id IN' => $serviceIdsForValidationAdmin])->toArray();
+                }
+
+                foreach ($data['bookings_services'] as $serviceData) {
+                    if (!isset($serviceData['stylist_id'], $serviceData['start_time'], $serviceData['service_id'])) {
+                         continue;
+                    }
+                    $stylistIdAdmin = (int)$serviceData['stylist_id'];
+                    $serviceIdAdmin = (int)$serviceData['service_id'];
+                    $startTimeStrAdmin = $serviceData['start_time'];
+                    // Use the already formatted date from earlier in the action
+                    $bookingDateStrAdmin = $data['booking_date_formatted'];
+                    $durationAdmin = $servicesDetailsForValidationAdmin[$serviceIdAdmin] ?? 0;
+
+                    if ($durationAdmin <= 0) continue;
+
+                    try {
+                         $startTimeAdmin = new \DateTime($bookingDateStrAdmin . ' ' . $startTimeStrAdmin);
+                         $endTimeAdmin = clone $startTimeAdmin;
+                         $endTimeAdmin->modify("+{$durationAdmin} minutes");
+                         $newSlotAdmin = ['start' => $startTimeAdmin->getTimestamp(), 'end' => $endTimeAdmin->getTimestamp(), 'service_id' => $serviceIdAdmin];
+
+                        if (isset($stylistTimeSlotsAdmin[$stylistIdAdmin])) {
+                            foreach ($stylistTimeSlotsAdmin[$stylistIdAdmin] as $existingSlotAdmin) {
+                                if ($newSlotAdmin['start'] < $existingSlotAdmin['end'] && $newSlotAdmin['end'] > $existingSlotAdmin['start']) {
+                                    $hasConflictAdmin = true;
+                                    $conflictMessageAdmin = "Time conflict detected for one of the selected stylists. Please ensure service times do not overlap.";
+                                    break 2;
+                                }
+                            }
+                        }
+                         $stylistTimeSlotsAdmin[$stylistIdAdmin][] = $newSlotAdmin;
+
+                    } catch (\Exception $e) {
+                         \Cake\Log\Log::error("[Admin Validation] Time processing error: " . $e->getMessage());
+                         $this->Flash->error(__('An error occurred while validating booking times. Please check the selected times.'));
+                         // Reload necessary data for the admin view
+                         $customers = $this->Bookings->Customers->find('list', ['limit' => 200])->all();
+                         $services = $this->fetchTable('Services')->find('all')->all();
+                         $this->set(compact('booking', 'customers', 'services'));
+                         return $this->render('adminbooking');
+                    }
+                }
+            }
+
+            if ($hasConflictAdmin) {
+                $this->Flash->error($conflictMessageAdmin ?: __('A time conflict was detected. Please ensure service times for the same stylist do not overlap.'));
+                // Reload necessary data for the admin view
+                $customers = $this->Bookings->Customers->find('list', ['limit' => 200])->all();
+                $services = $this->fetchTable('Services')->find('all')->all();
+                $booking = $this->Bookings->patchEntity($booking, $data, ['associated' => []]);
+                $this->set(compact('booking', 'customers', 'services'));
+                $this->request = $this->request->withParsedBody($data);
+                 return $this->render('adminbooking');
+            }
+            // --- END Server-Side Time Conflict Validation ---
 
             // Try saving the main booking record
             if ($this->Bookings->save($booking)) {
