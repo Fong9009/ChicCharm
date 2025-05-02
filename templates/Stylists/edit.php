@@ -5,6 +5,7 @@
  * @var string[]|\Cake\Collection\CollectionInterface $bookings
  * @var string[]|\Cake\Collection\CollectionInterface $services
  */
+$this->assign('title', 'Edit Profile');
 ?>
 <?= $this->Html->css('/utility/edits/edits.css') ?>
 <?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
@@ -89,9 +90,9 @@
     </aside>
     <div class="column">
         <div class="stylists form content">
-            <?= $this->Form->create($stylist) ?>
+            <?= $this->Form->create($stylist, ['type' => 'file']) ?>
             <fieldset>
-                <legend><?= __('Add Stylist') ?></legend>
+                <legend><?= __('Edit Stylist') ?></legend>
                 <div class="form-group mb-3">
                     <?= $this->Form->control('first_name', [
                         'label' => __('First Name'),
@@ -128,6 +129,33 @@
                         'value' => '',
                         'error' => ['class' => 'invalid-feedback'],
                     ]); ?>
+                </div>
+                <!-- Profile Picture Preview -->
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="profile-preview text-start">
+                            <?php if (!empty($stylist->profile_picture)): ?>
+                                <img src="<?= $this->Url->image('profile/' . $stylist->profile_picture) ?>"
+                                     alt="Profile Picture"
+                                     class="img-fluid"
+                                     style="width: 400px; height: 400px; object-fit: cover; border-radius: 8px;">
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+                <!-- File Upload Location -->
+                <div class="row">
+                    <div class="col-12 col-md-12 col-sm-12">
+                        <div class="input">
+                            <label for="profile_picture">Upload New Profile Picture</label>
+                            <?= $this->Form->Control('profile_picture', [
+                                'type' => 'file',
+                                'class' => 'form-control' . ($this->Form->isFieldError('profile_picture') ? ' is-invalid' : ''),
+                                'required' => false,
+                                'error' => ['class' => 'invalid-feedback']
+                            ]) ?>
+                        </div>
+                    </div>
                 </div>
                 <?php
                 echo $this->Form->control('nonce', ['type' => 'hidden', 'empty' => true]);
