@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Model\Table\AdminsTable;
+use App\Model\Table\StylistsTable;
 use Cake\I18n\DateTime;
 use Cake\Mailer\Mailer;
 use Cake\Utility\Security;
@@ -27,6 +28,11 @@ class AuthController extends AppController
     private $Customers;
 
     /**
+     * @var \App\Model\Table\StylistsTable $Stylists
+     */
+    private StylistsTable $Stylists;
+
+    /**
      * Controller initialize override
      *
      * @return void
@@ -45,6 +51,7 @@ class AuthController extends AppController
         // Load both Admins and Customers tables
         $this->Admins = $this->fetchTable('Admins');
         $this->Customers = $this->fetchTable('Customers');
+        $this->Stylists = $this->fetchTable('Stylists');
     }
 
     /**
@@ -202,15 +209,15 @@ class AuthController extends AppController
              * to prevent email enumeration attacks
              */
             $this->Flash->success('Please check your inbox (or spam folder) for an email regarding how to reset your account password.');
-            
+
             // Add null checks before logging environment variables
             $email_username = env('EMAIL_TRANSPORT_DEFAULT_USERNAME');
             $email_password = env('EMAIL_TRANSPORT_DEFAULT_PASSWORD');
-            
+
             if ($email_username !== null) {
                 $this->log($email_username, 'debug');
             }
-            
+
             if ($email_password !== null) {
                 $this->log($email_password, 'debug');
             }
@@ -228,18 +235,18 @@ class AuthController extends AppController
     public function resetPassword($token = null)
     {
         $this->viewBuilder()->setLayout('login');
-        
+
         if ($this->request->is('post')) {
             $data = $this->request->getData();
             $user = $this->Users->findByNonce($token)->first();
-            
+
             if ($user) {
                 // Check if nonce is expired
                 if ($user->nonce_expiry < new \DateTime()) {
                     $this->Flash->error(__('Password reset link has expired. Please request a new one.'));
                     return $this->redirect(['action' => 'forgotPassword']);
                 }
-                
+
                 // Different validation rules based on user type
                 if ($user->type === 'admin') {
                     $validator = new \Cake\Validation\Validator();
@@ -264,7 +271,7 @@ class AuthController extends AppController
                         ->notEmptyString('password', 'Please enter a password')
                         ->minLength('password', 8, 'Password must be at least 8 characters long');
                 }
-                
+
                 $errors = $validator->validate($data);
                 if (!empty($errors)) {
                     foreach ($errors as $field => $error) {
@@ -272,13 +279,13 @@ class AuthController extends AppController
                     }
                     return;
                 }
-                
+
                 $user = $this->Users->patchEntity($user, [
                     'password' => $data['password'],
                     'nonce' => null,
                     'nonce_expiry' => null
                 ]);
-                
+
                 if ($this->Users->save($user)) {
                     $this->Flash->success(__('Your password has been updated.'));
                     return $this->redirect(['action' => 'login']);
@@ -288,7 +295,7 @@ class AuthController extends AppController
                 $this->Flash->error(__('Invalid password reset link.'));
             }
         }
-        
+
         $this->set(compact('token'));
     }
 
@@ -315,7 +322,7 @@ class AuthController extends AppController
                 $this->Flash->error('Access denied. You can only change your own password.');
                 return $this->redirect(['action' => 'login']);
             }
-            
+
             // Check if target user is an admin
             $targetAdmin = $this->Admins->find()->where(['id' => $id])->first();
             if ($targetAdmin) {
@@ -327,21 +334,23 @@ class AuthController extends AppController
         // Get the appropriate model and entity based on who is being edited
         if ($user->type === 'admin') {
             $model = $this->Admins;
-        } else {
+        } elseif ($user->type === 'customer') {
             $model = $this->Customers;
+        } elseif ($user->type === 'stylist') {
+            $model = $this->Stylists;
         }
 
         try {
             $entity = $model->get($id, [
                 'fields' => ['id', 'first_name', 'last_name', 'password']
             ]);
-            
+
             // Create a clean entity for the form that only includes name fields
             $formEntity = $model->newEmptyEntity();
             $formEntity->id = $entity->id;
             $formEntity->first_name = $entity->first_name;
             $formEntity->last_name = $entity->last_name;
-            
+
         } catch (\Exception $e) {
             $this->Flash->error('User not found.');
             return $this->redirect(['controller' => 'Admins', 'action' => 'index']);
@@ -360,7 +369,7 @@ class AuthController extends AppController
 
             // Create validator with specific rules based on user type
             $validator = new \Cake\Validation\Validator();
-            
+
             if ($user->type === 'admin') {
                 $validator
                     ->requirePresence('password')
@@ -406,10 +415,10 @@ class AuthController extends AppController
                 foreach ($errors as $field => $error) {
                     $fieldErrors[$field] = $error['_empty'] ?? $error['minLength'] ?? $error['custom'] ?? 'Invalid password';
                 }
-                
+
                 // Set the errors in the entity for the form helper
                 $formEntity->setErrors($fieldErrors);
-                
+
                 $this->set('entity', $formEntity);
                 $this->set('userType', $user->type);
                 return $this->render();
@@ -456,7 +465,7 @@ class AuthController extends AppController
 
         if ($result && $result->isValid()) {
             $user = $result->getData();
-            
+
             // If redirected from booking, send to appropriate booking page
             if ($this->request->getQuery('redirect') === 'booking') {
                 if ($user->type === 'customer') {
@@ -469,8 +478,10 @@ class AuthController extends AppController
             // Default redirects if not from booking
             if ($user->type === 'admin') {
                 $fallbackLocation = ['controller' => 'Admins', 'action' => 'dashboard'];
-            } else {
+            } elseif ($user->type === 'customer') {
                 $fallbackLocation = ['controller' => 'Customers', 'action' => 'dashboard'];
+            } elseif ($user->type === 'stylist') {
+                $fallbackLocation = ['controller' => 'Stylists', 'action' => 'dashboard'];
             }
 
             return $this->redirect($this->Authentication->getLoginRedirect() ?? $fallbackLocation);

@@ -40,6 +40,10 @@ class CustomersController extends AppController
         $currentAction = $this->request->getParam('action');
 
         $restrictedActions = ['index', 'view'];
+        if ($user && $user->type === 'stylist') {
+
+            return $this->redirect(['controller' => 'Stylists','action' => 'dashboard']);
+        }
 
         if ($user && $user->type === 'customer' && in_array($currentAction, $restrictedActions)) {
             $this->Flash->error('Access denied. You are not authorized to view this page.');
@@ -97,7 +101,7 @@ class CustomersController extends AppController
                     ]
                 ],
             ])
-            ->order(['Bookings.modified' => 'DESC']) 
+            ->order(['Bookings.booking_date' => 'DESC'])
             ->limit(3);
 
         $this->set(compact('customer', 'activeBookings', 'cancelledBookings'));

@@ -96,13 +96,43 @@ class StylistsTable extends Table
             ->email('email')
             ->requirePresence('email', 'create')
             ->notEmptyString('email')
-            ->add('email', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
+            ->add('email', 'unique', [
+                'rule' => 'validateUnique',
+                'provider' => 'table',
+                'message' => 'This email is already in use.',
+            ])
+            ->add('email', 'mxRecord', [
+                'rule' => function ($value, $context) {
+                    if (empty($value) || !is_string($value) || strpos($value, '@') === false) {
+                        return false;
+                    }
+                    $domain = substr(strrchr($value, "@"), 1);
+                    if ($domain === false || empty($domain)) {
+                        return false;
+                    }
+                    return checkdnsrr($domain . '.', 'MX');
+                },
+                'message' => 'The email domain does not appear valid (e.g., must be like @gmail.com or @outlook.com).'
+            ]);
 
         $validator
             ->scalar('password')
             ->maxLength('password', 255)
             ->requirePresence('password', 'create')
-            ->notEmptyString('password');
+            ->notEmptyString('password')
+            ->minLength('password', 8, 'Password must be at least 8 characters long');
+
+        $validator
+            ->scalar('password_confirm')
+            ->maxLength('password_confirm', 255)
+            ->requirePresence('password_confirm', 'create')
+            ->notEmptyString('password_confirm')
+            ->add('password_confirm', 'custom', [
+                'rule' => function($value, $context) {
+                    return isset($context['data']['password']) && $value === $context['data']['password'];
+                },
+                'message' => 'Passwords do not match'
+            ]);
 
         $validator
             ->dateTime('nonce')
@@ -137,5 +167,35 @@ class StylistsTable extends Table
         $rules->add($rules->isUnique(['email']), ['errorField' => 'email']);
 
         return $rules;
+    }
+
+    /**
+     * Reset password validation rules.
+     *
+     * @param \Cake\Validation\Validator $validator Validator instance.
+     * @return \Cake\Validation\Validator
+     */
+    public function validationResetPassword(Validator $validator): Validator
+    {
+        $validator
+            ->scalar('password')
+            ->maxLength('password', 255)
+            ->requirePresence('password', true)
+            ->notEmptyString('password')
+            ->minLength('password', 8, 'Password must be at least 8 characters long');
+
+        $validator
+            ->scalar('confirm_password')
+            ->maxLength('confirm_password', 255)
+            ->requirePresence('confirm_password', true)
+            ->notEmptyString('confirm_password')
+            ->add('confirm_password', 'custom', [
+                'rule' => function($value, $context) {
+                    return isset($context['data']['password']) && $value === $context['data']['password'];
+                },
+                'message' => 'Passwords do not match'
+            ]);
+
+        return $validator;
     }
 }
