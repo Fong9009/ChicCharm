@@ -235,13 +235,40 @@ $titleDescription = 'Landing Page';
                                    'action' => 'dashboard']) ?>">Dashboard
                             </a>
                         </li>
-                    <?php }
-                    // Logout button for both admin and customer ?>
+                    <?php } else {
+                    // Customer Navigation ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= $this->Url->build(['plugin' => false,
-                            'controller' => 'Auth', 'action' => 'logout']) ?>" onclick="return confirmLogout()">Logout
+                        <a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           href="<?= $this->Url->build([
+                               'controller' => 'Bookings',
+                               'action' => 'guestbooking']) ?>">Make a Booking
                         </a>
                     </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= $this->Url->build(['plugin' => false,
+                                'controller' => 'Auth', 'action' => 'logout']) ?>" onclick="return confirmLogout()">Finish as Guest
+                            </a>
+                        </li>
+                    <?php }
+                    // Logout button for both admin and customer ?>
+                    <?php
+                    $identityType = $identity->get('type');
+                    if (isset($identityType) && in_array($identityType, ['admin', 'customer', 'stylist'])): ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= $this->Url->build(['plugin' => false,
+                                'controller' => 'Auth', 'action' => 'logout']) ?>" onclick="return confirmLogout()">Logout
+                            </a>
+                        </li>
+                    <?php endif; ?>
                 <?php } else {
                     // Public Navigation ?>
                     <li class="nav-item">
