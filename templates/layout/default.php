@@ -79,6 +79,11 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Auth', 'action' => 'logout']) ?>" onclick="return confirmLogout()">
                                 <i class="fas fa-sign-out-alt"></i><span>Logout</span></a></li>
+                        <?php elseif ($identity->get('type') === 'stylist') : ?>
+                            <li><a class="dropdown-item" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Stylists', 'action' => 'dashboard']) ?>">
+                                    <i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
+                            <li><a class="dropdown-item" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Auth', 'action' => 'logout']) ?>" onclick="return confirmLogout()">
+                                    <i class="fas fa-sign-out-alt"></i><span>Logout</span></a></li>
                         <?php endif; ?>
                     <?php else : ?>
                         <li><a class="dropdown-item" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Auth', 'action' => 'login']) ?>">
@@ -235,6 +240,24 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
                         <li class="nav-item">
                             <a class="nav-link" href="<?= $this->Url->build(['plugin' => false,
                                 'controller' => 'Customers', 'action' => 'edit', $identity->get('id')]) ?>">My Profile
+                            </a>
+                        </li>
+                    <?php } elseif ($identity->get('type') === 'stylist') {
+                        // Customer Navigation ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               href="<?= $this->Url->build([
+                                   'controller' => 'Stylists',
+                                   'action' => 'dashboard']) ?>">Dashboard
                             </a>
                         </li>
                     <?php }
