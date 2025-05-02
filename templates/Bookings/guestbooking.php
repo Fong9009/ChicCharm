@@ -25,7 +25,15 @@ $this->Html->script('booking', ['block' => 'script']);
             <div class="bookings form content" id="booking-form">
                 <?= $this->Form->create($booking) ?>
                 <fieldset>
-                    <h2 class="text-center"><?= __('Add Booking') ?></h2><br>
+                    <h2 class="text-center"><?= __('Guest Booking') ?></h2><br>
+                    <div class="row">
+                        <div>
+                            <h5>Want to Sign in?</h5>
+                            <p>Join us for installment payment, booking management and much more</p>
+                            <?= $this->Html->link(__('Sign in'), ['controller' => 'Auth', 'action' => 'guesttransfer'], ['class' => 'btn btn-secondary w-25']) ?>
+                        </div>
+                    </div>
+                    <br>
                     <div class="row">
                         <div>
                             <?= $this->Form->control('customer_name', [
