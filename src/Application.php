@@ -128,7 +128,7 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
             AbstractIdentifier::CREDENTIAL_PASSWORD => 'password',
         ];
 
-        $userModel = 'Customers'; 
+        $userModel = 'Customers';
         if ($request->is('post')) {
             $email = $request->getData('email');
             if ($email) {
@@ -136,6 +136,11 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
                 $admin = $adminsTable->find()->where(['email' => $email])->first();
                 if ($admin) {
                     $userModel = 'Admins';
+                }
+                $stylistsTable = \Cake\ORM\TableRegistry::getTableLocator()->get('Stylists');
+                $stylist = $stylistsTable->find()->where(['email' => $email])->first();
+                if ($stylist) {
+                    $userModel = 'Stylists';
                 }
             }
         }
