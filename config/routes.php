@@ -99,7 +99,6 @@ return function (RouteBuilder $routes): void {
          */
 
 
-
         /*
          * Connect catchall routes for all controllers.
          *

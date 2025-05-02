@@ -40,6 +40,8 @@ class BookingsController extends AppController
         // Define customer-specific actions
         $customerActions = ['customerbooking', 'customerindex', 'customerview', 'dashboard'];
 
+        $stylistActions = ['stylistindex', 'stylistview'];
+
         // Define admin-specific actions
         $adminActions = ['adminbooking', 'edit', 'index', 'stylistedit', 'view'];
 
@@ -57,6 +59,15 @@ class BookingsController extends AppController
             // Check if user is logged in and is an admin
             if (!$user || $user->type !== 'admin') {
                 $this->Flash->error('Access denied. This area is for administrators only.');
+                return $this->redirect(['controller' => 'Pages', 'action' => 'display', 'home']);
+            }
+        }
+
+        // If the current action is a customer action
+        if (in_array($this->request->getParam('action'), $stylistActions)) {
+            // Check if user is logged in and is a customer
+            if (!$user || $user->type !== 'stylist') {
+                $this->Flash->error('Access denied. This area is for Stylists only.');
                 return $this->redirect(['controller' => 'Pages', 'action' => 'display', 'home']);
             }
         }
@@ -176,6 +187,35 @@ class BookingsController extends AppController
             ]);
         $bookings = $this->paginate($query);
 
+        $this->set(compact('bookings'));
+    }
+
+    public function stylistindex()
+    {
+        $stylist = $this->Stylists->get($this->Authentication->getIdentity()->id);
+
+        //Bookings that have the selected Stylist
+        $bookingsTable = $this->fetchTable('Bookings');
+        $query = $bookingsTable->find()
+            ->contain([
+                'BookingsStylists',
+                'BookingsServices' => [
+                    'Services',
+                    'Stylists' => [
+                        'fields' => ['id','first_name','last_name'],
+                    ],
+                ],
+            ])
+            ->matching('BookingsStylists', function ($q) use ($stylist) {
+                return $q->where(['BookingsStylists.stylist_id' => $stylist->id]);
+            })
+            ->where(['Bookings.status' => 'active'])
+            ->order([
+                'ABS(DATEDIFF(booking_date, CURDATE()))' => 'ASC',
+                'booking_date' => 'ASC'
+            ]);
+
+        $bookings = $this->paginate($query);
         $this->set(compact('bookings'));
     }
 
@@ -701,7 +741,7 @@ class BookingsController extends AppController
                     $startTimeStr = $serviceData['start_time'];
                     $duration = $servicesDetailsForValidation[$serviceId] ?? 0;
 
-                    if ($duration <= 0) continue; 
+                    if ($duration <= 0) continue;
 
                     try {
                          $startTime = new \DateTime($data['booking_date'] . ' ' . $startTimeStr);
@@ -716,7 +756,7 @@ class BookingsController extends AppController
                                 if ($newSlot['start'] < $existingSlot['end'] && $newSlot['end'] > $existingSlot['start']) {
                                     $hasConflict = true;
                                     $conflictMessage = "Time conflict detected for one of the selected stylists. Please ensure service times do not overlap.";
-                                    break 2; 
+                                    break 2;
                                 }
                             }
                         }
@@ -729,8 +769,8 @@ class BookingsController extends AppController
                          // Reload necessary data for the view and render again
                          $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
                          $services = $this->fetchTable('Services')->find('all')->all();
-                         $this->set(compact('booking', 'stylists', 'services')); 
-                         return $this->render('customerbooking'); 
+                         $this->set(compact('booking', 'stylists', 'services'));
+                         return $this->render('customerbooking');
                     }
                 }
             }
@@ -849,14 +889,14 @@ class BookingsController extends AppController
                       \Cake\Log\Log::debug('[CustomerBooking] No bookings_services data found for saving BookingsStylists.');
                  }
 
-                // --- Calculate and Update Overall Booking Times --- 
+                // --- Calculate and Update Overall Booking Times ---
                  \Cake\Log\Log::debug('[CustomerBooking] Calculating overall times...');
                 $overallStartTime = null;
                 $overallEndTime = null;
                 if (!empty($allServicesTimes)) {
                     $startTimestamps = array_map(function($t) { return $t['start']->getTimestamp(); }, $allServicesTimes);
                     $endTimestamps = array_map(function($t) { return $t['end']->getTimestamp(); }, $allServicesTimes);
-                    
+
                     if (!empty($startTimestamps)) {
                         $minStartTs = min($startTimestamps);
                         $overallStartTime = (new \DateTime())->setTimestamp($minStartTs);
@@ -866,7 +906,7 @@ class BookingsController extends AppController
                         $overallEndTime = (new \DateTime())->setTimestamp($maxEndTs);
                     }
                 }
-                
+
                 // Patch and save the overall times to the main booking record
                  \Cake\Log\Log::debug('[CustomerBooking] Patching overall times: Start=' . ($overallStartTime ? $overallStartTime->format('H:i:s') : 'NULL') . ', End=' . ($overallEndTime ? $overallEndTime->format('H:i:s') : 'NULL'));
                 $booking = $this->Bookings->patchEntity($booking, [
@@ -874,9 +914,9 @@ class BookingsController extends AppController
                     'end_time' => $overallEndTime ? $overallEndTime->format('H:i:s') : null
                 ]);
                  \Cake\Log\Log::debug('[CustomerBooking] Attempting to save overall times...');
-                if (!$this->Bookings->save($booking, ['checkRules' => false])) { 
+                if (!$this->Bookings->save($booking, ['checkRules' => false])) {
                     \Cake\Log\Log::error('Failed to save overall times to booking ID: ' . $bookingId);
-                     $this->Flash->warning('Booking saved, but failed to update overall times.'); 
+                     $this->Flash->warning('Booking saved, but failed to update overall times.');
                 } else {
                      \Cake\Log\Log::debug('[CustomerBooking] Successfully saved overall times.');
                 }
@@ -1134,22 +1174,81 @@ class BookingsController extends AppController
                 'Customers',
                 'BookingsStylists' => [
                     'Stylists' => [
-                        'fields' => ['id', 'first_name', 'last_name']
-                    ]
+                        'fields' => ['id', 'first_name', 'last_name'],
+                    ],
                 ],
                 'BookingsServices' => [
                     'Services' => [
-                        'fields' => ['id', 'service_name', 'service_cost']
+                        'fields' => ['id', 'service_name', 'service_cost'],
                     ],
                     'Stylists' => [
-                        'fields' => ['id', 'first_name', 'last_name']
-                    ]
-                ]
-            ]
+                        'fields' => ['id', 'first_name', 'last_name'],
+                    ],
+                ],
+            ],
         );
 
         $this->set(compact('booking'));
     }
+
+    /**
+     * Stylist View Method
+     *
+     * @param string|null $id Booking id
+     * @return void
+     */
+    public function stylistview($id = null)
+    {
+        $booking = $this->Bookings->get(
+            $id,
+            contain: [
+                'Customers',
+                'BookingsStylists' => [
+                    'Stylists' => [
+                        'fields' => ['id', 'first_name', 'last_name'],
+                    ],
+                ],
+                'BookingsServices' => [
+                    'Services' => [
+                        'fields' => ['id', 'service_name', 'service_cost'],
+                    ],
+                    'Stylists' => [
+                        'fields' => ['id', 'first_name', 'last_name'],
+                    ],
+                ],
+            ],
+        );
+
+        $this->set(compact('booking'));
+    }
+
+    public function stylistPastBookings () {
+        $stylist = $this->Stylists->get($this->Authentication->getIdentity()->id);
+
+        //Bookings that have the selected Stylist
+        $bookingsTable = $this->fetchTable('Bookings');
+        $query = $bookingsTable->find()
+            ->contain([
+                'BookingsStylists',
+                'BookingsServices' => [
+                    'Services',
+                    'Stylists' => [
+                        'fields' => ['id','first_name','last_name'],
+                    ],
+                ],
+            ])
+            ->matching('BookingsServices', function ($q) use ($stylist) {
+                return $q->where(['BookingsServices.stylist_id' => $stylist->id]);
+            })
+            ->where(['Bookings.status IN' => ['finished', 'cancelled']])
+            ->order(['Bookings.booking_date' => 'DESC']);
+        $bookings = $this->paginate($query);
+
+        $this->set(compact('bookings'));
+    }
+
+
+
 
     /**
      * Select Service method
