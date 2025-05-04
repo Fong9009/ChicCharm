@@ -48,7 +48,6 @@ class ContentBlocksController extends AppController {
      * @return \Cake\Http\Response|null|void Renders view
      */
     public function index() {
-        debug("This is a test");
         $allBlocks = $this->ContentBlocks->find()->toArray();
 
         // To make it easier to loop over each group of content blocks in the view,
