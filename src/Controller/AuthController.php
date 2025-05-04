@@ -511,12 +511,22 @@ class AuthController extends AppController
         return $this->redirect(['controller' => 'Auth', 'action' => 'login']);
     }
 
-    public function guesttransfer() {
+    public function guesttransfer()
+    {
         $request = $this->getRequest();
         $response = $this->getResponse();
         $this->Authentication->getAuthenticationService()->clearIdentity($request, $response);
 
         return $this->redirect(['controller' => 'Auth', 'action' => 'login']);
+    }
+
+    public function guestcancel()
+    {
+        $request = $this->getRequest();
+        $response = $this->getResponse();
+        $this->Authentication->getAuthenticationService()->clearIdentity($request, $response);
+
+        return $this->redirect(['controller' => 'Pages', 'action' => 'display']);
     }
 
 }
