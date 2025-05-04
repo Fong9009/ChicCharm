@@ -1534,7 +1534,8 @@ class BookingsController extends AppController
                         }
                         // --- End Overall Time Calculation ---
 
-                        $this->Flash->success(__('Your booking has been saved successfully.'));
+                        $this->Flash->success(__('Your booking has been saved successfully,
+                         we will contact you when your booking to confirm.'));
                         Log::debug('[CustomerBooking] Redirecting to dashboard...');
 
                         $request = $this->getRequest();
