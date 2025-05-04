@@ -45,6 +45,11 @@ class CustomersController extends AppController
             return $this->redirect(['controller' => 'Stylists','action' => 'dashboard']);
         }
 
+        if ($user && $user->type === 'guest') {
+
+            return $this->redirect(['controller' => 'Pages','action' => 'display']);
+        }
+
         if ($user && $user->type === 'customer' && in_array($currentAction, $restrictedActions)) {
             $this->Flash->error('Access denied. You are not authorized to view this page.');
 

@@ -280,7 +280,7 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="<?= $this->Url->build(['plugin' => false,
-                                'controller' => 'Auth', 'action' => 'logout']) ?>" onclick="return confirmLogout()">Finish as Guest
+                                'controller' => 'Auth', 'action' => 'guesttransfer']) ?>">Finish as Guest
                             </a>
                         </li>
                     <?php }
