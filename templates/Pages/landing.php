@@ -159,7 +159,7 @@ $imgPort3 = extractImageSrc($this->ContentBlock, 'portfolio-3');
                                                 <?= $this->ContentBlock->text('service-one-title'); ?>
                                             </h1>
                                             <hr class="w-100 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
-                                            <h1 class="text-white fade-in-title">The Finest of Wig Stylists</h1>
+                                            <h1 class="text-white fade-in-title"><?= $this->ContentBlock->text('services-motto-1'); ?></h1>
                                             <p class="lead opacity-8 fade-in-title"><?= $this->ContentBlock->text('service-one-desc'); ?></p>
                                         </div>
                                     </div>
@@ -188,7 +188,7 @@ $imgPort3 = extractImageSrc($this->ContentBlock, 'portfolio-3');
                                                 <?= $this->ContentBlock->text('service-two-title'); ?>
                                             </h1>
                                             <hr class="w-100 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
-                                            <h1 class="text-white fade-in-title">The Finest of Wig Stylists</h1>
+                                            <h1 class="text-white fade-in-title"><?= $this->ContentBlock->text('services-motto-2'); ?></h1>
                                             <p class="lead opacity-8 fade-in-title"><?= $this->ContentBlock->text('service-two-desc'); ?></p>
                                         </div>
                                     </div>
@@ -217,7 +217,7 @@ $imgPort3 = extractImageSrc($this->ContentBlock, 'portfolio-3');
                                                 <?= $this->ContentBlock->text('service-three-title'); ?>
                                             </h1>
                                             <hr class="w-100 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
-                                            <h1 class="text-white fade-in-title">The Finest of dressmakers</h1>
+                                            <h1 class="text-white fade-in-title"><?= $this->ContentBlock->text('services-motto-3'); ?></h1>
                                             <p class="lead opacity-8 fade-in-title"><?= $this->ContentBlock->text('service-three-desc'); ?></p>
                                         </div>
                                     </div>
@@ -246,7 +246,7 @@ $imgPort3 = extractImageSrc($this->ContentBlock, 'portfolio-3');
                                                 <?= $this->ContentBlock->text('service-four-title'); ?>
                                             </h1>
                                             <hr class="w-100 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
-                                            <h1 class="text-white fade-in-title">The Finest of Wig Stylists</h1>
+                                            <h1 class="text-white fade-in-title"><?= $this->ContentBlock->text('services-motto-4'); ?></h1>
                                             <p class="lead opacity-8 fade-in-title"><?= $this->ContentBlock->text('service-four-desc'); ?></p>
                                         </div>
                                     </div>

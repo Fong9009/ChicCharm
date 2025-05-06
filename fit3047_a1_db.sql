@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 06, 2025 at 10:20 AM
+-- Generation Time: May 06, 2025 at 10:31 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -255,7 +255,11 @@ INSERT INTO `content_blocks` (`id`, `parent`, `slug`, `label`, `description`, `t
 (33, 'Portfolio Images', 'portfolio-1', 'Portfolio Image 1', 'Portfolio Image 1', 'image', '/content-blocks/uploads/portfolio-1.7114e8566fd96e6babbe1d4ea6f39cb6.jpg', NULL, '2025-05-06 18:10:03'),
 (34, 'Portfolio Images', 'portfolio-2', 'Portfolio Image 2', 'Portfolio Image 2', 'image', '/content-blocks/uploads/portfolio-2.390ab119c46bf74ca6ea7a1ac2c0bdf4.jpg', NULL, '2025-05-06 18:10:14'),
 (35, 'Portfolio Images', 'portfolio-3', 'Portfolio Image 3', 'Portfolio Image 3', 'image', '/content-blocks/uploads/portfolio-3.723ce5fabd08d9165e8c3981ba077736.jpg', NULL, '2025-05-06 18:13:36'),
-(36, 'Photos', 'photo-meet', 'Meet Photo', 'Meet photo for Michonne', 'image', '/content-blocks/uploads/photo-meet.9218833aca3b2d5fd7b7d5ff1c1396ba.jpg', NULL, '2025-05-06 18:17:17');
+(36, 'Photos', 'photo-meet', 'Meet Photo', 'Meet photo for Michonne', 'image', '/content-blocks/uploads/photo-meet.9218833aca3b2d5fd7b7d5ff1c1396ba.jpg', NULL, '2025-05-06 18:17:17'),
+(37, 'Services MotTo', 'services-motto-1', 'Services Motto 1', 'Services Motto 1', 'text', 'The Finest of Makeup Stylists', NULL, '2025-05-06 08:28:46'),
+(38, 'Services Motto', 'services-motto-2', 'Services Motto 2', 'Services Motto 2', 'text', 'The Finest of Wig Stylists', NULL, '2025-05-06 08:28:02'),
+(39, 'Services Motto', 'services-motto-3', 'Services Motto 3', 'Services Motto 3', 'text', 'The Finest of Dress Makers', NULL, '2025-05-06 08:31:33'),
+(40, 'Services Motto', 'services-motto-4', 'Services Motto 4', 'Services Motto 4', 'text', 'The Finest of Hair Stylists', NULL, '2025-05-06 08:29:50');
 
 -- --------------------------------------------------------
 
@@ -557,7 +561,7 @@ ALTER TABLE `contacts`
 -- AUTO_INCREMENT for table `content_blocks`
 --
 ALTER TABLE `content_blocks`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `customers`
