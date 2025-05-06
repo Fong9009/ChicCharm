@@ -16,15 +16,13 @@
                     <div class="col-lg-3 mb-4 side-nav-item">
                         <?= $this->Html->link(
                             '<div class="card h-100">
-                            <div class="card-header view-card-header d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h4 class="view-card-h4 view-card-h4 mb-0 flex-grow-1 text-truncate">Edit Customer</h4>
-                                </div>
-                                <i class="material-icons view-icon">edit</i>
+                            <div class="card-header view-card-header d-flex justify-content-between align-items-center flex-wrap">
+                                <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">Edit Customer</h4>
+                                <i class="material-icons view-icon ms-2">edit</i>
                             </div>
                             <div class="card-body view-card-body"></div>
                             <div class="card-footer view-card-footer">
-                                <span>Edit Customers</span>
+                                <span class="mb-0 text-truncate">Edit Customers</span>
                             </div>
                         </div>',
                             ['controller' => 'Customers', 'action' => 'edit', $customer->id],
@@ -35,15 +33,13 @@
                     <div class="col-lg-3 mb-4 side-nav-item">
                         <?= $this->Form->postLink(
                             '<div class="card h-100">
-                            <div class="card-header delete-card-header d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h4 class="view-card-h4 view-card-h4 mb-0 flex-grow-1 text-truncate">Delete Customer</h4>
-                                </div>
-                                <i class="material-icons view-icon">delete</i>
+                            <div class="card-header delete-card-header d-flex justify-content-between align-items-center flex-wrap">
+                                <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">Delete Customer</h4>
+                                <i class="material-icons view-icon ms-2">delete</i>
                             </div>
                             <div class="card-body delete-card-body"></div>
                             <div class="card-footer delete-card-footer">
-                                <span>Delete Customer</span>
+                                <span class="mb-0 text-truncate">Delete Customer</span>
                             </div>
                         </div>',
                             ['controller' => 'Customers', 'action' => 'delete', $customer->id],
@@ -56,15 +52,13 @@
                     <div class="col-lg-3 mb-4 side-nav-item">
                         <?= $this->Html->link(
                             '<div class="card h-100">
-                            <div class="card-header list-card-header d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h4 class="view-card-h4 view-card-h4 mb-0 flex-grow-1 text-truncate">List Customers</h4>
-                                </div>
-                                <i class="material-icons view-icon">menu</i>
+                            <div class="card-header list-card-header d-flex justify-content-between align-items-center flex-wrap">
+                                <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">List Customers</h4>
+                                <i class="material-icons view-icon ms-2">menu</i>
                             </div>
                             <div class="card-body list-card-body"></div>
                             <div class="card-footer list-card-footer">
-                                <span>List Customers</span>
+                                <span class="mb-0 text-truncate">List Customers</span>
                             </div>
                         </div>',
                             ['controller' => 'Customers', 'action' => 'index'],
@@ -76,15 +70,13 @@
                     <div class="col-lg-3 mb-4 side-nav-item">
                         <?= $this->Html->link(
                             '<div class="card h-100">
-                            <div class="card-header new-card-header d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h4 class="view-card-h4 view-card-h4 mb-0 flex-grow-1 text-truncate">Create New Customer</h4>
-                                </div>
-                                <i class="material-icons view-icon">add</i>
+                            <div class="card-header new-card-header d-flex justify-content-between align-items-center flex-wrap">
+                                <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">New Customer</h4>
+                                <i class="material-icons view-icon ms-2">add</i>
                             </div>
                             <div class="card-body new-card-body"></div>
                             <div class="card-footer new-card-footer">
-                                <span>Add Customer</span>
+                                <span class="mb-0 text-truncate">Add Customer</span>
                             </div>
                         </div>',
                             ['controller' => 'Customers', 'action' => 'registration'],
