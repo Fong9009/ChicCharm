@@ -29,7 +29,7 @@ $this->assign('title', 'Login');
                     <?= $this->Flash->render() ?>
                     <div class="input">
                         <?= $this->Form->control('email', [
-                            'label' => 'Email',
+                            'label' => ['text' => 'Email', 'class' => 'text-left-align'],
                             'type' => 'email',
                             'class' => 'form-control' . ($this->Form->isFieldError('email') ? ' is-invalid' : ''),
                             'required' => true,
@@ -40,7 +40,7 @@ $this->assign('title', 'Login');
                     </div>
                     <div class="input">
                         <?= $this->Form->control('password', [
-                            'label' => 'Password',
+                            'label' => ['text' => 'Password', 'class' => 'text-left-align'],
                             'type' => 'password',
                             'class' => 'form-control' . ($this->Form->isFieldError('password') ? ' is-invalid' : ''),
                             'required' => true,

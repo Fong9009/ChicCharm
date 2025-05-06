@@ -24,6 +24,11 @@
     height: 100%;
 }
 
+.text-left-align {
+    text-align: left;
+    display: block;
+}
+
 .login-image {
     width: 100%;
     height: 100%;
