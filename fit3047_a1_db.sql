@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 02, 2025 at 11:01 AM
+-- Generation Time: May 06, 2025 at 10:20 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -71,8 +71,9 @@ CREATE TABLE `bookings` (
 --
 
 INSERT INTO `bookings` (`id`, `booking_name`, `booking_date`, `total_cost`, `remaining_cost`, `customer_id`, `status`, `notes`) VALUES
-(168, 'Booking for Christian Cochrane', '2025-05-03', 370.00, 370.00, 2, 'active', ''),
-(169, 'Booking for Chay Fong Hong', '2025-05-03', 150.00, 150.00, 1, 'active', 'Makeup For a Friend');
+(168, 'Booking for Christian Cochrane', '2025-05-03', 370.00, 370.00, 2, 'finished', ''),
+(169, 'Booking for Chay Fong Hong', '2025-05-03', 150.00, 150.00, 1, 'finished', 'Makeup For a Friend'),
+(170, 'Booking for Christian Cochrane', '2025-05-07', 150.00, 150.00, 2, 'active', '');
 
 -- --------------------------------------------------------
 
@@ -99,7 +100,8 @@ CREATE TABLE `bookings_services` (
 INSERT INTO `bookings_services` (`id`, `booking_id`, `service_id`, `service_cost`, `created`, `modified`, `stylist_id`, `start_time`, `end_time`) VALUES
 (325, 168, 1, 150.00, '2025-05-02 08:56:02', '2025-05-02 08:56:02', 2, '10:00:00', '11:00:00'),
 (326, 168, 2, 220.00, '2025-05-02 08:56:02', '2025-05-02 08:56:02', 2, '11:00:00', '12:30:00'),
-(327, 169, 1, 150.00, '2025-05-02 08:56:28', '2025-05-02 08:56:28', 2, '12:30:00', '13:30:00');
+(327, 169, 1, 150.00, '2025-05-02 08:56:28', '2025-05-02 08:56:28', 2, '12:30:00', '13:30:00'),
+(328, 170, 1, 150.00, '2025-05-06 05:03:55', '2025-05-06 05:03:55', 2, '10:30:00', '11:30:00');
 
 -- --------------------------------------------------------
 
@@ -121,7 +123,8 @@ CREATE TABLE `bookings_stylists` (
 
 INSERT INTO `bookings_stylists` (`id`, `stylist_date`, `selected_cost`, `booking_id`, `stylist_id`) VALUES
 (291, '2025-05-03', 370.00, 168, 2),
-(292, '2025-05-03', 150.00, 169, 2);
+(292, '2025-05-03', 150.00, 169, 2),
+(293, '2025-05-07', 150.00, 170, 2);
 
 -- --------------------------------------------------------
 
@@ -231,9 +234,9 @@ INSERT INTO `content_blocks` (`id`, `parent`, `slug`, `label`, `description`, `t
 (11, 'Landing', 'owner-quote', 'Quote from Owner', 'Quote from Owner', 'text', '\"Creativity is what drives ChicCharm and that is what I am about\"', NULL, '2025-04-11 00:52:41'),
 (12, 'Landing', 'vision-statement', 'Vision Statement', 'Statement of ChicCharms Vision', 'text', 'Michonne had envisioned a future business that would take the fashion and entertainment industry by storm. <br />Seeing that the fashion and entertainment industry had yet to take its shape in Australia, Michonne had saw an opportunity. <br />An opportunity to provide fashion and makeup services to cater for modelling and the entertainment industry <br />Michonne believes that with enough dedication and a new makeover of ChicCharm she can bring it onto the not just the local stage<br />But the whole of Australia.', NULL, '2025-04-11 00:52:20'),
 (13, 'Landing', 'service-title', 'Service Title', 'The Title for landing page service', 'text', 'ChicCharm At Your Service', NULL, '2025-04-11 00:55:39'),
-(14, 'Landing', 'service-desc', 'Service Description', 'Description of services provided at ChicCharm', 'text', 'ChicCharm is dedicated to provide your show with the finest of artisens who are masters of their craft.\r\n                        They will make sure that your models or stars of the show will shine brighter than ever.', NULL, '2025-04-11 00:56:39'),
+(14, 'Landing', 'service-desc', 'Service Description', 'Description of services provided at ChicCharm', 'text', 'Here at ChicCharm we have many services that will suit your needs.', NULL, '2025-05-06 07:48:08'),
 (15, 'Landing', 'service-one-title', 'Service one title', 'First service title', 'text', 'Makeup Artistry', NULL, '2025-04-11 01:06:58'),
-(16, 'Landing', 'service-one-desc', 'Service one description', 'Description Text', 'text', 'ChicCharm can make sure your stars of the show shine.', NULL, '2025-04-11 01:07:15'),
+(16, 'Landing', 'service-one-desc', 'Service one description', 'Description Text', 'text', 'ChicCharm can make sure your stars of the show shine as bright as they should be. Our experienced Makeup artists are sure to bring the life to your show. ', 'ChicCharm can make sure your stars of the show shine.', '2025-05-06 17:28:30'),
 (17, 'Landing', 'service-two-title', 'Service two title', 'Service Title', 'text', 'Wig Styling', NULL, '2025-04-11 01:02:10'),
 (18, 'Landing', 'service-two-desc', 'Service two description', 'Description Text', 'text', 'ChicCharm can design custom wigs for all your needs.', NULL, '2025-04-11 01:03:07'),
 (19, 'Landing', 'service-three-title', 'Service three title', 'Service title', 'text', 'Fashion Design', NULL, '2025-04-11 01:03:49'),
@@ -243,7 +246,16 @@ INSERT INTO `content_blocks` (`id`, `parent`, `slug`, `label`, `description`, `t
 (23, 'Landing', 'booking-button', 'Booking Button', 'Button for booking', 'text', 'Make a Booking with ChicCharm', NULL, '2025-04-11 01:09:07'),
 (24, 'Landing', 'past-work-title', 'Past work title', 'Title', 'text', 'Some of ChicCharms latest works', NULL, '2025-04-11 01:10:08'),
 (25, 'Landing', 'past-text', 'Past text', 'Text description', 'text', 'ChicCharm is dedicated to helping make sure that your show is ready on the stage or a model show,\r\n                    Our Business is nothing without our fabulous customers who continue to work with us', NULL, '2025-04-11 01:10:49'),
-(26, 'Photos', 'photo-about', 'Photo about', 'Photo about', 'image', '/content-blocks/uploads/photo-test.0c5a460258f8dd77008ecac8d5de80eb.jpg', NULL, '2025-04-11 01:51:56');
+(26, 'Photos', 'photo-about', 'Photo about', 'Photo about', 'image', '/content-blocks/uploads/photo-test.0c5a460258f8dd77008ecac8d5de80eb.jpg', NULL, '2025-05-06 14:52:01'),
+(28, 'Photos', 'photo-carousel-1', 'Carousel Photo 1', 'This is for Carousel Photo 1', 'image', '/content-blocks/uploads/photo-carousel-1.2114f8243a35576002022f9220065902.jpg', '/content-blocks/uploads/photo-carousel-1.f6e0bf8fceba4b989d1cc9db68312cf8.jpg', '2025-05-06 17:27:33'),
+(29, 'Photos', 'photo-carousel-2', 'Carousel photo 2', 'This is for Carousel Photo 2', 'image', '/content-blocks/uploads/photo-carousel-2.c0df9c4cbd9a2bfbaae2d61b36e49b4b.jpg', NULL, '2025-05-06 17:33:25'),
+(30, 'Photos', 'photo-carousel-3', 'Carousel Photo 3', 'This is for Carousel Photo 3', 'image', '/content-blocks/uploads/photo-carousel-3.d2c03447d8f885a788dd71a11d6ff5bf.jpg', NULL, '2025-05-06 17:35:11'),
+(31, 'Photos', 'photo-carousel-4', 'Carousel Photo 4', 'This is for Carousel Photo 4', 'image', '/content-blocks/uploads/photo-carousel-4.044531ea1224ce7c9f8b8fb0d64c6c66.jpg', NULL, '2025-05-06 17:42:30'),
+(32, 'Photos', 'photo-masthead', 'Mast Photo', 'The front page photo', 'image', '/content-blocks/uploads/photo-masthead.5df4a72c41c007d45e39de70d5396d4d.jpg', NULL, '2025-05-06 18:03:34'),
+(33, 'Portfolio Images', 'portfolio-1', 'Portfolio Image 1', 'Portfolio Image 1', 'image', '/content-blocks/uploads/portfolio-1.7114e8566fd96e6babbe1d4ea6f39cb6.jpg', NULL, '2025-05-06 18:10:03'),
+(34, 'Portfolio Images', 'portfolio-2', 'Portfolio Image 2', 'Portfolio Image 2', 'image', '/content-blocks/uploads/portfolio-2.390ab119c46bf74ca6ea7a1ac2c0bdf4.jpg', NULL, '2025-05-06 18:10:14'),
+(35, 'Portfolio Images', 'portfolio-3', 'Portfolio Image 3', 'Portfolio Image 3', 'image', '/content-blocks/uploads/portfolio-3.723ce5fabd08d9165e8c3981ba077736.jpg', NULL, '2025-05-06 18:13:36'),
+(36, 'Photos', 'photo-meet', 'Meet Photo', 'Meet photo for Michonne', 'image', '/content-blocks/uploads/photo-meet.9218833aca3b2d5fd7b7d5ff1c1396ba.jpg', NULL, '2025-05-06 18:17:17');
 
 -- --------------------------------------------------------
 
@@ -521,19 +533,19 @@ ALTER TABLE `admins`
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=170;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=171;
 
 --
 -- AUTO_INCREMENT for table `bookings_services`
 --
 ALTER TABLE `bookings_services`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=328;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=329;
 
 --
 -- AUTO_INCREMENT for table `bookings_stylists`
 --
 ALTER TABLE `bookings_stylists`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=293;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=294;
 
 --
 -- AUTO_INCREMENT for table `contacts`
@@ -545,7 +557,7 @@ ALTER TABLE `contacts`
 -- AUTO_INCREMENT for table `content_blocks`
 --
 ALTER TABLE `content_blocks`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `customers`
