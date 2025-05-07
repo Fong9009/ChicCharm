@@ -7,6 +7,7 @@
 <?= $this->Html->css('/utility/indexes/indexes.css') ?>
 <?= $this->Html->css('/dashboard/profiledash.css') ?>
 <?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
+<?= $this->Html->css('booking-cards.css') ?>
 <div class="customer-index-dashboard" style="background-image: url(<?= $this->Url->image('customerbackground.jpg')?>);">
     <div class="container" style="margin-top: -5px">
         <div class="card" style=" border-radius: 1rem;">
@@ -181,9 +182,15 @@
                                                         'onmouseout' => 'this.style.backgroundColor="#59B3B3"; this.style.borderColor="#59B3B3"'
                                                         ]
                                                     ) ?>
+                                                    <?= $this->Html->link(__('Edit'), ['action' => 'customeredit', $booking->id], [
+                                                        'class' => 'button',
+                                                        'style' => 'background-color: #007bff; border-color: #007bff; color: white; transition: background-color 0.2s, border-color 0.2s;',
+                                                        'onmouseover' => 'this.style.backgroundColor="#0056b3"; this.style.borderColor="#0056b3"',
+                                                        'onmouseout' => 'this.style.backgroundColor="#007bff"; this.style.borderColor="#007bff"'
+                                                    ]) ?>
                                                     <?php if ($booking->status === 'active'): ?>
                                                         <?= $this->Form->postLink(
-                                                            __('Cancel Booking'),
+                                                            __('Cancel'),
                                                             ['action' => 'customerdelete', $booking->id],
                                                             [
                                                                 'method' => 'delete',

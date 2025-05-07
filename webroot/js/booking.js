@@ -1,13 +1,13 @@
-/* Customer Booking Functionality */
+/* Booking Functionality */
 document.addEventListener('DOMContentLoaded', function() {
 
-    // --- Configuration ---
+    // Configuration 
     const GET_STYLISTS_URL_BASE = apiUrl;
     const GET_TIMESLOTS_URL = apiUrl2;
     const GET_AVAILABILITY_URL = apiUrl3;
     const CSRF_TOKEN = document.querySelector('input[name="_csrfToken"]')?.value; 
 
-    // --- DOM Elements ---
+    // DOM Elements 
     const serviceCheckboxes = document.querySelectorAll('.service-checkbox');
     const totalCostInput = document.getElementById('total-cost'); 
     const bookingDateInput = document.getElementById('booking-date');
@@ -18,10 +18,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const bookingForm = document.getElementById('booking-form');
     const closingTimeWarningContainer = document.getElementById('closing-time-warning-container');
 
-    // --- State ---
+    // State 
     let serviceSelections = []; 
 
-    // --- Initialization ---
+    // Initialization 
 
     // Helper to parse H:i string to minutes since midnight
     const timeToMinutes = (timeStr) => {
@@ -44,20 +44,23 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeBookingState();
     configureDateInput();
 
-    // --- Functions ---
+    // Functions
 
     function getCsrfToken() {
         return CSRF_TOKEN || document.querySelector('input[name="_csrfToken"]')?.value;
     }
 
-    // Set min/max dates
+    // Set min/max dates and default for new bookings
     function configureDateInput() {
         const today = new Date();
         const todayStr = today.toISOString().split('T')[0];
-        bookingDateInput.min = todayStr;
-        bookingDateInput.max = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate()).toISOString().split('T')[0];
-        if (!bookingDateInput.value && !bookingDateInput.disabled) {
-             bookingDateInput.value = todayStr;
+        if (bookingDateInput) { 
+            bookingDateInput.min = todayStr;
+            bookingDateInput.max = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate()).toISOString().split('T')[0];
+            // If it's a new booking (input is empty and not disabled), set to today
+            if (!bookingDateInput.value && !bookingDateInput.disabled) {
+                bookingDateInput.value = todayStr;
+            }
         }
     }
 
@@ -115,24 +118,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Update enable/disable state of inputs
     function updateInputStates() {
-        // CHANGE: Enable date picker if AT LEAST ONE service is selected
-        const anyServiceSelected = serviceSelections.length > 0;
+        const anyServiceCheckboxSelected = serviceSelections.length > 0;
+        const isEditModeWithDate = bookingDateInput && bookingDateInput.value !== ''; // Check if date is pre-filled
 
         // --- Date Input State ---
-        if (anyServiceSelected) {
-            bookingDateInput.disabled = false;
-        } else {
-            bookingDateInput.disabled = true;
-            bookingDateInput.value = ''; 
-            // Also clear stylist dropdowns and time slots if no services are selected
-            serviceStylistSelectionsContainer.innerHTML = '';
-        }
-
-        // If no services are selected at all, reset date input
-        if (serviceSelections.length === 0) {
-            bookingDateInput.disabled = true;
-            bookingDateInput.value = '';
-            clearClosingTimeWarning();
+        // Enable date input if in edit mode with a date OR if a service checkbox is selected
+        if (bookingDateInput) { // Ensure bookingDateInput exists
+            if (isEditModeWithDate || anyServiceCheckboxSelected) {
+                bookingDateInput.disabled = false;
+            } else {
+                bookingDateInput.disabled = true;
+                // bookingDateInput.value = ''; // Don't clear if just no checkbox selected yet but could be edit mode without active services
+                // Clear stylist and time selections only if truly no services are selected AND not in edit mode with a date
+                if (!anyServiceCheckboxSelected && !isEditModeWithDate && serviceStylistSelectionsContainer) {
+                    serviceStylistSelectionsContainer.innerHTML = '';
+                }
+            }
+    
+            // If no services are *checked* AND no initial date was set (i.e., not edit mode or edit mode with no date), then clear date & warning
+            if (!anyServiceCheckboxSelected && !isEditModeWithDate) {
+                bookingDateInput.value = ''; // Safe to clear now
+                clearClosingTimeWarning();
+            }
         }
     }
 
@@ -163,9 +170,14 @@ document.addEventListener('DOMContentLoaded', function() {
             selectedServicesListDisplay.appendChild(listItem);
         });
 
-        totalCostInput.value = totalCost.toFixed(2); 
-        serviceCountDisplay.textContent = serviceSelections.length;
-        serviceTotalDisplay.textContent = totalCost.toFixed(2);
+        // Debugging logs
+        console.log(`[calculateAndUpdateSummary] Count: ${serviceSelections.length}, Total Cost: ${totalCost.toFixed(2)}`);
+        console.log("[calculateAndUpdateSummary] Elements:", serviceCountDisplay, serviceTotalDisplay, totalCostInput);
+
+        // Update DOM elements
+        if (totalCostInput) totalCostInput.value = totalCost.toFixed(2); 
+        if (serviceCountDisplay) serviceCountDisplay.textContent = serviceSelections.length;
+        if (serviceTotalDisplay) serviceTotalDisplay.textContent = totalCost.toFixed(2);
     }
 
      function displayClosingTimeWarning(message) {
@@ -248,7 +260,7 @@ document.addEventListener('DOMContentLoaded', function() {
         container.appendChild(select);
         select.addEventListener('change', handleStylistSelectionChange);
 
-        // --- Time Selection ---
+        // Time Selection
         const timeLabel = document.createElement('label');
         timeLabel.textContent = 'Time';
         timeLabel.htmlFor = `time-select-${selection.serviceId}`;
@@ -260,7 +272,7 @@ document.addEventListener('DOMContentLoaded', function() {
         timeSelect.className = 'form-control time-select mt-1';
         timeSelect.name = `bookings_services[${selection.serviceId}][start_time]`;
         timeSelect.required = true;
-        timeSelect.disabled = true; // Initially disabled
+        timeSelect.disabled = true; 
         timeSelect.dataset.serviceId = selection.serviceId;
         timeSelect.innerHTML = '<option value="">Select Stylist & Date...</option>';
         timeSelect.setAttribute('oninvalid', "this.setCustomValidity('Please Select a Time Slot')");
@@ -268,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function() {
         timeSelect.addEventListener('change', handleTimeSelectionChange);
         container.appendChild(timeSelect);
 
-        // --- Availability Info ---
+        // Availability Info 
         const availabilityInfo = document.createElement('div');
         availabilityInfo.className = 'availability-info mt-2 small text-muted';
         availabilityInfo.id = `availability-info-${selection.serviceId}`;
@@ -288,9 +300,8 @@ document.addEventListener('DOMContentLoaded', function() {
         container.appendChild(serviceInput);
         container.appendChild(costInput);
 
-        return container; // Return the fully constructed row element
+        return container; 
     }
-    // --- END NEW HELPER --- 
 
     // Fetch available time slots based on current selections
     async function updateAvailableTimeSlots() {
@@ -341,7 +352,7 @@ document.addEventListener('DOMContentLoaded', function() {
                       startTimeInput.innerHTML = `<option value="">Error: ${errorData.error}</option>`;
                  } else if (response.status === 500 && errorData.error){
                       startTimeInput.innerHTML = '<option value="">Server error loading slots</option>';
-                      // Maybe display a generic error message to the user
+                      // display a generic error message to the user
                  } else {
                       startTimeInput.innerHTML = '<option value="">Error loading time slots</option>';
                  }
@@ -835,6 +846,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
          timeSelectElement.innerHTML = ''; 
 
+         console.log(`[populateTimeSlotDropdown for ${timeSelectElement.id}] Final slots to add:`, JSON.stringify(slots));
         if (!slots || slots.length === 0) {
             timeSelectElement.innerHTML = '<option value="">No Available Slots</option>';
             timeSelectElement.disabled = true;
