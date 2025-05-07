@@ -20,6 +20,18 @@ class ContactsController extends AppController
         $this->Authentication->allowUnauthenticated(['enquiry']);
    }
 
+   public function beforeFilter(EventInterface $event)
+   {
+       parent::beforeFilter($event);
+       $user = $this->Authentication->getIdentity();
+       $action = $this->getRequest()->getParam('action');
+       $adminActions = ['index', 'view', 'edit', 'archiveIndex', 'reply'];
+       if (in_array($action, $adminActions, true) && (!$user || $user->type !== 'admin')) {
+           $this->Flash->error(__('Access denied. Admin only area.'));
+           return $this->redirect(['controller' => 'Pages','action' => 'display']);
+       }
+   }
+
     /**
      * Index method
      *

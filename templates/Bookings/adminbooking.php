@@ -107,10 +107,8 @@ $this->Html->script('booking', ['block' => 'script']);
                                     'required' => true,
                                     'class' => 'form-control' . ($this->Form->isFieldError('booking_date') ? ' is-invalid' : ''),
                                     'id' => 'booking-date',
-                                    'disabled' => true,
                                     'label' => false,
-                                    'min' => date('Y-m-d'),
-                                    'max' => date('Y-m-d', strtotime('+1 year')),
+                                    'disabled' => true,
                                     'error' => ['class' => 'invalid-feedback']
                                 ]);
                             ?>
@@ -168,3 +166,8 @@ $this->Html->script('booking', ['block' => 'script']);
         </div>
     </div>
 </div>
+
+<?php // Remove Flatpickr JS ?>
+<?php // <?= $this->Html->script('https://cdn.jsdelivr.net/npm/flatpickr') ?> ?>
+
+<?php // Script block for Flatpickr initialization was already removed ?>
