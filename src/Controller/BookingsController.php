@@ -4,14 +4,17 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Model\Table\BookingsStylistsTable;
-use Cake\Event\EventInterface;
-use DateTime;
-use Cake\I18n\DateTime as CakeDateTime;
-use Cake\I18n\FrozenTime;
 use App\Model\Table\ServicesTable;
 use App\Model\Table\StylistsTable;
+use Cake\Event\EventInterface;
 use Cake\Http\Response;
+use Cake\I18n\DateTime as CakeDateTime;
+use Cake\I18n\FrozenTime;
 use Cake\Log\Log;
+use Cake\View\Exception\MissingTemplateException;
+use DateTime;
+use Exception;
+use Throwable;
 
 /**
  * Bookings Controller
@@ -44,6 +47,10 @@ class BookingsController extends AppController
         $this->Authentication->addUnauthenticatedActions(['booking']);
     }
 
+    /**
+     * @param EventInterface $event
+     * @return Response|void|null
+     */
     public function beforeFilter(EventInterface $event)
     {
         parent::beforeFilter($event);
@@ -177,13 +184,18 @@ class BookingsController extends AppController
                     ],
                 ],
             ])
-            ->order(['booking_date' => 'ASC']);
+            ->orderBy(['booking_date' => 'ASC']);
         $bookings = $this->paginate($query);
 
         $this->set(compact('bookings'));
     }
 
-    public function customerindex()
+    /**
+     * Customer Index Where they can see all their current bookings
+     *
+     * @return void
+     */
+    public function customerindex(): void
     {
         $query = $this->Bookings->find()
             ->where([
@@ -199,7 +211,7 @@ class BookingsController extends AppController
                     ],
                 ],
             ])
-            ->order([
+            ->orderBy([
                 'ABS(DATEDIFF(booking_date, CURDATE()))' => 'ASC',
                 'booking_date' => 'ASC',
             ]);
@@ -208,7 +220,12 @@ class BookingsController extends AppController
         $this->set(compact('bookings'));
     }
 
-    public function stylistindex()
+    /**
+     * Stylist index for the stylist so they can see who has booked them
+     *
+     * @return void
+     */
+    public function stylistindex(): void
     {
         $stylist = $this->Stylists->get($this->Authentication->getIdentity()->id);
 
@@ -228,7 +245,7 @@ class BookingsController extends AppController
                 return $q->where(['BookingsStylists.stylist_id' => $stylist->id]);
             })
             ->where(['Bookings.status' => 'active'])
-            ->order([
+            ->orderBy([
                 'ABS(DATEDIFF(booking_date, CURDATE()))' => 'ASC',
                 'booking_date' => 'ASC',
             ]);
@@ -236,7 +253,6 @@ class BookingsController extends AppController
         $bookings = $this->paginate($query);
         $this->set(compact('bookings'));
     }
-
 
     /**
      * View method
@@ -349,7 +365,7 @@ class BookingsController extends AppController
             $bookingId = $booking->id;
 
             if (isset($data['booking_date'])) {
-                $data['booking_date_formatted'] = $data['booking_date']; 
+                $data['booking_date_formatted'] = $data['booking_date'];
             } else {
                 $this->Flash->error(__('Booking date is missing.'));
 
@@ -415,7 +431,7 @@ class BookingsController extends AppController
 
                 // Save main booking changes (without times yet)
                 if (!$this->Bookings->save($booking)) {
-                    throw new \Exception('Failed to save main booking updates.');
+                    throw new Exception('Failed to save main booking updates.');
                 }
 
                 $allServicesTimes = []; // To store start/end times
@@ -465,23 +481,22 @@ class BookingsController extends AppController
                                 }
                             }
                              $stylistTimeSlotsEdit[$stylistIdEdit][] = $newSlotEdit;
-
-                        } catch (\Exception $e) {
+                        } catch (Exception $e) {
                             // Throw exception to trigger transaction rollback
-                             throw new \Exception('Validation time processing error: ' . $e->getMessage());
+                             throw new Exception('Validation time processing error: ' . $e->getMessage());
                         }
                     }
 
                     if ($hasConflictEdit) {
                         // Throw exception to trigger transaction rollback
-                        throw new \Exception($conflictMessageEdit ?: 'A time conflict was detected. Please ensure service times for the same stylist do not overlap.');
+                        throw new Exception($conflictMessageEdit ?: 'A time conflict was detected. Please ensure service times for the same stylist do not overlap.');
                     }
                     // --- END Server-Side Time Conflict Validation (Edit) ---
 
                     // Re-Save BookingsServices records with individual start/end times
                     foreach ($data['bookings_services'] as $serviceIdKey => $serviceData) {
                         if (!isset($serviceData['service_id'], $serviceData['stylist_id'], $serviceData['start_time'], $serviceData['service_cost'])) {
-                            \Cake\Log\Log::warning('[Edit] Skipping incomplete service data: ' . json_encode($serviceData));
+                            Log::warning('[Edit] Skipping incomplete service data: ' . json_encode($serviceData));
                             continue;
                         }
                         $serviceId = (int)$serviceData['service_id'];
@@ -505,7 +520,7 @@ class BookingsController extends AppController
                         ]);
                         if (!$bookingsServicesTable->save($bookingService)) {
                             // Rollback on failure
-                            throw new \Exception('Failed to save updated booking service details.');
+                            throw new Exception('Failed to save updated booking service details.');
                         }
                          $allServicesTimes[] = ['start' => $startTime, 'end' => $endTime];
                     } // end foreach bookings_services
@@ -522,7 +537,7 @@ class BookingsController extends AppController
                  $booking->start_time = $overallStartTime ? $overallStartTime->format('H:i:s') : null;
                  $booking->end_time = $overallEndTime ? $overallEndTime->format('H:i:s') : null;
                  if (!$this->Bookings->save($booking)) {
-                     throw new \Exception('Failed to save overall times on booking update.');
+                     throw new Exception('Failed to save overall times on booking update.');
                  }
 
                 // Re-Create BookingsStylists records
@@ -539,7 +554,7 @@ class BookingsController extends AppController
                                  'selected_cost' => $booking->total_cost,
                             ]);
                             if (!$bookingsStylistsTable->save($bookingStylist)) {
-                                 throw new \Exception('Failed to save updated booking stylist details.');
+                                 throw new Exception('Failed to save updated booking stylist details.');
                             }
                              $processedStylists[] = $stylistId;
                         }
@@ -551,8 +566,7 @@ class BookingsController extends AppController
                 $this->Flash->success(__('The booking has been updated successfully.'));
 
                 return $this->redirect(['action' => 'index']);
-
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 // Rollback transaction on any error
                 $connection->rollback();
                 Log::error('[Edit] Booking update failed: '
@@ -566,7 +580,6 @@ class BookingsController extends AppController
                  $booking->setErrors(json_decode($e->getMessage(), true) ?: []);
             }
             // --- End Transaction ---
-
         } // end if request is post/put/patch
 
         // No need to format the date here as CakePHP will handle it through the form helper
@@ -811,7 +824,7 @@ class BookingsController extends AppController
                          // Add the new slot if no conflict found yet for this stylist
                          $stylistTimeSlots[$stylistId][] = $newSlot;
 
-                    } catch (\Exception $e) {
+                    } catch (Exception $e) {
                          Log::error('Validation time processing error: ' . $e->getMessage());
                          $this->Flash->error(__('An error occurred while validating booking times. Please check the selected times.'));
                          // Reload necessary data for the view and render again
@@ -852,7 +865,7 @@ class BookingsController extends AppController
                 if (!empty($serviceIds)) {
                     $servicesDetails = $this->Services->find('list', [
                         'keyField' => 'id',
-                        'valueField' => 'duration_minutes'
+                        'valueField' => 'duration_minutes',
                     ])->where(['id IN' => $serviceIds])->toArray();
                     Log::debug('[CustomerBooking] Durations fetched: ' . json_encode($servicesDetails));
                 } else {
@@ -902,7 +915,7 @@ class BookingsController extends AppController
                                 Log::error('Failed to save booking service. Errors: ' . json_encode($bookingService->getErrors()));
                                 // Decide if we should rollback or just flag the error
                             }
-                        } catch (\Exception $e) {
+                        } catch (Exception $e) {
                             Log::error("Error processing time for service {$serviceId}: " . $e->getMessage());
                         }
                     }
@@ -945,7 +958,7 @@ class BookingsController extends AppController
                 $overallEndTime = null;
                 if (!empty($allServicesTimes)) {
                     $startTimestamps = array_map(function($t) { return $t['start']->getTimestamp(); }, $allServicesTimes);
-                    $endTimestamps = array_map(function($t) { return $t['end']->getTimestamp(); }, $allServicesTimes);
+                    $endTimestamps = array_map(function($t) { return $t['end']->getTimestamp();}, $allServicesTimes);
 
                     if (!empty($startTimestamps)) {
                         $minStartTs = min($startTimestamps);
@@ -1083,7 +1096,7 @@ class BookingsController extends AppController
                         }
                          $stylistTimeSlotsAdmin[$stylistIdAdmin][] = $newSlotAdmin;
 
-                    } catch (\Exception $e) {
+                    } catch (Exception $e) {
                          Log::error("[Admin Validation] Time processing error: " . $e->getMessage());
                          $this->Flash->error(__('An error occurred while validating booking times. Please check the selected times.'));
                          // Reload necessary data for the admin view
@@ -1166,7 +1179,7 @@ class BookingsController extends AppController
                                     . json_encode($bookingService->getErrors()));
                                 // Consider adding a flash message here too
                             }
-                        } catch (\Exception $e) {
+                        } catch (Exception $e) {
                             Log::error("[Admin] Error processing time for service {$serviceId}: "
                                 . $e->getMessage());
                         }
@@ -1636,7 +1649,7 @@ class BookingsController extends AppController
                 return $q->where(['BookingsServices.stylist_id' => $stylist->id]);
             })
             ->where(['Bookings.status IN' => ['finished', 'cancelled']])
-            ->order(['Bookings.booking_date' => 'DESC']);
+            ->orderBy(['Bookings.booking_date' => 'DESC']);
         $bookings = $this->paginate($query);
 
         $this->set(compact('bookings'));
@@ -1799,7 +1812,7 @@ class BookingsController extends AppController
             }, $stylists);
 
             return $this->response->withStringBody(json_encode($formattedStylists));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->log('Error in getStylists: ' . $e->getMessage());
             $this->log('Stack trace: ' . $e->getTraceAsString());
 
@@ -1824,7 +1837,7 @@ class BookingsController extends AppController
                     ],
                 ],
             ])
-            ->order(['booking_date' => 'ASC'])
+            ->orderBy(['booking_date' => 'ASC'])
             ->limit(5);// Only show the next 5 upcoming bookings
 
         $bookings = $query->all();
@@ -1842,7 +1855,7 @@ class BookingsController extends AppController
      */
     private function _calculateAvailableSlots(string $date, int $serviceId, int $stylistId, ?int $bookingIdToExclude = null): array
     {
-        // Log entry and parameters 
+        // Log entry and parameters
         $this->log("_calculateAvailableSlots: Date={$date}, Svc={$serviceId}, Stylist={$stylistId}, ExcludeBooking=" . ($bookingIdToExclude !== null ? $bookingIdToExclude : 'NULL'), 'debug');
         try {
             $service = $this->Services->get($serviceId);
@@ -1872,7 +1885,7 @@ class BookingsController extends AppController
                     // Check if the service finishes by closing time
                     if ($potentialEndTime > $closingTime) {
                         $this->log("Slot {$slotStartString} for Svc {$serviceId} skipped: ends after closing time.", 'debug');
-                        break; 
+                        break;
                     }
 
                     // Check availability using the existing helper, PASSING the bookingIdToExclude
@@ -1896,7 +1909,7 @@ class BookingsController extends AppController
                         $this->log("  Past Check: Date={$date}, Today={$todayStr}, SlotStart=" . $potentialStartTime->format('Y-m-d H:i:s') . ", Now=" . $now->format('Y-m-d H:i:s'), 'debug');
                         if ($date === $todayStr && $potentialStartTime < $now) {
                             $this->log("  Slot Check: {$slotStartString} Skipped: In the past.", 'debug');
-                            continue; 
+                            continue;
                         }
 
                         $this->log("  >>> Reached point to ADD slot: {$slotStartString}", 'debug');
@@ -1910,13 +1923,13 @@ class BookingsController extends AppController
                         // +++ Log after append +++
                         $this->log("    Appended. Current array: " . json_encode($availableSlots), 'debug');
                     }
-                } 
-            } 
+                }
+            }
 
             // Log the final array before returning
             $this->log("_calculateAvailableSlots: Returning slots: " . json_encode($availableSlots), 'debug');
-            return $availableSlots;
 
+            return $availableSlots;
         } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
             $this->log("Error in _calculateAvailableSlots: Service ID {$serviceId} not found.", 'error');
             return [];
@@ -1984,15 +1997,15 @@ class BookingsController extends AppController
                         // +++ Log successful parse +++
                         $this->log("    -> Parsed successfully.", 'debug');
                         $formattedSlots[] = [
-                            'value' => $slotHi, 
-                            'text' => $timeObj->format('h:i A') 
+                            'value' => $slotHi,
+                            'text' => $timeObj->format('h:i A')
                         ];
                     } else {
                         // +++ Log parse failure +++
                         $this->log("    -> FAILED to parse '{$slotHi}' with FrozenTime.", 'warning');
                         $this->log("Failed to parse time slot '{$slotHi}' in getAvailableTimeSlots.", 'warning');
                     }
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                      // +++ Log exception during parse +++
                      $this->log("    -> EXCEPTION parsing '{$slotHi}': " . $e->getMessage(), 'error');
                      $this->log("Exception parsing time slot '{$slotHi}' in getAvailableTimeSlots: " . $e->getMessage(), 'error');
@@ -2002,7 +2015,7 @@ class BookingsController extends AppController
             $this->log("getAvailableTimeSlots: Returning formatted slots: " . json_encode($formattedSlots), 'debug');
             return $this->response->withStringBody(json_encode($formattedSlots));
 
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->log('Error in getAvailableTimeSlots (single): ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString(), 'error');
             return $this->response->withStatus(500)->withStringBody(json_encode(['error' => 'An internal error occurred while fetching time slots.']));
         }
@@ -2071,15 +2084,14 @@ class BookingsController extends AppController
             $hasConflict = $conflictCount > 0;
             $this->log("checkSegmentAvailability: Conflict check result: " . ($hasConflict ? 'Conflict Found ({$conflictCount})' : 'No Conflict'), 'debug');
 
-            return !$hasConflict;   
-
-        } catch (\Throwable $e) {
+            return !$hasConflict;
+        } catch (Throwable $e) {
             $this->log('Error in checkSegmentAvailability: '
                 . $e->getMessage()
                 . ' Trace: '
                 . $e->getTraceAsString(), 'error');
 
-            return false;   
+            return false;
         }
     }
 
@@ -2146,7 +2158,7 @@ class BookingsController extends AppController
                     ],
                 ],
             ])
-            ->order(['booking_date' => 'DESC']);
+            ->orderBy(['booking_date' => 'DESC']);
         $bookings = $this->paginate($query);
 
         $this->set(compact('bookings'));
@@ -2185,7 +2197,7 @@ class BookingsController extends AppController
                     ],
                 ],
             ])
-            ->order(['booking_date' => 'DESC']);
+            ->orderBy(['booking_date' => 'DESC']);
         $bookings = $this->paginate($query);
 
         $this->set(compact('bookings'));
@@ -2293,7 +2305,7 @@ class BookingsController extends AppController
 
             return $this->response->withStringBody(json_encode($formattedStylists));
 
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->log('Error in getStylistsForService: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
 
             return $this->response->withStatus(500)
@@ -2328,16 +2340,16 @@ class BookingsController extends AppController
                 // Basic validation/parsing
                 $serviceId = (int)$serviceId;
                 $stylistId = (int)$stylistId;
-          
+
                 $availableSlots = $this->_calculateAvailableSlots($date, $serviceId, $stylistId);
                 $availableSlotsCount = count($availableSlots);
 
                 $responseData['availableSlotsCount'] = $availableSlotsCount;
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::error('Error in getAvailabilityCount: '
                     . $e->getMessage() . ' | Trace: ' . $e->getTraceAsString());
 
-                $this->response = $this->response->withStatus(500); 
+                $this->response = $this->response->withStatus(500);
                 $responseData['error'] = 'An internal error occurred while checking availability.';
             }
         }
@@ -2380,15 +2392,15 @@ class BookingsController extends AppController
         // Combine booking date and start time to get the full booking datetime
         $bookingDateTimeStr = $booking->booking_date->format('Y-m-d') . ' ' . ($booking->start_time ? $booking->start_time->format('H:i:s') : '00:00:00');
         try {
-            $bookingDateTime = new \Cake\I18n\FrozenTime($bookingDateTimeStr);
-            $now = new \Cake\I18n\FrozenTime();
+            $bookingDateTime = new FrozenTime($bookingDateTimeStr);
+            $now = new FrozenTime();
             $minEditTime = $now->addHours(24);
 
             if ($bookingDateTime <= $minEditTime) {
                 $this->Flash->error(__('Bookings cannot be changed less than 24 hours before the scheduled time.'));
-                return $this->redirect(['action' => 'customerindex']); 
+                return $this->redirect(['action' => 'customerindex']);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Handle potential parsing errors if time is invalid
             Log::error('Error parsing booking date/time for edit check: ' . $e->getMessage());
             $this->Flash->error(__('Could not verify booking time for editing. Please contact support.'));
@@ -2465,7 +2477,7 @@ class BookingsController extends AppController
                 if (!$this->Bookings->save($booking /*, ['checkRules' => false] */)) {
                     // Log detailed error
                     Log::error('[CustomerEdit] Failed to save main booking updates. Errors: ' . json_encode($booking->getErrors()));
-                    throw new \Exception('Failed to save main booking updates.');
+                    throw new Exception('Failed to save main booking updates.');
                 }
 
                 $allServicesTimes = []; // To store start/end times for overall calculation
@@ -2533,16 +2545,16 @@ class BookingsController extends AppController
 
                               $stylistTimeSlotsEdit[$stylistIdEdit][] = $newSlotEdit;
 
-                         } catch (\Exception $e) {
+                         } catch (Exception $e) {
                               Log::error('[CustomerEdit] Validation time processing error: ' . $e->getMessage());
                               // Throw exception to trigger transaction rollback
-                              throw new \Exception('Validation time processing error: ' . $e->getMessage());
+                              throw new Exception('Validation time processing error: ' . $e->getMessage());
                          }
                      } // end foreach for conflict check
 
                     if ($hasConflictEdit) {
                         // Throw exception to trigger transaction rollback
-                        throw new \Exception($conflictMessageEdit ?: 'A time conflict was detected. Please adjust service times.');
+                        throw new Exception($conflictMessageEdit ?: 'A time conflict was detected. Please adjust service times.');
                     }
                     // --- END Server-Side Time Conflict Validation (Customer Edit) ---
 
@@ -2609,7 +2621,7 @@ class BookingsController extends AppController
                  if (!$this->Bookings->save($booking)) {
                      Log::error('[CustomerEdit] Failed to save overall times. Errors: ' . json_encode($booking->getErrors()));
                      // Decide if this is critical - maybe just warn?
-                     throw new \Exception('Failed to save overall times on booking update.');
+                     throw new Exception('Failed to save overall times on booking update.');
                  }
 
 
@@ -2631,7 +2643,7 @@ class BookingsController extends AppController
                             ]);
                             if (!$bookingsStylistsTable->save($bookingStylist)) {
                                 Log::error('[CustomerEdit] Failed to save booking stylist. Errors: ' . json_encode($bookingStylist->getErrors()));
-                                 throw new \Exception('Failed to save updated booking stylist details.');
+                                 throw new Exception('Failed to save updated booking stylist details.');
                             }
                              $processedStylists[] = $stylistId; // Mark stylist as processed
                         }
@@ -2645,7 +2657,7 @@ class BookingsController extends AppController
                 // Redirect to customer's booking list or dashboard
                 return $this->redirect(['action' => 'customerindex']);
 
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 // If any error occurred, rollback the transaction
                 $connection->rollback();
                 Log::error('[CustomerEdit] Booking update failed: ' . $e->getMessage() . ' Booking ID: ' . $bookingId . ' Data: ' . json_encode($data));
@@ -2673,7 +2685,7 @@ class BookingsController extends AppController
         // or you can explicitly render the 'edit' template.
         try {
              $this->render('customeredit');
-        } catch (\Cake\View\Exception\MissingTemplateException $e) {
+        } catch (MissingTemplateException $e) {
              // Fallback to the admin edit template if customer specific one doesn't exist
              Log::warning('customeredit.php template not found, falling back to edit.php');
              $this->render('edit');
