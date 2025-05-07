@@ -3570,3 +3570,74 @@ footer .input-group .btn-primary:hover {
     background-color: #0b5ed7;
     border-color: #0b5ed7;
 }
+
+/* Payments Admin Index Styling */
+.payments.index.content {
+    width: 100%;
+    max-width: 95%; 
+    margin: 40px auto 76px;
+    padding: 20px;
+    background-color: #fff; 
+    border-radius: 8px; 
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); 
+}
+
+.payments.index.content h3 {
+    text-align: center;
+    margin: 20px 0 30px 0; 
+    color: #333; 
+    font-weight: 600;
+}
+
+.payments.index.content .table-responsive {
+    overflow-x: auto; 
+}
+
+.payments.index.content table {
+    width: 100%;
+    table-layout: auto; 
+    border-collapse: collapse;
+    margin-bottom: 25px; 
+}
+
+.payments.index.content th,
+.payments.index.content td {
+    padding: 12px 15px; 
+    text-align: left;
+    white-space: nowrap; 
+    border: 1px solid #e9ecef; 
+}
+
+.payments.index.content td.notes-cell,
+.payments.index.content td.customer-cell {
+    white-space: normal;
+}
+
+.payments.index.content th {
+    background-color: #f8f9fa; 
+    font-weight: 600; 
+    color: #495057; 
+}
+
+.payments.index.content tr:nth-child(even) {
+    background-color: #fdfdfe; 
+}
+
+.payments.index.content tr:hover {
+    background-color: #f1f3f5; 
+}
+
+.payments.index.content .paginator {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.payments.index.content table a {
+    color: #007bff; 
+    text-decoration: none;
+}
+
+.payments.index.content table a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}

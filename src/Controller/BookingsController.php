@@ -673,40 +673,26 @@ class BookingsController extends AppController
         $this->request->allowMethod(['post', 'delete']);
         $booking = $this->Bookings->get($id);
 
-        // Allow deletion of both cancelled and finished bookings
-        if ($booking->status !== 'cancelled' && $booking->status !== 'finished') {
-            $this->Flash->error(__('Only cancelled or finished bookings can be deleted.'));
-
-            return $this->redirect(['action' => 'index']);
-        }
-
         if ($this->Bookings->delete($booking)) {
             $this->Flash->success(__('The booking has been deleted.'));
         } else {
             $this->Flash->error(__('The booking could not be deleted. Please, try again.'));
         }
 
-        return $this->redirect(['action' => 'adminPastBookings']);
+        return $this->redirect(['action' => 'index']);
     }
 
     public function customerdelete($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
-        $booking = $this->Bookings->get($id, [
-            'contain' => ['BookingsStylists'],
-        ]);
+        $booking = $this->Bookings->get($id);
 
-        // Delete the associated BookingsStylists records
-        if (!empty($booking->bookings_stylists)) {
-            $bookingsStylistsTable = $this->fetchTable('BookingsStylists');
-            foreach ($booking->bookings_stylists as $bookingStylist) {
-                $bookingsStylistsTable->delete($bookingStylist);
-            }
+        if ($booking->status === 'Confirmed - Paid') {
+            $this->Flash->error(__('This booking has been paid and can no longer be cancelled.'));
+            return $this->redirect(['action' => 'customerindex']);
         }
 
-        // Update status to cancelled
-        $booking = $this->Bookings->patchEntity($booking, ['status' => 'cancelled']);
-        if ($this->Bookings->save($booking)) {
+        if ($this->Bookings->delete($booking)) {
             $this->Flash->success(__('The booking has been cancelled.'));
         } else {
             $this->Flash->error(__('The booking could not be cancelled. Please, try again.'));
@@ -1041,7 +1027,7 @@ class BookingsController extends AppController
                 'total_cost' => $data['total_cost'],
                 'remaining_cost' => $data['remaining_cost'],
                 'notes' => $data['notes'] ?? null,
-                'status' => 'active',
+                'status' => 'Confirmed - Payment Due',
             ]);
 
             // Server-Side Time Conflict Validation 
@@ -1235,14 +1221,12 @@ class BookingsController extends AppController
     public function guestbooking()
     {
         $customersTable = $this->fetchTable('Customers');
-        //Check if the guest account is active
         $guest = $customersTable->find()
             ->where(['type' => 'guest'])
             ->first();
 
         if (empty($guest)) {
             $this->Flash->error(__('Sorry Guest Booking is not available at the moment. Please try again later'));
-
             return $this->redirect(['controller' => 'Pages', 'action' => 'display']);
         }
 
@@ -1250,293 +1234,195 @@ class BookingsController extends AppController
             $guestUser = $customersTable->find()
                 ->where([
                     'type' => 'guest',
-                    'email' => 'guest@chiccharm.com',
+                    'email' => 'guest@chiccharm.com', 
                 ])
                 ->first();
-
             if ($guestUser) {
                 $this->Authentication->setIdentity($guestUser);
             }
         }
 
-        $booking = $this->Bookings->newEmptyEntity();
-            if ($this->request->is('post')) {
-                if ($this->Recaptcha->verify()) {
-                    Log::debug('[CustomerBooking] POST request received.');     
-                    $data = $this->request->getData();
-                    Log::debug('[CustomerBooking] Request Data: ' . json_encode($data)); 
+        $bookingEntity = $this->Bookings->newEmptyEntity(); 
 
-                    // Check if end time exceeds 5 PM
-                    if (isset($data['end_time'])) {
-                        $endTime = new DateTime($data['end_time']);
-                        $closingTime = new DateTime('17:00');
+        if ($this->request->is('post')) {
+            if ($this->Recaptcha->verify()) {
+                $data = $this->request->getData();
 
-                        if ($endTime > $closingTime) {
-                            $this->Flash->error(__('Booking cannot extend past 5 PM as the shop will be closed.'));
-
-                            return $this->redirect(['action' => 'customerbooking']);
-                        }
-                    }
-
-                    // Automatically set customer details
-                    $data['customer_id'] = $guest->id;
-                    $data['booking_name'] = 'Booking for ' . $data['customer_name'];
-
-                    // Date should be Y-m-d from native date input
-                    // No further formatting needed if input type='date' sends Y-m-d
-                    // if (isset($data['booking_date'])) {
-                    //     $date = new DateTime($data['booking_date']);
-                    //     $data['booking_date'] = $date->format('Y-m-d');
-                    // }
-
-                    // Calculate total cost from all selected services
-                    $totalCost = 0;
-
-                    if (!empty($data['bookings_services'])) {
-                        foreach ($data['bookings_services'] as $serviceData) {
-                            $totalCost += floatval($serviceData['service_cost']);
-                        }
-                    }
-
-                    $data['total_cost'] = $totalCost;
-                    $data['remaining_cost'] = $totalCost;
-                    $data['notes'] = $data['notes'] ?? null;
-
-                    // Create a temporary booking entity without associations first
-                    $booking = $this->Bookings->newEntity([
-                        'customer_id' => $data['customer_id'],
-                        'booking_name' => $data['booking_name'],
-                        'booking_date' => $data['booking_date'], // Directly use Y-m-d from form
-                        'total_cost' => $data['total_cost'],
-                        'remaining_cost' => $data['total_cost'], // Initially, remaining is total
-                        'notes' => $data['notes'] ?? null,
-                        'status' => 'Confirmed - Payment Due', // Updated initial status
-                    ]);
-
-                    // --- Server-Side Time Conflict Validation ---
-                    Log::debug('[CustomerBooking] Entering Time Conflict Validation Block.'); // <-- ADD LOG
-                    $stylistTimeSlots = [];
-                    $hasConflict = false;
-                    $conflictMessage = '';
-
-                    if (!empty($data['bookings_services'])) {
-                        // Fetch service durations needed for validation
-                        $serviceIdsForValidation = array_column($data['bookings_services'], 'service_id');
-                        $servicesDetailsForValidation = [];
-                        if (!empty($serviceIdsForValidation)) {
-                            $servicesDetailsForValidation = $this->fetchTable('Services')->find('list', [
-                                'keyField' => 'id',
-                                'valueField' => 'duration_minutes',
-                            ])->where(['id IN' => $serviceIdsForValidation])->toArray();
-                        }
-
-                        foreach ($data['bookings_services'] as $serviceData) {
-                            if (!isset($serviceData['stylist_id'], $serviceData['start_time'], $serviceData['service_id'])) {
-                                continue; 
-                            }
-                            $stylistId = (int)$serviceData['stylist_id'];
-                            $serviceId = (int)$serviceData['service_id'];
-                            $startTimeStr = $serviceData['start_time'];
-                            $duration = $servicesDetailsForValidation[$serviceId] ?? 0;
-
-                            if ($duration <= 0) continue;
-
-                            try {
-                                $startTime = new DateTime($data['booking_date'] . ' ' . $startTimeStr);
-                                $endTime = clone $startTime;
-                                $endTime->modify("+{$duration} minutes");
-                                $newSlot = ['start' => $startTime->getTimestamp(), 'end' => $endTime->getTimestamp(), 'service_id' => $serviceId];
-
-                                // Check for conflicts with existing slots for THIS stylist in THIS request
-                                if (isset($stylistTimeSlots[$stylistId])) {
-                                    foreach ($stylistTimeSlots[$stylistId] as $existingSlot) {
-                                        // Check for overlap: new start is before existing end AND new end is after existing start
-                                        if ($newSlot['start'] < $existingSlot['end'] && $newSlot['end'] > $existingSlot['start']) {
-                                            $hasConflict = true;
-                                            $conflictMessage = "Time conflict detected for one of the selected stylists. Please ensure service times do not overlap.";
-                                            break 2;
-                                        }
-                                    }
-                                }
-                                // Add the new slot if no conflict found yet for this stylist
-                                $stylistTimeSlots[$stylistId][] = $newSlot;
-
-                            } catch (\Exception $e) {
-                                Log::error('Validation time processing error: ' . $e->getMessage());
-                                $this->Flash->error(__('An error occurred while validating booking times.
-                                 Please check the selected times.'));
-                                // Reload necessary data for the view and render again
-                                $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
-                                $services = $this->fetchTable('Services')->find('all')->all();
-                                $this->set(compact('booking', 'stylists', 'services'));
-
-                                return $this->render('customerbooking');
-                            }
-                        }
-                    }
-
-                    if ($hasConflict) {
-                        $this->Flash->error($conflictMessage ?: __('A time conflict was detected.
-                        Please ensure service times for the same stylist do not overlap.'));
-                        // Reload necessary data for the view and render again
-                        $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
-                        $services = $this->fetchTable('Services')->find('all')->all();
-                        // Patch the entity with the data *attempted* to be saved so the form repopulates
-                        $booking = $this->Bookings->patchEntity($booking, $data, ['associated' => []]);
-                        $this->set(compact('booking', 'stylists', 'services'));
-                        // Add the submitted service data back to the request scope for the template
-                        $this->request = $this->request->withParsedBody($data);
-
-                        return $this->render('customerbooking'); // Re-render the form
-                    }
-                    // --- Server-Side Time Conflict Validation ---
-
-                    // Try saving the main booking record
-                    if ($this->Bookings->save($booking)) {
-                        Log::debug('[CustomerBooking] Initial booking save successful. ID: ' . $booking->id);
-                        $bookingId = $booking->id;
-                        $allServicesTimes = [];
-
-                        // Fetch service durations
-                        Log::debug('[CustomerBooking] Fetching service durations...');
-                        $serviceIds = array_column($data['bookings_services'] ?? [], 'service_id');
-                        $servicesDetails = [];
-                        if (!empty($serviceIds)) {
-                            $servicesDetails = $this->Services->find('list', [
-                                'keyField' => 'id',
-                                'valueField' => 'duration_minutes',
-                            ])->where(['id IN' => $serviceIds])->toArray();
-                            Log::debug('[CustomerBooking] Durations fetched: ' . json_encode($servicesDetails));
-                        } else {
-                            Log::debug('[CustomerBooking] No service IDs found for duration fetch.');
-                        }
-
-                        // Save BookingsServices records with individual start/end times
-                        if (!empty($data['bookings_services'])) {
-                            Log::debug('[CustomerBooking] Starting loop to save BookingsServices...');
-                            $bookingsServicesTable = $this->fetchTable('BookingsServices');
-                            foreach ($data['bookings_services'] as $serviceIdKey => $serviceData) {
-                                Log::debug('[CustomerBooking] Processing service data: ' . json_encode($serviceData));
-                                // Ensure all needed keys exist
-                                if (!isset($serviceData['service_id'], $serviceData['stylist_id'], $serviceData['start_time'], $serviceData['service_cost'])) {
-                                    Log::warning('Skipping incomplete service data: ' . json_encode($serviceData));
-                                    continue;
-                                }
-
-                                $serviceId = (int)$serviceData['service_id'];
-                                $startTimeString = $serviceData['start_time'];
-                                $duration = $servicesDetails[$serviceId] ?? 0;
-
-                                if ($duration <= 0) {
-                                    Log::warning("Skipping service ID {$serviceId} with zero or invalid duration.");
-                                    continue;
-                                }
-
-                                try {
-                                    $startTime = new DateTime($data['booking_date'] . ' ' . $startTimeString);
-                                    $endTime = clone $startTime;
-                                    $endTime->modify("+{$duration} minutes");
-
-                                    $bookingService = $bookingsServicesTable->newEntity([
-                                        'booking_id' => $bookingId,
-                                        'service_id' => $serviceId,
-                                        'stylist_id' => (int)$serviceData['stylist_id'],
-                                        'start_time' => $startTime->format('H:i:s'),
-                                        'end_time' => $endTime->format('H:i:s'),
-                                        'service_cost' => $serviceData['service_cost'],
-                                    ]);
-
-                                    if ($bookingsServicesTable->save($bookingService)) {
-                                        Log::debug('[CustomerBooking] Saved BookingsService for Service ID: ' . $serviceId);
-                                        $allServicesTimes[] = ['start' => $startTime, 'end' => $endTime];
-                                        Log::debug('Successfully saved booking service with times');
-                                    } else {
-                                        Log::error('Failed to save booking service. Errors: ' . json_encode($bookingService->getErrors()));
-                                        // Decide if we should rollback or just flag the error
-                                    }
-                                } catch (\Exception $e) {
-                                    Log::error("Error processing time for service {$serviceId}: " . $e->getMessage());
-                                }
-                            }
-                            Log::debug('[CustomerBooking] Finished loop saving BookingsServices.');
-                        } else {
-                            Log::debug('[CustomerBooking] No bookings_services data found to save.');
-                        }
-
-                        // Create BookingsStylists records (without overall times)
-                        if (!empty($data['bookings_services'])) {
-                            Log::debug('[CustomerBooking] Starting loop to save BookingsStylists...');
-                            $bookingsStylistsTable = $this->fetchTable('BookingsStylists');
-                            $processedStylists = [];
-                            foreach ($data['bookings_services'] as $serviceData) {
-                                if (!isset($serviceData['stylist_id'])) continue;
-                                $stylistId = (int)$serviceData['stylist_id'];
-
-                                if (!in_array($stylistId, $processedStylists)) {
-                                    $bookingStylist = $bookingsStylistsTable->newEntity([
-                                        'booking_id' => $bookingId,
-                                        'stylist_id' => $stylistId,
-                                        'stylist_date' => $booking->booking_date->format('Y-m-d'),
-                                        'selected_cost' => $booking->total_cost,
-                                    ]);
-                                    if (!$bookingsStylistsTable->save($bookingStylist)) {
-                                        Log::error('Failed to save booking stylist record for stylist '
-                                            . $stylistId
-                                            . ' Errors: '
-                                            . json_encode($bookingStylist->getErrors()));
-                                        $this->Flash->error(__('Your booking was saved, but some stylist details could not be saved.'));
-                                    }
-                                    $processedStylists[] = $stylistId;
-                                }
-                            }
-                        }
-
-                        $overallStartTime = null;
-                        $overallEndTime = null;
-                        if (!empty($allServicesTimes)) {
-                            $startTimestamps = array_map(function ($t) {
-                                return $t['start']->getTimestamp();
-                            }, $allServicesTimes);
-                            $endTimestamps = array_map(function ($t) {
-                                return $t['end']->getTimestamp();
-                            }, $allServicesTimes);
-
-                            if (!empty($startTimestamps)) {
-                                $minStartTs = min($startTimestamps);
-                                $overallStartTime = (new \DateTime())->setTimestamp($minStartTs);
-                            }
-                            if (!empty($endTimestamps)) {
-                                $maxEndTs = max($endTimestamps);
-                                $overallEndTime = (new \DateTime())->setTimestamp($maxEndTs);
-                            }
-                        }
-
-                        // Patch and save the overall times to the main booking record
-                        Log::debug('[CustomerBooking] Patching overall times: Start='
-                            . ($overallStartTime ? $overallStartTime->format('H:i:s') : 'NULL')
-                            . ', End=' . ($overallEndTime ? $overallEndTime->format('H:i:s') : 'NULL'));
-                        $booking = $this->Bookings->patchEntity($booking, [
-                            'start_time' => $overallStartTime ? $overallStartTime->format('H:i:s') : null,
-                            'end_time' => $overallEndTime ? $overallEndTime->format('H:i:s') : null,
-                        ]);
-                        if (!$this->Bookings->save($booking, ['checkRules' => false])) {
-                            Log::error('Failed to save overall times to booking ID: ' . $bookingId);
-                            $this->Flash->warning('Booking saved, but failed to update overall times.');
-                        }
-
-                        $this->Flash->success(__('Your booking is confirmed! Please see payment options below.'));  
-                        Log::debug('[CustomerBooking] Redirecting to customerview for payment. ID: ' . $bookingId);
-                        return $this->redirect(['action' => 'customerview', $bookingId]);   
-                    }
-                }   else {
-                    $this->Flash->error(__('Please confirm that you are not a bot.'));
+                // Automatically set customer_id from the fetched guest account
+                $data['customer_id'] = $guest->id;
+                // Ensure booking_name is set (uses customer_name from form)
+                if (empty($data['customer_name'])) {
+                    $this->Flash->error(__('Please enter your name for the booking.'));
+                    // Set $bookingEntity with current data for form repopulation
+                    $this->set('booking', $this->Bookings->patchEntity($bookingEntity, $data));
+                    $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
+                    $services = $this->fetchTable('Services')->find('all')->all();
+                    $this->set(compact('stylists', 'services'));
+                    return $this->render('guestbooking');
                 }
-                Log::error('Failed to save initial booking. Errors: ' . json_encode($booking->getErrors()));
-                $this->Flash->error(__('The booking could not be saved. Please, try again.'));
-        }
+                $data['booking_name'] = 'Booking for ' . h($data['customer_name']);
+
+                // Calculate total cost from all selected services
+                $totalCost = 0;
+                if (!empty($data['bookings_services'])) {
+                    foreach ($data['bookings_services'] as $serviceData) {
+                        $totalCost += floatval($serviceData['service_cost'] ?? 0); 
+                    }
+                }
+                $data['total_cost'] = $totalCost;
+                $data['remaining_cost'] = $totalCost; 
+                $data['notes'] = $data['notes'] ?? null;
+
+                $stylistTimeSlots = [];
+                $hasConflict = false;
+                $conflictMessage = '';
+
+                if (!empty($data['bookings_services'])) {
+                    $serviceIdsForValidation = array_column($data['bookings_services'], 'service_id');
+                    $servicesDetailsForValidation = [];
+                    if (!empty($serviceIdsForValidation)) {
+                         $servicesDetailsForValidation = $this->fetchTable('Services')->find('list', [
+                            'keyField' => 'id',
+                            'valueField' => 'duration_minutes',
+                         ])->where(['id IN' => $serviceIdsForValidation])->toArray();
+                    }
+
+                    foreach ($data['bookings_services'] as $serviceData) {
+                        if (!isset($serviceData['stylist_id'], $serviceData['start_time'], $serviceData['service_id'])) {
+                             continue;
+                        }
+                        $stylistId = (int)$serviceData['stylist_id'];
+                        $serviceId = (int)$serviceData['service_id'];
+                        $startTimeStr = $serviceData['start_time'];
+                        $duration = $servicesDetailsForValidation[$serviceId] ?? 0;
+
+                        if ($duration <= 0) continue;
+
+                        try {
+                             $startTime = new DateTime($data['booking_date'] . ' ' . $startTimeStr);
+                             $endTime = clone $startTime;
+                             $endTime->modify("+{$duration} minutes");
+                             $newSlot = ['start' => $startTime->getTimestamp(), 'end' => $endTime->getTimestamp(), 'service_id' => $serviceId];
+
+                            if (isset($stylistTimeSlots[$stylistId])) {
+                                foreach ($stylistTimeSlots[$stylistId] as $existingSlot) {
+                                    if ($newSlot['start'] < $existingSlot['end'] && $newSlot['end'] > $existingSlot['start']) {
+                                        $hasConflict = true;
+                                        $conflictMessage = "Time conflict detected for one of the selected stylists. Please ensure service times do not overlap.";
+                                        break 2;
+                                    }
+                                }
+                            }
+                             $stylistTimeSlots[$stylistId][] = $newSlot;
+                        } catch (Exception $e) {
+                             Log::error('[GuestBooking] Validation time processing error: ' . $e->getMessage());
+                             $this->Flash->error(__('An error occurred while validating booking times. Please check the selected times.'));
+                             $this->set('booking', $this->Bookings->patchEntity($bookingEntity, $data));
+                             $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
+                             $services = $this->fetchTable('Services')->find('all')->all();
+                             $this->set(compact('stylists', 'services'));
+                             return $this->render('guestbooking');
+                        }
+                    }
+                }
+
+                if ($hasConflict) {
+                    $this->Flash->error($conflictMessage ?: __('A time conflict was detected. Please ensure service times for the same stylist do not overlap.'));
+                    $this->set('booking', $this->Bookings->patchEntity($bookingEntity, $data));
+                    $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
+                    $services = $this->fetchTable('Services')->find('all')->all();
+                    $this->request = $this->request->withParsedBody($data); 
+                    return $this->render('guestbooking');
+                }
+
+                $allServicesTimesForSession = [];
+                if (!empty($data['bookings_services'])) {
+                    foreach ($data['bookings_services'] as $key => $serviceData) {
+                        if (!isset($serviceData['service_id'], $serviceData['start_time'])) continue;
+                        $serviceId = (int)$serviceData['service_id'];
+                        $startTimeString = $serviceData['start_time'];
+                        $duration = $servicesDetailsForValidation[$serviceId] ?? 0; 
+                        if ($duration <= 0) continue;
+
+                        try {
+                            $startTime = new DateTime($data['booking_date'] . ' ' . $startTimeString);
+                            $endTime = clone $startTime;
+                            $endTime->modify("+{$duration} minutes");
+                            $data['bookings_services'][$key]['start_time_formatted'] = $startTime->format('H:i:s');
+                            $data['bookings_services'][$key]['end_time_formatted'] = $endTime->format('H:i:s');
+                            $allServicesTimesForSession[] = ['start' => $startTime, 'end' => $endTime];
+                        } catch (Exception $e) {
+                            // Should not happen if validation passed, but good to log
+                            Log::error('[GuestBooking] Error calculating final service times for session: ' . $e->getMessage());
+                        }
+                    }
+                }
+                
+                // Calculate overall start/end times for the booking to store in session
+                $overallStartTimeForSession = null;
+                $overallEndTimeForSession = null;
+                if (!empty($allServicesTimesForSession)) {
+                    $startTimestamps = array_map(function($t) { return $t['start']->getTimestamp(); }, $allServicesTimesForSession);
+                    $endTimestamps = array_map(function($t) { return $t['end']->getTimestamp(); }, $allServicesTimesForSession);
+                    if (!empty($startTimestamps)) {
+                        $overallStartTimeForSession = (new DateTime())->setTimestamp(min($startTimestamps))->format('H:i:s');
+                    }
+                    if (!empty($endTimestamps)) {
+                        $overallEndTimeForSession = (new DateTime())->setTimestamp(max($endTimestamps))->format('H:i:s');
+                    }
+                }
+                $data['overall_start_time'] = $overallStartTimeForSession;
+                $data['overall_end_time'] = $overallEndTimeForSession;
+
+                // Show service and stylist names in the booking summary 
+                $enrichedBookingServices = [];
+                if (!empty($data['bookings_services'])) {
+                    $serviceIds = array_unique(array_column($data['bookings_services'], 'service_id'));
+                    $stylistIds = array_unique(array_column($data['bookings_services'], 'stylist_id'));
+
+                    $serviceNameMap = [];
+                    if (!empty($serviceIds)) {
+                        $serviceNameMap = $this->Services->find('list', [
+                            'keyField' => 'id',
+                            'valueField' => 'service_name'
+                        ])->where(['id IN' => $serviceIds])->toArray();
+                    }
+
+                    $stylistNameMap = [];
+                    if (!empty($stylistIds)) {
+                        $stylistNameMap = $this->Stylists->find('list', [
+                            'keyField' => 'id',
+                            'valueField' => function($stylist) { return $stylist->first_name . ' ' . $stylist->last_name; }
+                        ])->where(['id IN' => $stylistIds])->toArray();
+                    }
+
+                    foreach ($data['bookings_services'] as $bs) {
+                        $enrichedBs = $bs; 
+                        $enrichedBs['service_name'] = $serviceNameMap[$bs['service_id']] ?? 'Unknown Service';
+                        $enrichedBs['stylist_name'] = $stylistNameMap[$bs['stylist_id']] ?? 'Unknown Stylist';
+                        $enrichedBookingServices[] = $enrichedBs;
+                    }
+                }
+                $data['bookings_services_summary'] = $enrichedBookingServices; 
+
+                Log::debug('[GuestBooking] Data being written to session: ' . json_encode($data), ['scope' => ['guest_session']]);
+
+                $this->request->getSession()->write('GuestBooking.pending_details', $data);
+
+                $this->Flash->success(__('Please complete your payment to confirm your booking.'));
+                return $this->redirect(['controller' => 'Payments', 'action' => 'processGuestPayment']);
+
+            } else { // Recaptcha failed
+                $this->Flash->error(__('Please confirm that you are not a bot.'));
+                $this->set('booking', $this->Bookings->patchEntity($bookingEntity, $this->request->getData()));
+            }
+        } 
+
         $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
         $services = $this->fetchTable('Services')->find('all')->all();
-        $this->set(compact('booking', 'stylists', 'services'));
+        $this->set('booking', $bookingEntity); 
+        $this->set(compact('stylists', 'services'));
+        $this->render('guestbooking'); 
     }
 
     /**
@@ -2359,8 +2245,17 @@ class BookingsController extends AppController
             'BookingsServices' => ['Services', 'Stylists'],
         ]);
 
+        // ---- ADD THIS CHECK ----
+        if ($booking->status === 'Confirmed - Paid') {
+            $this->Flash->error(__('This booking has been paid and can no longer be edited.'));
+            return $this->redirect(['action' => 'customerindex']);
+        }
+        // ---- END CHECK ----
+
+        $currentUserId = $this->Authentication->getIdentity()->id;
+
         // Check if the booking belongs to the logged-in customer
-        if ($booking->customer_id !== $user->id) {
+        if ($booking->customer_id !== $currentUserId) {
             $this->Flash->error(__('You are not authorized to edit this booking.'));
             // Redirect to customer's booking list or dashboard
             return $this->redirect(['action' => 'customerindex']);
@@ -2400,9 +2295,9 @@ class BookingsController extends AppController
             }
 
             // Customer ID and Name should be fixed to the logged-in user
-            $data['customer_id'] = $user->id;
+            $data['customer_id'] = $currentUserId;
             // Regenerate booking name based on logged-in customer
-            $customer = $this->Bookings->Customers->get($user->id); // Get fresh customer data if needed
+            $customer = $this->Bookings->Customers->get($currentUserId); // Get fresh customer data if needed
             $data['booking_name'] = 'Booking for ' . $customer->first_name . ' ' . $customer->last_name;
 
 
@@ -2650,7 +2545,7 @@ class BookingsController extends AppController
 
         // Prepare data for the view (GET request or if POST failed and needs re-render)
         // Only allow the current customer in the dropdown (though it shouldn't be changeable)
-        $customers = $this->Bookings->Customers->find('list', ['limit' => 1])->where(['id' => $user->id])->all();
+        $customers = $this->Bookings->Customers->find('list', ['limit' => 1])->where(['id' => $currentUserId])->all();
         $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
         $services = $this->fetchTable('Services')->find('all')->all(); // Fetch all service details for the form
 

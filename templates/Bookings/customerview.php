@@ -115,16 +115,31 @@
                 ['controller' => 'Customers', 'action' => 'dashboard'],
                 ['class' => 'btn btn-secondary']
             ) ?>
-            <?php if ($booking->status === 'active'): ?>
-                <?= $this->Form->postLink(
-                    __('Cancel Booking'),
-                    ['action' => 'customerdelete', $booking->id],
-                    [
-                        'method' => 'delete',
-                        'confirm' => __('Are you sure you want to cancel this booking?'),
-                        'class' => 'btn btn-danger',
-                    ]
-                ) ?>
+
+            <?php if ($booking->status === 'Confirmed - Paid'): ?>
+                <p class="mt-3 text-muted">This booking has been paid. Please contact the store if you want to cancel or make changes.</p>
+            <?php else: ?>
+                <?php // Show edit button if status allows (e.g., active or payment due)
+                if (in_array($booking->status, ['active', 'Confirmed - Payment Due'])): ?>
+                    <?= $this->Html->link(
+                        __('Edit Booking'),
+                        ['action' => 'customeredit', $booking->id],
+                        ['class' => 'btn btn-primary']
+                    ) ?>
+                <?php endif; ?>
+
+                <?php 
+                if (in_array($booking->status, ['active', 'Confirmed - Payment Due'])): ?>
+                    <?= $this->Form->postLink(
+                        __('Cancel Booking'),
+                        ['action' => 'customerdelete', $booking->id],
+                        [
+                            'method' => 'delete',
+                            'confirm' => __('Are you sure you want to cancel this booking? This action cannot be undone.'),
+                            'class' => 'btn btn-danger',
+                        ]
+                    ) ?>
+                <?php endif; ?>
             <?php endif; ?>
         </div>
     </div>
