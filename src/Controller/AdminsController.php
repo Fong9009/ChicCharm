@@ -281,7 +281,7 @@ class AdminsController extends AppController
         //Provides Active Booking Count
         $bookingsTable = $this->fetchTable('Bookings');
         $bookingCount = $bookingsTable->find()
-            ->where(['status' => 'active'])
+            ->where(['status IN' => ['active', 'Confirmed - Payment Due', 'Confirmed - Paid']])
             ->count();
 
         //Provides Service Count

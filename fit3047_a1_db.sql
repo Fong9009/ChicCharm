@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: May 07, 2025 at 09:16 AM
+-- Generation Time: May 07, 2025 at 11:21 AM
 -- Server version: 9.3.0
 -- PHP Version: 8.4.6
 
@@ -29,16 +29,16 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `admins` (
   `id` int NOT NULL,
-  `first_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `last_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `nonce` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `first_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `last_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `nonce` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `nonce_expiry` datetime DEFAULT NULL,
   `created` datetime DEFAULT CURRENT_TIMESTAMP,
   `modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'admin',
-  `profile_picture` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL
+  `type` varchar(50) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'admin',
+  `profile_picture` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -57,14 +57,12 @@ INSERT INTO `admins` (`id`, `first_name`, `last_name`, `email`, `password`, `non
 
 CREATE TABLE `bookings` (
   `id` int NOT NULL,
-  `booking_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `booking_name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `booking_date` date NOT NULL,
   `total_cost` decimal(10,2) NOT NULL,
   `remaining_cost` decimal(10,2) NOT NULL,
   `customer_id` int DEFAULT NULL,
-  `status` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `created` datetime NOT NULL,
-  `modified` datetime NOT NULL,
+  `status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `notes` text COLLATE utf8mb4_general_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -72,13 +70,10 @@ CREATE TABLE `bookings` (
 -- Dumping data for table `bookings`
 --
 
-INSERT INTO `bookings` (`id`, `booking_name`, `booking_date`, `total_cost`, `remaining_cost`, `customer_id`, `status`, `created`, `modified`, `notes`) VALUES
-(213, 'Booking for Chay Fong Hong', '2025-05-10', 150.00, 0.00, 1, 'cancelled', '2025-05-07 18:11:33', '2025-05-07 18:22:41', ''),
-(214, 'Booking for Chay Fong Hong', '2025-05-11', 150.00, 0.00, 1, 'cancelled', '2025-05-07 18:22:54', '2025-05-07 18:27:12', ''),
-(215, 'Booking for Chay Fong Hong', '2025-05-09', 150.00, 0.00, 1, 'cancelled', '2025-05-07 18:27:23', '2025-05-07 18:31:34', ''),
-(216, 'Booking for Chay Fong Hong', '2025-05-10', 220.00, 0.00, 1, 'cancelled', '2025-05-07 18:31:46', '2025-05-07 18:33:56', ''),
-(217, 'Booking for Chay Fong Hong', '2025-05-11', 150.00, 0.00, 1, 'cancelled', '2025-05-07 18:34:03', '2025-05-07 19:02:14', ''),
-(218, 'Booking for Chay Fong Hong', '2025-05-11', 150.00, 0.00, 1, 'Confirmed - Paid', '2025-05-07 19:09:44', '2025-05-07 19:09:58', '');
+INSERT INTO `bookings` (`id`, `booking_name`, `booking_date`, `total_cost`, `remaining_cost`, `customer_id`, `status`, `notes`) VALUES
+(168, 'Booking for Christian Cochrane', '2025-05-03', 370.00, 370.00, 2, 'finished', ''),
+(169, 'Booking for Chay Fong Hong', '2025-05-03', 150.00, 150.00, 1, 'finished', 'Makeup For a Friend'),
+(170, 'Booking for Christian Cochrane', '2025-05-07', 150.00, 150.00, 2, 'finished', '');
 
 -- --------------------------------------------------------
 
@@ -103,12 +98,10 @@ CREATE TABLE `bookings_services` (
 --
 
 INSERT INTO `bookings_services` (`id`, `booking_id`, `service_id`, `service_cost`, `created`, `modified`, `stylist_id`, `start_time`, `end_time`) VALUES
-(399, 213, 1, 150.00, '2025-05-07 08:11:33', '2025-05-07 08:11:33', 2, '09:00:00', '10:00:00'),
-(400, 214, 1, 150.00, '2025-05-07 08:22:54', '2025-05-07 08:22:54', 2, '09:00:00', '10:00:00'),
-(401, 215, 1, 150.00, '2025-05-07 08:27:23', '2025-05-07 08:27:23', 2, '09:00:00', '10:00:00'),
-(402, 216, 2, 220.00, '2025-05-07 08:31:46', '2025-05-07 08:31:46', 2, '09:15:00', '10:45:00'),
-(403, 217, 1, 150.00, '2025-05-07 08:34:03', '2025-05-07 08:34:03', 2, '09:00:00', '10:00:00'),
-(404, 218, 1, 150.00, '2025-05-07 09:09:44', '2025-05-07 09:09:44', 2, '09:00:00', '10:00:00');
+(325, 168, 1, 150.00, '2025-05-02 08:56:02', '2025-05-02 08:56:02', 2, '10:00:00', '11:00:00'),
+(326, 168, 2, 220.00, '2025-05-02 08:56:02', '2025-05-02 08:56:02', 2, '11:00:00', '12:30:00'),
+(327, 169, 1, 150.00, '2025-05-02 08:56:28', '2025-05-02 08:56:28', 2, '12:30:00', '13:30:00'),
+(328, 170, 1, 150.00, '2025-05-06 05:03:55', '2025-05-06 05:03:55', 2, '10:30:00', '11:30:00');
 
 -- --------------------------------------------------------
 
@@ -129,7 +122,9 @@ CREATE TABLE `bookings_stylists` (
 --
 
 INSERT INTO `bookings_stylists` (`id`, `stylist_date`, `selected_cost`, `booking_id`, `stylist_id`) VALUES
-(364, '2025-05-11', 150.00, 218, 2);
+(291, '2025-05-03', 370.00, 168, 2),
+(292, '2025-05-03', 150.00, 169, 2),
+(293, '2025-05-07', 150.00, 170, 2);
 
 -- --------------------------------------------------------
 
@@ -139,11 +134,11 @@ INSERT INTO `bookings_stylists` (`id`, `stylist_date`, `selected_cost`, `booking
 
 CREATE TABLE `contacts` (
   `id` int NOT NULL,
-  `first_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `last_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `phone_number` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `first_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `last_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `phone_number` varchar(10) COLLATE utf8mb4_general_ci NOT NULL,
+  `message` text COLLATE utf8mb4_general_ci NOT NULL,
   `replied` tinyint(1) DEFAULT '0',
   `is_archived` tinyint(1) NOT NULL DEFAULT '0',
   `created` datetime DEFAULT CURRENT_TIMESTAMP,
@@ -213,13 +208,13 @@ INSERT INTO `contacts` (`id`, `first_name`, `last_name`, `email`, `phone_number`
 
 CREATE TABLE `content_blocks` (
   `id` int NOT NULL,
-  `parent` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `slug` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `label` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `type` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
-  `previous_value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
+  `parent` varchar(128) COLLATE utf8mb4_general_ci NOT NULL,
+  `slug` varchar(128) COLLATE utf8mb4_general_ci NOT NULL,
+  `label` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `description` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `type` varchar(32) COLLATE utf8mb4_general_ci NOT NULL,
+  `value` text COLLATE utf8mb4_general_ci,
+  `previous_value` text COLLATE utf8mb4_general_ci,
   `modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -239,9 +234,9 @@ INSERT INTO `content_blocks` (`id`, `parent`, `slug`, `label`, `description`, `t
 (11, 'Landing', 'owner-quote', 'Quote from Owner', 'Quote from Owner', 'text', '\"Creativity is what drives ChicCharm and that is what I am about\"', NULL, '2025-04-11 00:52:41'),
 (12, 'Landing', 'vision-statement', 'Vision Statement', 'Statement of ChicCharms Vision', 'text', 'Michonne had envisioned a future business that would take the fashion and entertainment industry by storm. <br />Seeing that the fashion and entertainment industry had yet to take its shape in Australia, Michonne had saw an opportunity. <br />An opportunity to provide fashion and makeup services to cater for modelling and the entertainment industry <br />Michonne believes that with enough dedication and a new makeover of ChicCharm she can bring it onto the not just the local stage<br />But the whole of Australia.', NULL, '2025-04-11 00:52:20'),
 (13, 'Landing', 'service-title', 'Service Title', 'The Title for landing page service', 'text', 'ChicCharm At Your Service', NULL, '2025-04-11 00:55:39'),
-(14, 'Landing', 'service-desc', 'Service Description', 'Description of services provided at ChicCharm', 'text', 'ChicCharm is dedicated to provide your show with the finest of artisens who are masters of their craft.\r\n                        They will make sure that your models or stars of the show will shine brighter than ever.', NULL, '2025-04-11 00:56:39'),
+(14, 'Landing', 'service-desc', 'Service Description', 'Description of services provided at ChicCharm', 'text', 'Here at ChicCharm we have many services that will suit your needs.', NULL, '2025-05-06 07:48:08'),
 (15, 'Landing', 'service-one-title', 'Service one title', 'First service title', 'text', 'Makeup Artistry', NULL, '2025-04-11 01:06:58'),
-(16, 'Landing', 'service-one-desc', 'Service one description', 'Description Text', 'text', 'ChicCharm can make sure your stars of the show shine.', NULL, '2025-04-11 01:07:15'),
+(16, 'Landing', 'service-one-desc', 'Service one description', 'Description Text', 'text', 'ChicCharm can make sure your stars of the show shine as bright as they should be. Our experienced Makeup artists are sure to bring the life to your show. ', 'ChicCharm can make sure your stars of the show shine.', '2025-05-06 17:28:30'),
 (17, 'Landing', 'service-two-title', 'Service two title', 'Service Title', 'text', 'Wig Styling', NULL, '2025-04-11 01:02:10'),
 (18, 'Landing', 'service-two-desc', 'Service two description', 'Description Text', 'text', 'ChicCharm can design custom wigs for all your needs.', NULL, '2025-04-11 01:03:07'),
 (19, 'Landing', 'service-three-title', 'Service three title', 'Service title', 'text', 'Fashion Design', NULL, '2025-04-11 01:03:49'),
@@ -251,8 +246,20 @@ INSERT INTO `content_blocks` (`id`, `parent`, `slug`, `label`, `description`, `t
 (23, 'Landing', 'booking-button', 'Booking Button', 'Button for booking', 'text', 'Make a Booking with ChicCharm', NULL, '2025-04-11 01:09:07'),
 (24, 'Landing', 'past-work-title', 'Past work title', 'Title', 'text', 'Some of ChicCharms latest works', NULL, '2025-04-11 01:10:08'),
 (25, 'Landing', 'past-text', 'Past text', 'Text description', 'text', 'ChicCharm is dedicated to helping make sure that your show is ready on the stage or a model show,\r\n                    Our Business is nothing without our fabulous customers who continue to work with us', NULL, '2025-04-11 01:10:49'),
-(26, 'Photos', 'photo-about', 'Photo about', 'Photo about', 'image', '/content-blocks/uploads/photo-test.0c5a460258f8dd77008ecac8d5de80eb.jpg', NULL, '2025-04-11 01:51:56'),
-(27, 'Photos', 'mast-photo', 'Cover photo', 'photo', 'image', '/content-blocks/uploads/mast-photo.59be958825f3b623353eae8d71e42064.jpg', NULL, '2025-04-11 01:53:54');
+(26, 'Photos', 'photo-about', 'Photo about', 'Photo about', 'image', '/content-blocks/uploads/photo-test.0c5a460258f8dd77008ecac8d5de80eb.jpg', NULL, '2025-05-06 14:52:01'),
+(28, 'Photos', 'photo-carousel-1', 'Carousel Photo 1', 'This is for Carousel Photo 1', 'image', '/content-blocks/uploads/photo-carousel-1.2114f8243a35576002022f9220065902.jpg', '/content-blocks/uploads/photo-carousel-1.f6e0bf8fceba4b989d1cc9db68312cf8.jpg', '2025-05-06 17:27:33'),
+(29, 'Photos', 'photo-carousel-2', 'Carousel photo 2', 'This is for Carousel Photo 2', 'image', '/content-blocks/uploads/photo-carousel-2.c0df9c4cbd9a2bfbaae2d61b36e49b4b.jpg', NULL, '2025-05-06 17:33:25'),
+(30, 'Photos', 'photo-carousel-3', 'Carousel Photo 3', 'This is for Carousel Photo 3', 'image', '/content-blocks/uploads/photo-carousel-3.d2c03447d8f885a788dd71a11d6ff5bf.jpg', NULL, '2025-05-06 17:35:11'),
+(31, 'Photos', 'photo-carousel-4', 'Carousel Photo 4', 'This is for Carousel Photo 4', 'image', '/content-blocks/uploads/photo-carousel-4.044531ea1224ce7c9f8b8fb0d64c6c66.jpg', NULL, '2025-05-06 17:42:30'),
+(32, 'Photos', 'photo-masthead', 'Mast Photo', 'The front page photo', 'image', '/content-blocks/uploads/photo-masthead.5df4a72c41c007d45e39de70d5396d4d.jpg', NULL, '2025-05-06 18:03:34'),
+(33, 'Portfolio Images', 'portfolio-1', 'Portfolio Image 1', 'Portfolio Image 1', 'image', '/content-blocks/uploads/portfolio-1.7114e8566fd96e6babbe1d4ea6f39cb6.jpg', NULL, '2025-05-06 18:10:03'),
+(34, 'Portfolio Images', 'portfolio-2', 'Portfolio Image 2', 'Portfolio Image 2', 'image', '/content-blocks/uploads/portfolio-2.390ab119c46bf74ca6ea7a1ac2c0bdf4.jpg', NULL, '2025-05-06 18:10:14'),
+(35, 'Portfolio Images', 'portfolio-3', 'Portfolio Image 3', 'Portfolio Image 3', 'image', '/content-blocks/uploads/portfolio-3.723ce5fabd08d9165e8c3981ba077736.jpg', NULL, '2025-05-06 18:13:36'),
+(36, 'Photos', 'photo-meet', 'Meet Photo', 'Meet photo for Michonne', 'image', '/content-blocks/uploads/photo-meet.9218833aca3b2d5fd7b7d5ff1c1396ba.jpg', NULL, '2025-05-06 18:17:17'),
+(37, 'Services MotTo', 'services-motto-1', 'Services Motto 1', 'Services Motto 1', 'text', 'The Finest of Makeup Stylists', NULL, '2025-05-06 08:28:46'),
+(38, 'Services Motto', 'services-motto-2', 'Services Motto 2', 'Services Motto 2', 'text', 'The Finest of Wig Stylists', NULL, '2025-05-06 08:28:02'),
+(39, 'Services Motto', 'services-motto-3', 'Services Motto 3', 'Services Motto 3', 'text', 'The Finest of Dress Makers', NULL, '2025-05-06 08:31:33'),
+(40, 'Services Motto', 'services-motto-4', 'Services Motto 4', 'Services Motto 4', 'text', 'The Finest of Hair Stylists', NULL, '2025-05-06 08:29:50');
 
 -- --------------------------------------------------------
 
@@ -262,7 +269,7 @@ INSERT INTO `content_blocks` (`id`, `parent`, `slug`, `label`, `description`, `t
 
 CREATE TABLE `content_blocks_phinxlog` (
   `version` bigint NOT NULL,
-  `migration_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `migration_name` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `start_time` timestamp NULL DEFAULT NULL,
   `end_time` timestamp NULL DEFAULT NULL,
   `breakpoint` tinyint(1) NOT NULL DEFAULT '0'
@@ -283,16 +290,16 @@ INSERT INTO `content_blocks_phinxlog` (`version`, `migration_name`, `start_time`
 
 CREATE TABLE `customers` (
   `id` int NOT NULL,
-  `first_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `last_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `nonce` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `first_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `last_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `nonce` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `nonce_expiry` datetime DEFAULT NULL,
   `created` datetime DEFAULT CURRENT_TIMESTAMP,
   `modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'customer',
-  `profile_picture` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL
+  `type` varchar(50) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'customer',
+  `profile_picture` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -301,7 +308,8 @@ CREATE TABLE `customers` (
 
 INSERT INTO `customers` (`id`, `first_name`, `last_name`, `email`, `password`, `nonce`, `nonce_expiry`, `created`, `modified`, `type`, `profile_picture`) VALUES
 (1, 'Chay Fong', 'Hong', 'chayfong9009@gmail.com', '$2y$10$hIXeX/RjXv4ox29mSuSZiuxclpjRXzyhjO9bgG5is13uBubV8gbqq', 'cc15950b7cef51a668b0f471703d014cb0951e29a7774c49847a669a719ad4bf972d19fdc3cf2ba6ab3adfa14ec3b63a49047e642ebca46469bd429cd37b8471', '2025-04-20 13:28:57', '2025-03-26 11:10:12', '2025-04-18 04:50:05', 'customer', '11662_sung-jin-woo.png'),
-(2, 'Christian', 'Cochrane', 'cakephp@example.com', '$2y$10$4oCG2ResnEQbYk2rgtdTGe1faLZPOu29GZma4EfRmQ.B6vyHOk7u6', '', NULL, '2025-04-04 02:31:18', '2025-04-16 13:25:10', 'customer', NULL);
+(2, 'Christian', 'Cochrane', 'cakephp@example.com', '$2y$10$4oCG2ResnEQbYk2rgtdTGe1faLZPOu29GZma4EfRmQ.B6vyHOk7u6', '', NULL, '2025-04-04 02:31:18', '2025-04-16 13:25:10', 'customer', NULL),
+(61, 'Guest', 'Account', 'guest@chiccharm.com', '$2y$10$331arAgxUzMQjrnxAAh91uxGonTi.NiZm/1C8upN6cYRIu/66zqfG', NULL, NULL, '2025-05-02 18:55:30', '2025-05-02 19:00:00', 'guest', NULL);
 
 -- --------------------------------------------------------
 
@@ -313,38 +321,17 @@ CREATE TABLE `payment_histories` (
   `id` int NOT NULL,
   `booking_id` int DEFAULT NULL,
   `customer_id` int DEFAULT NULL,
-  `paypal_transaction_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `paypal_payer_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `paypal_transaction_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `paypal_payer_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `payment_amount` decimal(10,2) NOT NULL,
-  `payment_currency` varchar(3) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'e.g., AUD, USD',
-  `payment_status` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'e.g., COMPLETED, PENDING, FAILED, REFUNDED',
-  `payment_method` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT 'paypal',
+  `payment_currency` varchar(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'e.g., AUD, USD',
+  `payment_status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'e.g., COMPLETED, PENDING, FAILED, REFUNDED',
+  `payment_method` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'paypal',
   `payment_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `notes` text COLLATE utf8mb4_unicode_ci,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `phinxlog`
---
-
-CREATE TABLE `phinxlog` (
-  `version` bigint NOT NULL,
-  `migration_name` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `start_time` timestamp NULL DEFAULT NULL,
-  `end_time` timestamp NULL DEFAULT NULL,
-  `breakpoint` tinyint(1) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `phinxlog`
---
-
-INSERT INTO `phinxlog` (`version`, `migration_name`, `start_time`, `end_time`, `breakpoint`) VALUES
-(20250418044655, 'RemoveNotesFromBookingsServices', '2025-04-18 04:47:08', '2025-04-18 04:47:08', 0);
 
 -- --------------------------------------------------------
 
@@ -354,7 +341,7 @@ INSERT INTO `phinxlog` (`version`, `migration_name`, `start_time`, `end_time`, `
 
 CREATE TABLE `services` (
   `id` int NOT NULL,
-  `service_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `service_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
   `service_cost` decimal(10,2) NOT NULL,
   `duration_minutes` int NOT NULL DEFAULT '60'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -376,16 +363,16 @@ INSERT INTO `services` (`id`, `service_name`, `service_cost`, `duration_minutes`
 
 CREATE TABLE `stylists` (
   `id` int NOT NULL,
-  `first_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `last_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `first_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `last_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
   `nonce` datetime DEFAULT NULL,
   `nonce_expiry` datetime DEFAULT NULL,
   `created` datetime DEFAULT CURRENT_TIMESTAMP,
   `modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'stylist',
-  `profile_picture` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL
+  `type` varchar(50) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'stylist',
+  `profile_picture` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -497,12 +484,6 @@ ALTER TABLE `payment_histories`
   ADD KEY `fk_payment_customer` (`customer_id`);
 
 --
--- Indexes for table `phinxlog`
---
-ALTER TABLE `phinxlog`
-  ADD PRIMARY KEY (`version`);
-
---
 -- Indexes for table `services`
 --
 ALTER TABLE `services`
@@ -538,19 +519,19 @@ ALTER TABLE `admins`
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=219;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=171;
 
 --
 -- AUTO_INCREMENT for table `bookings_services`
 --
 ALTER TABLE `bookings_services`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=405;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=329;
 
 --
 -- AUTO_INCREMENT for table `bookings_stylists`
 --
 ALTER TABLE `bookings_stylists`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=365;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=294;
 
 --
 -- AUTO_INCREMENT for table `contacts`
@@ -562,13 +543,13 @@ ALTER TABLE `contacts`
 -- AUTO_INCREMENT for table `content_blocks`
 --
 ALTER TABLE `content_blocks`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
 -- AUTO_INCREMENT for table `payment_histories`
@@ -609,7 +590,7 @@ ALTER TABLE `bookings`
 --
 ALTER TABLE `bookings_services`
   ADD CONSTRAINT `bookings_services_ibfk_1` FOREIGN KEY (`booking_id`) REFERENCES `bookings` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `bookings_services_ibfk_2` FOREIGN KEY (`service_id`) REFERENCES `services` (`id`) ON DELETE RESTRICT;
+  ADD CONSTRAINT `bookings_services_ibfk_2` FOREIGN KEY (`service_id`) REFERENCES `services` (`id`);
 
 --
 -- Constraints for table `bookings_stylists`

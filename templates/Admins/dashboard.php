@@ -124,7 +124,7 @@ $identity = $this->request->getAttribute('identity');
                         <i class="material-icons contractor-icon">group</i>
                     </div>
                     <div class="card-body contractor-card-body">
-                        <h3 class="contractor-card-h3">Total Contractors</h3>
+                        <h3 class="contractor-card-h3">Total Stylists</h3>
                         <div class="total-value-container">
                             <p class="contractor-card-count"><?= h($stylistCount) ?></p>
                         </div>

@@ -10,6 +10,7 @@ use App\Controller\AppController;
 use App\Model\Table\BookingsTable;
 use App\Model\Table\PaymentHistoriesTable;
 use Cake\I18n\FrozenTime;
+use App\Mailer\InvoiceMailer;
 
 class PaymentsController extends AppController
 {
@@ -25,7 +26,7 @@ class PaymentsController extends AppController
         if (!$this->components()->has('Authentication')) {
             $this->loadComponent('Authentication.Authentication');
         }
-        $this->Authentication->allowUnauthenticated(['success', 'cancel']);
+        $this->Authentication->allowUnauthenticated(['success', 'cancel', 'processGuestPayment', 'successGuest', 'cancelGuest']);
     }
 
     public function createOrder($bookingId)
@@ -205,20 +206,10 @@ class PaymentsController extends AppController
                 ];
                 
                 $paymentHistory = $this->PaymentHistories->patchEntity($paymentHistory, $paymentHistoryData);
-                
-                // ---- ADD THIS LOGGING ----
-                Log::debug('Attempting to save PaymentHistory in CAPTURE_ORDER action.');
-                Log::debug('Using Table: ' . $this->PaymentHistories->getTable());
-                Log::debug('Using Entity: ' . $this->PaymentHistories->getEntityClass());
-                Log::debug('Data to save: ' . json_encode($paymentHistory->toArray()));
-                Log::debug('Validation errors before save: ' . json_encode($paymentHistory->getErrors()));
-                // ---- END LOGGING ----
 
                 if (!$this->PaymentHistories->save($paymentHistory)) {
-                    // ---- ADD THIS LOGGING ----
                     Log::error('Failed to save PaymentHistory in CAPTURE_ORDER.');
                     Log::error('Validation errors after save attempt: ' . json_encode($paymentHistory->getErrors()));
-                    // ---- END LOGGING ----
                     Log::error('Failed to save payment history for booking ID: ' . $bookingId . ' Errors: ' . json_encode($paymentHistory->getErrors()));
                 } else {
                     Log::debug('PaymentHistory SAVED successfully in CAPTURE_ORDER. ID: ' . $paymentHistory->id);
@@ -267,30 +258,39 @@ class PaymentsController extends AppController
                         'payment_status' => 'Completed',
                         'payment_method' => 'PayPal (Client-side)', 
                         'payment_date' => FrozenTime::now()->format('Y-m-d H:i:s'),
-                        'notes' => 'Payment confirmed via client-side capture redirect.',
+                        'notes' => 'Payment confirmed',
                     ];
                     $paymentHistory = $this->PaymentHistories->patchEntity($paymentHistory, $paymentHistoryData);
-                    
-                    // ---- ADD THIS LOGGING ----
-                    Log::debug('Attempting to save PaymentHistory in SUCCESS action.');
-                    Log::debug('Using Table: ' . $this->PaymentHistories->getTable());
-                    Log::debug('Using Entity: ' . $this->PaymentHistories->getEntityClass());
-                    Log::debug('Data to save: ' . json_encode($paymentHistory->toArray()));
-                    Log::debug('Validation errors before save: ' . json_encode($paymentHistory->getErrors()));
-                    // ---- END LOGGING ----
 
                     $saveResult = $this->PaymentHistories->save($paymentHistory);
 
                     if ($saveResult) {
-                        // ---- ADD THIS LOGGING ----
-                        Log::debug('PaymentHistory SAVED successfully in SUCCESS. ID: ' . $paymentHistory->id);
-                        // ---- END LOGGING ----
                         $this->Flash->success(__('Payment successful! Your booking is confirmed and paid.'));
+                        
+                        // Send invoice email
+                        try {
+                            // Ensure the booking entity has customer and service details for the email
+                            // It might be necessary to re-fetch or ensure associations are loaded.
+                            // For example, if $booking->customer is not loaded:
+                            $bookingWithDetails = $this->Bookings->get($bookingId, [
+                                'contain' => [
+                                    'Customers',
+                                    'BookingsServices' => ['Services', 'Stylists']
+                                ]
+                            ]);
+
+                            $mailer = new InvoiceMailer();
+                            $mailer->sendInvoice($bookingWithDetails, $paymentHistory);
+                            Log::info("Invoice email sent for Booking ID: {$bookingId} to {$bookingWithDetails->customer->email}");
+                        } catch (\Exception $e) {
+                            // Log email sending failure but don't let it break the user flow
+                            Log::error("Failed to send invoice email for Booking ID: {$bookingId}. Error: " . $e->getMessage());
+                            // Optionally, you could add a less critical flash message for the admin or user here
+                            // $this->Flash->warning('Payment was successful, but the invoice email could not be sent. Please contact support.');
+                        }
                     } else {
-                        // ---- ADD THIS LOGGING ----
                         Log::error('Failed to save PaymentHistory in SUCCESS.');
                         Log::error('Validation errors after save attempt: ' . json_encode($paymentHistory->getErrors()));
-                        // ---- END LOGGING ----
                         Log::error("Failed to save payment history for Booking ID: {$bookingId}. Errors: " . json_encode($paymentHistory->getErrors()), ['scope' => ['payment_success_debug']]);
                         $this->Flash->error(__('Payment was successful, but there was an issue recording payment details. Please contact support.'));
                     }
@@ -330,13 +330,230 @@ class PaymentsController extends AppController
             return $this->redirect(['controller' => 'Pages', 'action' => 'display', 'home']);
         }
 
-        $this->paginate = [
-            'contain' => ['Bookings' => ['Customers']],
-            'order' => ['created' => 'DESC']
-        ];
-        $payments = $this->paginate($this->PaymentHistories);
+        // Build the query first
+        $query = $this->PaymentHistories->find()
+            ->contain(['Bookings' => ['Customers']]) 
+            ->order(['PaymentHistories.payment_date' => 'DESC']);
+
+        // Pass the query object to paginate()
+        $payments = $this->paginate($query);
 
         $this->set(compact('payments'));
+    }
+
+    public function processGuestPayment()
+    {
+        $this->viewBuilder()->setLayout('default'); // Or your guest-specific layout if you have one
+
+        $bookingData = $this->request->getSession()->read('GuestBooking.pending_details');
+
+        if (!$bookingData) {
+            $this->Flash->error(__('Your booking session has expired or is invalid. Please try creating your booking again.'));
+            return $this->redirect(['controller' => 'Bookings', 'action' => 'guestbooking']);
+        }
+
+        // For the PayPal button in the view
+        $clientId = Configure::read('PayPal.clientId');
+        $mode = Configure::read('PayPal.mode', 'sandbox'); // Default to sandbox if not set
+
+        if (empty($clientId)) {
+            Log::error("PayPal client ID is not configured for guest payment.", ['scope' => ['paypal']]);
+            $this->Flash->error(__('Payment system is currently unavailable. Please try again later or contact support.'));
+            // Potentially redirect to an error page or back to booking
+            return $this->redirect(['controller' => 'Bookings', 'action' => 'guestbooking']);
+        }
+        
+        // Log the data being passed to the view for debugging
+        Log::debug('[ProcessGuestPayment] Booking data for view: ' . json_encode($bookingData), ['scope' => ['paypal']]);
+
+
+        $this->set(compact('bookingData', 'clientId', 'mode'));
+        // The view should be located at templates/Payments/process_guest_payment.php
+        // We will create this view in the next step.
+        try {
+            $this->render('process_guest_payment');
+        } catch (\Cake\View\Exception\MissingTemplateException $e) {
+            Log::error('Missing template for processGuestPayment: ' . $e->getMessage());
+            $this->Flash->error(__('Could not display the payment page. Please contact support.'));
+            return $this->redirect(['controller' => 'Pages', 'action' => 'display', 'home']);
+        }
+    }
+
+    public function successGuest($temporaryBookingId = null) // Can be null  if not passed
+    {
+        Log::debug("[successGuest] Reached for temp ID: {$temporaryBookingId}. Query: " . json_encode($this->request->getQueryParams()));
+        $session = $this->request->getSession();
+        $bookingData = $session->read('GuestBooking.pending_details');
+
+        if (!$bookingData) {
+            Log::error('[successGuest] Session data for GuestBooking.pending_details not found.');
+            $this->Flash->error(__('Your booking session has expired or payment data is missing. Please try again.'));
+            return $this->redirect(['controller' => 'Bookings', 'action' => 'guestbooking']);
+        }
+
+        if ($temporaryBookingId && (!isset($bookingData['id']) || $bookingData['id'] !== $temporaryBookingId)) {
+            Log::warning("[successGuest] Temporary ID mismatch. Session ID: " . ($bookingData['id'] ?? 'N/A') . ", URL ID: {$temporaryBookingId}");
+        }
+
+        $connection = $this->Bookings->getConnection();
+        try {
+            $connection->begin();
+            Log::debug('[successGuest] Transaction started. Booking data from session: ' . json_encode($bookingData));
+
+            // 1. Create and Save the Booking entity
+            $newBooking = $this->Bookings->newEntity([
+                'customer_id' => $bookingData['customer_id'], 
+                'booking_name' => $bookingData['booking_name'],
+                'booking_date' => $bookingData['booking_date'],
+                'total_cost' => $bookingData['total_cost'],
+                'remaining_cost' => 0.00, 
+                'status' => 'Confirmed - Paid', 
+                'notes' => $bookingData['notes'] ?? null,
+                'start_time' => $bookingData['overall_start_time'] ?? null,
+                'end_time' => $bookingData['overall_end_time'] ?? null,
+            ]);
+
+            if (!$this->Bookings->save($newBooking)) {
+                Log::error('[successGuest] Failed to save new Booking. Errors: ' . json_encode($newBooking->getErrors()));
+                throw new \Exception('Could not save the booking details.');
+            }
+            $newBookingId = $newBooking->id; 
+
+            // Save BookingsServices 
+            $bookingsServicesTable = $this->fetchTable('BookingsServices');
+            $bookingsStylistsTable = $this->fetchTable('BookingsStylists');
+            $processedStylists = [];
+
+            $bookingDateForStorage = null;
+            if (!empty($bookingData['booking_date'])) {
+                try {
+                    $bookingDateForStorage = FrozenTime::parse($bookingData['booking_date'])->format('Y-m-d');
+                } catch (\Exception $e) {
+                    Log::error("[successGuest] Could not parse booking_date from session: " . $bookingData['booking_date'] . " Error: " . $e->getMessage());
+                    throw new \Exception("Invalid booking date format in session.");
+                }
+            } else {
+                Log::error("[successGuest] booking_date missing from session data.");
+                throw new \Exception("Booking date is missing from session data.");
+            }
+
+            if (!empty($bookingData['bookings_services'])) {
+                foreach ($bookingData['bookings_services'] as $serviceKey => $serviceDataFromSession) {
+                    if (!isset($serviceDataFromSession['service_id'], $serviceDataFromSession['stylist_id'], $serviceDataFromSession['start_time_formatted'], $serviceDataFromSession['end_time_formatted'], $serviceDataFromSession['service_cost'])) {
+                        Log::warning("[successGuest] Incomplete service data in session for key {$serviceKey}: " . json_encode($serviceDataFromSession));
+                        throw new \Exception('Incomplete service details in session.');
+                    }
+
+                    $bookingService = $bookingsServicesTable->newEntity([
+                        'booking_id' => $newBookingId,
+                        'service_id' => $serviceDataFromSession['service_id'],
+                        'stylist_id' => $serviceDataFromSession['stylist_id'],
+                        'start_time' => $serviceDataFromSession['start_time_formatted'], 
+                        'end_time' => $serviceDataFromSession['end_time_formatted'],  
+                        'service_cost' => $serviceDataFromSession['service_cost'],
+                    ]);
+                    if (!$bookingsServicesTable->save($bookingService)) {
+                        Log::error('[successGuest] Failed to save BookingsService. Data: ' . json_encode($serviceDataFromSession) . ' Errors: ' . json_encode($bookingService->getErrors()));
+                        throw new \Exception('Could not save service details for the booking.');
+                    }
+
+                    $stylistId = (int)$serviceDataFromSession['stylist_id'];
+                    if (!in_array($stylistId, $processedStylists)) {
+                        $bookingStylist = $bookingsStylistsTable->newEntity([
+                            'booking_id' => $newBookingId,
+                            'stylist_id' => $stylistId,
+                            'stylist_date' => $bookingDateForStorage, 
+                            'selected_cost' => $newBooking->total_cost, 
+                        ]);
+                        if (!$bookingsStylistsTable->save($bookingStylist)) {
+                            Log::error('[successGuest] Failed to save BookingsStylist for stylist ID: ' . $stylistId . ' Errors: ' . json_encode($bookingStylist->getErrors()));
+                            throw new \Exception('Failed to save booking stylist details.');
+                        }
+                        $processedStylists[] = $stylistId;
+                    }
+                }
+            } else {
+                Log::warning("[successGuest] No 'bookings_services' found in session data for booking ID {$newBookingId}.");
+            }
+
+            // 3. Record Payment History
+            $payPalTransactionID = $this->request->getQuery('transaction_id', $this->request->getQuery('paypal_order_id'));
+            $payPalPayerID = $this->request->getQuery('paypal_payer_id');
+
+            $dataForPaymentHistory = [
+                'booking_id' => $newBookingId,
+                'customer_id' => $newBooking->customer_id, // Guest customer ID
+                'paypal_transaction_id' => $payPalTransactionID,
+                'paypal_payer_id' => $payPalPayerID,
+                'payment_amount' => $newBooking->total_cost,
+                'payment_currency' => 'AUD', 
+                'payment_status' => 'Completed',
+                'payment_method' => 'PayPal (Guest)',
+                'payment_date' => FrozenTime::now()->format('Y-m-d H:i:s'),
+                'notes' => 'Guest payment confirmed via client-side redirect. Original PayPal Order ID: ' . $this->request->getQuery('paypal_order_id'),
+            ];
+            $paymentHistory = $this->PaymentHistories->newEntity($dataForPaymentHistory);
+
+            Log::debug('[successGuest] Attempting to save PaymentHistory entity: ' . json_encode($paymentHistory->toArray(), JSON_PRETTY_PRINT));
+            Log::debug('[successGuest] PaymentHistory validation errors before save: ' . json_encode($paymentHistory->getErrors(), JSON_PRETTY_PRINT));
+
+            if (!$this->PaymentHistories->save($paymentHistory)) {
+                Log::error('[successGuest] Failed to save PaymentHistory. Booking ID: {$newBookingId}. Errors: ' . json_encode($paymentHistory->getErrors()));
+                throw new \Exception('Failed to record payment history. Validation errors: ' . json_encode($paymentHistory->getErrors()));
+            } else {
+                Log::info("[successGuest] PaymentHistory saved. ID: {$paymentHistory->id} for Booking ID: {$newBookingId}");
+            }
+
+            $connection->commit();
+            Log::info("[successGuest] Transaction committed for Booking ID: {$newBookingId}");
+
+            // 4. Clear session data
+            $session->delete('GuestBooking.pending_details');
+            Log::debug('[successGuest] GuestBooking.pending_details session data deleted.');
+
+            $this->Flash->success(__('Thank you! Your payment was successful and your booking is confirmed.'));
+            return $this->redirect(['action' => 'guestPaymentSuccess', $newBookingId]); 
+
+        } catch (\Exception $e) {
+            $connection->rollback();
+            Log::error("[successGuest] Transaction rolled back. Error: " . $e->getMessage() . " Session Data: " . json_encode($bookingData));
+            $this->Flash->error(__('An error occurred while finalizing your booking after payment: {0} Please contact support.', $e->getMessage()));
+            return $this->redirect(['controller' => 'Bookings', 'action' => 'guestbooking']);
+        }
+    }
+
+    public function cancelGuest($temporaryBookingId = null)
+    {
+        Log::debug("[cancelGuest] Reached for temp ID: {$temporaryBookingId}. Query: " . json_encode($this->request->getQueryParams()));
+        $session = $this->request->getSession();
+        $session->delete('GuestBooking.pending_details');
+        Log::info('[cancelGuest] GuestBooking.pending_details session data deleted due to cancellation.');
+
+        $this->Flash->warning(__('Your payment was cancelled. Your booking has not been confirmed. Please try again if you wish to book.'));
+        return $this->redirect(['controller' => 'Bookings', 'action' => 'guestbooking']);
+    }
+
+    public function guestPaymentSuccess($bookingId = null)
+    {
+        if (!$bookingId) {
+            $this->Flash->error('No booking specified.');
+            return $this->redirect(['controller' => 'Pages', 'action' => 'display', 'home']);
+        }
+        try {
+            $booking = $this->Bookings->get($bookingId, [
+                'contain' => [
+                    'Customers',
+                    'BookingsServices' => ['Services', 'Stylists' => function ($q) {
+                        return $q->select(['id', 'first_name', 'last_name']);
+                    }]
+                ]
+            ]);
+            $this->set(compact('booking'));
+        } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
+            $this->Flash->error('Booking confirmation not found.');
+            Log::error("[guestPaymentSuccess] Booking not found for ID: {$bookingId}");
+            return $this->redirect(['controller' => 'Pages', 'action' => 'display', 'home']);
+        }
     }
 
 } 
