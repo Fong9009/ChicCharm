@@ -96,9 +96,14 @@ return [
     'Email' => [
         'default' => [
             'transport' => 'default',
-            'from' => ['nemobyte071@gmail.com' => 'ChicCharm'],
+            'from' => ['your_email@gmail.com' => 'Company Name'],
             'charset' => 'utf-8',
             'headerCharset' => 'utf-8',
         ],
+    ],
+    'PayPal' => [
+        'clientId' => 'your_paypal_client_id',
+        'clientSecret' => 'your_paypal_client_secret',  
+        'mode' => 'sandbox',  // Change to 'live' when ready for production
     ],
 ];

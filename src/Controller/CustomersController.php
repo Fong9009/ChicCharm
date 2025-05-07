@@ -75,7 +75,7 @@ class CustomersController extends AppController
         $activeBookings = $bookingsTable->find()
             ->where([
                 'customer_id' => $this->Authentication->getIdentity()->id,
-                'status' => 'active'
+                'status IN' => ['active', 'Confirmed - Payment Due', 'Confirmed - Paid']
             ])
             ->contain([
                 'Customers',
