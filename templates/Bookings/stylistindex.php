@@ -160,7 +160,29 @@
                                                     <?= !empty($booking->notes) ? h($booking->notes) : 'No notes' ?>
                                                 </td>
                                                 <td>
-                                                    <span class="badge <?= $booking->status === 'active' ? 'bg-success' : 'bg-secondary' ?>">
+                                                    <?php 
+                                                    $statusClassStylist = ''; 
+                                                    switch ($booking->status) {
+                                                        case 'active':
+                                                            $statusClassStylist = 'active';
+                                                            break;
+                                                        case 'Confirmed - Payment Due':
+                                                            $statusClassStylist = 'payment-due';
+                                                            break;
+                                                        case 'Confirmed - Paid':
+                                                            $statusClassStylist = 'paid';
+                                                            break;
+                                                        case 'cancelled':
+                                                            $statusClassStylist = 'cancelled';
+                                                            break;
+                                                        case 'finished':
+                                                            $statusClassStylist = 'finished';
+                                                            break;
+                                                        default:
+                                                            $statusClassStylist = 'text-muted';
+                                                    }
+                                                    ?>
+                                                    <span class="status-text <?= $statusClassStylist ?>">
                                                         <?= strtoupper(h($booking->status)) ?>
                                                     </span>
                                                 </td>

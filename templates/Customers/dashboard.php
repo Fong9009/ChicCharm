@@ -104,7 +104,7 @@ $this->layout = 'default';
                                                         <div class="booking-info d-flex flex-column justify-content-between">
                                                             <div>
                                                                 <div class="status-badge">
-                                                                    <span class="status-text <?= $booking->status === 'active' ? 'active' : '' ?>">
+                                                                    <span class="status-text <?= $booking->status === 'active' ? 'active' : ($booking->status === 'Confirmed - Payment Due' ? 'payment-due' : ($booking->status === 'Confirmed - Paid' ? 'paid' : '')) ?>">
                                                                         <?= strtoupper(h($booking->status)) ?>
                                                                     </span>
                                                                 </div>
@@ -155,13 +155,27 @@ $this->layout = 'default';
 
                                                             <div class="booking-actions d-flex flex-column flex-sm-row gap-2">
                                                                 <?= $this->Html->link(
-                                                                    'View',
+                                                                    'View Details',
                                                                     ['controller' => 'Bookings', 'action' => 'customerview', $booking->id],
                                                                     ['class' => 'view-btn']
                                                                 ) ?>
-                                                                <?php if ($booking->status === 'active'): ?>
+                                                                <?php 
+                                                                $canBeEditedOrCancelledDashboard = in_array($booking->status, ['active', 'Confirmed - Payment Due', 'Confirmed - Paid']);
+                                                                $allowInteractionDashboard = true;
+                                                                if ($canBeEditedOrCancelledDashboard) {
+                                                                    try {
+                                                                        $bookingDateTimeDashboard = new \Cake\I18n\FrozenTime($booking->booking_date->format('Y-m-d') . ' ' . ($booking->start_time ? $booking->start_time->format('H:i:s') : '00:00:00'));
+                                                                        if ($bookingDateTimeDashboard < (new \Cake\I18n\FrozenTime())->addHours(24)) {
+                                                                            $allowInteractionDashboard = false;
+                                                                        }
+                                                                    } catch (Exception $e) {
+                                                                        $allowInteractionDashboard = false; // Safety net
+                                                                    }
+                                                                }
+                                                                ?>
+                                                                <?php if ($canBeEditedOrCancelledDashboard && $allowInteractionDashboard): ?>
                                                                     <?= $this->Html->link(
-                                                                        'Edit',
+                                                                        'Edit Booking',
                                                                         ['controller' => 'Bookings', 'action' => 'customeredit', $booking->id],
                                                                         [
                                                                             'class' => 'btn-edit-customer-dashboard',
@@ -176,6 +190,15 @@ $this->layout = 'default';
                                                                             'class' => 'cancel-btn'
                                                                         ]
                                                                     ) ?>
+                                                                <?php elseif (!$allowInteractionDashboard && $canBeEditedOrCancelledDashboard): ?>
+                                                                    <?= $this->Html->link(
+                                                                        'Edit Booking',
+                                                                        ['controller' => 'Bookings', 'action' => 'customeredit', $booking->id],
+                                                                        [
+                                                                            'class' => 'btn-edit-customer-dashboard',
+                                                                        ]
+                                                                    ) ?>
+                                                                    <span class="text-muted small d-block mt-1">Cannot cancel (within 24h)</span>
                                                                 <?php endif; ?>
                                                             </div>
                                                         </div>
