@@ -15,6 +15,7 @@ use Cake\View\Exception\MissingTemplateException;
 use DateTime;
 use Exception;
 use Throwable;
+use Cake\Core\Configure;
 
 /**
  * Bookings Controller
@@ -165,7 +166,7 @@ class BookingsController extends AppController
                 'Bookings.status',
                 'Bookings.notes',
             ])
-            ->where(['status' => 'active'])
+            ->where(['status IN' => ['active', 'Confirmed - Payment Due', 'Confirmed - Paid']])
             ->contain([
                 'Customers' => [
                     'fields' => ['id', 'first_name', 'last_name'],
@@ -200,7 +201,7 @@ class BookingsController extends AppController
         $query = $this->Bookings->find()
             ->where([
                 'customer_id' => $this->Authentication->getIdentity()->id,
-                'status' => 'active',
+                'status IN' => ['active', 'Confirmed - Payment Due', 'Confirmed - Paid'], 
             ])
             ->contain([
                 'Customers',
@@ -408,7 +409,7 @@ class BookingsController extends AppController
             // Check if any service data was submitted (might be empty if all services unchecked)
             $hasServiceData = !empty($data['bookings_services']);
 
-            // --- Start Transaction (Recommended for multi-table operations) ---
+            // Start Transaction    
             $connection = $this->Bookings->getConnection();
             try {
                 $connection->begin();
@@ -429,12 +430,12 @@ class BookingsController extends AppController
                     'notes' => $data['notes'],
                  ], ['associated' => []]);
 
-                // Save main booking changes (without times yet)
+                // Save main booking changes    
                 if (!$this->Bookings->save($booking)) {
                     throw new Exception('Failed to save main booking updates.');
                 }
 
-                $allServicesTimes = []; // To store start/end times
+                $allServicesTimes = [];     
                 // Fetch service durations if we have services
                 $servicesDetails = [];
                 if ($hasServiceData) {
@@ -769,15 +770,13 @@ class BookingsController extends AppController
             $booking = $this->Bookings->newEntity([
                 'customer_id' => $data['customer_id'],
                 'booking_name' => $data['booking_name'],
-                'booking_date' => $data['booking_date'], // Directly use Y-m-d from form
+                'booking_date' => $data['booking_date'], 
                 'total_cost' => $data['total_cost'],
-                'remaining_cost' => $data['remaining_cost'],
+                'remaining_cost' => $data['total_cost'], 
                 'notes' => $data['notes'] ?? null,
-                'status' => 'active',
+                'status' => 'Confirmed - Payment Due', 
             ]);
 
-            // --- Server-Side Time Conflict Validation ---
-            Log::debug('[CustomerBooking] Entering Time Conflict Validation Block.'); // <-- ADD LOG
             $stylistTimeSlots = [];
             $hasConflict = false;
             $conflictMessage = '';
@@ -795,7 +794,7 @@ class BookingsController extends AppController
 
                 foreach ($data['bookings_services'] as $serviceData) {
                     if (!isset($serviceData['stylist_id'], $serviceData['start_time'], $serviceData['service_id'])) {
-                         continue; // Skip incomplete data
+                         continue; 
                     }
                     $stylistId = (int)$serviceData['stylist_id'];
                     $serviceId = (int)$serviceData['service_id'];
@@ -952,8 +951,7 @@ class BookingsController extends AppController
                     Log::debug('[CustomerBooking] No bookings_services data found for saving BookingsStylists.');
                 }
 
-                // --- Calculate and Update Overall Booking Times ---
-                Log::debug('[CustomerBooking] Calculating overall times...');
+                // Calculate and Update Overall Booking Times
                 $overallStartTime = null;
                 $overallEndTime = null;
                 if (!empty($allServicesTimes)) {
@@ -971,22 +969,18 @@ class BookingsController extends AppController
                 }
 
                 // Patch and save the overall times to the main booking record
-                Log::debug('[CustomerBooking] Patching overall times: Start=' . ($overallStartTime ? $overallStartTime->format('H:i:s') : 'NULL') . ', End=' . ($overallEndTime ? $overallEndTime->format('H:i:s') : 'NULL'));
                 $booking = $this->Bookings->patchEntity($booking, [
                     'start_time' => $overallStartTime ? $overallStartTime->format('H:i:s') : null,
                     'end_time' => $overallEndTime ? $overallEndTime->format('H:i:s') : null
                 ]);
-                Log::debug('[CustomerBooking] Attempting to save overall times...');
                 if (!$this->Bookings->save($booking, ['checkRules' => false])) {
-                    Log::error('Failed to save overall times to booking ID: ' . $bookingId);
                      $this->Flash->warning('Booking saved, but failed to update overall times.');
                 } else {
                      Log::debug('[CustomerBooking] Successfully saved overall times.');
                 }
-                // --- End Overall Time Calculation ---
-                $this->Flash->success(__('Your booking has been saved successfully.'));
-                Log::debug('[CustomerBooking] Redirecting to dashboard...');
-                return $this->redirect(['controller' => 'Customers', 'action' => 'dashboard']);
+                $this->Flash->success(__('Your booking is confirmed! Please see payment options below.'));
+                Log::debug('[CustomerBooking] Redirecting to customerview for payment. ID: ' . $bookingId);
+                return $this->redirect(['action' => 'customerview', $bookingId]); // Redirect to customerview
             }
 
             Log::error('Failed to save initial booking. Errors: ' . json_encode($booking->getErrors()));
@@ -1003,9 +997,8 @@ class BookingsController extends AppController
         if ($this->request->is('post')) {
             $data = $this->request->getData();
 
-            // Date should be Y-m-d from native date input
             if (isset($data['booking_date'])) {
-                $data['booking_date_formatted'] = $data['booking_date']; // Directly use if Y-m-d
+                $data['booking_date_formatted'] = $data['booking_date']; 
             } else {
                 $this->Flash->error(__('Booking date is missing.'));
 
@@ -1044,14 +1037,14 @@ class BookingsController extends AppController
             $booking = $this->Bookings->newEntity([
                 'customer_id' => $data['customer_id'],
                 'booking_name' => $data['booking_name'],
-                'booking_date' => $data['booking_date_formatted'], // Use the (already Y-m-d) date
+                'booking_date' => $data['booking_date_formatted'], 
                 'total_cost' => $data['total_cost'],
                 'remaining_cost' => $data['remaining_cost'],
                 'notes' => $data['notes'] ?? null,
                 'status' => 'active',
             ]);
 
-            // --- START Server-Side Time Conflict Validation ---
+            // Server-Side Time Conflict Validation 
             $stylistTimeSlotsAdmin = [];
             $hasConflictAdmin = false;
             $conflictMessageAdmin = '';
@@ -1269,9 +1262,9 @@ class BookingsController extends AppController
         $booking = $this->Bookings->newEmptyEntity();
             if ($this->request->is('post')) {
                 if ($this->Recaptcha->verify()) {
-                    Log::debug('[CustomerBooking] POST request received.'); // <-- ADD LOG
+                    Log::debug('[CustomerBooking] POST request received.');     
                     $data = $this->request->getData();
-                    Log::debug('[CustomerBooking] Request Data: ' . json_encode($data)); // <-- ADD LOG
+                    Log::debug('[CustomerBooking] Request Data: ' . json_encode($data)); 
 
                     // Check if end time exceeds 5 PM
                     if (isset($data['end_time'])) {
@@ -1315,15 +1308,9 @@ class BookingsController extends AppController
                         'booking_name' => $data['booking_name'],
                         'booking_date' => $data['booking_date'], // Directly use Y-m-d from form
                         'total_cost' => $data['total_cost'],
-                        'remaining_cost' => $data['remaining_cost'],
-                        'notes' => $data['notes']
-                            . ' '
-                            . "\nCustomer Contacts"
-                            . "\nEmail: "
-                            . $data['email']
-                            . "\nPhone: "
-                            . $data['phone_number'] ?? null,
-                        'status' => 'active',
+                        'remaining_cost' => $data['total_cost'], // Initially, remaining is total
+                        'notes' => $data['notes'] ?? null,
+                        'status' => 'Confirmed - Payment Due', // Updated initial status
                     ]);
 
                     // --- Server-Side Time Conflict Validation ---
@@ -1345,7 +1332,7 @@ class BookingsController extends AppController
 
                         foreach ($data['bookings_services'] as $serviceData) {
                             if (!isset($serviceData['stylist_id'], $serviceData['start_time'], $serviceData['service_id'])) {
-                                continue; // Skip incomplete data
+                                continue; 
                             }
                             $stylistId = (int)$serviceData['stylist_id'];
                             $serviceId = (int)$serviceData['service_id'];
@@ -1502,13 +1489,8 @@ class BookingsController extends AppController
                                     $processedStylists[] = $stylistId;
                                 }
                             }
-                            Log::debug('[CustomerBooking] Finished loop saving BookingsStylists.');
-                        } else {
-                            Log::debug('[CustomerBooking] No bookings_services data found for saving BookingsStylists.');
                         }
 
-                        // --- Calculate and Update Overall Booking Times ---
-                        Log::debug('[CustomerBooking] Calculating overall times...');
                         $overallStartTime = null;
                         $overallEndTime = null;
                         if (!empty($allServicesTimes)) {
@@ -1537,24 +1519,14 @@ class BookingsController extends AppController
                             'start_time' => $overallStartTime ? $overallStartTime->format('H:i:s') : null,
                             'end_time' => $overallEndTime ? $overallEndTime->format('H:i:s') : null,
                         ]);
-                        Log::debug('[CustomerBooking] Attempting to save overall times...');
                         if (!$this->Bookings->save($booking, ['checkRules' => false])) {
                             Log::error('Failed to save overall times to booking ID: ' . $bookingId);
                             $this->Flash->warning('Booking saved, but failed to update overall times.');
-                        } else {
-                            Log::debug('[CustomerBooking] Successfully saved overall times.');
                         }
-                        // --- End Overall Time Calculation ---
 
-                        $this->Flash->success(__('Your booking has been saved successfully,
-                         we will contact you when your booking to confirm.'));
-                        Log::debug('[CustomerBooking] Redirecting to dashboard...');
-
-                        $request = $this->getRequest();
-                        $response = $this->getResponse();
-                        $this->Authentication->getAuthenticationService()->clearIdentity($request, $response);
-
-                        return $this->redirect(['controller' => 'Pages', 'action' => 'display']);
+                        $this->Flash->success(__('Your booking is confirmed! Please see payment options below.'));  
+                        Log::debug('[CustomerBooking] Redirecting to customerview for payment. ID: ' . $bookingId);
+                        return $this->redirect(['action' => 'customerview', $bookingId]);   
                     }
                 }   else {
                     $this->Flash->error(__('Please confirm that you are not a bot.'));
@@ -1595,6 +1567,12 @@ class BookingsController extends AppController
                 ],
             ],
         );
+
+        // Ensure the logged-in customer owns this booking
+        if ($booking->customer_id !== $this->Authentication->getIdentity()->id) {
+            $this->Flash->error(__('You are not authorized to view this booking.'));
+            return $this->redirect(['controller' => 'Customers', 'action' => 'dashboard']);
+        }
 
         $this->set(compact('booking'));
     }
