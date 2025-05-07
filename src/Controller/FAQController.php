@@ -5,8 +5,13 @@ namespace App\Controller;
 
 class FAQController extends AppController
 {
-    public function questions()
-    {
 
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->loadComponent('Authentication.Authentication');
+        $this->Authentication->allowUnauthenticated(['questions']);
+    }
+    public function questions(){
     }
 }
