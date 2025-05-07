@@ -2889,7 +2889,6 @@ footer .input-group .btn-primary:hover {
 
 .booking-details-wrapper {
     padding: 2rem;
-    margin-top: 76px;
     background-color: #f8f9fa;
     min-height: calc(100vh - 76px);
     display: flex;

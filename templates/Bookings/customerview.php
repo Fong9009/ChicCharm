@@ -76,7 +76,40 @@
             </div>
         </div>
 
-        <div class="actions">
+        <?php if ($booking->status === 'Confirmed - Payment Due'): ?>
+            <div id="payment-options" class="mt-4">
+                <h4>Payment Options</h4>
+                <p>Your booking is confirmed. Please complete your payment below. You can pay via PayPal or a debit/credit card.</p>
+                
+                <p class="mt-3">Alternatively, you may choose to pay at the salon upon arrival.</p>
+            </div>
+
+            <?php
+            // Define JavaScript variables for URLs and CSRF token that will be passed to the element
+            $csrfTokenPayPal = $this->request->getAttribute('csrfToken');
+            $createOrderUrlJs = $this->Url->build(['controller' => 'Payments', 'action' => 'createOrder', 'PAYMENT_BOOKING_ID_PLACEHOLDER'], ['fullBase' => true]);
+            $captureOrderUrlJs = $this->Url->build(['controller' => 'Payments', 'action' => 'captureOrder', 'PAYMENT_BOOKING_ID_PLACEHOLDER'], ['fullBase' => true]);
+            $paymentSuccessUrlJs = $this->Url->build(['controller' => 'Payments', 'action' => 'success', 'PAYMENT_BOOKING_ID_PLACEHOLDER'], ['fullBase' => true]);
+            $paymentCancelUrlJs = $this->Url->build(['controller' => 'Payments', 'action' => 'cancel', 'PAYMENT_BOOKING_ID_PLACEHOLDER'], ['fullBase' => true]);
+
+            echo $this->element('Bookings/paypal_payment', [
+                'booking' => $booking,
+                'csrfTokenPayPal' => $csrfTokenPayPal,
+                'createOrderUrlJsTemplate' => $createOrderUrlJs,
+                'captureOrderUrlJsTemplate' => $captureOrderUrlJs,
+                'paymentSuccessUrlJsTemplate' => $paymentSuccessUrlJs,
+                'paymentCancelUrlJsTemplate' => $paymentCancelUrlJs
+            ]);
+            ?>
+
+        <?php elseif ($booking->status === 'Active' || $booking->status === 'Confirmed - Paid'): ?>
+            <div class="payment-actions mt-4 p-3 border rounded bg-light">
+                <h4 class="text-success"><?= __('Payment Completed') ?></h4>
+                <p><?= __('Thank you! Your payment has been received and your booking is fully confirmed.') ?></p>
+            </div>
+        <?php endif; ?>
+
+        <div class="actions mt-4">
             <?= $this->Html->link(
                 __('Back to Dashboard'),
                 ['controller' => 'Customers', 'action' => 'dashboard'],
