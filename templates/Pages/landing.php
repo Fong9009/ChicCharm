@@ -135,7 +135,7 @@ $imgPort3 = extractImageSrc($this->ContentBlock, 'portfolio-3');
         </section>
 
         <!-- Services Carousel -->
-        <section id="services">
+        <section  id="services">
             <div id="ChiccharmCarousel" class="carousel slide" data-bs-ride="carousel">
                 <div class="carousel-inner mb-4">
                     <div class="carousel-item active">
@@ -274,8 +274,8 @@ $imgPort3 = extractImageSrc($this->ContentBlock, 'portfolio-3');
             </div>
         </section>
         <section>
-            <div>
-                <hr class="flex-grow-1 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
+            <div class="container px-4 px-lg-5">
+                <hr class="flex-grow-1 mx-auto" style="border: none; height: 3px; background-color: #c99863;" />
                 <div class="row gx-4 gx-lg-5">
                     <div class="d-flex justify-content-center mb-4">
                         <?php if (isset($message) && $message): ?>
@@ -285,6 +285,7 @@ $imgPort3 = extractImageSrc($this->ContentBlock, 'portfolio-3');
                     </div>
                 </div>
             </div>
+
             <div class="container px-4 px-lg-5">
                 <div class="row gx-4 gx-lg-5">
                     <h2 class="text-center mt-0"><?= $this->ContentBlock->text('past-work-title'); ?></h2>
