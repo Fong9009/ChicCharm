@@ -5,6 +5,7 @@ namespace App\Controller;
 
 use Cake\Event\EventInterface;
 use App\Mailer\ContactReplyMailer;
+use Cake\Log\Log;
 
 /**
  * Contacts Controller
@@ -262,6 +263,7 @@ class ContactsController extends AppController
             try {
                 $mailer = new ContactReplyMailer();
                 $mailer->sendAdminReply($contact, $replyData);
+                Log::info("Contact reply email attempt successful for Contact ID {$id} to {$contact->email}");
 
                 $contact->replied = true;
                 if ($this->Contacts->save($contact)) {
