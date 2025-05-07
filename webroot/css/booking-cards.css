@@ -54,7 +54,7 @@
     padding: 12px 24px;
     border-radius: 8px;
     text-decoration: none;
-    font-size: 16px;
+    font-size: px;
     text-align: center;
     transition: all 0.2s;
     white-space: nowrap;
@@ -401,8 +401,6 @@
     .cancel-btn {
         flex: 1;
         min-width: unset;
-        padding: 10px 16px;
-        font-size: 14px;
     }
 
     .bookings-header {
@@ -476,4 +474,29 @@
 
 .service-item .service-time {
     font-weight: 500;    
+}
+
+.btn-edit-customer-dashboard {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 0.25rem;
+    text-decoration: none;  
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    border: 1px solid transparent;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.btn-edit-customer-dashboard:hover {
+    background-color: #0056b3;
+    color: white;
 }

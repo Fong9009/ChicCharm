@@ -52,7 +52,7 @@ class BookingsController extends AppController
         $user = $this->Authentication->getIdentity();
 
         // Define customer-specific actions
-        $customerActions = ['customerbooking', 'customerindex', 'customerview', 'dashboard'];
+        $customerActions = ['customerbooking', 'customerindex', 'customerview', 'dashboard', 'customeredit'];
 
         $stylistActions = ['stylistindex', 'stylistview'];
 
@@ -348,10 +348,8 @@ class BookingsController extends AppController
             $data = $this->request->getData();
             $bookingId = $booking->id;
 
-            // Format the date to Y-m-d format
             if (isset($data['booking_date'])) {
-                $bookingDate = new DateTime($data['booking_date']);
-                $data['booking_date_formatted'] = $bookingDate->format('Y-m-d');
+                $data['booking_date_formatted'] = $data['booking_date']; 
             } else {
                 $this->Flash->error(__('Booking date is missing.'));
 
@@ -734,11 +732,12 @@ class BookingsController extends AppController
             $data['customer_id'] = $user->id;
             $data['booking_name'] = 'Booking for ' . $user->first_name . ' ' . $user->last_name;
 
-            // Format the date to Y-m-d format
-            if (isset($data['booking_date'])) {
-                $date = new DateTime($data['booking_date']);
-                $data['booking_date'] = $date->format('Y-m-d');
-            }
+            // Date should be Y-m-d from native date input
+            // No further formatting needed if input type='date' sends Y-m-d
+            // if (isset($data['booking_date'])) {
+            //     $date = new DateTime($data['booking_date']);
+            //     $data['booking_date'] = $date->format('Y-m-d');
+            // }
 
             // Calculate total cost from all selected services
             $totalCost = 0;
@@ -757,7 +756,7 @@ class BookingsController extends AppController
             $booking = $this->Bookings->newEntity([
                 'customer_id' => $data['customer_id'],
                 'booking_name' => $data['booking_name'],
-                'booking_date' => $data['booking_date'],
+                'booking_date' => $data['booking_date'], // Directly use Y-m-d from form
                 'total_cost' => $data['total_cost'],
                 'remaining_cost' => $data['remaining_cost'],
                 'notes' => $data['notes'] ?? null,
@@ -991,10 +990,9 @@ class BookingsController extends AppController
         if ($this->request->is('post')) {
             $data = $this->request->getData();
 
-            // Format the date to Y-m-d format
+            // Date should be Y-m-d from native date input
             if (isset($data['booking_date'])) {
-                $bookingDate = new DateTime($data['booking_date']);
-                $data['booking_date_formatted'] = $bookingDate->format('Y-m-d');
+                $data['booking_date_formatted'] = $data['booking_date']; // Directly use if Y-m-d
             } else {
                 $this->Flash->error(__('Booking date is missing.'));
 
@@ -1033,7 +1031,7 @@ class BookingsController extends AppController
             $booking = $this->Bookings->newEntity([
                 'customer_id' => $data['customer_id'],
                 'booking_name' => $data['booking_name'],
-                'booking_date' => $data['booking_date_formatted'],
+                'booking_date' => $data['booking_date_formatted'], // Use the (already Y-m-d) date
                 'total_cost' => $data['total_cost'],
                 'remaining_cost' => $data['remaining_cost'],
                 'notes' => $data['notes'] ?? null,
@@ -1278,11 +1276,12 @@ class BookingsController extends AppController
                     $data['customer_id'] = $guest->id;
                     $data['booking_name'] = 'Booking for ' . $data['customer_name'];
 
-                    // Format the date to Y-m-d format
-                    if (isset($data['booking_date'])) {
-                        $date = new DateTime($data['booking_date']);
-                        $data['booking_date'] = $date->format('Y-m-d');
-                    }
+                    // Date should be Y-m-d from native date input
+                    // No further formatting needed if input type='date' sends Y-m-d
+                    // if (isset($data['booking_date'])) {
+                    //     $date = new DateTime($data['booking_date']);
+                    //     $data['booking_date'] = $date->format('Y-m-d');
+                    // }
 
                     // Calculate total cost from all selected services
                     $totalCost = 0;
@@ -1301,7 +1300,7 @@ class BookingsController extends AppController
                     $booking = $this->Bookings->newEntity([
                         'customer_id' => $data['customer_id'],
                         'booking_name' => $data['booking_name'],
-                        'booking_date' => $data['booking_date'],
+                        'booking_date' => $data['booking_date'], // Directly use Y-m-d from form
                         'total_cost' => $data['total_cost'],
                         'remaining_cost' => $data['remaining_cost'],
                         'notes' => $data['notes']
@@ -1838,17 +1837,18 @@ class BookingsController extends AppController
      * @param string $date (Y-m-d)
      * @param int $serviceId
      * @param int $stylistId
+     * @param int|null $bookingIdToExclude Optional: ID of the booking being edited.
      * @return array List of available start time strings (H:i format), or empty array on error/no slots.
      */
-    private function _calculateAvailableSlots(string $date, int $serviceId, int $stylistId): array
+    private function _calculateAvailableSlots(string $date, int $serviceId, int $stylistId, ?int $bookingIdToExclude = null): array
     {
+        // Log entry and parameters 
+        $this->log("_calculateAvailableSlots: Date={$date}, Svc={$serviceId}, Stylist={$stylistId}, ExcludeBooking=" . ($bookingIdToExclude !== null ? $bookingIdToExclude : 'NULL'), 'debug');
         try {
-            // Fetch service details (duration)
             $service = $this->Services->get($serviceId);
             $duration = $service->duration_minutes;
             if ($duration <= 0) {
                 $this->log("Service ID {$serviceId} has zero or negative duration.", 'warning');
-
                 return [];
             }
 
@@ -1860,51 +1860,68 @@ class BookingsController extends AppController
 
             for ($hour = $startHour; $hour < $endHour; $hour++) {
                 for ($minute = 0; $minute < 60; $minute += $interval) {
+                    // Calculate potential start/end times
                     $slotStartString = sprintf('%02d:%02d:00', $hour, $minute);
                     $potentialStartTime = new DateTime($date . ' ' . $slotStartString);
-
                     $potentialEndTime = clone $potentialStartTime;
                     $potentialEndTime->modify("+{$duration} minutes");
 
+                    // Log the attempt for this specific minute slot BEFORE checking anything else
+                    $this->log("  Trying Slot: {$slotStartString}", 'debug');
+
                     // Check if the service finishes by closing time
                     if ($potentialEndTime > $closingTime) {
-                        // This slot is too late, no need to check further for this hour
                         $this->log("Slot {$slotStartString} for Svc {$serviceId} skipped: ends after closing time.", 'debug');
-                        break; // Break inner loop (minutes) for this hour
+                        break; 
                     }
 
-                    // Check availability using the existing helper
+                    // Check availability using the existing helper, PASSING the bookingIdToExclude
                     $isSegmentAvailable = $this->checkSegmentAvailability(
                         $date,
                         $potentialStartTime->format('H:i:s'),
                         $potentialEndTime->format('H:i:s'),
                         $serviceId,
-                        $stylistId
+                        $stylistId,
+                        $bookingIdToExclude // Pass the ID here
                     );
 
+                    // Log the check result for each potential slot
+                    $this->log("  Slot Check: Time=" . $potentialStartTime->format('H:i:s') . "-" . $potentialEndTime->format('H:i:s') . " Available=" . ($isSegmentAvailable ? 'Yes' : 'No'), 'debug');
+
                     if ($isSegmentAvailable) {
-                         // Check if the start time is in the past (only for today)
+                        // Check if the slot is in the past (only for today)
                         $todayStr = (new DateTime())->format('Y-m-d');
                         $now = new DateTime();
+                        // Log the values being compared for the past check
+                        $this->log("  Past Check: Date={$date}, Today={$todayStr}, SlotStart=" . $potentialStartTime->format('Y-m-d H:i:s') . ", Now=" . $now->format('Y-m-d H:i:s'), 'debug');
                         if ($date === $todayStr && $potentialStartTime < $now) {
-                            $this->log("Slot {$slotStartString} for Svc {$serviceId} skipped: time is in the past.", 'debug');
-                            continue; // Skip past time slots
+                            $this->log("  Slot Check: {$slotStartString} Skipped: In the past.", 'debug');
+                            continue; 
                         }
 
-                        $availableSlots[] = $potentialStartTime->format('H:i'); // Store as H:i
+                        $this->log("  >>> Reached point to ADD slot: {$slotStartString}", 'debug');
+                        $this->log("  Slot Check: {$slotStartString} ADDED.", 'debug');
+                        // +++ Log before format +++
+                        $this->log("    Attempting format on: " . var_export($potentialStartTime, true), 'debug');
+                        $timeToAdd = $potentialStartTime->format('H:i');
+                        // +++ Log after format +++
+                        $this->log("    Formatted time: {$timeToAdd}", 'debug');
+                        $availableSlots[] = $timeToAdd;
+                        // +++ Log after append +++
+                        $this->log("    Appended. Current array: " . json_encode($availableSlots), 'debug');
                     }
-                } // End minute loop
-            } // End hour loop
+                } 
+            } 
 
+            // Log the final array before returning
+            $this->log("_calculateAvailableSlots: Returning slots: " . json_encode($availableSlots), 'debug');
             return $availableSlots;
 
         } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
             $this->log("Error in _calculateAvailableSlots: Service ID {$serviceId} not found.", 'error');
-
             return [];
         } catch (\Throwable $e) {
             $this->log('Error in _calculateAvailableSlots: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString(), 'error');
-
             return [];
         }
     }
@@ -1913,7 +1930,7 @@ class BookingsController extends AppController
      * Get Available Time Slots method
      *
      * Handles sequential service bookings with potentially different stylists.
-     * Expects input format: { date: 'YYYY-MM-DD', selected_services: [{service_id: X, stylist_id: Y|'any'}, ...] }
+     * Expects input format: { date: 'YYYY-MM-DD', selected_services: [{service_id: X, stylist_id: Y|'any'}, ...], booking_id: Z (optional) }
      *
      * @return \Cake\Http\Response|null|void Returns JSON response with available start times
      */
@@ -1921,56 +1938,72 @@ class BookingsController extends AppController
     {
         $this->request->allowMethod(['post']);
         $this->autoRender = false;
-        $this->response = $this->response->withType('json');
+        $this->response = $this->response->withType('application/json');
 
         $data = $this->request->getData();
-        $date = $data['date'] ?? null;
-        // Expecting structure like: [{service_id: 1, stylist_id: 5}, {service_id: 2, stylist_id: 'any'}]
+        $date = $data['date'] ?? null; // Date should now be Y-m-d directly
         $selectedServiceInput = $data['selected_services'][0] ?? null;
+        $bookingIdToExclude = isset($data['booking_id']) ? (int)$data['booking_id'] : null;
+
+        // Log received data
+        $this->log("getAvailableTimeSlots: Received Data: " . json_encode($data), 'debug');
+        $this->log("getAvailableTimeSlots: Extracted ExcludeBooking=" . ($bookingIdToExclude !== null ? $bookingIdToExclude : 'NULL'), 'debug');
 
         if (!$date || !$selectedServiceInput || !isset($selectedServiceInput['service_id']) || !isset($selectedServiceInput['stylist_id'])) {
             $this->log('getAvailableTimeSlots: Invalid input data received: ' . json_encode($data), 'warning');
             return $this->response->withStatus(400)->withStringBody(json_encode(['error' => 'Missing or invalid date, service_id, or stylist_id.']));
         }
 
+        // Removed parsing from dd/MM/yyyy as date should be Y-m-d
+        // $this->log("getAvailableTimeSlots: Date from input '{$date}' (expected Y-m-d)", 'debug');
+
         try {
             $serviceId = (int)$selectedServiceInput['service_id'];
             $stylistId = (int)$selectedServiceInput['stylist_id'];
 
-            // Call the refactored helper method
-            $availableSlotsHi = $this->_calculateAvailableSlots($date, $serviceId, $stylistId);
+            // Call the refactored helper method, passing the bookingIdToExclude
+            $availableSlotsHi = $this->_calculateAvailableSlots($date, $serviceId, $stylistId, $bookingIdToExclude);
+
+            // +++ Log the raw array received from helper +++
+            $this->log("getAvailableTimeSlots: Received raw slots from helper: " . json_encode($availableSlotsHi), 'debug');
 
             // If no slots were found by the helper, return empty array immediately
             if (empty($availableSlotsHi)) {
+                $this->log("getAvailableTimeSlots: No slots returned from helper, returning empty JSON.", 'debug');
                 return $this->response->withStringBody(json_encode([]));
             }
 
             // Format the H:i slots into the required value/text format
             $formattedSlots = [];
             foreach ($availableSlotsHi as $slotHi) {
+                // +++ Log each slot being processed +++
+                $this->log("  Formatting loop: Processing slot '{$slotHi}'", 'debug');
                 try {
-                    // Use FrozenTime for date-agnostic time parsing/formatting
                     $timeObj = FrozenTime::createFromFormat('H:i', $slotHi);
                     if ($timeObj) {
+                        // +++ Log successful parse +++
+                        $this->log("    -> Parsed successfully.", 'debug');
                         $formattedSlots[] = [
-                            'value' => $slotHi, // H:i format
-                            'text' => $timeObj->format('h:i A') // h:i A format
+                            'value' => $slotHi, 
+                            'text' => $timeObj->format('h:i A') 
                         ];
                     } else {
-                        // Log if parsing somehow fails despite valid format expected
-                        $this->log("Failed to parse time slot '{$slotHi}' in getAvailableTimeSlots even after calculation.", 'warning');
+                        // +++ Log parse failure +++
+                        $this->log("    -> FAILED to parse '{$slotHi}' with FrozenTime.", 'warning');
+                        $this->log("Failed to parse time slot '{$slotHi}' in getAvailableTimeSlots.", 'warning');
                     }
                 } catch (\Exception $e) {
+                     // +++ Log exception during parse +++
+                     $this->log("    -> EXCEPTION parsing '{$slotHi}': " . $e->getMessage(), 'error');
                      $this->log("Exception parsing time slot '{$slotHi}' in getAvailableTimeSlots: " . $e->getMessage(), 'error');
                 }
             }
-
+            // +++ Log the final formatted array +++
+            $this->log("getAvailableTimeSlots: Returning formatted slots: " . json_encode($formattedSlots), 'debug');
             return $this->response->withStringBody(json_encode($formattedSlots));
 
         } catch (\Throwable $e) {
-            // Log detailed error
             $this->log('Error in getAvailableTimeSlots (single): ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString(), 'error');
-            // Return generic error
             return $this->response->withStatus(500)->withStringBody(json_encode(['error' => 'An internal error occurred while fetching time slots.']));
         }
     }
@@ -1985,12 +2018,14 @@ class BookingsController extends AppController
      * @param int $stylistId Specific Stylist ID
      * @return bool True if available, false otherwise
      */
-    private function checkSegmentAvailability(string $date, string $startTimeString, string $endTimeString, int $serviceId, int $stylistId): bool
+    private function checkSegmentAvailability(string $date, string $startTimeString, string $endTimeString, int $serviceId, int $stylistId, ?int $bookingIdToExclude = null): bool
     {
         try {
-            $this->log("checkSegmentAvailability: Checking Svc={$serviceId}, Stylist={$stylistId}, Date={$date}, Time={$startTimeString}-{$endTimeString}", 'debug');
+            // Log the exclusion ID if provided
+            $logSuffix = $bookingIdToExclude ? " (Excluding Booking ID: {$bookingIdToExclude})" : '';
+            $this->log("checkSegmentAvailability: Checking Svc={$serviceId}, Stylist={$stylistId}, Date={$date}, Time={$startTimeString}-{$endTimeString}{$logSuffix}", 'debug');
 
-            // 1. Check qualification (remains the same)
+            // 1. Check qualification
             $this->log("checkSegmentAvailability: Checking qualification...", 'debug');
             $isQualified = $this->Stylists->find()
                 ->where(['Stylists.id' => $stylistId])
@@ -2009,7 +2044,7 @@ class BookingsController extends AppController
             $this->log("checkSegmentAvailability: Checking for booking conflicts in BookingsServices...", 'debug');
             $bookingsServicesTable = $this->fetchTable('BookingsServices');
 
-            $conflictCount = $bookingsServicesTable->find()
+            $query = $bookingsServicesTable->find()
                 ->innerJoinWith('Bookings', function ($q) use ($date) {
                     // Also ensure the booking itself isn't cancelled
                     return $q->where([
@@ -2019,28 +2054,24 @@ class BookingsController extends AppController
                 })
                 ->where([
                     'BookingsServices.stylist_id' => $stylistId,
-                    // Overlap conditions using BookingsServices times
-                    'OR' => [
-                        // Exact match (unlikely for different services but check anyway)
-                        ['BookingsServices.start_time' => $startTimeString, 'BookingsServices.end_time' => $endTimeString],
-                        // New slot starts during existing slot
-                        ['BookingsServices.start_time <' => $startTimeString, 'BookingsServices.end_time >' => $startTimeString],
-                        // New slot ends during existing slot
-                        ['BookingsServices.start_time <' => $endTimeString, 'BookingsServices.end_time >' => $endTimeString],
-                        // New slot completely contains existing slot
-                        ['BookingsServices.start_time >=' => $startTimeString, 'BookingsServices.end_time <=' => $endTimeString],
-                         // Existing slot completely contains new slot (Redundant with above checks but safe)
-                         // ['BookingsServices.start_time <=' => $startTimeString, 'BookingsServices.end_time >=' => $endTimeString],
-                    ],
+                    'BookingsServices.start_time <' => $endTimeString,   // Existing starts before new one ends
+                    'BookingsServices.end_time >' => $startTimeString, // Existing ends after new one starts
                     'BookingsServices.start_time IS NOT NULL',
                     'BookingsServices.end_time IS NOT NULL',
-                ])
-                ->count();
+                ]);
+
+            // Add condition to exclude the current booking if ID is provided
+            if ($bookingIdToExclude !== null) {
+                $query->where(['BookingsServices.booking_id !=' => $bookingIdToExclude]);
+                $this->log("checkSegmentAvailability: Excluding booking ID {$bookingIdToExclude} from conflict check.", 'debug');
+            }
+
+            $conflictCount = $query->count();
 
             $hasConflict = $conflictCount > 0;
             $this->log("checkSegmentAvailability: Conflict check result: " . ($hasConflict ? 'Conflict Found ({$conflictCount})' : 'No Conflict'), 'debug');
 
-            return !$hasConflict; // Return true if NO conflict
+            return !$hasConflict;   
 
         } catch (\Throwable $e) {
             $this->log('Error in checkSegmentAvailability: '
@@ -2048,7 +2079,7 @@ class BookingsController extends AppController
                 . ' Trace: '
                 . $e->getTraceAsString(), 'error');
 
-            return false; // Assume unavailable on error
+            return false;   
         }
     }
 
@@ -2297,20 +2328,16 @@ class BookingsController extends AppController
                 // Basic validation/parsing
                 $serviceId = (int)$serviceId;
                 $stylistId = (int)$stylistId;
-                // Add validation for date format if needed
-                // Example: \Cake\I18n\Date::parseDate($date, 'yyyy-MM-dd');
-
-                // --- Use the refactored logic to get actual slots ---
+          
                 $availableSlots = $this->_calculateAvailableSlots($date, $serviceId, $stylistId);
                 $availableSlotsCount = count($availableSlots);
 
                 $responseData['availableSlotsCount'] = $availableSlotsCount;
             } catch (\Exception $e) {
-                // Log the detailed error on the server
                 Log::error('Error in getAvailabilityCount: '
                     . $e->getMessage() . ' | Trace: ' . $e->getTraceAsString());
 
-                $this->response = $this->response->withStatus(500); // Internal Server Error
+                $this->response = $this->response->withStatus(500); 
                 $responseData['error'] = 'An internal error occurred while checking availability.';
             }
         }
@@ -2318,5 +2345,338 @@ class BookingsController extends AppController
         // Set the response data and serialization keys
         $this->set($responseData);
         $this->viewBuilder()->setOption('serialize', array_keys($responseData));
+    }
+
+    /**
+     * Customer Edit method
+     *
+     * @param string|null $id Booking id.
+     * @return \Cake\Http\Response|null|void Redirects on successful edit, renders view otherwise.
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     */
+    public function customeredit($id = null)
+    {
+        $user = $this->Authentication->getIdentity();
+        // Check if user is a customer
+        if (!$user || $user->type !== 'customer') {
+             $this->Flash->error(__('Access denied. Please log in as a customer.'));
+             return $this->redirect(['controller' => 'Auth', 'action' => 'login']);
+        }
+
+        $booking = $this->Bookings->get($id, contain: [
+            'Customers',
+            'BookingsStylists' => ['Stylists'],
+            'BookingsServices' => ['Services', 'Stylists'],
+        ]);
+
+        // Check if the booking belongs to the logged-in customer
+        if ($booking->customer_id !== $user->id) {
+            $this->Flash->error(__('You are not authorized to edit this booking.'));
+            // Redirect to customer's booking list or dashboard
+            return $this->redirect(['action' => 'customerindex']);
+        }
+
+        // Check the 24-hour rule
+        // Combine booking date and start time to get the full booking datetime
+        $bookingDateTimeStr = $booking->booking_date->format('Y-m-d') . ' ' . ($booking->start_time ? $booking->start_time->format('H:i:s') : '00:00:00');
+        try {
+            $bookingDateTime = new \Cake\I18n\FrozenTime($bookingDateTimeStr);
+            $now = new \Cake\I18n\FrozenTime();
+            $minEditTime = $now->addHours(24);
+
+            if ($bookingDateTime <= $minEditTime) {
+                $this->Flash->error(__('Bookings cannot be changed less than 24 hours before the scheduled time.'));
+                return $this->redirect(['action' => 'customerindex']); 
+            }
+        } catch (\Exception $e) {
+            // Handle potential parsing errors if time is invalid
+            Log::error('Error parsing booking date/time for edit check: ' . $e->getMessage());
+            $this->Flash->error(__('Could not verify booking time for editing. Please contact support.'));
+            return $this->redirect(['action' => 'customerindex']);
+        }
+
+
+        if ($this->request->is(['patch', 'post', 'put'])) {
+            $data = $this->request->getData();
+            $bookingId = $booking->id;
+
+            // Date should be Y-m-d from native date input
+            if (isset($data['booking_date'])) {
+                $data['booking_date_formatted'] = $data['booking_date']; // Directly use if Y-m-d
+            } else {
+                $this->Flash->error(__('Booking date is missing.'));
+
+                return $this->redirect(['action' => 'edit', $bookingId]);
+            }
+
+            // Customer ID and Name should be fixed to the logged-in user
+            $data['customer_id'] = $user->id;
+            // Regenerate booking name based on logged-in customer
+            $customer = $this->Bookings->Customers->get($user->id); // Get fresh customer data if needed
+            $data['booking_name'] = 'Booking for ' . $customer->first_name . ' ' . $customer->last_name;
+
+
+            // Calculate total cost from all selected services
+            $totalCost = 0;
+            if (!empty($data['bookings_services'])) {
+                foreach ($data['bookings_services'] as $serviceData) {
+                    // Ensure cost is retrieved correctly, might need service ID lookup
+                    // Assuming service_cost is submitted with the form
+                    $totalCost += floatval($serviceData['service_cost'] ?? 0);
+                }
+            }
+            $data['total_cost'] = $totalCost;
+            // Remaining cost might need adjustment based on payment status - ASSUME full recalc for now
+            $data['remaining_cost'] = $totalCost;
+            $data['notes'] = $data['notes'] ?? $booking->notes; // Keep existing notes if not provided
+
+
+            $hasServiceData = !empty($data['bookings_services']);
+
+            // --- Start Transaction ---
+            $connection = $this->Bookings->getConnection();
+            try {
+                $connection->begin();
+
+                // Delete existing BookingsServices and BookingsStylists for this booking
+                $bookingsServicesTable = $this->fetchTable('BookingsServices');
+                $bookingsStylistsTable = $this->fetchTable('BookingsStylists');
+                $bookingsServicesTable->deleteAll(['booking_id' => $bookingId]);
+                $bookingsStylistsTable->deleteAll(['booking_id' => $bookingId]);
+
+                // Patch main booking entity
+                 $booking = $this->Bookings->patchEntity($booking, [
+                    // customer_id and booking_name are set above from $user
+                    'customer_id' => $data['customer_id'],
+                    'booking_name' => $data['booking_name'],
+                    'booking_date' => $data['booking_date_formatted'], // Use the validated/formatted date
+                    'total_cost' => $data['total_cost'],
+                    'remaining_cost' => $data['remaining_cost'],
+                    'notes' => $data['notes'],
+                    // Keep status as 'active' unless changed explicitly? Needs clarification.
+                    // 'status' => 'active',
+                 ], [
+                     'associated' => [], // Don't process associations here
+                     'guard' => false // Allow modification of customer_id if needed (though we override)
+                 ]);
+
+                 // Save main booking changes (without times)
+                 // Add checkRules=false temporarily if needed, but rules should ideally allow this
+                if (!$this->Bookings->save($booking /*, ['checkRules' => false] */)) {
+                    // Log detailed error
+                    Log::error('[CustomerEdit] Failed to save main booking updates. Errors: ' . json_encode($booking->getErrors()));
+                    throw new \Exception('Failed to save main booking updates.');
+                }
+
+                $allServicesTimes = []; // To store start/end times for overall calculation
+                $servicesDetails = []; // To store service durations
+
+                if ($hasServiceData) {
+                    // Fetch service durations for calculation
+                    $serviceIds = array_column($data['bookings_services'], 'service_id');
+                    if (!empty($serviceIds)) {
+                        $servicesDetails = $this->Services->find('list', [
+                            'keyField' => 'id',
+                            'valueField' => 'duration_minutes',
+                        ])->where(['id IN' => $serviceIds])->toArray();
+                    }
+
+                    // --- START Server-Side Time Conflict Validation (Customer Edit) ---
+                    $stylistTimeSlotsEdit = [];
+                    $hasConflictEdit = false;
+                    $conflictMessageEdit = '';
+
+                    foreach ($data['bookings_services'] as $serviceData) {
+                         if (!isset($serviceData['stylist_id'], $serviceData['start_time'], $serviceData['service_id'])) {
+                             Log::warning('[CustomerEdit] Skipping service data due to missing fields: ' . json_encode($serviceData));
+                             continue; // Skip if essential data is missing
+                         }
+                         $stylistIdEdit = (int)$serviceData['stylist_id'];
+                         $serviceIdEdit = (int)$serviceData['service_id'];
+                         $startTimeStrEdit = $serviceData['start_time'];
+                         $bookingDateStrEdit = $data['booking_date_formatted']; // Use the potentially new date
+                         $durationEdit = $servicesDetails[$serviceIdEdit] ?? 0;
+
+                         if ($durationEdit <= 0) {
+                             Log::warning("[CustomerEdit] Service ID {$serviceIdEdit} has zero or invalid duration.");
+                             continue; // Skip services with no duration
+                         }
+
+                         try {
+                              $startTimeEdit = new DateTime($bookingDateStrEdit . ' ' . $startTimeStrEdit);
+                              $endTimeEdit = clone $startTimeEdit;
+                              $endTimeEdit->modify("+{$durationEdit} minutes");
+                              $newSlotEdit = ['start' => $startTimeEdit->getTimestamp(), 'end' => $endTimeEdit->getTimestamp()];
+
+                             // Check for conflicts within the submitted services for the same stylist
+                             if (isset($stylistTimeSlotsEdit[$stylistIdEdit])) {
+                                 foreach ($stylistTimeSlotsEdit[$stylistIdEdit] as $existingSlotEdit) {
+                                     // Simple overlap check: new start < existing end AND new end > existing start
+                                     if ($newSlotEdit['start'] < $existingSlotEdit['end'] && $newSlotEdit['end'] > $existingSlotEdit['start']) {
+                                         $hasConflictEdit = true;
+                                         $conflictMessageEdit = "Time conflict detected for stylist. Please ensure service times do not overlap.";
+                                         Log::warning("[CustomerEdit] Internal conflict detected: " . $conflictMessageEdit);
+                                         break 2; // Exit both loops
+                                     }
+                                 }
+                             }
+
+                             // Check for conflicts with OTHER bookings for the same stylist (more complex)
+                             // Reuse checkSegmentAvailability logic if possible, adapting for *this* booking being edited
+                              if (!$this->checkSegmentAvailability($bookingDateStrEdit, $startTimeEdit->format('H:i:s'), $endTimeEdit->format('H:i:s'), $serviceIdEdit, $stylistIdEdit, $bookingId)) {
+                                 $hasConflictEdit = true;
+                                 $conflictMessageEdit = "The selected time slot for a service conflicts with another booking.";
+                                 Log::warning("[CustomerEdit] External conflict detected via checkSegmentAvailability.");
+                                 break; // Exit current loop
+                              }
+
+
+                              $stylistTimeSlotsEdit[$stylistIdEdit][] = $newSlotEdit;
+
+                         } catch (\Exception $e) {
+                              Log::error('[CustomerEdit] Validation time processing error: ' . $e->getMessage());
+                              // Throw exception to trigger transaction rollback
+                              throw new \Exception('Validation time processing error: ' . $e->getMessage());
+                         }
+                     } // end foreach for conflict check
+
+                    if ($hasConflictEdit) {
+                        // Throw exception to trigger transaction rollback
+                        throw new \Exception($conflictMessageEdit ?: 'A time conflict was detected. Please adjust service times.');
+                    }
+                    // --- END Server-Side Time Conflict Validation (Customer Edit) ---
+
+
+                    // Re-Save BookingsServices records
+                    foreach ($data['bookings_services'] as $serviceData) {
+                        // Basic validation again
+                        if (!isset($serviceData['service_id'], $serviceData['stylist_id'], $serviceData['start_time'], $serviceData['service_cost'])) {
+                             Log::warning('[CustomerEdit] Post-validation: Skipping incomplete service data: ' . json_encode($serviceData));
+                            continue;
+                        }
+                        $serviceId = (int)$serviceData['service_id'];
+                        $startTimeString = $serviceData['start_time'];
+                        $duration = $servicesDetails[$serviceId] ?? 0;
+
+                        if ($duration <= 0) continue; // Skip if duration is invalid
+
+                        // Use the potentially updated date
+                        $startTime = new DateTime($data['booking_date_formatted'] . ' ' . $startTimeString);
+                        $endTime = clone $startTime;
+                        $endTime->modify("+{$duration} minutes");
+
+                        $bookingService = $bookingsServicesTable->newEntity([
+                            'booking_id' => $bookingId,
+                            'service_id' => $serviceId,
+                            'stylist_id' => (int)$serviceData['stylist_id'],
+                            'start_time' => $startTime->format('H:i:s'),
+                            'end_time' => $endTime->format('H:i:s'),
+                            'service_cost' => $serviceData['service_cost'], // Use submitted cost
+                        ]);
+
+                        if (!$bookingsServicesTable->save($bookingService)) {
+                            Log::error('[CustomerEdit] Failed to save booking service. Errors: ' . json_encode($bookingService->getErrors()));
+                            throw new \Exception('Failed to save updated booking service details.');
+                        }
+                         $allServicesTimes[] = ['start' => $startTime, 'end' => $endTime]; // Store for overall calculation
+                    }
+                } // end if hasServiceData
+
+                 // Calculate and update overall start/end time for the booking
+                 $overallStartTime = null;
+                 $overallEndTime = null;
+                 if (!empty($allServicesTimes)) {
+                     // Find min start time and max end time from all saved services
+                     $startTimestamps = array_map(function($t) { return $t['start']->getTimestamp(); }, $allServicesTimes);
+                     $endTimestamps = array_map(function($t) { return $t['end']->getTimestamp(); }, $allServicesTimes);
+
+                     if (!empty($startTimestamps)) {
+                         $minStartTs = min($startTimestamps);
+                         $overallStartTime = (new DateTime())->setTimestamp($minStartTs);
+                     }
+                     if (!empty($endTimestamps)) {
+                         $maxEndTs = max($endTimestamps);
+                         $overallEndTime = (new DateTime())->setTimestamp($maxEndTs);
+                     }
+                 }
+
+                 // Update booking with overall times (can be null if no services)
+                 $booking = $this->Bookings->patchEntity($booking, [
+                     'start_time' => $overallStartTime ? $overallStartTime->format('H:i:s') : null,
+                     'end_time' => $overallEndTime ? $overallEndTime->format('H:i:s') : null
+                 ]);
+
+                 if (!$this->Bookings->save($booking)) {
+                     Log::error('[CustomerEdit] Failed to save overall times. Errors: ' . json_encode($booking->getErrors()));
+                     // Decide if this is critical - maybe just warn?
+                     throw new \Exception('Failed to save overall times on booking update.');
+                 }
+
+
+                // Re-Create BookingsStylists records (only if services were submitted)
+                if ($hasServiceData) {
+                    $processedStylists = [];
+                    foreach ($data['bookings_services'] as $serviceData) {
+                        if (!isset($serviceData['stylist_id'])) continue; // Skip if no stylist ID
+                        $stylistId = (int)$serviceData['stylist_id'];
+                        // Only save one record per stylist for the booking
+                        if (!in_array($stylistId, $processedStylists)) {
+                            $bookingStylist = $bookingsStylistsTable->newEntity([
+                                 'booking_id' => $bookingId,
+                                 'stylist_id' => $stylistId,
+                                 // Use the main booking date (potentially updated)
+                                 'stylist_date' => $booking->booking_date->format('Y-m-d'),
+                                 // selected_cost seems ambiguous here, link to total cost? Use booking total?
+                                 'selected_cost' => $booking->total_cost,
+                            ]);
+                            if (!$bookingsStylistsTable->save($bookingStylist)) {
+                                Log::error('[CustomerEdit] Failed to save booking stylist. Errors: ' . json_encode($bookingStylist->getErrors()));
+                                 throw new \Exception('Failed to save updated booking stylist details.');
+                            }
+                             $processedStylists[] = $stylistId; // Mark stylist as processed
+                        }
+                    }
+                }
+
+                // If everything succeeded, commit the transaction
+                $connection->commit();
+                $this->Flash->success(__('Your booking has been updated successfully.'));
+
+                // Redirect to customer's booking list or dashboard
+                return $this->redirect(['action' => 'customerindex']);
+
+            } catch (\Exception $e) {
+                // If any error occurred, rollback the transaction
+                $connection->rollback();
+                Log::error('[CustomerEdit] Booking update failed: ' . $e->getMessage() . ' Booking ID: ' . $bookingId . ' Data: ' . json_encode($data));
+                $this->Flash->error(__('The booking could not be updated. Please, try again. Error: {0}', $e->getMessage()));
+                 // Repopulate form data for rendering? Or just redirect?
+                 // Need to reload data for the view if rendering again
+                 $booking->setError('general', $e->getMessage()); // Set a general error
+            }
+            // --- End Transaction ---
+
+        } // end if request is post/put/patch
+
+        // Prepare data for the view (GET request or if POST failed and needs re-render)
+        // Only allow the current customer in the dropdown (though it shouldn't be changeable)
+        $customers = $this->Bookings->Customers->find('list', ['limit' => 1])->where(['id' => $user->id])->all();
+        $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
+        $services = $this->fetchTable('Services')->find('all')->all(); // Fetch all service details for the form
+
+        // Pass booking, stylists, services, and the single customer to the view
+        $this->set(compact('booking', 'stylists', 'services', 'customers'));
+
+        // Explicitly render the customeredit template if it exists, otherwise try 'edit'
+        // This assumes you might create a specific template `templates/Bookings/customeredit.php`
+        // If not, it might fall back to `templates/Bookings/edit.php` if configured,
+        // or you can explicitly render the 'edit' template.
+        try {
+             $this->render('customeredit');
+        } catch (\Cake\View\Exception\MissingTemplateException $e) {
+             // Fallback to the admin edit template if customer specific one doesn't exist
+             Log::warning('customeredit.php template not found, falling back to edit.php');
+             $this->render('edit');
+        }
     }
 }
