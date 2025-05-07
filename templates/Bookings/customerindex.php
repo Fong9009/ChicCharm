@@ -169,7 +169,29 @@
                                                     <?= !empty($booking->notes) ? h($booking->notes) : 'No notes' ?>
                                                 </td>
                                                 <td>
-                                                    <span class="badge <?= $booking->status === 'active' ? 'bg-success' : 'bg-secondary' ?>">
+                                                    <?php 
+                                                    $statusClass = '';
+                                                    switch ($booking->status) {
+                                                        case 'active':
+                                                            $statusClass = 'active';
+                                                            break;
+                                                        case 'Confirmed - Payment Due':
+                                                            $statusClass = 'payment-due';
+                                                            break;
+                                                        case 'Confirmed - Paid':
+                                                            $statusClass = 'paid';
+                                                            break;
+                                                        case 'cancelled':
+                                                            $statusClass = 'cancelled';
+                                                            break;
+                                                        case 'finished':
+                                                            $statusClass = 'finished';
+                                                            break;
+                                                        default:
+                                                            $statusClass = 'text-muted';
+                                                    }
+                                                    ?>
+                                                    <span class="status-text <?= $statusClass ?>">
                                                         <?= strtoupper(h($booking->status)) ?>
                                                     </span>
                                                 </td>
@@ -182,27 +204,61 @@
                                                         'onmouseout' => 'this.style.backgroundColor="#59B3B3"; this.style.borderColor="#59B3B3"'
                                                         ]
                                                     ) ?>
-                                                    <?= $this->Html->link(__('Edit'), ['action' => 'customeredit', $booking->id], [
-                                                        'class' => 'button',
-                                                        'style' => 'background-color: #007bff; border-color: #007bff; color: white; transition: background-color 0.2s, border-color 0.2s;',
-                                                        'onmouseover' => 'this.style.backgroundColor="#0056b3"; this.style.borderColor="#0056b3"',
-                                                        'onmouseout' => 'this.style.backgroundColor="#007bff"; this.style.borderColor="#007bff"'
-                                                    ]) ?>
-                                                    <?php if ($booking->status === 'active'): ?>
+                                                    <?php 
+                                                    $canBeEditedOrCancelled = in_array($booking->status, ['active', 'Confirmed - Payment Due', 'Confirmed - Paid']);
+                                                    $isTrulyCancelled = $booking->status === 'cancelled';
+                                                    $isFinished = $booking->status === 'finished';
+
+                                                    // 24-hour rule for edit/cancel 
+                                                    $allowInteraction = true;
+                                                    if ($canBeEditedOrCancelled) {
+                                                        try {
+                                                            $bookingDateTime = new \Cake\I18n\FrozenTime($booking->booking_date->format('Y-m-d') . ' ' . ($booking->start_time ? $booking->start_time->format('H:i:s') : '00:00:00'));
+                                                            if ($bookingDateTime < (new \Cake\I18n\FrozenTime())->addHours(24)) {
+                                                                $allowInteraction = false;
+                                                            }
+                                                        } catch (Exception $e) {
+                                                            $allowInteraction = false; 
+                                                        }
+                                                    }
+                                                    ?>
+
+                                                    <?php if ($canBeEditedOrCancelled && $allowInteraction): ?>
+                                                        <?= $this->Html->link(__('Edit'), ['action' => 'customeredit', $booking->id], [
+                                                            'class' => 'button',
+                                                            'style' => 'background-color: #007bff; border-color: #007bff; color: white; transition: background-color 0.2s, border-color 0.2s;',
+                                                            'onmouseover' => 'this.style.backgroundColor="#0056b3"; this.style.borderColor="#0056b3"',
+                                                            'onmouseout' => 'this.style.backgroundColor="#007bff"; this.style.borderColor="#007bff"'
+                                                        ]) ?>
                                                         <?= $this->Form->postLink(
                                                             __('Cancel'),
                                                             ['action' => 'customerdelete', $booking->id],
                                                             [
                                                                 'method' => 'delete',
                                                                 'confirm' => __('Are you sure you want to cancel this booking?'),
-                                                                'class' => 'button',    
+                                                                'class' => 'button',
                                                                 'style' => 'background-color: #dc3545; border-color: #dc3545; transition: background-color 0.2s;',
                                                                 'onmouseover' => 'this.style.backgroundColor="#bb2d3b"; this.style.borderColor="#bb2d3b"',
                                                                 'onmouseout' => 'this.style.backgroundColor="#dc3545"; this.style.borderColor="#dc3545"'
                                                             ]
                                                         ) ?>
+                                                    <?php elseif (!$allowInteraction && $canBeEditedOrCancelled):
+                                                    // Still show edit button if past 24h, but it will be denied by controller, or show message.
+                                                    // For Cancel, it's better to just hide it if not allowed.
+                                                    ?>
+                                                        <?= $this->Html->link(__('Edit'), ['action' => 'customeredit', $booking->id], [
+                                                            'class' => 'button',
+                                                            'style' => 'background-color: #007bff; border-color: #007bff; color: white; transition: background-color 0.2s, border-color 0.2s;',
+                                                            'onmouseover' => 'this.style.backgroundColor="#0056b3"; this.style.borderColor="#0056b3"',
+                                                            'onmouseout' => 'this.style.backgroundColor="#007bff"; this.style.borderColor="#007bff"'
+                                                        ]) ?>
+                                                        <span class="text-muted small d-block mt-1">Cannot cancel (within 24h)</span>
+                                                    <?php elseif ($isTrulyCancelled): ?>
+                                                        <span class="text-muted small d-block mt-1">Booking is cancelled</span>
+                                                    <?php elseif ($isFinished): ?>
+                                                        <span class="text-muted small d-block mt-1">Booking is finished</span>
                                                     <?php else: ?>
-                                                        <span class="text-muted small">Booking is already cancelled</span>
+                                                        <span class="text-muted small d-block mt-1">Interaction not allowed</span>
                                                     <?php endif; ?>
                                                 </td>
                                             </tr>

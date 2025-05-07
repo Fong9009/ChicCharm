@@ -120,7 +120,6 @@
                                                 <small>
                                                      <?= h($bookingService->service->service_name) ?> 
                                                     (<?= $this->Number->currency($bookingService->service->service_cost) ?>):
-                                                    <?php // Time Slot ?>
                                                     <?php if ($bookingService->start_time && $bookingService->end_time): ?>
                                                         <span class="service-time">
                                                             <?= h($bookingService->start_time->format('h:i A')) ?> - <?= h($bookingService->end_time->format('h:i A')) ?>
@@ -144,16 +143,44 @@
                     </td>
                     <td><?= $this->Number->currency($booking->total_cost) ?></td>
                     <td>
-                        <span class="badge <?= $booking->status === 'active' ? 'bg-success' : 'bg-secondary' ?>">
+                        <?php 
+                        $statusClassAdmin = ''; 
+                        switch ($booking->status) {
+                            case 'active':
+                                $statusClassAdmin = 'active';
+                                break;
+                            case 'Confirmed - Payment Due':
+                                $statusClassAdmin = 'payment-due';
+                                break;
+                            case 'Confirmed - Paid':
+                                $statusClassAdmin = 'paid';
+                                break;
+                            case 'cancelled':
+                                $statusClassAdmin = 'cancelled';
+                                break;
+                            case 'finished':
+                                $statusClassAdmin = 'finished';
+                                break;
+                            default:
+                                $statusClassAdmin = 'text-muted';
+                        }
+                        ?>
+                        <span class="status-text <?= $statusClassAdmin ?>">
                             <?= strtoupper(h($booking->status)) ?>
                         </span>
                     </td>
                     <td class="actions">
                         <?= $this->Html->link(__('View'), ['action' => 'view', $booking->id], ['class' => 'button']) ?>
+                        <?php 
+                        $isConfirmedAndNotDeletable = in_array($booking->status, ['active', 'Confirmed - Payment Due', 'Confirmed - Paid']);
+                        ?>
                         <?php if ($booking->status === 'active'): ?>
                             <?= $this->Html->link(__('Edit'), ['action' => 'edit', $booking->id], ['class' => 'button']) ?>
-                            <span class="text-muted small">Cannot delete active bookings</span>
-                        <?php else: ?>
+                        <?php endif; ?>
+
+                        <?php if ($isConfirmedAndNotDeletable): ?>
+                            <span class="text-muted small d-block mt-1">Cannot delete active/confirmed bookings</span>
+                        <?php elseif (in_array($booking->status, ['cancelled', 'finished'])): ?>
                             <?= $this->Form->postLink(
                                 __('Delete'),
                                 ['action' => 'delete', $booking->id],

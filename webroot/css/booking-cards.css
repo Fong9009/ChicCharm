@@ -112,7 +112,7 @@
     font-size: 14px;
     text-transform: uppercase;
     font-weight: 500;
-    margin-bottom: 24px;
+    margin-bottom: 10px;
 }
 
 .status-text.active {
@@ -499,4 +499,26 @@
 .btn-edit-customer-dashboard:hover {
     background-color: #0056b3;
     color: white;
+}
+
+.status-text.payment-due {
+    background-color: #ffc107; 
+    color: #212529; 
+    padding: 0.25em 0.6em;
+    border-radius: 0.25rem;
+    font-weight: bold;
+    font-size: 0.8em;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.status-text.paid {
+    background-color: #28a745; 
+    color: #ffffff; 
+    padding: 0.25em 0.6em;
+    border-radius: 0.25rem;
+    font-weight: bold;
+    font-size: 0.8em;
+    text-transform: uppercase;
+    display: inline-block;
 }
