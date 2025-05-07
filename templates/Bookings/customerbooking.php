@@ -9,7 +9,9 @@
 
 // Add the JavaScript file
 $this->Html->script('booking', ['block' => 'script']);
-?>
+
+$this->Html->css('/utility/forms/forms.css') ?>
+<?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
 <script>
     const apiUrl = '<?= $this->Url->build("/bookings/get-stylists-for-service/") ?>';
     const apiUrl2 = '<?= $this->Url->build("/bookings/get-available-time-slots") ?>';
@@ -50,21 +52,18 @@ $this->Html->script('booking', ['block' => 'script']);
                     <br>
                     <div class="row">
                         <div class="col-md-12">
-                            <h4>Please Select The Date</h4>
+                            <h5>Please Select The Date</h5>
                             <?php
-                                echo $this->Form->control('booking_date', [
-                                    'type' => 'date',
-                                    'required' => true,
-                                    'oninvalid' => "this.setCustomValidity('Please select a Date')",
-                                    'oninput' => "this.setCustomValidity('')",
-                                    'class' => 'form-control' . ($this->Form->isFieldError('booking_date') ? ' is-invalid' : ''),
-                                    'id' => 'booking-date',
-                                    'disabled' => true,
-                                    'label' => false,
-                                    'error' => ['class' => 'invalid-feedback']
-                                ]);
+                             echo $this->Form->control('booking_date', [
+                                'type' => 'date',
+                                'required' => true,
+                                'class' => 'form-control' . ($this->Form->isFieldError('booking_date') ? ' is-invalid' : ''),
+                                'id' => 'booking-date',
+                                'label' => false,
+                                'error' => ['class' => 'invalid-feedback']
+                             ]);
                             ?>
-                            <small class="text-muted">Please select service(s) first</small>
+                             <small class="text-muted">Select services first</small>
                         </div>
                     </div>
                     <br>
@@ -118,3 +117,6 @@ $this->Html->script('booking', ['block' => 'script']);
         </div>
     </div>
 </div>
+
+<!-- Flatpickr JS -->
+<?php // <?= $this->Html->script('https://cdn.jsdelivr.net/npm/flatpickr') ?> ?>

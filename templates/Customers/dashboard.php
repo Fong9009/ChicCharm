@@ -160,6 +160,13 @@ $this->layout = 'default';
                                                                     ['class' => 'view-btn']
                                                                 ) ?>
                                                                 <?php if ($booking->status === 'active'): ?>
+                                                                    <?= $this->Html->link(
+                                                                        'Edit',
+                                                                        ['controller' => 'Bookings', 'action' => 'customeredit', $booking->id],
+                                                                        [
+                                                                            'class' => 'btn-edit-customer-dashboard',
+                                                                        ]
+                                                                    ) ?>
                                                                     <?= $this->Form->postLink(
                                                                         'Cancel Booking',
                                                                         ['controller' => 'Bookings', 'action' => 'customerdelete', $booking->id],
