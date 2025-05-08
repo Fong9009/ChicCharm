@@ -23,8 +23,12 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
     <?= $this->Html->charset() ?>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>
-        <?= $this->request->getAttribute('identity')->type == 'Admin' ? 'Admin - ' : 'Customer -' ?>
-        <?= $this->fetch('title') ?>
+        <?php if ($this->request->getAttribute('identity')): ?>
+            <?= $this->request->getAttribute('identity')->type === 'Admin' ? 'Admin - ' : 'Customer - ' ?>
+            <?= $this->fetch('title') ?>
+        <?php else: ?>
+            ChicCharm
+        <?php endif; ?>
     </title>
     <!-- Google fonts-->
     <link href="https://fonts.googleapis.com/css?family=Merriweather+Sans:400,700" rel="stylesheet" />
