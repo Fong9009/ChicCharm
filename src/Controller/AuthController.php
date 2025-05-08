@@ -517,7 +517,7 @@ class AuthController extends AppController
         $response = $this->getResponse();
         $this->Authentication->getAuthenticationService()->clearIdentity($request, $response);
 
-        return $this->redirect(['controller' => 'Auth', 'action' => 'login']);
+        return $this->redirect(['controller' => 'Customers', 'action' => 'register']);
     }
 
     public function guestcancel()

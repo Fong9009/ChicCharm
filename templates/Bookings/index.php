@@ -171,26 +171,15 @@
                     </td>
                     <td class="actions">
                         <?= $this->Html->link(__('View'), ['action' => 'view', $booking->id], ['class' => 'button']) ?>
-                        <?php 
-                        $isConfirmedAndNotDeletable = in_array($booking->status, ['active', 'Confirmed - Payment Due', 'Confirmed - Paid']);
-                        ?>
-                        <?php if ($booking->status === 'active'): ?>
-                            <?= $this->Html->link(__('Edit'), ['action' => 'edit', $booking->id], ['class' => 'button']) ?>
-                        <?php endif; ?>
-
-                        <?php if ($isConfirmedAndNotDeletable): ?>
-                            <span class="text-muted small d-block mt-1">Cannot delete active/confirmed bookings</span>
-                        <?php elseif (in_array($booking->status, ['cancelled', 'finished'])): ?>
-                            <?= $this->Form->postLink(
-                                __('Delete'),
-                                ['action' => 'delete', $booking->id],
-                                [
-                                    'method' => 'delete',
-                                    'confirm' => __('Are you sure you want to permanently delete this {0} booking?', $booking->status),
-                                    'class' => 'button btn-danger',
-                                ]
-                            ) ?>
-                        <?php endif; ?>
+                        <?= $this->Html->link(__('Edit'), ['action' => 'edit', $booking->id], ['class' => 'button']) ?>
+                        <?= $this->Form->postLink(
+                            __('Delete'),
+                            ['action' => 'delete', $booking->id],
+                            [
+                                'confirm' => __('Are you sure you want to permanently delete booking #{0} ({1})?', $booking->id, h($booking->booking_name)),
+                                'class' => 'button btn-danger',
+                            ]
+                        ) ?>
                     </td>
                 </tr>
             <?php endforeach; ?>

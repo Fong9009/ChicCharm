@@ -159,46 +159,54 @@ $this->layout = 'default';
                                                                     ['controller' => 'Bookings', 'action' => 'customerview', $booking->id],
                                                                     ['class' => 'view-btn']
                                                                 ) ?>
-                                                                <?php 
-                                                                $canBeEditedOrCancelledDashboard = in_array($booking->status, ['active', 'Confirmed - Payment Due', 'Confirmed - Paid']);
-                                                                $allowInteractionDashboard = true;
-                                                                if ($canBeEditedOrCancelledDashboard) {
-                                                                    try {
-                                                                        $bookingDateTimeDashboard = new \Cake\I18n\FrozenTime($booking->booking_date->format('Y-m-d') . ' ' . ($booking->start_time ? $booking->start_time->format('H:i:s') : '00:00:00'));
-                                                                        if ($bookingDateTimeDashboard < (new \Cake\I18n\FrozenTime())->addHours(24)) {
-                                                                            $allowInteractionDashboard = false;
+
+                                                                <?php if ($booking->status === 'Confirmed - Paid'): ?>
+                                                                    <p class="text-muted small mt-1 mb-0 align-self-center">This booking is paid. Contact store for changes.</p>
+                                                                <?php else: ?>
+                                                                    <?php 
+                                                                    // Check if the booking status allows editing or cancellation initially
+                                                                    $statusAllowsActions = in_array($booking->status, ['active', 'Confirmed - Payment Due']);
+                                                                    $interactionAllowedByTime = true;
+
+                                                                    if ($statusAllowsActions) {
+                                                                        try {
+                                                                            $bookingDateTime = new \Cake\I18n\FrozenTime($booking->booking_date->format('Y-m-d') . ' ' . ($booking->start_time ? $booking->start_time->format('H:i:s') : '00:00:00'));
+                                                                            if ($bookingDateTime < (new \Cake\I18n\FrozenTime())->addHours(24)) {
+                                                                                $interactionAllowedByTime = false;
+                                                                            }
+                                                                        } catch (Exception $e) {
+                                                                            $interactionAllowedByTime = false;
                                                                         }
-                                                                    } catch (Exception $e) {
-                                                                        $allowInteractionDashboard = false; // Safety net
                                                                     }
-                                                                }
-                                                                ?>
-                                                                <?php if ($canBeEditedOrCancelledDashboard && $allowInteractionDashboard): ?>
-                                                                    <?= $this->Html->link(
-                                                                        'Edit Booking',
-                                                                        ['controller' => 'Bookings', 'action' => 'customeredit', $booking->id],
-                                                                        [
-                                                                            'class' => 'btn-edit-customer-dashboard',
-                                                                        ]
-                                                                    ) ?>
-                                                                    <?= $this->Form->postLink(
-                                                                        'Cancel Booking',
-                                                                        ['controller' => 'Bookings', 'action' => 'customerdelete', $booking->id],
-                                                                        [
-                                                                            'method' => 'delete',
-                                                                            'confirm' => __('Are you sure you want to cancel this booking?'),
-                                                                            'class' => 'cancel-btn'
-                                                                        ]
-                                                                    ) ?>
-                                                                <?php elseif (!$allowInteractionDashboard && $canBeEditedOrCancelledDashboard): ?>
-                                                                    <?= $this->Html->link(
-                                                                        'Edit Booking',
-                                                                        ['controller' => 'Bookings', 'action' => 'customeredit', $booking->id],
-                                                                        [
-                                                                            'class' => 'btn-edit-customer-dashboard',
-                                                                        ]
-                                                                    ) ?>
-                                                                    <span class="text-muted small d-block mt-1">Cannot cancel (within 24h)</span>
+                                                                    ?>
+
+                                                                    <?php if ($statusAllowsActions): ?>
+                                                                        <?php if ($interactionAllowedByTime): ?>
+                                                                            <?= $this->Html->link(
+                                                                                'Edit Booking',
+                                                                                ['controller' => 'Bookings', 'action' => 'customeredit', $booking->id],
+                                                                                ['class' => 'btn-edit-customer-dashboard']
+                                                                            ) ?>
+                                                                            <?= $this->Form->postLink(
+                                                                                'Cancel Booking',
+                                                                                ['controller' => 'Bookings', 'action' => 'customerdelete', $booking->id],
+                                                                                [
+                                                                                    'method' => 'delete',
+                                                                                    'confirm' => __('Are you sure you want to cancel this booking?'),
+                                                                                    'class' => 'cancel-btn'
+                                                                                ]
+                                                                            ) ?>
+                                                                        <?php else:  ?>
+                                                                            <?= $this->Html->link(
+                                                                                'Edit Booking',
+                                                                                ['controller' => 'Bookings', 'action' => 'customeredit', $booking->id],
+                                                                                [
+                                                                                    'class' => 'btn-edit-customer-dashboard',
+                                                                                ]
+                                                                            ) ?>
+                                                                            <span class="text-muted small d-block mt-1 align-self-center">Cannot cancel (within 24h)</span>
+                                                                        <?php endif; ?>
+                                                                    <?php endif; ?>
                                                                 <?php endif; ?>
                                                             </div>
                                                         </div>
