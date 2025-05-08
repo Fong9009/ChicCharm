@@ -8,7 +8,7 @@
     <head>
         <title>FAQ Page</title>
     </head>-->
-    <body>
+
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
         <div class = "title">
             <h2 class = "faq_header">Frequently Asked Questions</h2>
@@ -62,5 +62,5 @@
         <p>Answer 1 is this xyz</p>
     </div>
 </div>
-    </body>
+
 <!--</html>-->
