@@ -1,4 +1,8 @@
 <?php
+/**
+ * @var \App\View\AppView $this
+ * @var \App\Model\Entity\Service[] $services
+ */
 use Cake\Routing\Router;
 ?>
 <section class="px-5 mt-4">
@@ -27,8 +31,6 @@ use Cake\Routing\Router;
                 </a></h5>
         </div>
     </div>
-
-    </div>
     <hr class="flex-grow-1 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
     <?php
     $counter = 0;
@@ -54,7 +56,7 @@ use Cake\Routing\Router;
                     <p><strong>Cost:</strong> $<?= h($service->service_cost) ?></p>
                 </div>
                 <div class="card-footer" style="background-color: orange">
-                    <!-- Optional footer -->
+                    <?= $this->Html->link('View Service', ['controller' => 'Services', 'action' => 'serviceView', $service->id], ['class' => 'btn btn-primary w-100', 'style' =>"background-color: orange"]) ?>
                 </div>
             </div>
         </div>
@@ -70,4 +72,13 @@ use Cake\Routing\Router;
     if ($counter % 3 !== 0): ?>
         </div>
     <?php endif; ?>
+    <div class="paginator text-center p-2">
+        <ul class="pagination justify-content-center">
+            <?= $this->Paginator->first('<<') ?>
+            <?= $this->Paginator->prev('<') ?>
+            <?= $this->Paginator->next('>') ?>
+            <?= $this->Paginator->last('>>') ?>
+        </ul>
+        <p><?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} Services out of {{count}} total')) ?></p>
+    </div>
 </section>

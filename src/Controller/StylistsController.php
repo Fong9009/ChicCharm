@@ -382,7 +382,7 @@ class StylistsController extends AppController
                 return $q->where(['BookingsStylists.stylist_id' => $stylist->id]);
             })
             ->where(['Bookings.status' => 'active'])
-            ->order(['Bookings.booking_date' => 'DESC'])
+            ->orderBy(['Bookings.booking_date' => 'DESC'])
             ->limit(3);
 
         // Get recent cancelled bookings (limited to 3)
@@ -399,8 +399,30 @@ class StylistsController extends AppController
                 return $q->where(['BookingsServices.stylist_id' => $stylist->id]);
             })
             ->where(['Bookings.status IN' => ['finished', 'cancelled']])
-            ->order(['Bookings.booking_date' => 'DESC'])
+            ->orderBy(['Bookings.booking_date' => 'DESC'])
             ->limit(3);
         $this->set(compact('stylist', 'activeBookings', 'finishedBookings'));
+    }
+
+    public function stylistOverview()
+    {
+        $this->paginate = [
+            'limit' => 12, // Show 6 services per page
+        ];
+
+        // Search functionality
+        $query = $this->Stylists->find();
+        $search = $this->request->getQuery('search');
+        if ($search) {
+            $query->where([
+                'OR' => [
+                    'first_name LIKE' => '%' . $search . '%',
+                    'last_name LIKE' => '%' . $search . '%',
+                ],
+            ]);
+        }
+        $stylists = $this->paginate($query);
+        $this->set(compact('stylists'));
+
     }
 }

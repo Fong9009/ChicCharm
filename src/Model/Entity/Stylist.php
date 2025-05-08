@@ -20,6 +20,8 @@ use Authentication\PasswordHasher\DefaultPasswordHasher;
  * @property \Cake\I18n\DateTime|null $modified
  * @property string $type
  * @property string|null $profile_picture
+ * @property string|null $stylist_motto
+ * @property string|null $stylist_bio
  *
  * @property \App\Model\Entity\Booking[] $bookings
  * @property \App\Model\Entity\Service[] $services
@@ -46,6 +48,8 @@ class Stylist extends Entity
         'modified' => true,
         'type' => true,
         'profile_picture' => true,
+        'stylist_motto' => true,
+        'stylist_bio' => true,
         'bookings' => true,
         'services' => true,
     ];

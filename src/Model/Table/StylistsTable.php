@@ -152,6 +152,16 @@ class StylistsTable extends Table
             ->maxLength('profile_picture', 255)
             ->allowEmptyString('profile_picture');
 
+        $validator
+            ->scalar('stylist_motto')
+            ->maxLength('stylist_motto', 100)
+            ->allowEmptyString('stylist_motto');
+
+        $validator
+            ->scalar('stylist_bio')
+            ->maxLength('stylist_bio', 255)
+            ->allowEmptyString('stylist_bio');
+
         return $validator;
     }
 

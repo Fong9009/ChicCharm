@@ -15,7 +15,7 @@ class ServicesController extends AppController
     public function initialize(): void
     {
         parent::initialize();
-        $this->Authentication->allowUnauthenticated(['servicePage']);
+        $this->Authentication->allowUnauthenticated(['servicePage', 'serviceView']);
     }
 
     /**
@@ -300,6 +300,10 @@ class ServicesController extends AppController
     }
 
     public function servicePage() {
+        $this->paginate = [
+            'limit' => 12, // Show 6 services per page
+        ];
+
         // Search functionality
         $query = $this->Services->find();
         $search = $this->request->getQuery('search');
@@ -308,11 +312,16 @@ class ServicesController extends AppController
                 'OR' => [
                     'service_name LIKE' => '%' . $search . '%',
                     'service_desc LIKE' => '%' . $search . '%',
-                ]
+                ],
             ]);
         }
         $services = $this->paginate($query);
         $this->set(compact('services'));
+    }
+
+    public function serviceView($id = null) {
+        $service = $this->Services->get($id, contain: ['Stylists']);
+        $this->set(compact('service'));
     }
 }
 
