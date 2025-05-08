@@ -94,7 +94,7 @@ $titleDescription = 'Landing Page';
                             <a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a>
+                            <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Services', 'action' => 'servicePage']) ?>">Services</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a>
@@ -205,7 +205,7 @@ $titleDescription = 'Landing Page';
                             <a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a>
+                            <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Services', 'action' => 'servicePage']) ?>">Services</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a>
@@ -229,7 +229,7 @@ $titleDescription = 'Landing Page';
                             <a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a>
+                            <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Services', 'action' => 'servicePage']) ?>">Services</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a>
@@ -247,7 +247,7 @@ $titleDescription = 'Landing Page';
                         <a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a>
+                        <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Services', 'action' => 'servicePage']) ?>">Services</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a>
@@ -281,7 +281,7 @@ $titleDescription = 'Landing Page';
                         <a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a>
+                        <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Services', 'action' => 'servicePage']) ?>">Services</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a>
@@ -340,6 +340,9 @@ $titleDescription = 'Landing Page';
                 <h5 class="text-light fw-bold">Our Company</h5>
                 <ul class="list-unstyled">
                     <li><a href="<?= $this->Url->build('/#about') ?>" class="text-secondary">About Us</a></li>
+                </ul>
+                <ul class="list-unstyled">
+                    <li><a href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Services', 'action' => 'servicePage']) ?>" class="text-secondary">Our Services</a></li>
                 </ul>
             </div>
         </div>
