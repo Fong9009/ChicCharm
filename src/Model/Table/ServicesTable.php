@@ -90,8 +90,18 @@ class ServicesTable extends Table
                 'rule' => function ($value) {
                     return $value % 15 === 0;
                 },
-                'message' => 'Duration must be in 15-minute increments'
+                'message' => 'Duration must be in 15-minute increments',
             ]);
+
+        $validator
+            ->scalar('service_desc')
+            ->maxLength('service_desc', 255)
+            ->requirePresence('service_desc', 'create');
+
+        $validator
+            ->scalar('service_image')
+            ->maxLength('service_image', 255)
+            ->allowEmptyString('service_image');
 
         return $validator;
     }
