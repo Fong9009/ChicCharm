@@ -106,6 +106,7 @@
                         'label' => __('Service Description'),
                         'type' => 'text',
                         'class' => 'form-control',
+                        'required' => false,
                         'placeholder' => __('Enter Service Description'),
                         'error' => ['Please enter Service Description'],
                     ]); ?>

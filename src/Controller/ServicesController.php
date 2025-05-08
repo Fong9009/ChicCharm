@@ -300,7 +300,17 @@ class ServicesController extends AppController
     }
 
     public function servicePage() {
+        // Search functionality
         $query = $this->Services->find();
+        $search = $this->request->getQuery('search');
+        if ($search) {
+            $query->where([
+                'OR' => [
+                    'service_name LIKE' => '%' . $search . '%',
+                    'service_desc LIKE' => '%' . $search . '%',
+                ]
+            ]);
+        }
         $services = $this->paginate($query);
         $this->set(compact('services'));
     }
