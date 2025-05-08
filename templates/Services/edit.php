@@ -88,40 +88,80 @@
     </aside>
     <div class="column">
         <div class="services form content">
-            <?= $this->Form->create($service) ?>
+            <?= $this->Form->create($service, ['type' => 'file']) ?>
             <fieldset>
                 <legend><?= __('Edit Service') ?></legend>
                 <div class="form-group mb-3">
-                    <?=$this->Form->control('service_name',[
-                        'label' => __('Service Name'),
+                    <?= $this->Form->control('service_name', [
+                        'label' => __('Service Name*'),
+                        'type' => 'text',
                         'class' => 'form-control',
                         'required' => true,
-                        'placeholder' => __('Service Name'),
-                        'error' => ['class' => 'invalid-feedback'],
+                        'placeholder' => __('Enter Service Name'),
+                        'error' => ['Please enter Service Name'],
+                    ]); ?>
+                </div>
+                <div class="form-group mb-3">
+                    <?= $this->Form->control('service_desc', [
+                        'label' => __('Service Description'),
+                        'type' => 'text',
+                        'class' => 'form-control',
+                        'placeholder' => __('Enter Service Description'),
+                        'error' => ['Please enter Service Description'],
                     ]); ?>
                 </div>
                 <div class="form-group mb-3">
                     <?= $this->Form->control('service_cost', [
-                        'label' => __('Service Cost'),
+                        'label' => __('Service Cost*'),
+                        'type' => 'text',
                         'class' => 'form-control',
                         'required' => true,
-                        'placeholder' => __('Service Cost'),
-                        'error' => ['class' => 'invalid-feedback'],
+                        'placeholder' => __('Enter Service Cost'),
+                        'error' => ['Please enter Service Cost'],
                     ]); ?>
                 </div>
                 <div class="form-group mb-3">
                     <?= $this->Form->control('duration_minutes', [
-                        'label' => __('Duration (minutes)'),
+                        'label' => __('Duration (minutes)*'),
+                        'type' => 'number',
                         'class' => 'form-control',
                         'required' => true,
                         'placeholder' => __('Enter duration in minutes'),
-                        'error' => ['class' => 'invalid-feedback'],
+                        'error' => ['Please enter duration in minutes'],
                         'min' => 15,
                         'max' => 480,
-                        'step' => 15,
-                        'type' => 'number'
+                        'step' => 15
                     ]); ?>
                     <small class="form-text text-muted">Duration must be in 15-minute increments, between 15 minutes and 8 hours.</small>
+                </div>
+                <!-- Service Image Preview -->
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="profile-preview text-start">
+                            <?php if (!empty($service->service_image)): ?>
+                                <img src="<?= $this->Url->image('service/' . $service->service_image) ?>"
+                                     alt="Service Picture"
+                                     class="img-fluid"
+                                     style="width: 400px; height: 400px; object-fit: cover; border-radius: 8px;">
+                            <?php else: ?>
+                                <p>No Image Available</p>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+                <!-- File Upload Location -->
+                <div class="row">
+                    <div class="col-12 col-md-12 col-sm-12">
+                        <div class="input">
+                            <label for="Service Image">Upload for Service Image</label>
+                            <?= $this->Form->Control('service_image', [
+                                'type' => 'file',
+                                'class' => 'form-control' . ($this->Form->isFieldError('service_image') ? ' is-invalid' : ''),
+                                'required' => false,
+                                'error' => ['class' => 'invalid-feedback']
+                            ]) ?>
+                        </div>
+                    </div>
                 </div>
             </fieldset>
             <?= $this->Form->button(__('Submit'), ['class' => 'btn btn-primary']) ?>
