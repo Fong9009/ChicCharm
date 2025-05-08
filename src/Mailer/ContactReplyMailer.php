@@ -27,9 +27,9 @@ class ContactReplyMailer extends Mailer
             ->setFrom([$fromEmail => $fromName])
             ->setSubject($replyData['subject'] ?? 'Re: Your Enquiry with ChicCharm') 
             ->setViewVars([
-                'contactFirstName' => $contact->first_name,
-                'contactLastName' => $contact->last_name,
-                'replyMessage' => $replyData['message'] ?? '',
+                'first_name' => $contact->first_name,
+                'last_name' => $contact->last_name,
+                'message' => $replyData['message'] ?? '',
                 'originalMessage' => $contact->message, 
                 'companyName' => Configure::read('MyApp.companyName', 'Chic Charm'), 
             ])
