@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use Cake\Event\EventInterface;
+use App\Mailer\ContactReplyMailer;
+use Cake\Log\Log;
 
 /**
  * Contacts Controller
@@ -251,38 +253,31 @@ class ContactsController extends AppController
         $contact = $this->Contacts->get($id, contain: []);
         
         if ($this->request->is('post')) {
-            $data = $this->request->getData();
+            $replyData = $this->request->getData();
+            
+            if (empty($replyData['subject']) || empty($replyData['message'])) {
+                $this->Flash->error(__('Subject and message cannot be empty.'));
+                return $this->redirect(['action' => 'reply', $id]);
+            }
             
             try {
-                $mailer = new \Cake\Mailer\Mailer('default');
-                
-                $mailer
-                    ->setEmailFormat('both')
-                    ->setTo($contact->email)
-                    ->setSubject($data['subject'])
-                    ->setFrom(env('EMAIL_FROM_ADDRESS', 'nemobyte071@gmail.com'), env('EMAIL_FROM_NAME', 'ChicCharm'));
+                $mailer = new ContactReplyMailer();
+                $mailer->sendAdminReply($contact, $replyData);
+                Log::info("Contact reply email attempt successful for Contact ID {$id} to {$contact->email}");
 
-                $mailer
-                    ->viewBuilder()
-                    ->setTemplate('contact_reply');
-
-                $mailer
-                    ->setViewVars([
-                        'first_name' => $contact->first_name,
-                        'last_name' => $contact->last_name,
-                        'message' => $data['message']
-                    ]);
-
-                if ($mailer->deliver()) {
-                    $contact->replied = true;
-                    if ($this->Contacts->save($contact)) {
-                        $this->Flash->success(__('The reply has been sent successfully.'));
-                        return $this->redirect(['action' => 'index']);
-                    }
+                $contact->replied = true;
+                if ($this->Contacts->save($contact)) {
+                    $this->Flash->success(__('The reply has been sent successfully.'));
+                    return $this->redirect(['action' => 'index']);
+                } else {
+                    $this->log("Reply sent, but failed to update contact ID {$id} status to replied.", 'warning');
+                    $this->Flash->warning(__('Reply sent, but failed to update the contact status.'));
+                    return $this->redirect(['action' => 'index']);
                 }
+
             } catch (\Exception $e) {
-                $this->log('Failed to send reply email: ' . $e->getMessage(), 'error');
-                $this->Flash->error(__('The reply could not be sent. Please try again.'));
+                $this->log("Failed to send reply email for contact ID {$id}: " . $e->getMessage(), 'error');
+                $this->Flash->error(__('The reply could not be sent. Please check the email configuration and try again. Error: {0}', $e->getMessage()));
             }
         }
         

@@ -1,0 +1,73 @@
+<?php
+/**
+ * @var \App\View\AppView $this
+ * @var iterable<\App\Model\Entity\PaymentHistory> $payments
+ */
+?>
+<div class="payments index content">
+    <h3><?= __('Payment History / Receipts') ?></h3>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th><?= $this->Paginator->sort('id', 'Payment ID') ?></th>
+                    <th><?= $this->Paginator->sort('payment_date', 'Date') ?></th>
+                    <th><?= __('Customer') ?></th>
+                    <th><?= $this->Paginator->sort('booking_id', 'Booking ID') ?></th>
+                    <th><?= $this->Paginator->sort('payment_amount', 'Amount') ?></th>
+                    <th><?= $this->Paginator->sort('payment_status', 'Status') ?></th>
+                    <th><?= $this->Paginator->sort('payment_method', 'Method') ?></th>
+                    <th><?= $this->Paginator->sort('paypal_transaction_id', 'Transaction ID') ?></th>
+                    <!-- Optional: Add notes or other fields -->
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (!empty($payments->toArray())): ?>
+                    <?php foreach ($payments as $payment): ?>
+                    <tr>
+                        <td><?= $this->Number->format($payment->id) ?></td>
+                        <td><?= h($payment->payment_date ? $payment->payment_date->format('Y-m-d H:i:s') : 'N/A') ?></td>
+                        <td>
+                            <?php // Check if customer relationship is loaded and not null
+                            if ($payment->hasValue('customer') && $payment->customer) {
+                                echo h($payment->customer->first_name) . ' ' . h($payment->customer->last_name);
+                                // Optional: Link to customer view if needed
+                                // echo $this->Html->link(h($payment->customer->first_name) . ' ' . h($payment->customer->last_name), ['controller' => 'Customers', 'action' => 'view', $payment->customer->id]);
+                            } else {
+                                echo 'N/A';
+                            } ?>
+                        </td>
+                        <td>
+                            <?php // Check if booking relationship is loaded and not null
+                            if ($payment->hasValue('booking') && $payment->booking) {
+                                echo $this->Html->link($payment->booking_id, ['controller' => 'Bookings', 'action' => 'view', $payment->booking->id]);
+                            } else {
+                                echo $payment->booking_id ? h($payment->booking_id) : 'N/A';
+                            } ?>
+                        </td>
+                        <td><?= $this->Number->currency($payment->payment_amount, $payment->payment_currency ?: 'AUD') ?></td>
+                        <td><?= h($payment->payment_status) ?></td>
+                        <td><?= h($payment->payment_method) ?></td>
+                        <td><?= h($payment->paypal_transaction_id) ?></td>
+                        <!-- Optional: Add other cells like notes -->
+                    </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="8"><?= __('No payment history found.') ?></td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+    <div class="paginator">
+        <ul class="pagination">
+            <?= $this->Paginator->first('<< ' . __('first')) ?>
+            <?= $this->Paginator->prev('< ' . __('previous')) ?>
+            <?= $this->Paginator->numbers() ?>
+            <?= $this->Paginator->next(__('next') . ' >') ?>
+            <?= $this->Paginator->last(__('last') . ' >>') ?>
+        </ul>
+        <p><?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} record(s) out of {{count}} total')) ?></p>
+    </div>
+</div> 

@@ -5,6 +5,8 @@ namespace App\Controller;
 
 use Cake\Event\EventInterface;
 use Cake\Mailer\Mailer;
+use App\Mailer\NewsletterMailer;
+use Cake\Log\Log;
 
 /**
  * Newsletter Controller
@@ -34,14 +36,20 @@ class NewsletterController extends AppController
                 return $this->redirect($this->referer() . '#footer');
             }
 
-            // In a real application, you would:
+            // Add log HERE to confirm this point is reached
+            Log::debug("NewsletterController::subscribe - Passed validation for email: {$email}");
+
+            // TO Be Implemented
             // 1. Check if the email is already subscribed
             // 2. Store the email in a subscribers table
             // 3. Add any additional user data (name, preferences, etc.)
 
             // For now, we'll just set a success flag and send the confirmation email
             try {
-                $this->sendSubscriptionConfirmation($email);
+                $mailer = new NewsletterMailer();
+                $mailer->sendWelcome($email);
+                Log::info("Newsletter welcome email attempt successful for {$email}");
+                
                 // Set a session variable instead of using Flash
                 $this->request->getSession()->write('newsletter_success', true);
             } catch (\Exception $e) {
@@ -55,34 +63,6 @@ class NewsletterController extends AppController
     }
 
     /**
-     * Send subscription confirmation email
-     *
-     * @param string $email The subscriber's email address
-     * @return bool True if email was sent successfully
-     */
-    private function sendSubscriptionConfirmation($email)
-    {
-        $mailer = new Mailer('default');
-
-        $mailer
-            ->setEmailFormat('both')
-            ->setTo($email)
-            ->setSubject('Welcome to ChicCharm Newsletter!')
-            ->setFrom(env('EMAIL_FROM_ADDRESS', 'chayfong9009@gmail.com'), env('EMAIL_FROM_NAME', 'ChicCharm'));
-
-        $mailer
-            ->viewBuilder()
-            ->setTemplate('newsletter_subscription');
-
-        $mailer->setViewVars([
-            'websiteUrl' => 'https://chiccharm.com',
-            'unsubscribeUrl' => 'https://chiccharm.com/newsletter/unsubscribe?email=' . urlencode($email)
-        ]);
-
-        return $mailer->deliver();
-    }
-
-    /**
      * Unsubscribe method - Handles newsletter unsubscribe requests
      * This is a placeholder - in a real app, you would implement proper unsubscribe functionality
      *
@@ -93,7 +73,7 @@ class NewsletterController extends AppController
         $email = $this->request->getQuery('email');
 
         if (!empty($email)) {
-            // In a real application, you would:
+            // TO Be Implemented
             // 1. Validate the email
             // 2. Remove or mark the email as unsubscribed in your database
 
