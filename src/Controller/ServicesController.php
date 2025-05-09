@@ -119,7 +119,7 @@ class ServicesController extends AppController
                 $maxSize = 4 * 1024 * 1024;
                 if ($serviceImage->getSize() > $maxSize) {
                     $data['error'] = true;
-                    $this->Flash->error(__('The profile picture is too big please use something smaller than 4MB.'));
+                    $this->Flash->error(__('The service image is too big please use something smaller than 4MB.'));
                 }
 
                 //Check if the file is a real image
@@ -133,7 +133,7 @@ class ServicesController extends AppController
                 $allowedFileTypes = ['image/jpeg', 'image/png','image/jpg'];
                 if (!in_array($serviceImage->getClientMediaType(), $allowedFileTypes)) {
                     $data['error'] = true;
-                    $this->Flash->error(__('The profile picture must be a jpeg/jpg or png format.'));
+                    $this->Flash->error(__('The service image must be a jpeg/jpg or png format.'));
                 }
                 if (!$data['error']) {
                     //Stores file in directory
@@ -215,7 +215,7 @@ class ServicesController extends AppController
                 $maxSize = 4 * 1024 * 1024;
                 if ($serviceImage->getSize() > $maxSize) {
                     $data['error'] = true;
-                    $this->Flash->error(__('The profile picture is too big please use something smaller than 4MB.'));
+                    $this->Flash->error(__('The service image is too big please use something smaller than 4MB.'));
                 }
 
                 //Check if the file is a real image
@@ -229,7 +229,7 @@ class ServicesController extends AppController
                 $allowedFileTypes = ['image/jpeg', 'image/png','image/jpg'];
                 if (!in_array($serviceImage->getClientMediaType(), $allowedFileTypes)) {
                     $data['error'] = true;
-                    $this->Flash->error(__('The profile picture must be a jpeg/jpg or png format.'));
+                    $this->Flash->error(__('The service image must be a jpeg/jpg or png format.'));
                 }
 
                 //Delete old Image if there is one
@@ -301,7 +301,7 @@ class ServicesController extends AppController
 
     public function servicePage() {
         $this->paginate = [
-            'limit' => 12, // Show 6 services per page
+            'limit' => 12,
         ];
 
         // Search functionality
@@ -320,6 +320,11 @@ class ServicesController extends AppController
     }
 
     public function serviceView($id = null) {
+
+
+        $this->paginate = [
+            'limit' => 6,
+        ];
         $service = $this->Services->get($id, contain: ['Stylists']);
         $this->set(compact('service'));
     }
