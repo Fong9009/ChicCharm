@@ -2,6 +2,7 @@
 /**
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Stylist[] $stylists
+ * @var \App\Model\Entity\Service[] $serviceInQuestion
  * @var int $currentServiceId
  */
 use Cake\Routing\Router;
