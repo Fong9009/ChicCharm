@@ -454,18 +454,19 @@ class StylistsController extends AppController
         ];
         // Search functionality
         $query = $this->Stylists->find()
+            ->select($this->Stylists)   
             ->contain(['Services'])
             ->matching('Services')
-            ->distinct(['Stylists.id'])
+            ->group(['Stylists.id'])
             ->orderBy(['Stylists.first_name' => 'ASC']);
 
         $search = $this->request->getQuery('search');
         if ($search) {
             $query->where([
                 'OR' => [
-                    'first_name LIKE' => '%' . $search . '%',
-                    'last_name LIKE' => '%' . $search . '%',
-                    'service_name LIKE' => '%' . $search . '%',
+                    'Stylists.first_name LIKE' => '%' . $search . '%',
+                    'Stylists.last_name LIKE' => '%' . $search . '%',
+                    'Services.service_name LIKE' => '%' . $search . '%', 
                 ],
             ]);
         }

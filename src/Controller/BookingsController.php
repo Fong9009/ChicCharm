@@ -673,10 +673,14 @@ class BookingsController extends AppController
         $this->request->allowMethod(['post', 'delete']);
         $booking = $this->Bookings->get($id);
 
-        if ($this->Bookings->delete($booking)) {
-            $this->Flash->success(__('The booking has been deleted.'));
+        // Change status to 'cancelled' instead of deleting
+        $booking->status = 'cancelled';
+        if ($this->Bookings->save($booking)) {
+            $this->Flash->success(__('The booking has been cancelled.'));
         } else {
-            $this->Flash->error(__('The booking could not be deleted. Please, try again.'));
+            // Log the error for debugging
+            Log::error("Admin: Failed to cancel booking ID {$id}. Errors: " . json_encode($booking->getErrors()));
+            $this->Flash->error(__('The booking could not be cancelled. Please, try again.'));
         }
 
         return $this->redirect(['action' => 'index']);
