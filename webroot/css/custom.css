@@ -2418,7 +2418,6 @@ footer .input-group .btn-primary:hover {
 .customer-dashboard {
     padding-top: 40px;
     padding-bottom: 40px;
-    min-height: 100vh;
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
