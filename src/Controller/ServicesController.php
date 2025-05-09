@@ -304,7 +304,7 @@ class ServicesController extends AppController
             'limit' => 12,
         ];
 
-        // Search functionality
+        //Search functionality
         $query = $this->Services->find();
         $search = $this->request->getQuery('search');
         if ($search) {
@@ -319,14 +319,40 @@ class ServicesController extends AppController
         $this->set(compact('services'));
     }
 
-    public function serviceView($id = null) {
-
-
+    /**
+     * Used To Display Stylists for that service
+     *
+     * @param $id
+     * @return void
+     */
+    public function serviceView($id = null)
+    {
         $this->paginate = [
             'limit' => 6,
         ];
-        $service = $this->Services->get($id, contain: ['Stylists']);
-        $this->set(compact('service'));
+        $service = $this->Services->get($id, contain: ['Stylists','Stylists.Services']);
+        $stylistTable = $this->fetchTable('Stylists');
+        //Query stylists with the related services
+        $stylistsQuery =  $stylistTable->find()
+            ->contain(['Services'])
+            ->matching('Services')
+            ->distinct('stylist_id')
+            ->orderBy(['Stylists.first_name' => 'ASC']);
+
+        $search = $this->request->getQuery('search');
+        if ($search) {
+            $stylistsQuery->where([
+                'OR' => [
+                    'first_name LIKE' => '%' . $search . '%',
+                    'last_name LIKE' => '%' . $search . '%',
+                    'service_name LIKE' => '%' . $search . '%',
+                ],
+            ]);
+        }
+
+        $stylists = $this->paginate($stylistsQuery);
+
+        $this->set(compact('service', 'stylists'));
     }
 }
 
