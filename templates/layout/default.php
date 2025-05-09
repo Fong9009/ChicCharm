@@ -23,8 +23,12 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
     <?= $this->Html->charset() ?>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>
-        <?= $this->request->getAttribute('identity')->type == 'Admin' ? 'Admin - ' : 'Customer -' ?>
-        <?= $this->fetch('title') ?>
+        <?php if ($this->request->getAttribute('identity')): ?>
+            <?= $this->request->getAttribute('identity')->type === 'Admin' ? 'Admin - ' : 'Customer - ' ?>
+            <?= $this->fetch('title') ?>
+        <?php else: ?>
+            ChicCharm
+        <?php endif; ?>
     </title>
     <!-- Google fonts-->
     <link href="https://fonts.googleapis.com/css?family=Merriweather+Sans:400,700" rel="stylesheet" />
@@ -108,10 +112,10 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
                             <a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a>
+                            <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Services', 'action' => 'servicePage']) ?>">Services</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a>
+                            <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Stylists', 'action' => 'stylistOverview']) ?>">Stylists</a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="enquiriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -219,10 +223,10 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
                             <a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a>
+                            <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Services', 'action' => 'servicePage']) ?>">Services</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a>
+                            <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Stylists', 'action' => 'stylistOverview']) ?>">Stylists</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link"
@@ -248,10 +252,10 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
                             <a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a>
+                            <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Services', 'action' => 'servicePage']) ?>">Services</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a>
+                            <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Stylists', 'action' => 'stylistOverview']) ?>">Stylists</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link"
@@ -266,10 +270,10 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
                             <a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a>
+                            <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Services', 'action' => 'servicePage']) ?>">Services</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a>
+                            <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Stylists', 'action' => 'stylistOverview']) ?>">Stylists</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link"
@@ -300,10 +304,10 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
                         <a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a>
+                        <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Services', 'action' => 'servicePage']) ?>">Services</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a>
+                        <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Stylists', 'action' => 'stylistOverview']) ?>">Stylists</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= $this->Url->build('/contacts/enquiry') ?>">Contact Us</a>
@@ -360,6 +364,12 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
                 <h5 class="text-light fw-bold">Our Company</h5>
                 <ul class="list-unstyled">
                     <li><a href="<?= $this->Url->build('/#about') ?>" class="text-secondary">About Us</a></li>
+                </ul>
+                <ul class="list-unstyled">
+                    <li><a href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Services', 'action' => 'servicePage']) ?>" class="text-secondary">Our Services</a></li>
+                </ul>
+                <ul class="list-unstyled">
+                    <li><a href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Stylists', 'action' => 'stylistOverview']) ?>" class="text-secondary">Our Stylists</a></li>
                 </ul>
             </div>
         </div>

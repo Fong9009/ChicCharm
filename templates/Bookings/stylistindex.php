@@ -65,7 +65,7 @@
                                         <span class="mb-0 text-truncate">View Past Bookings</span>
                                     </div>
                                 </div>',
-                                    ['action' => 'customerPastBookings'],
+                                    ['action' => 'stylistPastBookings'],
                                     ['escape' => false, 'class' => 'card-link-wrapper d-block text-decoration-none']
                                 ) ?>
                             </div>
@@ -160,8 +160,8 @@
                                                     <?= !empty($booking->notes) ? h($booking->notes) : 'No notes' ?>
                                                 </td>
                                                 <td>
-                                                    <?php 
-                                                    $statusClassStylist = ''; 
+                                                    <?php
+                                                    $statusClassStylist = '';
                                                     switch ($booking->status) {
                                                         case 'active':
                                                             $statusClassStylist = 'active';

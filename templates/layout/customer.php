@@ -29,10 +29,10 @@
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            
+
             <!-- Brand/Logo -->
             <a class="navbar-brand" href="<?= $this->Url->build('/') ?>">ChicCharm</a>
-            
+
             <!-- Profile Icon -->
             <div class="mobile-profile-icon">
                 <button class="btn btn-link" type="button" id="mobileProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -81,10 +81,10 @@
                             <a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a>
+                            <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Services', 'action' => 'servicePage']) ?>">Services</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a>
+                            <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Stylists', 'action' => 'stylistOverview']) ?>">Stylists</a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="enquiriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -192,10 +192,10 @@
                             <a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a>
+                            <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Services', 'action' => 'servicePage']) ?>">Services</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a>
+                            <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Stylists', 'action' => 'stylistOverview']) ?>">Stylists</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link"
@@ -228,10 +228,10 @@
                         <a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= $this->Url->build('/#services') ?>">Services</a>
+                        <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Services', 'action' => 'servicePage']) ?>">Services</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a>
+                        <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Stylists', 'action' => 'stylistOverview']) ?>">Stylists</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= $this->Url->build('/contacts/enquiry') ?>">Contact Us</a>
@@ -289,6 +289,9 @@
                 <h5 class="text-light fw-bold">Our Company</h5>
                 <ul class="list-unstyled">
                     <li><a href="<?= $this->Url->build('/#about') ?>" class="text-secondary">About Us</a></li>
+                </ul>
+                <ul class="list-unstyled">
+                    <li><a href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Services', 'action' => 'servicePage']) ?>" class="text-secondary">Our Services</a></li>
                 </ul>
             </div>
         </div>

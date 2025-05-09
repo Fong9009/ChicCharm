@@ -130,6 +130,30 @@ $this->assign('title', 'Edit Profile');
                         'error' => ['class' => 'invalid-feedback'],
                     ]); ?>
                 </div>
+                <div class="form-group mb-3">
+                    <?= $this->Form->control('stylist_motto', [
+                        'label' => __('Stylist Motto'),
+                        'class' => 'form-control',
+                        'required' => false,
+                        'placeholder' => __('Enter Stylist Motto'),
+                        'error' => ['class' => 'invalid-feedback'],
+                    ]); ?>
+                </div>
+                <div class="form-group mb-3">
+                    <?= $this->Form->control('stylist_bio', [
+                        'label' => __('Stylist Bio'),
+                        'type' => 'textarea',
+                        'id' => 'content-value-input',
+                        'class' => 'form-control',
+                        'required' => false,
+                        'placeholder' => __('Enter Stylist Bio A Short Description'),
+                        'maxlength' => 1000,
+                        'error' => ['class' => 'invalid-feedback'],
+                    ]); ?>
+                </div>
+                <div class="row">
+                    <div id="message-char-count" class="char-count-display text-muted text-start small mb-2"></div>
+                </div>
                 <!-- Profile Picture Preview -->
                 <div class="row">
                     <div class="col-md-4">
@@ -176,4 +200,35 @@ $this->assign('title', 'Edit Profile');
             <?= $this->Form->end() ?>
         </div>
     </div>
+    <?php $this->append('script'); ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const messageTextarea = document.getElementById('content-value-input');
+            const charCountDisplay = document.getElementById('message-char-count');
+            const maxLength = messageTextarea ? parseInt(messageTextarea.getAttribute('maxlength'), 10) : 0;
+
+            function updateCharCount() {
+                if (!messageTextarea || !charCountDisplay || !maxLength) return;
+
+                const currentLength = messageTextarea.value.length;
+                const remaining = maxLength - currentLength;
+
+                charCountDisplay.textContent = `${currentLength}/${maxLength}`;
+
+                if (remaining < 0) {
+                    charCountDisplay.style.color = 'red';
+                } else if (remaining < 50) {
+                    charCountDisplay.style.color = 'orange';
+                } else {
+                    charCountDisplay.style.color = '';
+                }
+            }
+
+            if (messageTextarea) {
+                messageTextarea.addEventListener('input', updateCharCount);
+                updateCharCount();
+            }
+        });
+    </script>
+    <?php $this->end(); ?>
 </div>

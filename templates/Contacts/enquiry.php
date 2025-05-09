@@ -4,7 +4,10 @@
  * @var \App\Model\Entity\Contact $contact
  */
 ?>
-<div class="form-wrapper">
+<?= $this->Html->css('/dashboard/profiledash.css') ?>
+<?= $this->Html->script('custom') ?>
+<?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
+<div class="customer-dashboard" style="background-image: url(<?= $this->Url->image('gradient.jpg')?>);">
     <div class="contacts form content">
         <h2>Contact Us</h2>
         <p class="text-center mb-4">We'd love to hear from you. Please fill out the form below.</p>
@@ -72,7 +75,6 @@
         </div>
         <?= $this->Form->end() ?>
     </div>
-</div>
 
 <?php $this->append('script'); ?>
 <script>
@@ -105,5 +107,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <?php $this->end(); ?>
-
-
+</div>

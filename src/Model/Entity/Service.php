@@ -12,7 +12,8 @@ use Cake\ORM\Entity;
  * @property string $service_name
  * @property string $service_cost
  * @property int $duration_minutes
- *
+ * @property string $service_desc
+ * @property string $service_image
  * @property \App\Model\Entity\Stylist[] $stylists
  */
 class Service extends Entity
@@ -30,6 +31,8 @@ class Service extends Entity
         'service_name' => true,
         'service_cost' => true,
         'duration_minutes' => true,
+        'service_desc' => true,
+        'service_image' => true,
         'stylists' => true,
     ];
 }
