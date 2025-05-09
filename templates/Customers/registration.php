@@ -4,7 +4,7 @@
  * @var \App\Model\Entity\Customer $customer
  */
 ?>
-<div class="customer-dashboard" style="background-image: url(<?= $this->Url->image('gradient.jpg')?>);">
+<div class="customer-dashboard" style="background-image: url(<?= $this->Url->image('gradient.jpg')?>); padding-left: 20px; padding-right: 20px;">
     <div class="registration-form">
         <h2>Registration Form</h2>
         <?= $this->Form->create($customer, ['type' => 'file', 'novalidate' => true]) ?>
