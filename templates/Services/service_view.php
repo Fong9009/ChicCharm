@@ -1,6 +1,8 @@
 <?php
 /**
  * @var \App\View\AppView $this
+ * @var \App\Model\Entity\Stylist[] $stylists
+ * @var int $currentServiceId
  */
 use Cake\Routing\Router;
 ?>
