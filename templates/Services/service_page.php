@@ -8,8 +8,8 @@ use Cake\Routing\Router;
 <section class="px-5 mt-4">
     <div class="row p-2 justify-content-center">
         <div class="col-12 text-center">
-            <h1 class="fw-bold"><?= $this->ContentBlock->text('service-title'); ?></h1>
-            <h2> <?= $this->ContentBlock->text('service-desc'); ?></h2>
+            <h1 class="fw-bold"><?= $this->ContentBlock->text('service-page-title'); ?></h1>
+            <h2> <?= $this->ContentBlock->text('service-page-description'); ?></h2>
         </div>
     </div>
     <div class="row p-2 justify-content-center">
