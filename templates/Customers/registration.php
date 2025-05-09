@@ -4,7 +4,7 @@
  * @var \App\Model\Entity\Customer $customer
  */
 ?>
-<div class="registration-wrapper">
+<div class="customer-dashboard" style="background-image: url(<?= $this->Url->image('gradient.jpg')?>);">
     <div class="registration-form">
         <h2>Registration Form</h2>
         <?= $this->Form->create($customer, ['type' => 'file', 'novalidate' => true]) ?>
@@ -65,13 +65,14 @@
             </div>
         <div class="text-center mt-3">
             <?= $this->Form->button('Register', ['class' => 'btn btn-primary']) ?>
-            <br>
+        </div>
+        <div class="text-center mt-3">
             <?= $this->Html->link(__('Cancel'),
                 ['controller' => 'Auth', 'action' => 'login'],
                 ['class' => 'btn btn-primary',
-                'style' => 'background-color: #6c757d; border-color: #6c757d; color: white; transition: all 0.3s;',
-                'onmouseover' => 'this.style.backgroundColor = "#5a6268"; this.style.borderColor = "#545b62";',
-                'onmouseout' => 'this.style.backgroundColor = "#6c757d"; this.style.borderColor = "#6c757d";']) ?>
+                    'style' => 'background-color: #6c757d; border-color: #6c757d; color: white; transition: all 0.3s;',
+                    'onmouseover' => 'this.style.backgroundColor = "#5a6268"; this.style.borderColor = "#545b62";',
+                    'onmouseout' => 'this.style.backgroundColor = "#6c757d"; this.style.borderColor = "#6c757d";']) ?>
         </div>
         <?= $this->Form->end() ?>
     </div>

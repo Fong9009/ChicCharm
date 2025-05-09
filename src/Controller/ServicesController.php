@@ -351,7 +351,7 @@ class ServicesController extends AppController
         }
 
         $stylists = $this->paginate($stylistsQuery);
-
+        $this->set('currentServiceId', $id);
         $this->set(compact('service', 'stylists'));
     }
 }

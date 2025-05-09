@@ -44,7 +44,7 @@ use Cake\Routing\Router;
         <?php endif; ?>
 
         <div class="col-lg-4 mb-4">
-            <div class="card h-100">
+            <div class="card h-100 fade-in-title">
                 <div class="card-header d-flex justify-content-between align-items-center"
                      style="background: url('<?= $imagePath ?>') center center / cover no-repeat; height: 150px;">
                     <div>
