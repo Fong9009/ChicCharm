@@ -456,7 +456,7 @@ class StylistsController extends AppController
         $query = $this->Stylists->find()
             ->contain(['Services'])
             ->matching('Services')
-            ->distinct('Stylists.id')
+            ->distinct(['Stylists.id'])
             ->orderBy(['Stylists.first_name' => 'ASC']);
 
         $search = $this->request->getQuery('search');
