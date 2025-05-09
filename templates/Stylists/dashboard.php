@@ -56,6 +56,8 @@ $this->layout = 'default';
                                         <p><strong>Name:</strong> <?= h($stylist->first_name) ?> <?= h($stylist->last_name) ?></p>
                                         <p><strong>Email:</strong> <?= h($stylist->email) ?></p>
                                         <p><strong>Member Since:</strong> <?= $stylist->created->format('F Y') ?></p>
+                                        <p><strong>Motto:</strong> <?= h($stylist->stylist_motto) ?></p>
+                                        <p><strong>Bio:</strong> <?= h($stylist->stylist_bio) ?></p>
                                     </div>
                                 </div>
                             </div>
