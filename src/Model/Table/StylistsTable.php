@@ -159,7 +159,7 @@ class StylistsTable extends Table
 
         $validator
             ->scalar('stylist_bio')
-            ->maxLength('stylist_bio', 255)
+            ->maxLength('stylist_bio', 1000)
             ->allowEmptyString('stylist_bio');
 
         return $validator;

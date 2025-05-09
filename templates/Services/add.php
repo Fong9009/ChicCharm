@@ -102,7 +102,7 @@
                     <div class="col-md-4">
                         <div class="profile-preview text-start">
                             <?php if (!empty($service->service_image)): ?>
-                                <img src="<?= $this->Url->image('service/' . $service->profile_picture) ?>"
+                                <img src="<?= $this->Url->image('service/' . $service->service_image) ?>"
                                      alt="Service Picture"
                                      class="img-fluid"
                                      style="width: 400px; height: 400px; object-fit: cover; border-radius: 8px;">
