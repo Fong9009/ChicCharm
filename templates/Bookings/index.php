@@ -173,10 +173,10 @@
                         <?= $this->Html->link(__('View'), ['action' => 'view', $booking->id], ['class' => 'button']) ?>
                         <?= $this->Html->link(__('Edit'), ['action' => 'edit', $booking->id], ['class' => 'button']) ?>
                         <?= $this->Form->postLink(
-                            __('Delete'),
+                            __('Cancel'),
                             ['action' => 'delete', $booking->id],
                             [
-                                'confirm' => __('Are you sure you want to permanently delete booking #{0} ({1})?', $booking->id, h($booking->booking_name)),
+                                'confirm' => __('Are you sure you want to cancel booking #{0} ({1})?', $booking->id, h($booking->booking_name)),
                                 'class' => 'button btn-danger',
                             ]
                         ) ?>

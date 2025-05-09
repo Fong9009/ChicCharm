@@ -334,18 +334,19 @@ class ServicesController extends AppController
         $stylistTable = $this->fetchTable('Stylists');
         //Query stylists with the related services
         $stylistsQuery =  $stylistTable->find()
+            ->select($stylistTable)     
             ->contain(['Services'])
             ->matching('Services')
-            ->distinct(['Stylists.id'])
+            ->group(['Stylists.id']) 
             ->orderBy(['Stylists.first_name' => 'ASC']);
 
         $search = $this->request->getQuery('search');
         if ($search) {
             $stylistsQuery->where([
                 'OR' => [
-                    'first_name LIKE' => '%' . $search . '%',
-                    'last_name LIKE' => '%' . $search . '%',
-                    'service_name LIKE' => '%' . $search . '%',
+                    'Stylists.first_name LIKE' => '%' . $search . '%',
+                    'Stylists.last_name LIKE' => '%' . $search . '%',
+                    'Services.service_name LIKE' => '%' . $search . '%', 
                 ],
             ]);
         }
