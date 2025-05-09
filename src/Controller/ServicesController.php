@@ -330,14 +330,16 @@ class ServicesController extends AppController
         $this->paginate = [
             'limit' => 6,
         ];
+        $serviceInQuestion = $this->Services->get($id, contain: []);
+
         $service = $this->Services->get($id, contain: ['Stylists','Stylists.Services']);
         $stylistTable = $this->fetchTable('Stylists');
         //Query stylists with the related services
         $stylistsQuery =  $stylistTable->find()
-            ->select($stylistTable)     
+            ->select($stylistTable)
             ->contain(['Services'])
             ->matching('Services')
-            ->group(['Stylists.id']) 
+            ->group(['Stylists.id'])
             ->orderBy(['Stylists.first_name' => 'ASC']);
 
         $search = $this->request->getQuery('search');
@@ -346,14 +348,14 @@ class ServicesController extends AppController
                 'OR' => [
                     'Stylists.first_name LIKE' => '%' . $search . '%',
                     'Stylists.last_name LIKE' => '%' . $search . '%',
-                    'Services.service_name LIKE' => '%' . $search . '%', 
+                    'Services.service_name LIKE' => '%' . $search . '%',
                 ],
             ]);
         }
 
         $stylists = $this->paginate($stylistsQuery);
         $this->set('currentServiceId', $id);
-        $this->set(compact('service', 'stylists'));
+        $this->set(compact('service', 'stylists', 'serviceInQuestion'));
     }
 }
 
