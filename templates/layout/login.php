@@ -100,7 +100,7 @@ $appLocale = Configure::read('App.defaultLocale');
                             <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Services', 'action' => 'servicePage']) ?>">Services</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a>
+                            <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Stylists', 'action' => 'stylistOverview']) ?>">Stylists</a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="enquiriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -211,7 +211,7 @@ $appLocale = Configure::read('App.defaultLocale');
                             <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Services', 'action' => 'servicePage']) ?>">Services</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a>
+                            <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Stylists', 'action' => 'stylistOverview']) ?>">Stylists</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link"
@@ -247,7 +247,7 @@ $appLocale = Configure::read('App.defaultLocale');
                         <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Services', 'action' => 'servicePage']) ?>">Services</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= $this->Url->build('/#portfolio') ?>">Portfolio</a>
+                        <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Stylists', 'action' => 'stylistOverview']) ?>">Stylists</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= $this->Url->build('/contacts/enquiry') ?>">Contact Us</a>
@@ -262,9 +262,7 @@ $appLocale = Configure::read('App.defaultLocale');
 </nav>
 
 <main class="main">
-    <div class="container mt-4">
-        <?= $this->Flash->render() ?>
-    </div>
+    <?= $this->Flash->render() ?>
     <?= $this->fetch('content') ?>
 </main>
 
@@ -307,6 +305,9 @@ $appLocale = Configure::read('App.defaultLocale');
                 </ul>
                 <ul class="list-unstyled">
                     <li><a href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Services', 'action' => 'servicePage']) ?>" class="text-secondary">Our Services</a></li>
+                </ul>
+                <ul class="list-unstyled">
+                    <li><a href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Stylists', 'action' => 'stylistOverview']) ?>" class="text-secondary">Our Stylists</a></li>
                 </ul>
             </div>
         </div>

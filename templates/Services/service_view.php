@@ -48,7 +48,7 @@ use Cake\Routing\Router;
         <?php endif; ?>
 
         <div class="col-lg-6 col-md-12 col-sm-12 mb-4">
-            <div class="card h-100">
+            <div class="card h-100 fade-in-title">
                 <div class="row g-0 h-100">
                     <!-- Left side: Image -->
                     <div class="col-md-5">
@@ -68,7 +68,9 @@ use Cake\Routing\Router;
                             <h5><strong>Stylist Bio:</strong> <?= h($stylist->stylist_bio) ?></h5>
                             <h5><strong>Other Services that <?= h($stylist->first_name)?> Offers: </strong></h5>
                             <?php foreach ($stylist->services as $service): ?>
-                                <li><?= h($service->service_name) ?></li>
+                                <?php if ($service->id != $currentServiceId ): ?>
+                                    <li><?= h($service->service_name) ?></li>
+                                <?php endif; ?>
                             <?php endforeach; ?>
                         </div>
                     </div>

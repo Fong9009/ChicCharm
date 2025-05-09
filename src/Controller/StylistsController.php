@@ -14,18 +14,20 @@ class StylistsController extends AppController
     public function initialize(): void
     {
         parent::initialize();
+        $this->Authentication->allowUnauthenticated(['stylistOverview']);
         $this->loadComponent('Authentication.Authentication');
     }
 
-    public function beforeFilter(\Cake\Event\EventInterface $event)
+
+    private function verification(): void
     {
-        parent::beforeFilter($event);
-        // Check if user is admin for all actions
         $user = $this->Authentication->getIdentity();
         if (!$user) {
-            return $this->redirect(['controller' => 'Auth', 'action' => 'login']);
+            $this->redirect(['controller' => 'Auth', 'action' => 'login']);
         } elseif ($user->type === 'customer') {
-            return $this->redirect(['controller' => 'Customers', 'action' => 'dashboard']);
+            $this->redirect(['controller' => 'Customers', 'action' => 'dashboard']);
+        } elseif ($user->type === 'stylist') {
+            $this->redirect(['controller' => 'Stylists', 'action' => 'dashboard']);
         }
     }
 
@@ -36,6 +38,7 @@ class StylistsController extends AppController
      */
     public function index()
     {
+        $this->verification();
         $query = $this->Stylists->find();
         $stylists = $this->paginate($query);
 
@@ -62,6 +65,7 @@ class StylistsController extends AppController
      */
     public function add()
     {
+        $this->verification();
         $stylist = $this->Stylists->newEmptyEntity();
         if ($this->request->is('post')) {
             $data = $this->request->getData();
@@ -446,17 +450,22 @@ class StylistsController extends AppController
     public function stylistOverview()
     {
         $this->paginate = [
-            'limit' => 12, // Show 6 services per page
+            'limit' => 6,
         ];
-
         // Search functionality
-        $query = $this->Stylists->find();
+        $query = $this->Stylists->find()
+            ->contain(['Services'])
+            ->matching('Services')
+            ->distinct('stylist_id')
+            ->orderBy(['Stylists.first_name' => 'ASC']);
+
         $search = $this->request->getQuery('search');
         if ($search) {
             $query->where([
                 'OR' => [
                     'first_name LIKE' => '%' . $search . '%',
                     'last_name LIKE' => '%' . $search . '%',
+                    'service_name LIKE' => '%' . $search . '%',
                 ],
             ]);
         }
