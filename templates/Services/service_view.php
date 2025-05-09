@@ -5,39 +5,58 @@
  * @var int $currentServiceId
  */
 use Cake\Routing\Router;
+$imageServicePath = $serviceInQuestion->service_image;
+if ($imageServicePath != null) {
+    $imageServicePath = Router::url('/img/service/' . $serviceInQuestion->service_image, true);
+}
 ?>
 <section class="px-5 mt-4">
-    <div class="row p-2 justify-content-start">
-        <div class="col-lg-2 text-center">
-            <?= $this->Html->link('Back to Services', ['controller' => 'Services', 'action' => 'servicePage'], ['class' => 'btn btn-primary w-100', 'style' =>"background-color: orange"]) ?>
-        </div>
-    </div>
-    <div class="row p-2 justify-content-center">
-        <div class="col-lg-12 text-center">
-            <h1 class="fw-bold"><?= $this->ContentBlock->text('service-page-stylist-title'); ?></h1>
-            <h2> <?= $this->ContentBlock->text('service-page-stylist-description'); ?></h2>
-        </div>
-    </div>
-    <div class="row p-2 justify-content-center">
-        <div class="col-lg-4 col-md-12 col-sm-12">
-            <?= $this->Form->create(null, ['type' => 'get', 'class' => 'search-form']) ?>
-            <div class="justify-content-center">
-                <?= $this->Form->control('search', [
-                    'label' => false,
-                    'placeholder' => 'Search...',
-                    'class' => 'form-control',
-                    'value' => $this->request->getQuery('search'),
-                ]) ?>
+    <div style=" background: url('<?= $imageServicePath ?>')  center center / cover no-repeat; " >
+        <div class="row p-2 justify-content-start">
+            <div class="col-lg-2 text-center">
+                <?= $this->Html->link('Back to Services', ['controller' => 'Services', 'action' => 'servicePage'], ['class' => 'btn btn-primary w-100', 'style' =>"background-color: orange"]) ?>
             </div>
-            <?= $this->Form->end() ?>
         </div>
-        <div class="col-12 text-center p-2">
-            <h5> Can't find who you are looking for? <a href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'enquiry'])?>">
-                    <span>Contact Us</span>
-                </a></h5>
+        <div class="row p-2 justify-content-center">
+            <div class="col-lg-8 text-center" style="background-color: rgba(0, 0, 0, 0.5); padding: 20px;">
+                <h1 class="fw-bold text-white"><?= $this->ContentBlock->text('service-page-stylist-title'); ?></h1>
+                <h1 class="fw-bold text-white"><?= $serviceInQuestion->service_name ?></h1>
+                <h2 class="text-white"> <?= $this->ContentBlock->text('service-page-stylist-description'); ?></h2>
+            </div>
         </div>
+        <div class="row p-2 justify-content-center">
+            <div class="col-lg-6 col-md-12 col-sm-12" style="background-color: rgba(0, 0, 0, 0.5); padding: 20px;">
+                <?= $this->Form->create(null, ['type' => 'get', 'class' => 'search-form']) ?>
+                <div class="justify-content-center">
+                    <?= $this->Form->control('search', [
+                        'label' => false,
+                        'placeholder' => 'Search...',
+                        'class' => 'form-control',
+                        'value' => $this->request->getQuery('search'),
+                    ]) ?>
+                </div>
+                <?= $this->Form->end() ?>
+                <div class="col-12 text-center p-2">
+                    <h5 class="text-white"> Can't find who you are looking for? <a href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'enquiry'])?>">
+                            <span>Contact Us</span>
+                        </a></h5>
+                </div>
+            </div>
+        </div>
+        <hr class="flex-grow-1 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
     </div>
-    <hr class="flex-grow-1 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
+    <div class="card h-100 fade-in-title mb-3" style=" box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);">
+        <div class="row g-0 h-100">
+            <div class="card-body text-center" style="background-color: #1e2125;">
+                <h1 class="fw-bold text-white mb-3"><?= $serviceInQuestion->service_name ?></h1>
+                <h3 class="fw-bold text-white mb-3">"<?= $serviceInQuestion->service_desc ?>"</h3>
+                <h3 class="fw-bold text-white mb-0">$<?= $serviceInQuestion->service_cost ?> </h3>
+                <h3 class="fw-bold text-white mb-0">Stylists Who do <?=$serviceInQuestion->service_name ?></h3>
+            </div>
+        </div>
+        <div class="card-footer" style="background-color: orange;"></div>
+    </div>
+
     <?php
     $counter = 0;
     foreach ($stylists as $stylist):
