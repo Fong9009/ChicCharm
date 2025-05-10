@@ -22,7 +22,7 @@ class PaymentsController extends AppController
         parent::initialize();
         $this->Bookings = $this->getTableLocator()->get('Bookings');
         $this->PaymentHistories = $this->getTableLocator()->get('PaymentHistories');
-        
+
         if (!$this->components()->has('Authentication')) {
             $this->loadComponent('Authentication.Authentication');
         }
@@ -60,7 +60,7 @@ class PaymentsController extends AppController
             $tokenUrl,
             ['grant_type' => 'client_credentials'],
             [
-                'auth' => ['user' => $clientId, 'pass' => $clientSecret], 
+                'auth' => ['user' => $clientId, 'pass' => $clientSecret],
                 'headers' => ['Content-Type' => 'application/x-www-form-urlencoded']
             ]
         );
@@ -75,12 +75,12 @@ class PaymentsController extends AppController
             }
 
             // Create order
-            $orderAmount = number_format($booking->remaining_cost, 2, '.', ''); 
+            $orderAmount = number_format($booking->remaining_cost, 2, '.', '');
             if ($booking->remaining_cost <= 0) {
                 Log::error("Cannot create PayPal order for booking ID {$bookingId} with zero or negative amount: {$booking->remaining_cost}", ['scope' => ['paypal']]);
                 return $this->response->withStatus(400)->withType('application/json')->withStringBody(json_encode(['error' => 'Invalid amount for payment.']));
             }
-            
+
             $orderData = [
                 'intent' => 'CAPTURE',
                 'purchase_units' => [
@@ -90,11 +90,11 @@ class PaymentsController extends AppController
                             'value' => $orderAmount
                         ],
                         'description' => 'Payment for booking #' . $booking->id,
-                        'custom_id' => 'BOOKING_ID_' . $booking->id 
+                        'custom_id' => 'BOOKING_ID_' . $booking->id
                     ]
                 ],
             ];
-            
+
             // Create order
             $orderApiUrl = "https://api-m." . ($mode === 'sandbox' ? 'sandbox.' : '') . "paypal.com/v2/checkout/orders";
 
@@ -112,11 +112,11 @@ class PaymentsController extends AppController
             if ($orderResponse->isOk()) {
                 return $this->response
                     ->withType('application/json')
-                    ->withStringBody($orderResponse->getStringBody()); 
+                    ->withStringBody($orderResponse->getStringBody());
             } else {
                 Log::error("Failed to create PayPal Order for booking ID: {$bookingId}. Status: " . $orderResponse->getStatusCode() . ". Response: " . $orderResponse->getStringBody(), ['scope' => ['paypal']]);
                 return $this->response
-                    ->withStatus($orderResponse->getStatusCode()) 
+                    ->withStatus($orderResponse->getStatusCode())
                     ->withType('application/json')
                     ->withStringBody(json_encode(['error' => 'Failed to create PayPal order.', 'paypal_response' => $orderResponse->getJson() ?? $orderResponse->getStringBody()]));
             }
@@ -177,34 +177,34 @@ class PaymentsController extends AppController
 
             if ($captureResponse->isOk()) {
                 $captureData = $captureResponse->getJson();
-                
+
                 // Update booking status
                 $booking = $this->Bookings->get($bookingId);
                 $booking->remaining_cost = 0;
-                $booking->status = 'Confirmed - Paid'; 
+                $booking->status = 'Confirmed - Paid';
                 $this->Bookings->save($booking);
 
                 // Record payment history
                 $paymentHistory = $this->PaymentHistories->newEmptyEntity();
-                
+
                 $captureDetails = $captureData['purchase_units'][0]['payments']['captures'][0] ?? null;
-                $paypalApiStatus = strtolower($captureData['status'] ?? 'unknown'); 
+                $paypalApiStatus = strtolower($captureData['status'] ?? 'unknown');
                 $internalPaymentStatus = ($paypalApiStatus === 'completed') ? 'Completed' : $paypalApiStatus;
 
                 $paymentHistoryData = [
                     'booking_id' => $bookingId,
-                    'customer_id' => $booking->customer_id, 
+                    'customer_id' => $booking->customer_id,
                     'paypal_transaction_id' => $captureData['id'] ?? $orderID,
                     'paypal_payer_id' => $captureData['payer']['payer_id'] ?? null,
                     'payment_amount' => $captureDetails ? ($captureDetails['amount']['value'] ?? null) : $booking->total_cost,
                     'payment_currency' => $captureDetails ? ($captureDetails['amount']['currency_code'] ?? 'AUD') : 'AUD',
-                    'payment_status' => $internalPaymentStatus, 
+                    'payment_status' => $internalPaymentStatus,
                     'payment_method' => 'paypal',
-                    'payment_date' => isset($captureDetails['create_time']) 
-                                        ? \Cake\I18n\FrozenTime::parse($captureDetails['create_time'])->format('Y-m-d H:i:s') 
+                    'payment_date' => isset($captureDetails['create_time'])
+                                        ? \Cake\I18n\FrozenTime::parse($captureDetails['create_time'])->format('Y-m-d H:i:s')
                                         : gmdate("Y-m-d H:i:s"),
                 ];
-                
+
                 $paymentHistory = $this->PaymentHistories->patchEntity($paymentHistory, $paymentHistoryData);
 
                 if (!$this->PaymentHistories->save($paymentHistory)) {
@@ -236,14 +236,14 @@ class PaymentsController extends AppController
                 // Update Booking
                 $booking->status = 'Confirmed - Paid';
                 $booking->remaining_cost = 0;
-                
+
                 if ($this->Bookings->save($booking)) {
                     // Record Payment History
                     $paymentHistory = $this->PaymentHistories->newEmptyEntity();
 
                     // Attempt to get PayPal Transaction ID from request
-                    $payPalTransactionID = $this->request->getQuery('transaction_id', 
-                                             $this->request->getQuery('paypal_order_id', 
+                    $payPalTransactionID = $this->request->getQuery('transaction_id',
+                                             $this->request->getQuery('paypal_order_id',
                                                                   $this->request->getQuery('orderID')
                                                                  )
                                             );
@@ -251,12 +251,12 @@ class PaymentsController extends AppController
                     $paymentHistoryData = [
                         'booking_id' => $bookingId,
                         'customer_id' => $booking->customer_id,
-                        'paypal_transaction_id' => $payPalTransactionID, 
-                        'paypal_payer_id' => $this->request->getQuery('payer_id', $this->request->getQuery('paypal_payer_id')), 
-                        'payment_amount' => $booking->total_cost,   
-                        'payment_currency' => 'AUD',    
+                        'paypal_transaction_id' => $payPalTransactionID,
+                        'paypal_payer_id' => $this->request->getQuery('payer_id', $this->request->getQuery('paypal_payer_id')),
+                        'payment_amount' => $booking->total_cost,
+                        'payment_currency' => 'AUD',
                         'payment_status' => 'Completed',
-                        'payment_method' => 'PayPal (Client-side)', 
+                        'payment_method' => 'PayPal (Client-side)',
                         'payment_date' => FrozenTime::now()->format('Y-m-d H:i:s'),
                         'notes' => 'Payment confirmed',
                     ];
@@ -266,7 +266,7 @@ class PaymentsController extends AppController
 
                     if ($saveResult) {
                         $this->Flash->success(__('Payment successful! Your booking is confirmed and paid.'));
-                        
+
                         // Send invoice email
                         try {
                             // Ensure the booking entity has customer and service details for the email
@@ -332,7 +332,7 @@ class PaymentsController extends AppController
 
         // Build the query first
         $query = $this->PaymentHistories->find()
-            ->contain(['Bookings' => ['Customers']]) 
+            ->contain(['Bookings' => ['Customers']])
             ->order(['PaymentHistories.payment_date' => 'DESC']);
 
         // Pass the query object to paginate()
@@ -343,7 +343,7 @@ class PaymentsController extends AppController
 
     public function processGuestPayment()
     {
-        $this->viewBuilder()->setLayout('default'); // Or your guest-specific layout if you have one
+        $this->viewBuilder()->setLayout('default');
 
         $bookingData = $this->request->getSession()->read('GuestBooking.pending_details');
 
@@ -362,7 +362,7 @@ class PaymentsController extends AppController
             // Potentially redirect to an error page or back to booking
             return $this->redirect(['controller' => 'Bookings', 'action' => 'guestbooking']);
         }
-        
+
         // Log the data being passed to the view for debugging
         Log::debug('[ProcessGuestPayment] Booking data for view: ' . json_encode($bookingData), ['scope' => ['paypal']]);
 
@@ -402,12 +402,12 @@ class PaymentsController extends AppController
 
             // 1. Create and Save the Booking entity
             $newBooking = $this->Bookings->newEntity([
-                'customer_id' => $bookingData['customer_id'], 
+                'customer_id' => $bookingData['customer_id'],
                 'booking_name' => $bookingData['booking_name'],
                 'booking_date' => $bookingData['booking_date'],
                 'total_cost' => $bookingData['total_cost'],
-                'remaining_cost' => 0.00, 
-                'status' => 'Confirmed - Paid', 
+                'remaining_cost' => 0.00,
+                'status' => 'Confirmed - Paid',
                 'notes' => $bookingData['notes'] ?? null,
                 'start_time' => $bookingData['overall_start_time'] ?? null,
                 'end_time' => $bookingData['overall_end_time'] ?? null,
@@ -417,9 +417,9 @@ class PaymentsController extends AppController
                 Log::error('[successGuest] Failed to save new Booking. Errors: ' . json_encode($newBooking->getErrors()));
                 throw new \Exception('Could not save the booking details.');
             }
-            $newBookingId = $newBooking->id; 
+            $newBookingId = $newBooking->id;
 
-            // Save BookingsServices 
+            // Save BookingsServices
             $bookingsServicesTable = $this->fetchTable('BookingsServices');
             $bookingsStylistsTable = $this->fetchTable('BookingsStylists');
             $processedStylists = [];
@@ -448,8 +448,8 @@ class PaymentsController extends AppController
                         'booking_id' => $newBookingId,
                         'service_id' => $serviceDataFromSession['service_id'],
                         'stylist_id' => $serviceDataFromSession['stylist_id'],
-                        'start_time' => $serviceDataFromSession['start_time_formatted'], 
-                        'end_time' => $serviceDataFromSession['end_time_formatted'],  
+                        'start_time' => $serviceDataFromSession['start_time_formatted'],
+                        'end_time' => $serviceDataFromSession['end_time_formatted'],
                         'service_cost' => $serviceDataFromSession['service_cost'],
                     ]);
                     if (!$bookingsServicesTable->save($bookingService)) {
@@ -462,8 +462,8 @@ class PaymentsController extends AppController
                         $bookingStylist = $bookingsStylistsTable->newEntity([
                             'booking_id' => $newBookingId,
                             'stylist_id' => $stylistId,
-                            'stylist_date' => $bookingDateForStorage, 
-                            'selected_cost' => $newBooking->total_cost, 
+                            'stylist_date' => $bookingDateForStorage,
+                            'selected_cost' => $newBooking->total_cost,
                         ]);
                         if (!$bookingsStylistsTable->save($bookingStylist)) {
                             Log::error('[successGuest] Failed to save BookingsStylist for stylist ID: ' . $stylistId . ' Errors: ' . json_encode($bookingStylist->getErrors()));
@@ -486,7 +486,7 @@ class PaymentsController extends AppController
                 'paypal_transaction_id' => $payPalTransactionID,
                 'paypal_payer_id' => $payPalPayerID,
                 'payment_amount' => $newBooking->total_cost,
-                'payment_currency' => 'AUD', 
+                'payment_currency' => 'AUD',
                 'payment_status' => 'Completed',
                 'payment_method' => 'PayPal (Guest)',
                 'payment_date' => FrozenTime::now()->format('Y-m-d H:i:s'),
@@ -512,7 +512,7 @@ class PaymentsController extends AppController
             Log::debug('[successGuest] GuestBooking.pending_details session data deleted.');
 
             $this->Flash->success(__('Thank you! Your payment was successful and your booking is confirmed.'));
-            return $this->redirect(['action' => 'guestPaymentSuccess', $newBookingId]); 
+            return $this->redirect(['action' => 'guestPaymentSuccess', $newBookingId]);
 
         } catch (\Exception $e) {
             $connection->rollback();
@@ -556,4 +556,4 @@ class PaymentsController extends AppController
         }
     }
 
-} 
+}
