@@ -71,7 +71,7 @@ $this->Html->script('booking', ['block' => 'script']);
                             ['escape' => false, 'class' => 'card-link-wrapper d-block text-decoration-none']
                         ) ?>
                     </div>
-                    <?php if ($booking->status !== 'active'): ?>
+                    <?php if ($booking->status !== 'active' && $booking->status !== 'Confirmed - Payment Due' && $booking->status !== 'Confirmed - Paid'): ?>
                         <div class="col-lg-4 col-md-6 col-sm-12 mb-3 side-nav-item">
                             <?= $this->Form->postLink(
                                 '<div class="card h-100">
@@ -84,7 +84,7 @@ $this->Html->script('booking', ['block' => 'script']);
                                         <span class="mb-0 text-truncate">Delete This Booking</span>
                                     </div>
                                 </div>',
-                                ['action' => 'delete', $booking->id],
+                                ['controller' => 'Bookings','action' => 'delete', $booking->id],
                                 [
                                     'confirm' => __('Are you sure you want to permanently delete this cancelled booking?'),
                                     'class' => 'card-link-wrapper d-block text-decoration-none',

@@ -28,8 +28,8 @@
                         ['escape' => false, 'class' => 'card-link-wrapper d-block text-decoration-none']
                     ) ?>
                 </div>
-                <!-- Delete Service -->
-                <?php if ($booking->status === 'active'): ?>
+                <!-- Delete Booking -->
+                <?php if ($booking->status !== 'active'): ?>
                 <?php else: ?>
                     <div class="col-lg-3 col-md-6 col-sm-12 mb-3 side-nav-item">
                         <?= $this->Form->postLink(
