@@ -4,16 +4,41 @@
  * @var iterable<\App\Model\Entity\PaymentHistory> $payments
  */
 ?>
-<div class="payments index content" style="margin-bottom: 120px; padding-bottom: 120px;">
+<?= $this->Html->css('/utility/indexes/indexes.css') ?>
+<?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
+<div class="admin-background">
+<div class="payments index content admin-border" style="margin-bottom: 120px; padding-bottom: 120px;">
+    <aside class="column">
+        <div class="side-nav">
+            <h4 class="heading"><?= __('Actions') ?></h4>
+            <div class="row gx-2">
+                <div class="col-lg-4 col-md-6 col-sm-12 mb-3 side-nav-item">
+                    <?= $this->Html->link(
+                        '<div class="card h-100">
+                        <div class="card-header dashboard-card-header d-flex justify-content-between align-items-center flex-wrap">
+                            <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">Dashboard</h4>
+                            <i class="material-icons view-icon ms-2">person</i>
+                        </div>
+                        <div class="card-body dashboard-card-body"></div>
+                        <div class="card-footer dashboard-card-footer">
+                            <span class="mb-0 text-truncate ">Back To Dashboard</span>
+                        </div>
+                    </div>',
+                        ['controller' => 'Admins', 'action' => 'dashboard'],
+                        ['escape' => false, 'class' => 'card-link-wrapper d-block text-decoration-none']
+                    ) ?>
+                </div>
+            </div>
+        </div>
+    </aside>
     <h3><?= __('Payment History / Receipts') ?></h3>
     <div class="table-responsive">
         <table>
             <thead>
                 <tr>
-                    <th><?= $this->Paginator->sort('id', 'Payment ID') ?></th>
                     <th><?= $this->Paginator->sort('payment_date', 'Date') ?></th>
                     <th><?= __('Customer') ?></th>
-                    <th><?= $this->Paginator->sort('booking_id', 'Booking ID') ?></th>
+                    <th><?= $this->Paginator->sort('booking_id', 'Booking Name') ?></th>
                     <th><?= $this->Paginator->sort('payment_amount', 'Amount') ?></th>
                     <th><?= $this->Paginator->sort('payment_status', 'Status') ?></th>
                     <th><?= $this->Paginator->sort('payment_method', 'Method') ?></th>
@@ -25,7 +50,6 @@
                 <?php if (!empty($payments->toArray())): ?>
                     <?php foreach ($payments as $payment): ?>
                     <tr>
-                        <td><?= $this->Number->format($payment->id) ?></td>
                         <td><?= h($payment->payment_date ? $payment->payment_date->format('Y-m-d H:i:s') : 'N/A') ?></td>
                         <td>
                             <?php
@@ -46,9 +70,9 @@
                         <td>
                             <?php // Check if booking relationship is loaded and not null
                             if ($payment->hasValue('booking') && $payment->booking) {
-                                echo $this->Html->link($payment->booking_id, ['controller' => 'Bookings', 'action' => 'view', $payment->booking->id]);
+                                echo $this->Html->link($payment->booking->booking_name, ['controller' => 'Bookings', 'action' => 'view', $payment->booking->id]);
                             } else {
-                                echo $payment->booking_id ? h($payment->booking_id) : 'N/A';
+                                echo $payment->booking->booking_name ? h($payment->booking->booking_name) : 'N/A';
                             } ?>
                         </td>
                         <td><?= $this->Number->currency($payment->payment_amount, $payment->payment_currency ?: 'AUD') ?></td>
@@ -82,4 +106,5 @@
         </ul>
         <p><?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} record(s) out of {{count}} total')) ?></p>
     </div>
-</div> 
+</div>
+</div>
