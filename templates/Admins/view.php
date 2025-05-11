@@ -8,7 +8,8 @@ $adminId = $this->request->getAttribute('identity')->id
 ?>
 <?= $this->Html->css('/utility/views/views.css') ?>
 <?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
-<div class="custom-view-wrapper">
+<div class="admin-background">
+<div class="admin-view-wrapper admin-border">
     <div class="row">
         <aside class="column">
             <div class="side-nav">
@@ -120,4 +121,5 @@ $adminId = $this->request->getAttribute('identity')->id
             </div>
         </div>
     </div>
+</div>
 </div>

@@ -10,7 +10,8 @@ $this->Html->script('custom', ['block' => true]);
 ?>
 <?= $this->Html->css('/utility/indexes/indexes.css') ?>
 <?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
-<div class="contacts index content">
+<div class="admin-background">
+<div class="contacts index content admin-border">
     <!-- Action Menu -->
         <aside class="column">
             <div class="side-nav">
@@ -135,16 +136,15 @@ $this->Html->script('custom', ['block' => true]);
                     </tbody>
                 </table>
             </div>
-            <div class="paginator">
-                <ul class="pagination">
-                    <?= $this->Paginator->first('<< ' . __('first')) ?>
-                    <?= $this->Paginator->prev('< ' . __('previous')) ?>
-                    <?= $this->Paginator->numbers() ?>
-                    <?= $this->Paginator->next(__('next') . ' >') ?>
-                    <?= $this->Paginator->last(__('last') . ' >>') ?>
-                </ul>
-                <p><?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} record(s) out of {{count}} total')) ?></p>
-            </div>
+        <div class="paginator">
+            <ul class="pagination">
+                <?= $this->Paginator->first('<< ' . __('first')) ?>
+                <?= $this->Paginator->prev('< ' . __('previous')) ?>
+                <?= $this->Paginator->numbers() ?>
+                <?= $this->Paginator->next(__('next') . ' >') ?>
+                <?= $this->Paginator->last(__('last') . ' >>') ?>
+            </ul>
+            <p><?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} record(s) out of {{count}} total')) ?></p>
         </div>
     </div>
-
+</div>

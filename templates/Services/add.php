@@ -7,7 +7,8 @@
 ?>
 <?= $this->Html->css('/utility/adds/adds.css') ?>
 <?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
-<div class="contacts index content">
+<div class="admin-background">
+<div class="contacts index content admin-border">
     <!-- Action Menu -->
     <aside class="column">
         <div class="side-nav">
@@ -129,4 +130,5 @@
             <?= $this->Form->end() ?>
         </div>
     </div>
+</div>
 </div>

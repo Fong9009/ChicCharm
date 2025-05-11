@@ -6,7 +6,9 @@
 ?>
 <?= $this->Html->css('/utility/views/views.css') ?>
 <?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
-<div class="row px-4" style="padding-top: 80px;">
+<div class="admin-background">
+<div class="admin-view-wrapper admin-border">
+<div class="row px-4">
     <aside class="column">
         <div class="side-nav">
             <h4 class="heading"><?= __('Actions') ?></h4>
@@ -185,4 +187,5 @@
             </div>
         </div>
     </div>
+</div>
 </div>

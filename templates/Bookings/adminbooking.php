@@ -17,7 +17,8 @@ $this->Html->script('booking', ['block' => 'script']);
     const apiUrl2 = '<?= $this->Url->build("/bookings/get-available-time-slots") ?>';
     const apiUrl3 = '<?= $this->Url->build("/bookings/get-availability-count") ?>';
 </script>
-<div class="booking-form-wrapper">
+<div class="admin-background">
+<div class="admin-view-wrapper admin-border">
     <div class="row">
         <aside class="column">
             <div class="side-nav">
@@ -166,8 +167,8 @@ $this->Html->script('booking', ['block' => 'script']);
         </div>
     </div>
 </div>
-
+</div>
 <?php // Remove Flatpickr JS ?>
-<?php // <?= $this->Html->script('https://cdn.jsdelivr.net/npm/flatpickr') ?> ?>
+<?php // <?= $this->Html->script('https://cdn.jsdelivr.net/npm/flatpickr') ?>
 
 <?php // Script block for Flatpickr initialization was already removed ?>
