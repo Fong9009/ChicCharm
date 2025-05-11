@@ -6,8 +6,8 @@ $identity = $this->request->getAttribute('identity');
 <?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
 <?= $this->Html->script('/dashboard/time.js') ?>
 
-<main class="admin-dashboard" style="background-image: url(<?= $this->Url->image('gradient.jpg')?>);">
-    <div class="dashboard-container">
+<main class="admin-dashboard" style="background: linear-gradient(147deg,rgba(62, 149, 207, 1) 16%, rgba(115, 140, 230, 1) 41%, rgba(158, 74, 253, 1) 73%, rgba(105, 71, 255, 1) 100%);">
+    <div class="dashboard-container admin-border">
         <!-- Welcome, Section -->
         <div class="row mb-4">
             <div class="col-12">

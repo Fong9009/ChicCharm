@@ -11,6 +11,7 @@ $this->Html->css('custom', ['block' => true]);
 $this->Html->script('custom', ['block' => true]);
 
 ?>
+    <div class="admin-background">
 <div class="custom-list-wrapper">
     <div class="row">
         <div class="col-12">
@@ -21,7 +22,7 @@ $this->Html->script('custom', ['block' => true]);
                     <?= $this->Html->link(__('Back to Dashboard'), ['controller' => 'Admins', 'action' => 'dashboard'], ['class' => 'side-nav-item']) ?>
                 </div>
             </aside>
-            <div class="contacts index content">
+            <div class="contacts index content admin-border">
                 <h3><?= __('Archived Messages') ?></h3>
                 <div class="table-responsive">
                     <div class="search-filter-container">
@@ -37,7 +38,7 @@ $this->Html->script('custom', ['block' => true]);
                             </div>
                             <?= $this->Form->end() ?>
                         </div>
-                        
+
                         <div class="filter-box">
                             <?= $this->Form->create(null, ['type' => 'get', 'class' => 'filter-form']) ?>
                             <?= $this->Form->select('filter', [
@@ -105,7 +106,7 @@ $this->Html->script('custom', ['block' => true]);
         </div>
     </div>
 </div>
-
+    </div>
 <?php
 $this->Html->script('https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js', ['block' => true]);
 $this->Html->script('custom', ['block' => true]);
