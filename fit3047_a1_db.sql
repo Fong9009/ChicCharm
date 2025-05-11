@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: May 09, 2025 at 06:41 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: localhost
+-- Generation Time: May 11, 2025 at 11:06 AM
+-- Server version: 9.3.0
+-- PHP Version: 8.4.6
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `cake_project_v2`
+-- Database: `fit3047_a1_db`
 --
 
 -- --------------------------------------------------------
@@ -28,17 +28,17 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `admins` (
-  `id` int(11) NOT NULL,
-  `first_name` varchar(255) NOT NULL,
-  `last_name` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `nonce` varchar(255) DEFAULT NULL,
+  `id` int NOT NULL,
+  `first_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `last_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `nonce` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `nonce_expiry` datetime DEFAULT NULL,
-  `created` datetime DEFAULT current_timestamp(),
-  `modified` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `type` varchar(50) NOT NULL DEFAULT 'admin',
-  `profile_picture` varchar(255) DEFAULT NULL
+  `created` datetime DEFAULT CURRENT_TIMESTAMP,
+  `modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `type` varchar(50) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'admin',
+  `profile_picture` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -57,15 +57,22 @@ INSERT INTO `admins` (`id`, `first_name`, `last_name`, `email`, `password`, `non
 --
 
 CREATE TABLE `bookings` (
-  `id` int(11) NOT NULL,
-  `booking_name` varchar(255) DEFAULT NULL,
+  `id` int NOT NULL,
+  `booking_name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `booking_date` date NOT NULL,
   `total_cost` decimal(10,2) NOT NULL,
   `remaining_cost` decimal(10,2) NOT NULL,
-  `customer_id` int(11) DEFAULT NULL,
-  `status` varchar(50) DEFAULT NULL,
-  `notes` text DEFAULT NULL
+  `customer_id` int DEFAULT NULL,
+  `status` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `notes` text COLLATE utf8mb4_general_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `bookings`
+--
+
+INSERT INTO `bookings` (`id`, `booking_name`, `booking_date`, `total_cost`, `remaining_cost`, `customer_id`, `status`, `notes`) VALUES
+(189, 'Booking for Chay Fong Hong', '2025-05-14', 150.00, 0.00, 1, 'Confirmed - Paid', '');
 
 -- --------------------------------------------------------
 
@@ -74,16 +81,23 @@ CREATE TABLE `bookings` (
 --
 
 CREATE TABLE `bookings_services` (
-  `id` int(11) NOT NULL,
-  `booking_id` int(11) NOT NULL,
-  `service_id` int(11) NOT NULL,
+  `id` int NOT NULL,
+  `booking_id` int NOT NULL,
+  `service_id` int NOT NULL,
   `service_cost` decimal(10,2) DEFAULT NULL COMMENT 'Cost of this specific service at time of booking',
-  `created` datetime DEFAULT current_timestamp(),
-  `modified` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `stylist_id` int(11) DEFAULT NULL,
+  `created` datetime DEFAULT CURRENT_TIMESTAMP,
+  `modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `stylist_id` int DEFAULT NULL,
   `start_time` time DEFAULT NULL COMMENT 'Start time specific to this service within the booking',
   `end_time` time DEFAULT NULL COMMENT 'End time specific to this service within the booking'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `bookings_services`
+--
+
+INSERT INTO `bookings_services` (`id`, `booking_id`, `service_id`, `service_cost`, `created`, `modified`, `stylist_id`, `start_time`, `end_time`) VALUES
+(351, 189, 1, 150.00, '2025-05-11 08:28:43', '2025-05-11 08:28:43', 2, '09:00:00', '10:00:00');
 
 -- --------------------------------------------------------
 
@@ -92,12 +106,19 @@ CREATE TABLE `bookings_services` (
 --
 
 CREATE TABLE `bookings_stylists` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL,
   `stylist_date` date NOT NULL,
   `selected_cost` decimal(10,2) NOT NULL,
-  `booking_id` int(11) NOT NULL,
-  `stylist_id` int(11) NOT NULL
+  `booking_id` int NOT NULL,
+  `stylist_id` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `bookings_stylists`
+--
+
+INSERT INTO `bookings_stylists` (`id`, `stylist_date`, `selected_cost`, `booking_id`, `stylist_id`) VALUES
+(316, '2025-05-14', 150.00, 189, 2);
 
 -- --------------------------------------------------------
 
@@ -106,16 +127,16 @@ CREATE TABLE `bookings_stylists` (
 --
 
 CREATE TABLE `contacts` (
-  `id` int(11) NOT NULL,
-  `first_name` varchar(255) NOT NULL,
-  `last_name` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `phone_number` varchar(10) NOT NULL,
-  `message` text NOT NULL,
-  `replied` tinyint(1) DEFAULT 0,
-  `is_archived` tinyint(1) NOT NULL DEFAULT 0,
-  `created` datetime DEFAULT current_timestamp(),
-  `modified` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `id` int NOT NULL,
+  `first_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `last_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `phone_number` varchar(10) COLLATE utf8mb4_general_ci NOT NULL,
+  `message` text COLLATE utf8mb4_general_ci NOT NULL,
+  `replied` tinyint(1) DEFAULT '0',
+  `is_archived` tinyint(1) NOT NULL DEFAULT '0',
+  `created` datetime DEFAULT CURRENT_TIMESTAMP,
+  `modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -181,15 +202,15 @@ INSERT INTO `contacts` (`id`, `first_name`, `last_name`, `email`, `phone_number`
 --
 
 CREATE TABLE `content_blocks` (
-  `id` int(11) NOT NULL,
-  `parent` varchar(128) NOT NULL,
-  `slug` varchar(128) NOT NULL,
-  `label` varchar(255) NOT NULL,
-  `description` varchar(255) NOT NULL,
-  `type` varchar(32) NOT NULL,
-  `value` text DEFAULT NULL,
-  `previous_value` text DEFAULT NULL,
-  `modified` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `id` int NOT NULL,
+  `parent` varchar(128) COLLATE utf8mb4_general_ci NOT NULL,
+  `slug` varchar(128) COLLATE utf8mb4_general_ci NOT NULL,
+  `label` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `description` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `type` varchar(32) COLLATE utf8mb4_general_ci NOT NULL,
+  `value` text COLLATE utf8mb4_general_ci,
+  `previous_value` text COLLATE utf8mb4_general_ci,
+  `modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -248,11 +269,11 @@ INSERT INTO `content_blocks` (`id`, `parent`, `slug`, `label`, `description`, `t
 --
 
 CREATE TABLE `content_blocks_phinxlog` (
-  `version` bigint(20) NOT NULL,
-  `migration_name` varchar(100) DEFAULT NULL,
+  `version` bigint NOT NULL,
+  `migration_name` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `start_time` timestamp NULL DEFAULT NULL,
   `end_time` timestamp NULL DEFAULT NULL,
-  `breakpoint` tinyint(1) NOT NULL DEFAULT 0
+  `breakpoint` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -269,28 +290,29 @@ INSERT INTO `content_blocks_phinxlog` (`version`, `migration_name`, `start_time`
 --
 
 CREATE TABLE `customers` (
-  `id` int(11) NOT NULL,
-  `first_name` varchar(255) NOT NULL,
-  `last_name` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `nonce` varchar(255) DEFAULT NULL,
+  `id` int NOT NULL,
+  `first_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `last_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `nonce` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `nonce_expiry` datetime DEFAULT NULL,
-  `created` datetime DEFAULT current_timestamp(),
-  `modified` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `type` varchar(50) NOT NULL DEFAULT 'customer',
-  `profile_picture` varchar(255) DEFAULT NULL
+  `created` datetime DEFAULT CURRENT_TIMESTAMP,
+  `modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `type` varchar(50) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'customer',
+  `profile_picture` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `customers`
 --
 
-INSERT INTO `customers` (`id`, `first_name`, `last_name`, `email`, `password`, `nonce`, `nonce_expiry`, `created`, `modified`, `type`, `profile_picture`) VALUES
-(1, 'Chay Fong', 'Hong', 'chayfong9009@gmail.com', '$2y$10$hIXeX/RjXv4ox29mSuSZiuxclpjRXzyhjO9bgG5is13uBubV8gbqq', 'cc15950b7cef51a668b0f471703d014cb0951e29a7774c49847a669a719ad4bf972d19fdc3cf2ba6ab3adfa14ec3b63a49047e642ebca46469bd429cd37b8471', '2025-04-20 13:28:57', '2025-03-26 11:10:12', '2025-04-18 04:50:05', 'customer', '11662_sung-jin-woo.png'),
-(2, 'Christian', 'Cochrane', 'cakephp@example.com', '$2y$10$4oCG2ResnEQbYk2rgtdTGe1faLZPOu29GZma4EfRmQ.B6vyHOk7u6', '', NULL, '2025-04-04 02:31:18', '2025-04-16 13:25:10', 'customer', NULL),
-(61, 'Guest', 'Account', 'guest@chiccharm.com', '$2y$10$331arAgxUzMQjrnxAAh91uxGonTi.NiZm/1C8upN6cYRIu/66zqfG', NULL, NULL, '2025-05-02 18:55:30', '2025-05-02 19:00:00', 'guest', NULL),
-(62, 'Steve', 'Davidson', 'customer@chiccharm.com', '$2y$10$FOl32Hpf6hWbYI0S4c7fZeq8VT43RDwFwj3K8spMAGm1p3fwIePUu', NULL, NULL, '2025-05-09 14:38:25', '2025-05-09 14:38:25', 'customer', NULL);
+INSERT INTO `customers` (`id`, `first_name`, `last_name`, `email`, `password`, `nonce`, `nonce_expiry`, `created`, `modified`, `type`, `profile_picture`, `is_active`) VALUES
+(1, 'Chay Fong', 'Hong', 'chayfong9009@gmail.com', '$2y$10$hIXeX/RjXv4ox29mSuSZiuxclpjRXzyhjO9bgG5is13uBubV8gbqq', 'cc15950b7cef51a668b0f471703d014cb0951e29a7774c49847a669a719ad4bf972d19fdc3cf2ba6ab3adfa14ec3b63a49047e642ebca46469bd429cd37b8471', '2025-04-20 13:28:57', '2025-03-26 11:10:12', '2025-04-18 04:50:05', 'customer', '11662_sung-jin-woo.png', 1),
+(2, 'Christian', 'Cochrane', 'cakephp@example.com', '$2y$10$4oCG2ResnEQbYk2rgtdTGe1faLZPOu29GZma4EfRmQ.B6vyHOk7u6', '', NULL, '2025-04-04 02:31:18', '2025-04-16 13:25:10', 'customer', NULL, 1),
+(61, 'Guest', 'Account', 'guest@chiccharm.com', '$2y$10$331arAgxUzMQjrnxAAh91uxGonTi.NiZm/1C8upN6cYRIu/66zqfG', NULL, NULL, '2025-05-02 18:55:30', '2025-05-02 19:00:00', 'guest', NULL, 1),
+(62, 'Steve', 'Davidson', 'customer@chiccharm.com', '$2y$10$FOl32Hpf6hWbYI0S4c7fZeq8VT43RDwFwj3K8spMAGm1p3fwIePUu', NULL, NULL, '2025-05-09 14:38:25', '2025-05-09 14:38:25', 'customer', NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -299,20 +321,56 @@ INSERT INTO `customers` (`id`, `first_name`, `last_name`, `email`, `password`, `
 --
 
 CREATE TABLE `payment_histories` (
-  `id` int(11) NOT NULL,
-  `booking_id` int(11) DEFAULT NULL,
-  `customer_id` int(11) DEFAULT NULL,
-  `paypal_transaction_id` varchar(255) NOT NULL,
-  `paypal_payer_id` varchar(255) DEFAULT NULL,
+  `id` int NOT NULL,
+  `booking_id` int DEFAULT NULL,
+  `customer_id` int DEFAULT NULL,
+  `paypal_transaction_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `invoice_pdf` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `paypal_payer_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `payment_amount` decimal(10,2) NOT NULL,
-  `payment_currency` varchar(3) NOT NULL COMMENT 'e.g., AUD, USD',
-  `payment_status` varchar(50) NOT NULL COMMENT 'e.g., COMPLETED, PENDING, FAILED, REFUNDED',
-  `payment_method` varchar(50) DEFAULT 'paypal',
-  `payment_date` timestamp NOT NULL DEFAULT current_timestamp(),
-  `notes` text DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `payment_currency` varchar(3) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'e.g., AUD, USD',
+  `payment_status` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'e.g., COMPLETED, PENDING, FAILED, REFUNDED',
+  `payment_method` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT 'paypal',
+  `payment_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `notes` text COLLATE utf8mb4_unicode_ci,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `payment_histories`
+--
+
+INSERT INTO `payment_histories` (`id`, `booking_id`, `customer_id`, `paypal_transaction_id`, `invoice_pdf`, `paypal_payer_id`, `payment_amount`, `payment_currency`, `payment_status`, `payment_method`, `payment_date`, `notes`, `created_at`, `updated_at`) VALUES
+(16, 189, 1, '72192123GV602331F', NULL, '${payerId}', 150.00, 'AUD', 'Completed', 'PayPal', '2025-05-11 18:29:50', 'Payment confirmed', '2025-05-11 08:29:50', '2025-05-11 08:29:50'),
+(17, 189, 1, '72192123GV602331F', NULL, '${payerId}', 150.00, 'AUD', 'Completed', 'PayPal', '2025-05-11 18:31:15', 'Payment confirmed', '2025-05-11 08:31:15', '2025-05-11 08:31:15'),
+(18, 189, 1, '72192123GV602331F', NULL, '${payerId}', 150.00, 'AUD', 'Completed', 'PayPal', '2025-05-11 18:31:17', 'Payment confirmed', '2025-05-11 08:31:17', '2025-05-11 08:31:17'),
+(19, 189, 1, '72192123GV602331F', 'invoices/invoice_19.pdf', '${payerId}', 150.00, 'AUD', 'Completed', 'PayPal', '2025-05-11 18:32:04', 'Payment confirmed', '2025-05-11 08:32:04', '2025-05-11 08:32:04'),
+(20, 189, 1, '72192123GV602331F', 'invoices/invoice_20.pdf', '${payerId}', 150.00, 'AUD', 'Completed', 'PayPal', '2025-05-11 18:32:08', 'Payment confirmed', '2025-05-11 08:32:08', '2025-05-11 08:32:08'),
+(21, 189, 1, '72192123GV602331F', 'invoices/invoice_21.pdf', '${payerId}', 150.00, 'AUD', 'Completed', 'PayPal', '2025-05-11 18:32:12', 'Payment confirmed', '2025-05-11 08:32:12', '2025-05-11 08:32:12'),
+(22, 189, 1, '72192123GV602331F', 'invoices/invoice_22.pdf', '${payerId}', 150.00, 'AUD', 'Completed', 'PayPal', '2025-05-11 18:32:17', 'Payment confirmed', '2025-05-11 08:32:17', '2025-05-11 08:32:17');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `paypal_webhook_events`
+--
+
+CREATE TABLE `paypal_webhook_events` (
+  `id` int NOT NULL,
+  `paypal_event_id` varchar(255) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'PayPal''s unique event ID',
+  `event_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'e.g., PAYMENT.CAPTURE.COMPLETED',
+  `resource_type` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'Type of the resource, e.g., "capture", "order"',
+  `resource_id` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'ID of the PayPal resource, e.g., capture ID or order ID',
+  `summary` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'A brief summary of the event from PayPal',
+  `status` varchar(50) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'received' COMMENT 'Internal processing status: received, processing, completed, failed',
+  `payload` text COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Full JSON payload from PayPal. Consider JSON type if your MySQL version supports it and you need to query its contents.',
+  `error_message` text COLLATE utf8mb4_general_ci COMMENT 'To store any error messages if processing fails',
+  `received_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp when the event was received by your system',
+  `processed_at` timestamp NULL DEFAULT NULL COMMENT 'Timestamp when the event was processed by your system',
+  `amount` decimal(10,2) DEFAULT NULL,
+  `currency` varchar(3) COLLATE utf8mb4_general_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -321,12 +379,12 @@ CREATE TABLE `payment_histories` (
 --
 
 CREATE TABLE `services` (
-  `id` int(11) NOT NULL,
-  `service_name` varchar(255) NOT NULL,
-  `service_desc` varchar(255) DEFAULT NULL,
+  `id` int NOT NULL,
+  `service_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `service_desc` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `service_cost` decimal(10,2) NOT NULL,
-  `duration_minutes` int(11) NOT NULL DEFAULT 60,
-  `service_image` varchar(255) DEFAULT NULL
+  `duration_minutes` int NOT NULL DEFAULT '60',
+  `service_image` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -345,29 +403,30 @@ INSERT INTO `services` (`id`, `service_name`, `service_desc`, `service_cost`, `d
 --
 
 CREATE TABLE `stylists` (
-  `id` int(11) NOT NULL,
-  `first_name` varchar(255) NOT NULL,
-  `last_name` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
+  `id` int NOT NULL,
+  `first_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `last_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
   `nonce` datetime DEFAULT NULL,
   `nonce_expiry` datetime DEFAULT NULL,
-  `created` datetime DEFAULT current_timestamp(),
-  `modified` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `type` varchar(50) NOT NULL DEFAULT 'stylist',
-  `profile_picture` varchar(255) DEFAULT NULL,
-  `stylist_motto` varchar(100) DEFAULT NULL,
-  `stylist_bio` varchar(1000) DEFAULT NULL
+  `created` datetime DEFAULT CURRENT_TIMESTAMP,
+  `modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `type` varchar(50) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'stylist',
+  `profile_picture` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `stylist_motto` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `stylist_bio` varchar(1000) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `stylists`
 --
 
-INSERT INTO `stylists` (`id`, `first_name`, `last_name`, `email`, `password`, `nonce`, `nonce_expiry`, `created`, `modified`, `type`, `profile_picture`, `stylist_motto`, `stylist_bio`) VALUES
-(2, 'Lucy', 'Reig', 'lucyr@chiccharm.com.au', '$2y$10$UaR/Z4ljlvG1LztxsODz8uWljiN0Hv8MpN8mKZjZ5NEBOfchCFwei', NULL, NULL, '2025-04-05 11:51:05', '2025-05-09 10:26:38', 'stylist', '57478_alrick-gillard-0mn84vxigl0-unsplash.jpg', 'Crafting Confidence from Head to Hem', 'I always dreamed of being a hair dresser and a makeup artist starting off doing makeup for my family along with hair dressing, I can assure you that you won\'t be disappointed.'),
-(4, 'Michael ', 'Jackson', 'hehe@gmail.com', '$2y$10$QAXdlH9eRlnPjL83P300BuDDNzHyDjchXuSxfoJTVNg3Suv8Me/UW', NULL, NULL, '2025-04-05 04:23:35', '2025-05-09 10:32:27', 'stylist', '69216_malik-mccotter-jordan-ogtwkjz8-ms-unsplash.jpg', 'You\'ve been hit by, You\'ve been struck by, A Smooth hairdresser ', 'He may not be the smooth dancer that is Jackson himself but he is sure to make sure you look smooth for whatever occasion you are looking for'),
-(5, 'Michelle', 'Yang', 'Michelleyang01@gmail.com', '$2y$10$fAokVzWnNpCP.yZ7VkmsxeKgXY7tJ0l0UNFZZQ4RJfioBRwS0eIyW', NULL, NULL, '2025-04-05 14:48:30', '2025-05-09 10:39:15', 'stylist', '46967_lance-reis-gpmgpkjujma-unsplash.jpg', 'Where Every Thread Tells a Story', 'Michelle has been an expert in her field for almost 15 years with dresses that have made it to the highest levels in Australia. There is no day when you won\'t not notice her presence with her classy outfit you may think she is a person from the past but in fact is years ahead.');
+INSERT INTO `stylists` (`id`, `first_name`, `last_name`, `email`, `password`, `nonce`, `nonce_expiry`, `created`, `modified`, `type`, `profile_picture`, `stylist_motto`, `stylist_bio`, `is_active`) VALUES
+(2, 'Lucy', 'Reig', 'lucyr@chiccharm.com.au', '$2y$10$UaR/Z4ljlvG1LztxsODz8uWljiN0Hv8MpN8mKZjZ5NEBOfchCFwei', NULL, NULL, '2025-04-05 11:51:05', '2025-05-09 10:26:38', 'stylist', '57478_alrick-gillard-0mn84vxigl0-unsplash.jpg', 'Crafting Confidence from Head to Hem', 'I always dreamed of being a hair dresser and a makeup artist starting off doing makeup for my family along with hair dressing, I can assure you that you won\'t be disappointed.', 1),
+(4, 'Michael ', 'Jackson', 'hehe@gmail.com', '$2y$10$QAXdlH9eRlnPjL83P300BuDDNzHyDjchXuSxfoJTVNg3Suv8Me/UW', NULL, NULL, '2025-04-05 04:23:35', '2025-05-09 10:32:27', 'stylist', '69216_malik-mccotter-jordan-ogtwkjz8-ms-unsplash.jpg', 'You\'ve been hit by, You\'ve been struck by, A Smooth hairdresser ', 'He may not be the smooth dancer that is Jackson himself but he is sure to make sure you look smooth for whatever occasion you are looking for', 1),
+(5, 'Michelle', 'Yang', 'Michelleyang01@gmail.com', '$2y$10$fAokVzWnNpCP.yZ7VkmsxeKgXY7tJ0l0UNFZZQ4RJfioBRwS0eIyW', NULL, NULL, '2025-04-05 14:48:30', '2025-05-09 10:39:15', 'stylist', '46967_lance-reis-gpmgpkjujma-unsplash.jpg', 'Where Every Thread Tells a Story', 'Michelle has been an expert in her field for almost 15 years with dresses that have made it to the highest levels in Australia. There is no day when you won\'t not notice her presence with her classy outfit you may think she is a person from the past but in fact is years ahead.', 1);
 
 -- --------------------------------------------------------
 
@@ -376,9 +435,9 @@ INSERT INTO `stylists` (`id`, `first_name`, `last_name`, `email`, `password`, `n
 --
 
 CREATE TABLE `stylists_services` (
-  `id` int(11) NOT NULL,
-  `stylist_id` int(11) NOT NULL,
-  `service_id` int(11) NOT NULL
+  `id` int NOT NULL,
+  `stylist_id` int NOT NULL,
+  `service_id` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -469,6 +528,18 @@ ALTER TABLE `payment_histories`
   ADD KEY `fk_payment_customer` (`customer_id`);
 
 --
+-- Indexes for table `paypal_webhook_events`
+--
+ALTER TABLE `paypal_webhook_events`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `paypal_event_id` (`paypal_event_id`),
+  ADD KEY `idx_paypal_event_id` (`paypal_event_id`),
+  ADD KEY `idx_event_name` (`event_name`),
+  ADD KEY `idx_resource_id` (`resource_id`),
+  ADD KEY `idx_status` (`status`),
+  ADD KEY `idx_received_at` (`received_at`);
+
+--
 -- Indexes for table `services`
 --
 ALTER TABLE `services`
@@ -498,67 +569,73 @@ ALTER TABLE `stylists_services`
 -- AUTO_INCREMENT for table `admins`
 --
 ALTER TABLE `admins`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=173;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=190;
 
 --
 -- AUTO_INCREMENT for table `bookings_services`
 --
 ALTER TABLE `bookings_services`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=331;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=352;
 
 --
 -- AUTO_INCREMENT for table `bookings_stylists`
 --
 ALTER TABLE `bookings_stylists`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=296;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=317;
 
 --
 -- AUTO_INCREMENT for table `contacts`
 --
 ALTER TABLE `contacts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- AUTO_INCREMENT for table `content_blocks`
 --
 ALTER TABLE `content_blocks`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
 
 --
 -- AUTO_INCREMENT for table `payment_histories`
 --
 ALTER TABLE `payment_histories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+
+--
+-- AUTO_INCREMENT for table `paypal_webhook_events`
+--
+ALTER TABLE `paypal_webhook_events`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `services`
 --
 ALTER TABLE `services`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `stylists`
 --
 ALTER TABLE `stylists`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `stylists_services`
 --
 ALTER TABLE `stylists_services`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- Constraints for dumped tables

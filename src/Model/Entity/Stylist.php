@@ -22,6 +22,7 @@ use Authentication\PasswordHasher\DefaultPasswordHasher;
  * @property string|null $profile_picture
  * @property string|null $stylist_motto
  * @property string|null $stylist_bio
+ * @property bool $is_active
  *
  * @property \App\Model\Entity\Booking[] $bookings
  * @property \App\Model\Entity\Service[] $services
@@ -52,6 +53,7 @@ class Stylist extends Entity
         'stylist_bio' => true,
         'bookings' => true,
         'services' => true,
+        'is_active' => true,
     ];
 
     /**

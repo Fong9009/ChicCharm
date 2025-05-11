@@ -72,7 +72,7 @@ class CustomersController extends AppController
         $bookingsTable = $this->fetchTable('Bookings');
 
         // Get upcoming active bookings (limited to 3)
-        $activeBookings = $bookingsTable->find()
+        $activeBookingsQuery = $bookingsTable->find()
             ->where([
                 'customer_id' => $this->Authentication->getIdentity()->id,
                 'status IN' => ['active', 'Confirmed - Payment Due', 'Confirmed - Paid']
@@ -84,6 +84,10 @@ class CustomersController extends AppController
                     'Stylists' => [
                         'fields' => ['id', 'first_name', 'last_name']
                     ]
+                ],
+                'PaymentHistories' => [
+                    'fields' => ['booking_id', 'invoice_pdf', 'payment_date'],
+                    'sort' => ['PaymentHistories.payment_date' => 'DESC']
                 ]
             ])
             ->order([
@@ -91,6 +95,16 @@ class CustomersController extends AppController
                 'booking_date' => 'ASC'
             ])
             ->limit(3);
+
+        $activeBookings = $activeBookingsQuery->all(); 
+
+        foreach ($activeBookings as $booking) {
+            $latestPayment = null;
+            if (!empty($booking->payment_histories)) {
+                $latestPayment = $booking->payment_histories[0]; 
+            }
+            $booking->latest_payment_history = $latestPayment;
+        }
 
         // Get recent cancelled bookings (limited to 3)
         $cancelledBookings = $bookingsTable->find()

@@ -161,6 +161,20 @@ $this->layout = 'default';
                                                                 ) ?>
 
                                                                 <?php if ($booking->status === 'Confirmed - Paid'): ?>
+                                                                    <?php if (!empty($booking->latest_payment_history) && !empty($booking->latest_payment_history->invoice_pdf)):
+                                                                        echo $this->Html->link(
+                                                                            __('Download/Check Invoice'),
+                                                                            '/' . h($booking->latest_payment_history->invoice_pdf),
+                                                                            [
+                                                                                'class' => 'view-btn',
+                                                                                'style' => 'background-color: #6c757d; border-color: #6c757d; color: white;',
+                                                                                'onmouseover' => "this.style.backgroundColor='#5a6268'; this.style.borderColor='#5a6268';",
+                                                                                'onmouseout' => "this.style.backgroundColor='#6c757d'; this.style.borderColor='#6c757d';",
+                                                                                'target' => '_blank',
+                                                                                'escape' => false
+                                                                            ]
+                                                                        );
+                                                                    endif; ?>
                                                                     <p class="text-muted small mt-1 mb-0 align-self-center">This booking is paid. Contact store for changes.</p>
                                                                 <?php else: ?>
                                                                     <?php 

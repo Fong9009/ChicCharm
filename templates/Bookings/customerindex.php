@@ -206,7 +206,18 @@
                                                     ) ?>
 
                                                     <?php if ($booking->status === 'Confirmed - Paid'): ?>
-                                                        <p class="text-muted small mb-0" style="white-space: normal;">This booking is paid. Contact store for changes.</p>
+                                                        <?php if (!empty($booking->latest_payment_history) && !empty($booking->latest_payment_history->invoice_pdf)):
+                                                            echo $this->Html->link(
+                                                                __('Download/Check Invoice'),
+                                                                '/' . h($booking->latest_payment_history->invoice_pdf),
+                                                                [
+                                                                    'class' => 'button button-outline',
+                                                                    'style' => 'background-color: #6c757d; border-color: #6c757d; color: white; margin-top: 5px;',
+                                                                    'target' => '_blank'
+                                                                ]
+                                                            );
+                                                        endif; ?>
+                                                        <p class="text-muted small mb-0 mt-2" style="white-space: normal;">This booking is paid. Contact store for changes.</p>
                                                     <?php else: ?>
                                                         <?php 
                                                         $statusAllowsActionsIndex = in_array($booking->status, ['active', 'Confirmed - Payment Due']);

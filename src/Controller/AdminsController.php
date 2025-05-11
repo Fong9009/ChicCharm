@@ -410,5 +410,68 @@ class AdminsController extends AppController
         }
         return $this->redirect(['action' => 'inactiveCustomers']);
     }
+
+    /**
+     * List inactive (soft-deleted) stylists
+     */
+    public function inactiveStylists()
+    {
+        $stylistsTable = $this->fetchTable('Stylists');
+        $query = $stylistsTable->find()->where(['is_active' => false]);
+
+        // Search functionality
+        $search = $this->request->getQuery('search');
+        if ($search) {
+            $query->where([
+                'OR' => [
+                    'first_name LIKE' => '%' . $search . '%',
+                    'last_name LIKE' => '%' . $search . '%',
+                    'email LIKE' => '%' . $search . '%',
+                ]
+            ]);
+        }
+
+        // Filter functionality
+        $filter = $this->request->getQuery('filter');
+        if ($filter === 'recent') {
+            $query->where(['modified >=' => date('Y-m-d', strtotime('-30 days'))]);
+        } elseif ($filter === 'old') {
+            $query->where(['modified <' => date('Y-m-d', strtotime('-30 days'))]);
+        }
+
+        $inactiveStylists = $this->paginate($query);
+        $this->set(compact('inactiveStylists'));
+    }
+
+    /**
+     * Restore a soft-deleted (inactive) stylist
+     */
+    public function restoreStylist($id = null)
+    {
+        $stylistsTable = $this->fetchTable('Stylists');
+        $stylist = $stylistsTable->get($id);
+        $stylist->is_active = true;
+        if ($stylistsTable->save($stylist)) {
+            $this->Flash->success(__('The stylist has been restored.'));
+        } else {
+            $this->Flash->error(__('The stylist could not be restored. Please, try again.'));
+        }
+        return $this->redirect(['action' => 'inactiveStylists']);
+    }
+
+    /**
+     * Permanently delete a stylist
+     */
+    public function hardDeleteStylist($id = null)
+    {
+        $stylistsTable = $this->fetchTable('Stylists');
+        $stylist = $stylistsTable->get($id);
+        if ($stylistsTable->delete($stylist)) {
+            $this->Flash->success(__('The stylist has been permanently deleted.'));
+        } else {
+            $this->Flash->error(__('The stylist could not be deleted. Please, try again.'));
+        }
+        return $this->redirect(['action' => 'inactiveStylists']);
+    }
 }
 

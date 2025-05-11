@@ -19,6 +19,7 @@ use Cake\ORM\Entity;
  * @property string|null $payment_method
  * @property \Cake\I18n\DateTime $payment_date
  * @property string|null $notes
+ * @property string|null $invoice_pdf
  * @property \Cake\I18n\DateTime|null $created_at
  * @property \Cake\I18n\DateTime|null $updated_at
  *
@@ -47,6 +48,7 @@ class PaymentHistory extends Entity
         'payment_method' => true,
         'payment_date' => true,
         'notes' => true,
+        'invoice_pdf' => true,
         'created_at' => true,
         'updated_at' => true,
         'booking' => true,

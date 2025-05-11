@@ -22,7 +22,6 @@ $paymentDateFormatted = $paymentHistory->payment_date ? $paymentHistory->payment
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Invoice</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -70,7 +69,7 @@ $paymentDateFormatted = $paymentHistory->payment_date ? $paymentHistory->payment
         .invoice-details table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 0; /* Remove extra margin if h4 is present */
+            margin-bottom: 0; 
         }
          .booking-summary table {
             width: 100%;
@@ -163,7 +162,22 @@ $paymentDateFormatted = $paymentHistory->payment_date ? $paymentHistory->payment
         <div class="customer-details">
             <h4>Billed To:</h4>
             <p>
-                <?= h($booking->customer->full_name ?? 'N/A') ?><br>
+                <?php 
+                $customerName = 'N/A';
+                if ($booking->customer && !empty(trim((string)$booking->customer->full_name)) && strtolower(trim((string)$booking->customer->full_name)) !== 'guest user') {
+                    $customerName = h($booking->customer->full_name);
+                } elseif (!empty($booking->booking_name)) {
+                    if (stripos($booking->booking_name, 'Booking for ') === 0) {
+                        $extractedName = trim(substr($booking->booking_name, strlen('Booking for ')));
+                        if (!empty($extractedName)) {
+                            $customerName = h($extractedName);
+                        }
+                    } else {
+                        $customerName = h($booking->booking_name); 
+                    }
+                }
+                ?>
+                <?= $customerName ?><br>
                 <?= h($booking->customer->email ?? 'N/A') ?><br>
                 <?php if (!empty($booking->customer->phone_number)): ?>
                     Phone: <?= h($booking->customer->phone_number) ?><br>
@@ -190,12 +204,38 @@ $paymentDateFormatted = $paymentHistory->payment_date ? $paymentHistory->payment
                                     $serviceStartTime = $bs->start_time->format('h:i A');
                                     $serviceEndTime = $bs->end_time->format('h:i A');
                                     $serviceTimeInfo = $serviceStartTime . ' - ' . $serviceEndTime;
-                                } elseif ($bs->service && $bs->service->duration) {
-                                    $serviceTimeInfo = $bs->service->duration . ' mins';    
+                                }
+
+                                $stylistNameDisplay = 'N/A'; 
+                                if ($bs && !empty($bs->stylist)) {
+                                    $fullName = trim((string)($bs->stylist->full_name ?? ''));
+                                    $firstName = trim((string)($bs->stylist->first_name ?? ''));
+                                    $lastName = trim((string)($bs->stylist->last_name ?? ''));
+
+                                    $resolvedName = '';
+                                    if (!empty($fullName) && !in_array(strtolower($fullName), ['unknown stylist', 'unknown', 'n/a', ''])) {
+                                        $resolvedName = $fullName;
+                                    } 
+                                    else {
+                                        $constructedName = trim($firstName . ' ' . $lastName);
+                                        if (!empty($constructedName) && !in_array(strtolower($constructedName), ['unknown stylist', 'unknown', 'n/a', ''])) {
+                                            if (!in_array(strtolower($firstName), ['unknown stylist', 'unknown', 'n/a', '']) && 
+                                                !in_array(strtolower($lastName), ['unknown stylist', 'unknown', 'n/a', ''])) {
+                                                $resolvedName = $constructedName;
+                                            }
+                                        }
+                                    }
+
+                                    if (!empty($resolvedName)) {
+                                        $stylistNameDisplay = h($resolvedName);
+                                    }
                                 }
                             ?>
                             <tr>
-                                <td><?= h($bs->service->service_name ?? 'N/A') ?></td>
+                                <td>
+                                    <?= h($bs->service->service_name ?? 'N/A') ?><br>
+                                    <small class="text-muted">Stylist: <?= $stylistNameDisplay ?></small>
+                                </td>
                                 <td><?= h($serviceTimeInfo) ?></td>
                                 <td style="text-align: right;"><?= $this->Number->currency($bs->service_cost ?? 0, 'AUD') ?></td>
                             </tr>
