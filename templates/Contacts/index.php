@@ -8,6 +8,7 @@ $this->Html->css('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css
 $this->Html->css('https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css', ['block' => true]);
 $this->Html->css('custom', ['block' => true]);
 ?>
+<div class="admin-background">
 <div class="custom-list-wrapper">
     <div class="row">
         <aside class="column">
@@ -17,7 +18,7 @@ $this->Html->css('custom', ['block' => true]);
                 <?= $this->Html->link(__('Back to Dashboard'), ['controller' => 'Admins', 'action' => 'dashboard'], ['class' => 'side-nav-item']) ?>
             </div>
         </aside>
-        <div class="contacts index content">
+        <div class="contacts index content admin-border">
             <div class="table-responsive">
                 <div class="container">
                     <div class="row align-items-center">
@@ -110,7 +111,7 @@ $this->Html->css('custom', ['block' => true]);
         </div>
     </div>
 </div>
-
+</div>
 <?php
 $this->Html->script('https://code.jquery.com/jquery-3.6.0.min.js', ['block' => true]);
 $this->Html->script('https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js', ['block' => true]);
