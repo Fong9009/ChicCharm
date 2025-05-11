@@ -6,8 +6,8 @@
 ?>
 <?= $this->Html->css('/utility/indexes/indexes.css') ?>
 <?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
-
-<div class="contacts index content">
+<div class="admin-background">
+<div class="contacts index content admin-border">
     <!-- Action Menu -->
     <aside class="column">
         <div class="side-nav">
@@ -118,7 +118,7 @@
                     <td>
                         <?php if (!empty($booking->bookings_services)): ?>
                             <ul style="list-style: none; padding-left: 0;">
-                            <?php 
+                            <?php
                             // Group services by stylist
                             $stylistServices = [];
                             foreach ($booking->bookings_services as $bookingService) {
@@ -136,13 +136,13 @@
                             ?>
                             <?php foreach ($stylistServices as $stylistData): ?>
                                 <li class="mb-2">
-                                    <?= h($stylistData['stylist']->first_name) ?> 
+                                    <?= h($stylistData['stylist']->first_name) ?>
                                     <?= h($stylistData['stylist']->last_name) ?>:
                                     <ul style="list-style: none; padding-left: 1rem; margin-top: 0.25rem;">
                                         <?php foreach ($stylistData['booking_services'] as $bookingService): ?>
                                             <li>
                                                 <small>
-                                                     <?= h($bookingService->service->service_name) ?> 
+                                                     <?= h($bookingService->service->service_name) ?>
                                                     (<?= $this->Number->currency($bookingService->service->service_cost) ?>):
                                                     <?php // Time Slot ?>
                                                     <?php if ($bookingService->start_time && $bookingService->end_time): ?>
@@ -168,8 +168,8 @@
                     </td>
                     <td><?= $this->Number->currency($booking->total_cost) ?></td>
                     <td>
-                        <span class="badge <?= 
-                            $booking->status === 'finished' ? 'bg-info' : 'bg-secondary' 
+                        <span class="badge <?=
+                            $booking->status === 'finished' ? 'bg-info' : 'bg-secondary'
                         ?>">
                             <?= h($booking->status) ?>
                         </span>
@@ -201,4 +201,5 @@
         </ul>
         <p><?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} record(s) out of {{count}} total')) ?></p>
     </div>
-</div> 
+</div>
+</div>

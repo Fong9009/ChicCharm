@@ -128,13 +128,3 @@
     display: flex;
     justify-content: center;
 }
-
-
-.index-background {
-    padding-top: 40px;
-    padding-bottom: 40px;
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-}
