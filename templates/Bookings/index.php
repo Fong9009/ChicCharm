@@ -6,6 +6,9 @@
 ?>
 <?= $this->Html->css('/utility/indexes/indexes.css') ?>
 <?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
+<?php
+$this->Html->script('custom', ['block' => true]);
+?>
 
 <div class="contacts index content">
     <!-- Action Menu -->
@@ -68,6 +71,32 @@
         <div class="container">
             <div class="row align-items-center">
                 <h3><?= __('Active Bookings') ?></h3>
+            </div>
+        </div>
+        <div class="search-filter-container">
+            <div class="search-box">
+                <?= $this->Form->create(null, ['type' => 'get', 'class' => 'search-form']) ?>
+                <div class="input-group">
+                    <?= $this->Form->control('search', [
+                        'label' => false,
+                        'class' => 'form-control',
+                        'placeholder' => 'Search by customer name or booking name...',
+                        'value' => $this->request->getQuery('search')
+                    ]) ?>
+                </div>
+                <?= $this->Form->end() ?>
+            </div>
+            <div class="filter-box">
+                <?= $this->Form->create(null, ['type' => 'get', 'class' => 'filter-form']) ?>
+                <?= $this->Form->select('filter', [
+                    '' => 'All Statuses',
+                    'Confirmed - Payment Due' => 'Payment Due',
+                    'Confirmed - Paid' => 'Paid'
+                ], [
+                    'class' => 'form-control',
+                    'value' => $this->request->getQuery('filter')
+                ]) ?>
+                <?= $this->Form->end() ?>
             </div>
         </div>
         <table>

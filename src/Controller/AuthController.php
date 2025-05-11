@@ -466,6 +466,14 @@ class AuthController extends AppController
         if ($result && $result->isValid()) {
             $user = $result->getData();
 
+            // Prevent inactive customers from logging in
+            if ($user->type === 'customer' && isset($user->is_active) && !$user->is_active) {
+                $this->Authentication->logout();
+                $this->getRequest()->getSession()->destroy();
+                $this->Flash->error('Your account is inactive. Please contact the administrator.');
+                return $this->redirect(['action' => 'login']);
+            }
+
             // If redirected from booking, send to appropriate booking page
             if ($this->request->getQuery('redirect') === 'booking') {
                 if ($user->type === 'customer') {
