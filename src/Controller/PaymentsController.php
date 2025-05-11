@@ -11,6 +11,7 @@ use App\Model\Table\BookingsTable;
 use App\Model\Table\PaymentHistoriesTable;
 use Cake\I18n\FrozenTime;
 use App\Mailer\InvoiceMailer;
+use Cake\Routing\Router;
 
 class PaymentsController extends AppController
 {
@@ -75,9 +76,9 @@ class PaymentsController extends AppController
             }
 
             // Create order
-            $orderAmount = number_format($booking->remaining_cost, 2, '.', '');
-            if ($booking->remaining_cost <= 0) {
-                Log::error("Cannot create PayPal order for booking ID {$bookingId} with zero or negative amount: {$booking->remaining_cost}", ['scope' => ['paypal']]);
+            $orderAmount = number_format($booking->total_cost, 2, '.', ''); 
+            if ($booking->total_cost <= 0) {
+                Log::error("Cannot create PayPal order for booking ID {$bookingId} with zero or negative amount: {$booking->total_cost}", ['scope' => ['paypal']]);
                 return $this->response->withStatus(400)->withType('application/json')->withStringBody(json_encode(['error' => 'Invalid amount for payment.']));
             }
 
@@ -269,9 +270,6 @@ class PaymentsController extends AppController
 
                         // Send invoice email
                         try {
-                            // Ensure the booking entity has customer and service details for the email
-                            // It might be necessary to re-fetch or ensure associations are loaded.
-                            // For example, if $booking->customer is not loaded:
                             $bookingWithDetails = $this->Bookings->get($bookingId, [
                                 'contain' => [
                                     'Customers',
@@ -283,10 +281,7 @@ class PaymentsController extends AppController
                             $mailer->sendInvoice($bookingWithDetails, $paymentHistory);
                             Log::info("Invoice email sent for Booking ID: {$bookingId} to {$bookingWithDetails->customer->email}");
                         } catch (\Exception $e) {
-                            // Log email sending failure but don't let it break the user flow
                             Log::error("Failed to send invoice email for Booking ID: {$bookingId}. Error: " . $e->getMessage());
-                            // Optionally, you could add a less critical flash message for the admin or user here
-                            // $this->Flash->warning('Payment was successful, but the invoice email could not be sent. Please contact support.');
                         }
                     } else {
                         Log::error('Failed to save PaymentHistory in SUCCESS.');
@@ -335,7 +330,6 @@ class PaymentsController extends AppController
             ->contain(['Bookings' => ['Customers']])
             ->order(['PaymentHistories.payment_date' => 'DESC']);
 
-        // Pass the query object to paginate()
         $payments = $this->paginate($query);
 
         $this->set(compact('payments'));
@@ -348,28 +342,23 @@ class PaymentsController extends AppController
         $bookingData = $this->request->getSession()->read('GuestBooking.pending_details');
 
         if (!$bookingData) {
+            $this->request->getSession()->delete('GuestBooking.pending_details');
             $this->Flash->error(__('Your booking session has expired or is invalid. Please try creating your booking again.'));
-            return $this->redirect(['controller' => 'Bookings', 'action' => 'guestbooking']);
-        }
-
-        // For the PayPal button in the view
-        $clientId = Configure::read('PayPal.clientId');
-        $mode = Configure::read('PayPal.mode', 'sandbox'); // Default to sandbox if not set
-
-        if (empty($clientId)) {
-            Log::error("PayPal client ID is not configured for guest payment.", ['scope' => ['paypal']]);
-            $this->Flash->error(__('Payment system is currently unavailable. Please try again later or contact support.'));
-            // Potentially redirect to an error page or back to booking
             return $this->redirect(['controller' => 'Bookings', 'action' => 'guestbooking']);
         }
 
         // Log the data being passed to the view for debugging
         Log::debug('[ProcessGuestPayment] Booking data for view: ' . json_encode($bookingData), ['scope' => ['paypal']]);
 
+        $paymentAmount = number_format((float)($bookingData['total_cost'] ?? 0), 2, '.', '');
+        $currencyCode = 'AUD'; 
 
-        $this->set(compact('bookingData', 'clientId', 'mode'));
-        // The view should be located at templates/Payments/process_guest_payment.php
-        // We will create this view in the next step.
+        $temporaryBookingId = $bookingData['id'] ?? 'temp_id_' . uniqid(); 
+        $finalSuccessUrl = Router::url(['controller' => 'Payments', 'action' => 'successGuest', $temporaryBookingId], true);
+        $finalCancelUrl = Router::url(['controller' => 'Payments', 'action' => 'cancelGuest', $temporaryBookingId], true);
+
+        $this->set(compact('bookingData', 'clientId', 'mode', 'paymentAmount', 'currencyCode', 'finalSuccessUrl', 'finalCancelUrl'));
+
         try {
             $this->render('process_guest_payment');
         } catch (\Cake\View\Exception\MissingTemplateException $e) {
@@ -379,13 +368,14 @@ class PaymentsController extends AppController
         }
     }
 
-    public function successGuest($temporaryBookingId = null) // Can be null  if not passed
+    public function successGuest($temporaryBookingId = null) 
     {
         Log::debug("[successGuest] Reached for temp ID: {$temporaryBookingId}. Query: " . json_encode($this->request->getQueryParams()));
         $session = $this->request->getSession();
         $bookingData = $session->read('GuestBooking.pending_details');
 
         if (!$bookingData) {
+            $session->delete('GuestBooking.pending_details');
             Log::error('[successGuest] Session data for GuestBooking.pending_details not found.');
             $this->Flash->error(__('Your booking session has expired or payment data is missing. Please try again.'));
             return $this->redirect(['controller' => 'Bookings', 'action' => 'guestbooking']);
@@ -482,7 +472,7 @@ class PaymentsController extends AppController
 
             $dataForPaymentHistory = [
                 'booking_id' => $newBookingId,
-                'customer_id' => $newBooking->customer_id, // Guest customer ID
+                'customer_id' => $newBooking->customer_id, 
                 'paypal_transaction_id' => $payPalTransactionID,
                 'paypal_payer_id' => $payPalPayerID,
                 'payment_amount' => $newBooking->total_cost,

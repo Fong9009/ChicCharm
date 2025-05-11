@@ -117,6 +117,3 @@ $this->Html->css('/utility/forms/forms.css') ?>
         </div>
     </div>
 </div>
-
-<!-- Flatpickr JS -->
-<?php // <?= $this->Html->script('https://cdn.jsdelivr.net/npm/flatpickr') ?> ?>

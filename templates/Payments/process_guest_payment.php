@@ -20,17 +20,6 @@ if (empty($bookingData) || !isset($bookingData['total_cost'])) {
 $totalCost = number_format((float)($bookingData['total_cost'] ?? 0), 2, '.', '');
 $temporaryBookingId = $bookingData['id'] ?? 'temp_id_' . uniqid();
 
-$this->Html->scriptBlock("var payPalClientId = '{$clientId}';", ['block' => true]);
-$this->Html->scriptBlock("var payPalBookingId = '{$temporaryBookingId}';", ['block' => true]);
-$this->Html->scriptBlock("var payPalOrderAmount = '{$totalCost}';", ['block' => true]);
-$this->Html->scriptBlock("var payPalCurrency = 'AUD';", ['block' => true]);
-
-$successUrl = $this->Url->build(['controller' => 'Payments', 'action' => 'successGuest', $temporaryBookingId], ['fullBase' => true]);
-$cancelUrl = $this->Url->build(['controller' => 'Payments', 'action' => 'cancelGuest', $temporaryBookingId], ['fullBase' => true]);
-
-$this->Html->scriptBlock("var payPalSuccessUrl = '{$successUrl}';", ['block' => true]);
-$this->Html->scriptBlock("var payPalCancelUrl = '{$cancelUrl}';", ['block' => true]);
-
 ?>
 <div class="login-wrapper">
   <div class="container mt-5 payments process-guest-payment">
@@ -73,6 +62,16 @@ $this->Html->scriptBlock("var payPalCancelUrl = '{$cancelUrl}';", ['block' => tr
 
                       <div id="paypal-button-container" style="max-width: 400px; margin: 20px auto;"></div>
 
+                      <?php
+                        // Render the PayPal payment element
+                        echo $this->element('Bookings/paypal_payment', compact(
+                            'paymentAmount',
+                            'currencyCode',
+                            'finalSuccessUrl',
+                            'finalCancelUrl'
+                        ));
+                      ?>
+
                       <p class="text-center text-muted small mt-3">
                           You will be redirected to PayPal to complete your payment securely.
                       </p>
@@ -90,62 +89,4 @@ $this->Html->scriptBlock("var payPalCancelUrl = '{$cancelUrl}';", ['block' => tr
   </div>
 </div> 
 
-<?php
-echo $this->Html->script("https://www.paypal.com/sdk/js?client-id={$clientId}&currency=AUD", ['block' => 'script']);
-?>
-
-<?php $this->append('script'); ?>
-<script>
-    if (typeof paypal === 'undefined') {
-        console.error('PayPal SDK not loaded. Cannot render PayPal buttons.');
-        document.getElementById('paypal-button-container').innerHTML = '<p class=\'text-danger\'>Error: Payment gateway could not be loaded. Please try refreshing the page or contact support.</p>';
-    } else {
-        paypal.Buttons({
-            createOrder: function(data, actions) {
-                console.log("Creating PayPal order for guest booking ID: " + payPalBookingId + ", Amount: " + payPalOrderAmount);
-                return actions.order.create({
-                    purchase_units: [{
-                        amount: {
-                            value: payPalOrderAmount,
-                            currency_code: payPalCurrency
-                        },
-                        description: 'Guest Booking Payment',
-                        custom_id: 'GUEST_BOOKING_ID_' + payPalBookingId
-                    }]
-                });
-            },
-            onApprove: function(data, actions) {
-                console.log("PayPal order approved by guest. Order ID: " + data.orderID);
-                return actions.order.capture().then(function(details) {
-                    console.log("Guest payment capture details: ", details);
-                    const transactionId = details.id;
-                    const payerId = details.payer ? details.payer.payer_id : null;
-
-                    let finalSuccessUrl = payPalSuccessUrl;
-                    finalSuccessUrl += `?transaction_id=${transactionId}`;
-                    if (payerId) {
-                        finalSuccessUrl += `&paypal_payer_id=${payerId}`;
-                    }
-                    finalSuccessUrl += `&paypal_order_id=${data.orderID}`;
-
-                    window.location.href = finalSuccessUrl;
-                }).catch(function(err) {
-                    console.error('Error capturing guest payment:', err);
-                    alert('There was an error processing your payment. Please try again or contact support.');
-                });
-            },
-            onError: function(err) {
-                console.error('PayPal Button SDK onError for guest:', err);
-                alert('An error occurred with the PayPal payment. Please check your details and try again.');
-            },
-            onCancel: function(data) {
-                console.log("Guest payment cancelled. PayPal Order ID: " + data.orderID);
-                window.location.href = payPalCancelUrl + (payPalCancelUrl.includes('?') ? '&' : '?') + 'paypal_order_id=' + data.orderID;
-            }
-        }).render('#paypal-button-container').catch(function (err) {
-            console.error('Failed to render PayPal Buttons:', err);
-            document.getElementById('paypal-button-container').innerHTML = '<p class=\'text-danger\'>Could not load payment options. Please ensure you are connected to the internet and try again.</p>';
-        });
-    }
-</script>
 <?php $this->end(); ?>

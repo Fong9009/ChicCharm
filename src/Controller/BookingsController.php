@@ -166,7 +166,7 @@ class BookingsController extends AppController
                 'Bookings.status',
                 'Bookings.notes',
             ])
-            ->where(['status IN' => ['active', 'Confirmed - Payment Due', 'Confirmed - Paid']])
+            ->where(['status IN' => ['Confirmed - Payment Due', 'Confirmed - Paid']])
             ->contain([
                 'Customers' => [
                     'fields' => ['id', 'first_name', 'last_name'],
@@ -184,8 +184,27 @@ class BookingsController extends AppController
                         'fields' => ['id', 'first_name', 'last_name'],
                     ],
                 ],
-            ])
-            ->orderBy(['booking_date' => 'ASC']);
+            ]);
+
+        // Search functionality
+        $search = $this->request->getQuery('search');
+        if ($search) {
+            $query->where([
+                'OR' => [
+                    'Bookings.booking_name LIKE' => '%' . $search . '%',
+                    'Customers.first_name LIKE' => '%' . $search . '%',
+                    'Customers.last_name LIKE' => '%' . $search . '%',
+                ]
+            ]);
+        }
+
+        // Filter by status (only allow Confirmed - Payment Due and Confirmed - Paid)
+        $filter = $this->request->getQuery('filter');
+        if ($filter && in_array($filter, ['Confirmed - Payment Due', 'Confirmed - Paid'])) {
+            $query->where(['Bookings.status' => $filter]);
+        }
+
+        $query->orderBy(['booking_date' => 'ASC']);
         $bookings = $this->paginate($query);
 
         $this->set(compact('bookings'));
@@ -1997,7 +2016,6 @@ class BookingsController extends AppController
         $user = $this->Authentication->getIdentity();
         if (!$user || $user->type !== 'admin') {
             $this->Flash->error('Access denied. Admin only area.');
-
             return $this->redirect(['action' => 'customerindex']);
         }
 
@@ -2012,6 +2030,9 @@ class BookingsController extends AppController
             ])
             ->where(['status IN' => ['finished', 'cancelled']])
             ->contain([
+                'Customers' => [
+                    'fields' => ['id', 'first_name', 'last_name'],
+                ],
                 'BookingsServices' => [
                     'Services' => [
                         'fields' => ['id', 'service_name', 'service_cost'],
@@ -2025,8 +2046,49 @@ class BookingsController extends AppController
                         'fields' => ['id', 'first_name', 'last_name'],
                     ],
                 ],
-            ])
-            ->orderBy(['booking_date' => 'DESC']);
+            ]);
+
+        // Search functionality
+        $search = $this->request->getQuery('search');
+        if ($search) {
+            $query->where([
+                'OR' => [
+                    'Bookings.booking_name LIKE' => '%' . $search . '%',
+                    'Customers.first_name LIKE' => '%' . $search . '%',
+                    'Customers.last_name LIKE' => '%' . $search . '%',
+                ]
+            ]);
+        }
+
+        // Filter by date range
+        $dateRange = $this->request->getQuery('date_range');
+        if ($dateRange) {
+            $now = new CakeDateTime();
+            switch ($dateRange) {
+                case 'last_week':
+                    $startDate = $now->modify('-1 week');
+                    break;
+                case 'last_month':
+                    $startDate = $now->modify('-1 month');
+                    break;
+                case 'last_3_months':
+                    $startDate = $now->modify('-3 months');
+                    break;
+                case 'last_6_months':
+                    $startDate = $now->modify('-6 months');
+                    break;
+                case 'last_year':
+                    $startDate = $now->modify('-1 year');
+                    break;
+                default:
+                    $startDate = null;
+            }
+            if ($startDate) {
+                $query->where(['Bookings.booking_date >=' => $startDate->format('Y-m-d')]);
+            }
+        }
+
+        $query->orderBy(['booking_date' => 'DESC']);
         $bookings = $this->paginate($query);
 
         $this->set(compact('bookings'));

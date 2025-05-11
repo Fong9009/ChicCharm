@@ -329,10 +329,11 @@ class CustomersController extends AppController
         }
 
         $customer = $this->Customers->get($id);
-        if ($this->Customers->delete($customer)) {
-            $this->Flash->success(__('The customer has been deleted.'));
+        $customer->is_active = false;
+        if ($this->Customers->save($customer)) {
+            $this->Flash->success(__('The customer has been set to inactive (soft deleted).'));
         } else {
-            $this->Flash->error(__('The customer could not be deleted. Please, try again.'));
+            $this->Flash->error(__('The customer could not be set to inactive. Please, try again.'));
         }
 
         return $this->redirect(['action' => 'index']);
@@ -375,7 +376,6 @@ class CustomersController extends AppController
         $this->set(compact('customer'));
         $this->set('userType', 'customer');
     }
-
 }
 
 

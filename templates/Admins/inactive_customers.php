@@ -1,7 +1,7 @@
 <?php
 /**
  * @var \App\View\AppView $this
- * @var iterable<\App\Model\Entity\Customer> $customers
+ * @var iterable<\App\Model\Entity\Customer> $inactiveCustomers
  */
 $this->Html->css('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css', ['block' => true]);
 $this->Html->script('https://code.jquery.com/jquery-3.6.0.min.js', ['block' => true]);
@@ -36,31 +36,15 @@ $this->Html->script('custom', ['block' => true]);
                         <?= $this->Html->link(
                             '<div class="card h-100">
                         <div class="card-header new-card-header d-flex justify-content-between align-items-center flex-wrap">
-                            <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">New Customer</h4>
-                            <i class="material-icons view-icon ms-2">add</i>
+                            <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">Active Customers</h4>
+                            <i class="material-icons view-icon ms-2">people</i>
                         </div>
                         <div class="card-body new-card-body"></div>
                         <div class="card-footer new-card-footer">
-                            <span  class="mb-0 text-truncate">Add Customer</span>
+                            <span class="mb-0 text-truncate">View Active Customers</span>
                         </div>
                     </div>',
-                            ['controller' => 'Customers', 'action' => 'registration'],
-                            ['escape' => false, 'class' => 'card-link-wrapper d-block text-decoration-none']
-                        ) ?>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-12 mb-3 side-nav-item">
-                        <?= $this->Html->link(
-                            '<div class="card h-100">
-                        <div class="card-header dashboard-card-header d-flex justify-content-between align-items-center flex-wrap">
-                            <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">Inactive Customers</h4>
-                            <i class="material-icons view-icon ms-2">archive</i>
-                        </div>
-                        <div class="card-body dashboard-card-body"></div>
-                        <div class="card-footer dashboard-card-footer">
-                            <span class="mb-0 text-truncate">View Inactive Accounts</span>
-                        </div>
-                    </div>',
-                            ['controller' => 'Admins', 'action' => 'inactiveCustomers'],
+                            ['controller' => 'Customers', 'action' => 'index'],
                             ['escape' => false, 'class' => 'card-link-wrapper d-block text-decoration-none']
                         ) ?>
                     </div>
@@ -70,7 +54,7 @@ $this->Html->script('custom', ['block' => true]);
             <div class="table-responsive mt-3">
                 <div class="container">
                     <div class="row align-items-center">
-                            <h3><?= __('Customer List') ?></h3>
+                            <h3><?= __('Inactive Customer Accounts') ?></h3>
                     </div>
                 </div>
                 <div class="search-filter-container">
@@ -90,7 +74,9 @@ $this->Html->script('custom', ['block' => true]);
                     <div class="filter-box">
                         <?= $this->Form->create(null, ['type' => 'get', 'class' => 'filter-form']) ?>
                         <?= $this->Form->select('filter', [
-                            '' => 'All Customers',
+                            '' => 'All Inactive Customers',
+                            'recent' => 'Recently Inactivated',
+                            'old' => 'Long Term Inactive'
                         ], [
                             'class' => 'form-control',
                             'value' => $this->request->getQuery('filter')
@@ -110,7 +96,7 @@ $this->Html->script('custom', ['block' => true]);
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($customers as $customer): ?>
+                        <?php foreach ($inactiveCustomers as $customer): ?>
                         <tr>
                             <td><?= h($customer->first_name) ?></td>
                             <td><?= h($customer->last_name) ?></td>
@@ -118,15 +104,21 @@ $this->Html->script('custom', ['block' => true]);
                             <td><?= h($customer->created) ?></td>
                             <td><?= h($customer->modified) ?></td>
                             <td class="actions">
-                                <?= $this->Html->link(__('View'), ['action' => 'view', $customer->id], ['class' => 'button']) ?>
-                                <?= $this->Html->link(__('Edit'), ['action' => 'edit', $customer->id], ['class' => 'button']) ?>
+                                <?= $this->Html->link(__('View'), ['controller' => 'Customers', 'action' => 'view', $customer->id], ['class' => 'button']) ?>
                                 <?= $this->Form->postLink(
-                                    __('Delete'),
-                                    ['action' => 'delete', $customer->id],
+                                    __('Restore'),
+                                    ['action' => 'restoreCustomer', $customer->id],
                                     [
-                                        'method' => 'delete',
-                                        'confirm' => __('Are you sure you want to delete # {0}? You will not be able to get them back', ($customer->first_name . ' ' . $customer->last_name)),
-                                        'class' => 'button'
+                                        'confirm' => __('Are you sure you want to restore # {0}?', ($customer->first_name . ' ' . $customer->last_name)),
+                                        'class' => 'button btn-success'
+                                    ]
+                                ) ?>
+                                <?= $this->Form->postLink(
+                                    __('Delete Permanently'),
+                                    ['action' => 'hardDeleteCustomer', $customer->id],
+                                    [
+                                        'confirm' => __('Are you sure you want to permanently delete # {0}? This cannot be undone.', ($customer->first_name . ' ' . $customer->last_name)),
+                                        'class' => 'button btn-danger'
                                     ]
                                 ) ?>
                             </td>
@@ -146,5 +138,4 @@ $this->Html->script('custom', ['block' => true]);
                 <p><?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} record(s) out of {{count}} total')) ?></p>
             </div>
         </div>
-    </div>
-
+    </div> 
