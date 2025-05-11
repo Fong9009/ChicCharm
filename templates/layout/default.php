@@ -357,6 +357,9 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
                 <ul class="list-unstyled">
                     <li><a href="<?= $this->Url->build('/contacts/enquiry') ?>" class="text-secondary">Contact us</a></li>
                 </ul>
+                <ul class="list-unstyled">
+                    <li><a href="<?= $this->Url->build('/faq/questions') ?>" class="text-secondary">FAQ</a></li>
+                </ul>
             </div>
 
             <!-- Our Company -->
