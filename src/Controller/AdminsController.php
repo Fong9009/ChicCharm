@@ -342,5 +342,68 @@ class AdminsController extends AppController
         $this->set(compact('admin'));
         $this->set('userType', 'admin');
     }
+
+    /**
+     * List inactive (soft-deleted) customers
+     */
+    public function inactiveCustomers()
+    {
+        $customersTable = $this->fetchTable('Customers');
+        $query = $customersTable->find()->where(['is_active' => false]);
+
+        // Search functionality
+        $search = $this->request->getQuery('search');
+        if ($search) {
+            $query->where([
+                'OR' => [
+                    'first_name LIKE' => '%' . $search . '%',
+                    'last_name LIKE' => '%' . $search . '%',
+                    'email LIKE' => '%' . $search . '%',
+                ]
+            ]);
+        }
+
+        // Filter functionality
+        $filter = $this->request->getQuery('filter');
+        if ($filter === 'recent') {
+            $query->where(['modified >=' => date('Y-m-d', strtotime('-30 days'))]);
+        } elseif ($filter === 'old') {
+            $query->where(['modified <' => date('Y-m-d', strtotime('-30 days'))]);
+        }
+
+        $inactiveCustomers = $this->paginate($query);
+        $this->set(compact('inactiveCustomers'));
+    }
+
+    /**
+     * Restore a soft-deleted (inactive) customer
+     */
+    public function restoreCustomer($id = null)
+    {
+        $customersTable = $this->fetchTable('Customers');
+        $customer = $customersTable->get($id);
+        $customer->is_active = true;
+        if ($customersTable->save($customer)) {
+            $this->Flash->success(__('The customer has been restored.'));
+        } else {
+            $this->Flash->error(__('The customer could not be restored. Please, try again.'));
+        }
+        return $this->redirect(['action' => 'inactiveCustomers']);
+    }
+
+    /**
+     * Permanently delete a customer
+     */
+    public function hardDeleteCustomer($id = null)
+    {
+        $customersTable = $this->fetchTable('Customers');
+        $customer = $customersTable->get($id);
+        if ($customersTable->delete($customer)) {
+            $this->Flash->success(__('The customer has been permanently deleted.'));
+        } else {
+            $this->Flash->error(__('The customer could not be deleted. Please, try again.'));
+        }
+        return $this->redirect(['action' => 'inactiveCustomers']);
+    }
 }
 

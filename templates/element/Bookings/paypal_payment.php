@@ -1,58 +1,135 @@
 <?php
 /**
- * PayPal payment element
+ * Generic PayPal payment element
  *
- * @var \App\Model\Entity\Booking $booking
+ * Expected variables:
+ * @var string $paymentAmount The amount to be charged (e.g., '100.00'). Defaults to '0.00'.
+ * @var string $currencyCode The currency code (e.g., 'AUD'). Defaults to 'AUD'.
+ * @var string $finalSuccessUrl The fully pre-constructed success URL. Defaults to '#error-success-url-not-set'.
+ * @var string $finalCancelUrl The fully pre-constructed cancel URL. Defaults to '#error-cancel-url-not-set'.
  */
 $paypalConfig = \Cake\Core\Configure::read('PayPal');
+$clientId = $paypalConfig['clientId'] ?? null;
+
+// Ensure variables are set with defaults to avoid JS errors
+$paymentAmount = $paymentAmount ?? '0.00';
+$currencyCode = $currencyCode ?? 'AUD';
+$finalSuccessUrl = $finalSuccessUrl ?? '#error-success-url-not-set';
+$finalCancelUrl = $finalCancelUrl ?? '#error-cancel-url-not-set';
+
+// Validate that essential URLs are not the default error ones if we are trying to render
+$validUrls = ($finalSuccessUrl !== '#error-success-url-not-set' && $finalCancelUrl !== '#error-cancel-url-not-set');
+
 ?>
 
 <div class="paypal-payment">
     <div id="paypal-button-container"></div>
+    <p id="result-message" class="text-danger"></p>
 </div>
 
-<script src="https://www.paypal.com/sdk/js?client-id=<?= $paypalConfig['clientId'] ?>&currency=AUD"></script>
+<?php
+if (empty($clientId)) {
+    echo '<div class="alert alert-danger">PayPal Client ID is not configured. Payment cannot proceed.</div>';
+} elseif (!$validUrls) {
+    echo '<div class="alert alert-danger">PayPal Success/Cancel URLs are not correctly configured. Payment cannot proceed.</div>';
+} else {
+    // Use the $currencyCode variable in the SDK URL
+    echo $this->Html->script(
+        sprintf(
+            'https://www.paypal.com/sdk/js?client-id=%s&currency=%s&components=buttons&enable-funding=venmo,paylater,card',
+            h($clientId),
+            h($currencyCode)
+        ),
+        ['block' => true]
+    );
+}
+?>
+
+<?php $this->append('script'); ?>
 <script>
-    paypal.Buttons({
-        createOrder: function(data, actions) {
-            return actions.order.create({
-                purchase_units: [{
-                    amount: {
-                        value: '<?= $booking->remaining_cost ?>',
-                        currency_code: 'AUD'
-                    }
-                }]
-            });
-        },
-        onApprove: function(data, actions) {
-            return actions.order.capture().then(function(details) {
-                // Capture the transaction and payer IDs
-                const transactionId = details.id;
-                const payerId = details.payer.payer_id;
+document.addEventListener('DOMContentLoaded', function() {
+    const payPalContainer = document.getElementById('paypal-button-container');
+    const resultMessageContainer = document.getElementById('result-message');
+    const clientIdIsConfigured = <?= !empty($clientId) && $validUrls ? 'true' : 'false' ?>;
 
-                // Build the base success URL
-                let successUrl = '<?= $this->Url->build(['controller' => 'Payments', 'action' => 'success', $booking->id], ['fullBase' => true]) ?>';
-
-                // Append the transaction ID as a query parameter
-                successUrl += `?transaction_id=${transactionId}`;
-
-                // Append the payer ID if it exists
-                if (payerId) {
-                    successUrl += `&payer_id=${payerId}`;
-                }
-
-                // Redirect to success page with the IDs
-                window.location.href = successUrl;
-            });
-        },
-        onCancel: function(data) {
-            if (data.intent === 'cancel') {
-                window.location.href = '<?= $this->Url->build(['controller' => 'Payments', 'action' => 'cancel', $booking->id]) ?>';
-            }
-        },
-        onError: function(err) {
-            console.error('PayPal error:', err);
-            alert('An error occurred while processing your payment. Please try again.');
+    function displayError(message) {
+        if (resultMessageContainer) {
+            resultMessageContainer.innerHTML = message;
         }
-    }).render('#paypal-button-container');
-</script> 
+        console.error(message);
+    }
+
+    if (!clientIdIsConfigured) {
+        return;
+    }
+
+    if (!payPalContainer) {
+        console.error('PayPal button container (paypal-button-container) not found on this page.');
+        return;
+    }
+
+    if (typeof paypal === 'undefined') {
+        displayError('Error: PayPal SDK not loaded. Please check your internet connection or client ID configuration.');
+        return;
+    }
+
+    try {
+        paypal.Buttons({
+            style: {
+                shape: "rect",
+                layout: "vertical",
+                color: "gold",
+                label: "paypal",
+            },
+            createOrder: function(data, actions) {
+                console.log('Client-side createOrder: Amount: <?= h($paymentAmount) ?>, Currency: <?= h($currencyCode) ?>');
+                return actions.order.create({
+                    purchase_units: [{
+                        amount: {
+                            value: '<?= h($paymentAmount) ?>',
+                            currency_code: '<?= h($currencyCode) ?>'
+                        }
+                    }]
+                });
+            },
+            onApprove: function(data, actions) {
+                console.log('Client-side onApprove. OrderID: ' + data.orderID);
+                return actions.order.capture().then(function(details) {
+                    console.log('Payment captured:', details);
+                    const transactionId = details.id;
+                    const payerId = details.payer && details.payer.payer_id ? details.payer.payer_id : null;
+                    let successUrl = '<?= $finalSuccessUrl ?>';
+
+                    successUrl += (successUrl.includes('?') ? '&' : '?') + `transaction_id=\${transactionId}`;
+                    if (payerId) {
+                        successUrl += `&paypal_payer_id=\${payerId}`;
+                    }
+                    // Include the original PayPal Order ID for server-side reference if needed
+                    successUrl += `&paypal_order_id=\${data.orderID}`;
+
+                    window.location.href = successUrl;
+                }).catch(function(err) {
+                    console.error('Error during payment capture:', err);
+                    displayError('An error occurred while capturing your payment. Please try again or contact support.');
+                });
+            },
+            onCancel: function(data) {
+                console.log('Payment cancelled. OrderID: ' + (data && data.orderID ? data.orderID : 'N/A'));
+                let cancelUrl = '<?= $finalCancelUrl ?>';
+                if (data && data.orderID) {
+                    cancelUrl += (cancelUrl.includes('?') ? '&' : '?') + `paypal_order_id=\${data.orderID}`;
+                }
+                window.location.href = cancelUrl;
+            },
+            onError: function(err) {
+                console.error('PayPal Buttons onError:', err);
+                displayError('An error occurred with the PayPal payment process. Please try again or contact support.');
+            }
+        }).render('#' + payPalContainer.id);
+    } catch (error) {
+        console.error('Failed to render PayPal Buttons:', error);
+        displayError('Could not initialize PayPal payment options. Please try refreshing the page.');
+    }
+});
+</script>
+<?php $this->end(); ?> 

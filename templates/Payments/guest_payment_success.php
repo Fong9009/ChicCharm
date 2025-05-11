@@ -44,7 +44,7 @@
                                 <?php endif; ?>
                             </div>
                             <p class="mt-4 text-muted small">
-                                You will receive a confirmation email shortly (if email functionality is implemented).
+                                You will receive a confirmation email shortly.
                                 Please keep your Booking ID for reference.
                             </p>
                         <?php else: ?>

@@ -64,6 +64,36 @@
                 </div>
             </div>
         </div>
+        <div class="search-filter-container">
+            <div class="search-box">
+                <?= $this->Form->create(null, ['type' => 'get', 'class' => 'search-form']) ?>
+                <div class="input-group">
+                    <?= $this->Form->control('search', [
+                        'label' => false,
+                        'class' => 'form-control',
+                        'placeholder' => 'Search by customer name or booking name...',
+                        'value' => $this->request->getQuery('search')
+                    ]) ?>
+                </div>
+                <?= $this->Form->end() ?>
+            </div>
+
+            <div class="filter-box">
+                <?= $this->Form->create(null, ['type' => 'get', 'class' => 'filter-form']) ?>
+                <?= $this->Form->select('date_range', [
+                    '' => 'All Time',
+                    'last_week' => 'Last Week',
+                    'last_month' => 'Last Month',
+                    'last_3_months' => 'Last 3 Months',
+                    'last_6_months' => 'Last 6 Months',
+                    'last_year' => 'Last Year'
+                ], [
+                    'class' => 'form-control',
+                    'value' => $this->request->getQuery('date_range')
+                ]) ?>
+                <?= $this->Form->end() ?>
+            </div>
+        </div>
         <table>
             <thead>
             <tr>
