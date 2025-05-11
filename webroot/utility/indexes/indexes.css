@@ -107,4 +107,34 @@
     justify-content: center;
 }
 
+/* Delete */
+.delete-card-header {
+    background-color: #da3544;
+    border:none;
+}
+.delete-card-body {
+    background-color: #da3544;
+}
+.delete-card-footer {
+    background-color: #a82a36;
+    color: white;
+    display: flex;
+    justify-content: center;
+}
 
+.card-footer .delete-button {
+    background-color: #a82a36;
+    color: white;
+    display: flex;
+    justify-content: center;
+}
+
+
+.index-background {
+    padding-top: 40px;
+    padding-bottom: 40px;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}

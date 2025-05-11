@@ -6,7 +6,7 @@ $identity = $this->request->getAttribute('identity');
 <?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
 <?= $this->Html->script('/dashboard/time.js') ?>
 
-<main class="admin-dashboard">
+<main class="admin-dashboard" style="background-image: url(<?= $this->Url->image('gradient.jpg')?>);">
     <div class="dashboard-container">
         <!-- Welcome, Section -->
         <div class="row mb-4">
@@ -216,19 +216,33 @@ $identity = $this->request->getAttribute('identity');
                     </div>
                 </div>
             </div>
-
-
         </div>
+        <!-- Third Row: Payment -->
+        <div class="row">
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+                <div class="card h-100">
+                    <div class="card-header payment-card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="payment-card-h4">Payments</h4>
+                        </div>
+                        <i class="material-icons service-icon">payments</i>
+                    </div>
+                    <div class="card-body payment-card-body">
+                        <h3 class="service-card-h3">Total Payments</h3>
+                        <div class="total-value-container">
+                            <p class="service-card-count"><?= h($paymentCount) ?></p>
+                        </div>
+                    </div>
+                    <div class="card-footer payment-card-footer">
+                        <?= $this->Html->link(
+                            '<span class="fs-5">View Payment Lists</span><i class="material-icons">visibility</i>',
+                            ['controller' => 'Payments', 'action' => 'adminIndex'],
+                            ['class' => 'payment-button', 'escape' => false]
+                        ) ?>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </main>
 
-<footer class="footer py-4  ">
-    <div class="container-fluid">
-        <div class="row align-items-center justify-content-lg-between">
-            <div class="col-lg-6 mb-lg-0 mb-4">
-                <div class="copyright text-center text-sm text-muted text-lg-start">
-                </div>
-            </div>
-        </div>
-</footer>
