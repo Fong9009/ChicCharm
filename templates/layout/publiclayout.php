@@ -259,11 +259,20 @@ $titleDescription = 'Landing Page';
                                'action' => 'guestbooking']) ?>">Make a Booking
                         </a>
                     </li>
+                    <?php if ($this->request->getSession()->check('GuestBooking.pending_details')): ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build(['plugin' => false,
-                                'controller' => 'Auth', 'action' => 'logout']) ?>" onclick="return confirmLogout()">Finish as Guest
+                            <a class="nav-link"
+                               href="<?= $this->Url->build([
+                                   'controller' => 'Bookings',
+                                   'action' => 'viewPendingGuestBooking']) ?>">View Pending Booking
                             </a>
                         </li>
+                    <?php endif; ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= $this->Url->build(['plugin' => false,
+                            'controller' => 'Auth', 'action' => 'logout']) ?>" onclick="return confirmLogout()">Finish as Guest
+                        </a>
+                    </li>
                     <?php }
                     // Logout button for both admin and customer ?>
                     <?php

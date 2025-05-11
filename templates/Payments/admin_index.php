@@ -4,7 +4,7 @@
  * @var iterable<\App\Model\Entity\PaymentHistory> $payments
  */
 ?>
-<div class="payments index content">
+<div class="payments index content" style="margin-bottom: 120px; padding-bottom: 120px;">
     <h3><?= __('Payment History / Receipts') ?></h3>
     <div class="table-responsive">
         <table>
@@ -18,7 +18,7 @@
                     <th><?= $this->Paginator->sort('payment_status', 'Status') ?></th>
                     <th><?= $this->Paginator->sort('payment_method', 'Method') ?></th>
                     <th><?= $this->Paginator->sort('paypal_transaction_id', 'Transaction ID') ?></th>
-                    <!-- Optional: Add notes or other fields -->
+                    <th><?= __('Invoice') ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -28,14 +28,20 @@
                         <td><?= $this->Number->format($payment->id) ?></td>
                         <td><?= h($payment->payment_date ? $payment->payment_date->format('Y-m-d H:i:s') : 'N/A') ?></td>
                         <td>
-                            <?php // Check if customer relationship is loaded and not null
-                            if ($payment->hasValue('customer') && $payment->customer) {
-                                echo h($payment->customer->first_name) . ' ' . h($payment->customer->last_name);
-                                // Optional: Link to customer view if needed
-                                // echo $this->Html->link(h($payment->customer->first_name) . ' ' . h($payment->customer->last_name), ['controller' => 'Customers', 'action' => 'view', $payment->customer->id]);
+                            <?php
+                            if (
+                                $payment->hasValue('booking') &&
+                                $payment->booking &&
+                                $payment->booking->hasValue('customer') &&
+                                $payment->booking->customer
+                            ) {
+                                echo h($payment->booking->customer->first_name) . ' ' . h($payment->booking->customer->last_name);
+                            } elseif ($payment->hasValue('booking') && $payment->booking && !empty($payment->booking->booking_name)) {
+                                echo h($payment->booking->booking_name);
                             } else {
                                 echo 'N/A';
-                            } ?>
+                            }
+                            ?>
                         </td>
                         <td>
                             <?php // Check if booking relationship is loaded and not null
@@ -49,12 +55,18 @@
                         <td><?= h($payment->payment_status) ?></td>
                         <td><?= h($payment->payment_method) ?></td>
                         <td><?= h($payment->paypal_transaction_id) ?></td>
-                        <!-- Optional: Add other cells like notes -->
+                        <td>
+                            <?php if (!empty($payment->invoice_pdf)): ?>
+                                <a href="/<?= h($payment->invoice_pdf) ?>" target="_blank">Download/Check Invoice</a>
+                            <?php else: ?>
+                                N/A
+                            <?php endif; ?>
+                        </td>
                     </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
                     <tr>
-                        <td colspan="8"><?= __('No payment history found.') ?></td>
+                        <td colspan="12"><?= __('No payment history found.') ?></td>
                     </tr>
                 <?php endif; ?>
             </tbody>

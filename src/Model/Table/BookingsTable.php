@@ -72,6 +72,11 @@ class BookingsTable extends Table
             'dependent' => true,
             'cascadeCallbacks' => true,
         ]);
+
+        $this->hasMany('PaymentHistories', [
+            'foreignKey' => 'booking_id',
+            'dependent' => false,
+        ]);
     }
 
     /**

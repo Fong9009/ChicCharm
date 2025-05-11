@@ -117,6 +117,11 @@ class PaymentHistoriesTable extends Table
             ->dateTime('updated_at')
             ->allowEmptyDateTime('updated_at');
 
+        $validator
+            ->scalar('invoice_pdf')
+            ->maxLength('invoice_pdf', 255)
+            ->allowEmptyString('invoice_pdf');
+
         return $validator;
     }
 

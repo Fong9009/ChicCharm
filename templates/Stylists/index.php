@@ -7,6 +7,7 @@
 ?>
 <?= $this->Html->css('/utility/indexes/indexes.css') ?>
 <?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
+
 <div class="admin-background">
     <div class="contacts index content admin-border">
         <aside class="column">
@@ -42,6 +43,22 @@
                                 </div>
                             </div>',
                             ['controller' => 'Stylists', 'action' => 'add'],
+                            ['escape' => false, 'class' => 'card-link-wrapper d-block text-decoration-none']
+                        ) ?>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12 mb-3 side-nav-item">
+                        <?= $this->Html->link(
+                            '<div class="card h-100">
+                                <div class="card-header dashboard-card-header d-flex justify-content-between align-items-center flex-wrap">
+                                    <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">Inactive Stylists</h4>
+                                    <i class="material-icons view-icon ms-2">archive</i>
+                                </div>
+                                <div class="card-body dashboard-card-body"></div>
+                                <div class="card-footer dashboard-card-footer">
+                                    <span class="mb-0 text-truncate">View Inactive Stylists</span>
+                                </div>
+                            </div>',
+                            ['controller' => 'Admins', 'action' => 'inactiveStylists'],
                             ['escape' => false, 'class' => 'card-link-wrapper d-block text-decoration-none']
                         ) ?>
                     </div>

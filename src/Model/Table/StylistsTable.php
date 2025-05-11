@@ -162,6 +162,10 @@ class StylistsTable extends Table
             ->maxLength('stylist_bio', 1000)
             ->allowEmptyString('stylist_bio');
 
+        $validator
+            ->boolean('is_active')
+            ->notEmptyString('is_active');
+
         return $validator;
     }
 

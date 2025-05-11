@@ -110,8 +110,28 @@
             <?= $this->Html->link(
                 __('Back to Dashboard'),
                 ['controller' => 'Customers', 'action' => 'dashboard'],
-                ['class' => 'btn btn-secondary']
+                [
+                    'class' => 'btn',
+                    'style' => 'background-color: #D7CCC8; border-color: #BFB6B1; color: #333333;',
+                    'onmouseover' => "this.style.backgroundColor='#BFB6B1'; this.style.borderColor='#AFA6A1';",
+                    'onmouseout' => "this.style.backgroundColor='#D7CCC8'; this.style.borderColor='#BFB6B1';"
+                ]
             ) ?>
+
+            <?php if ($booking->status === 'Confirmed - Paid' && !empty($booking->latest_payment_history) && !empty($booking->latest_payment_history->invoice_pdf)):
+                echo $this->Html->link(
+                    __('Download/Check Invoice'),
+                    '/' . h($booking->latest_payment_history->invoice_pdf),
+                    [
+                        'class' => 'btn',
+                        'style' => 'background-color: #6c757d; border-color: #6c757d; color: white;',
+                        'onmouseover' => "this.style.backgroundColor='#5a6268'; this.style.borderColor='#5a6268';",
+                        'onmouseout' => "this.style.backgroundColor='#6c757d'; this.style.borderColor='#6c757d';",
+                        'target' => '_blank',
+                        'escape' => false
+                    ]
+                );
+            endif; ?>
 
             <?php if ($booking->status === 'Confirmed - Paid'): ?>
                 <p class="mt-3 text-muted">This booking has been paid. Please contact the store if you want to cancel or make changes.</p>

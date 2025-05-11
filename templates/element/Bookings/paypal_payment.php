@@ -87,9 +87,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     purchase_units: [{
                         amount: {
                             value: '<?= h($paymentAmount) ?>',
-                            currency_code: '<?= h($currencyCode) ?>'
+                            currency_code: 'AUD'
                         }
-                    }]
+                    }],
+                    application_context: {
+                        shipping_preference: 'NO_SHIPPING',
+                        user_country: 'AU'
+                    }
                 });
             },
             onApprove: function(data, actions) {
@@ -100,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const payerId = details.payer && details.payer.payer_id ? details.payer.payer_id : null;
                     let successUrl = '<?= $finalSuccessUrl ?>';
 
-                    successUrl += (successUrl.includes('?') ? '&' : '?') + `transaction_id=\${transactionId}`;
+                    successUrl += (successUrl.includes('?') ? '&' : '?') + `transaction_id=${transactionId}`;
                     if (payerId) {
                         successUrl += `&paypal_payer_id=\${payerId}`;
                     }

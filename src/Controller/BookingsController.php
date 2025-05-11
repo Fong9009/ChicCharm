@@ -223,19 +223,34 @@ class BookingsController extends AppController
                 'status IN' => ['active', 'Confirmed - Payment Due', 'Confirmed - Paid'], 
             ])
             ->contain([
-                'Customers',
+                'Customers', 
                 'BookingsServices' => [
                     'Services',
                     'Stylists' => [
                         'fields' => ['id', 'first_name', 'last_name'],
                     ],
                 ],
+                'PaymentHistories' => function ($q) {
+                    return $q->select(['PaymentHistories.booking_id', 'PaymentHistories.invoice_pdf', 'PaymentHistories.payment_date'])
+                               ->orderBy(['PaymentHistories.payment_date' => 'DESC']); 
+                }
             ])
             ->orderBy([
                 'ABS(DATEDIFF(booking_date, CURDATE()))' => 'ASC',
                 'booking_date' => 'ASC',
             ]);
+        
         $bookings = $this->paginate($query);
+
+        // Post-process to attach the most recent payment history (if any) directly to the booking entity
+        // This simplifies access in the template, especially since a booking might have multiple histories (though less likely for this flow)
+        foreach ($bookings as $booking) {
+            if (!empty($booking->payment_histories)) {
+                $booking->latest_payment_history = $booking->payment_histories[0]; // Get the first one due to DESC order
+            } else {
+                $booking->latest_payment_history = null;
+            }
+        }
 
         $this->set(compact('bookings'));
     }
@@ -1428,12 +1443,17 @@ class BookingsController extends AppController
                 }
                 $data['bookings_services_summary'] = $enrichedBookingServices; 
 
+                // Generate and add a unique token for the pending booking
+                $pendingBookingToken = bin2hex(random_bytes(16));
+                $data['pending_booking_token'] = $pendingBookingToken;
+
                 Log::debug('[GuestBooking] Data being written to session: ' . json_encode($data), ['scope' => ['guest_session']]);
 
                 $this->request->getSession()->write('GuestBooking.pending_details', $data);
 
-                $this->Flash->success(__('Please complete your payment to confirm your booking.'));
-                return $this->redirect(['controller' => 'Payments', 'action' => 'processGuestPayment']);
+                // Redirect to the view pending booking page with the token
+                $this->Flash->success(__('Your booking details are summarized below. Please complete your payment to confirm.'));
+                return $this->redirect(['controller' => 'Bookings', 'action' => 'viewPendingGuestBooking', $pendingBookingToken]);
 
             } else { // Recaptcha failed
                 $this->Flash->error(__('Please confirm that you are not a bot.'));
@@ -1457,30 +1477,30 @@ class BookingsController extends AppController
      */
     public function customerview($id = null)
     {
-        $booking = $this->Bookings->get(
-            $id,
+        $booking = $this->Bookings->get($id, 
             contain: [
                 'Customers',
                 'BookingsStylists' => [
                     'Stylists' => [
-                        'fields' => ['id', 'first_name', 'last_name'],
-                    ],
+                        'fields' => ['id', 'first_name', 'last_name']
+                    ]
                 ],
                 'BookingsServices' => [
-                    'Services' => [
-                        'fields' => ['id', 'service_name', 'service_cost'],
-                    ],
-                    'Stylists' => [
-                        'fields' => ['id', 'first_name', 'last_name'],
-                    ],
+                    'Services',
+                    'Stylists'
                 ],
-            ],
+                'PaymentHistories' => [
+                    'fields' => ['booking_id', 'invoice_pdf', 'payment_date'],
+                    'sort' => ['PaymentHistories.payment_date' => 'DESC']
+                ]
+            ]
         );
 
-        // Ensure the logged-in customer owns this booking
-        if ($booking->customer_id !== $this->Authentication->getIdentity()->id) {
-            $this->Flash->error(__('You are not authorized to view this booking.'));
-            return $this->redirect(['controller' => 'Customers', 'action' => 'dashboard']);
+        if (!empty($booking->payment_histories)) {
+            // The payment_histories are already sorted by payment_date DESC from the query
+            $booking->latest_payment_history = $booking->payment_histories[0];
+        } else {
+            $booking->latest_payment_history = null; 
         }
 
         $this->set(compact('booking'));
@@ -2625,9 +2645,38 @@ class BookingsController extends AppController
         try {
              $this->render('customeredit');
         } catch (MissingTemplateException $e) {
-             // Fallback to the admin edit template if customer specific one doesn't exist
              Log::warning('customeredit.php template not found, falling back to edit.php');
              $this->render('edit');
         }
+    }
+
+    public function viewPendingGuestBooking($token = null) // Add $token parameter
+    {
+        $bookingData = $this->request->getSession()->read('GuestBooking.pending_details');
+        
+        if (!$bookingData) {
+            $this->Flash->error(__('No pending booking found in your session. It may have expired or been completed. Please start a new booking if needed.'));
+            return $this->redirect(['controller' => 'Bookings', 'action' => 'guestbooking']);
+        }
+
+        // If a token is passed in the URL, validate it against the token in the session
+        if ($token !== null) {
+            if (!isset($bookingData['pending_booking_token']) || $bookingData['pending_booking_token'] !== $token) {
+                $this->Flash->error(__('The booking link used is invalid or does not match your current pending booking. Please start a new booking if needed.'));
+                // Optionally clear the session if there's a mismatch to avoid confusion
+                // $this->request->getSession()->delete('GuestBooking.pending_details');
+                return $this->redirect(['controller' => 'Bookings', 'action' => 'guestbooking']);
+            }
+        } elseif (isset($bookingData['pending_booking_token'])) {
+            // If no token in URL, but one exists in session, redirect to the URL with the token
+            // This ensures the URL always shows the token for bookmarking/sharing.
+            return $this->redirect(['controller' => 'Bookings', 'action' => 'viewPendingGuestBooking', $bookingData['pending_booking_token']]);
+        }
+        // If $token is null AND no 'pending_booking_token' in session, it's an old state or direct access attempt without context.
+        // The initial check for $bookingData would have caught if session is empty.
+        // If $bookingData exists but has no token, it implies it was created before this token logic was added.
+        // For simplicity, we assume new bookings will always generate and use tokens.
+
+        $this->set(compact('bookingData'));
     }
 }
