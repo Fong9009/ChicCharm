@@ -85,20 +85,17 @@
             </div>
 
             <?php
-            // Define JavaScript variables for URLs and CSRF token that will be passed to the element
-            $csrfTokenPayPal = $this->request->getAttribute('csrfToken');
-            $createOrderUrlJs = $this->Url->build(['controller' => 'Payments', 'action' => 'createOrder', 'PAYMENT_BOOKING_ID_PLACEHOLDER'], ['fullBase' => true]);
-            $captureOrderUrlJs = $this->Url->build(['controller' => 'Payments', 'action' => 'captureOrder', 'PAYMENT_BOOKING_ID_PLACEHOLDER'], ['fullBase' => true]);
-            $paymentSuccessUrlJs = $this->Url->build(['controller' => 'Payments', 'action' => 'success', 'PAYMENT_BOOKING_ID_PLACEHOLDER'], ['fullBase' => true]);
-            $paymentCancelUrlJs = $this->Url->build(['controller' => 'Payments', 'action' => 'cancel', 'PAYMENT_BOOKING_ID_PLACEHOLDER'], ['fullBase' => true]);
+            // Define variables for the PayPal payment element
+            $paymentAmount = (string)$booking->remaining_cost;
+            $currencyCode = 'AUD';
+            $finalSuccessUrl = $this->Url->build(['controller' => 'Payments', 'action' => 'success', $booking->id], ['fullBase' => true]);
+            $finalCancelUrl = $this->Url->build(['controller' => 'Payments', 'action' => 'cancel', $booking->id], ['fullBase' => true]);
 
             echo $this->element('Bookings/paypal_payment', [
-                'booking' => $booking,
-                'csrfTokenPayPal' => $csrfTokenPayPal,
-                'createOrderUrlJsTemplate' => $createOrderUrlJs,
-                'captureOrderUrlJsTemplate' => $captureOrderUrlJs,
-                'paymentSuccessUrlJsTemplate' => $paymentSuccessUrlJs,
-                'paymentCancelUrlJsTemplate' => $paymentCancelUrlJs
+                'paymentAmount' => $paymentAmount,
+                'currencyCode' => $currencyCode,
+                'finalSuccessUrl' => $finalSuccessUrl,
+                'finalCancelUrl' => $finalCancelUrl,
             ]);
             ?>
 
