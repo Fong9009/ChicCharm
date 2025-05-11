@@ -288,7 +288,12 @@ class AdminsController extends AppController
         $servicesTable = $this->fetchTable('Services');
         $serviceCount = $servicesTable->find()->count();
 
-        $this->set(compact('custCount', 'adminName', 'adminCount', 'contactCount', 'bookingCount', 'serviceCount', 'stylistCount'));
+        //Provides Payment Count
+        $paymentsTable = $this->fetchTable('PaymentHistories');
+        $paymentCount = $paymentsTable->find()->count();
+
+
+        $this->set(compact('custCount', 'adminName', 'adminCount', 'contactCount', 'bookingCount', 'serviceCount', 'stylistCount','paymentCount'));
     }
 
     public function profile($id = null)

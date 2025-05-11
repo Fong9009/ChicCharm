@@ -13,7 +13,7 @@ $adminId = $this->request->getAttribute('identity')->id
 <?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
 <div class="contacts index content">
     <?= $this->Flash->render('admin_notify') ?>
-        <aside class="column">
+        <div class="column">
             <div class="side-nav">
                 <h4 class="heading"><?= __('Actions') ?></h4>
                 <div class="row gx-2">
@@ -51,7 +51,7 @@ $adminId = $this->request->getAttribute('identity')->id
                     </div>
                 </div>
             </div>
-        </aside>
+        </div>
             <div class="table-responsive mt-3">
                 <div class="container">
                     <div class="row align-items-center">
@@ -106,7 +106,7 @@ $adminId = $this->request->getAttribute('identity')->id
                                 <?= $this->Html->link(__('View'), ['action' => 'view', $admin->id], ['class' => 'button']) ?>
                                 <?php if ($admin->id == $adminId): ?>
                                     <?= $this->Html->link(__('Edit'), ['action' => 'edit', $admin->id], ['class' => 'button btn-primary']) ?>
-                                    <span class="text-muted small">Cannot delete your own account</span>
+                                    <br><span class="text-muted small">Cannot delete your own account</span>
                                 <?php endif; ?>
                                 <?php if ($admin->id != $adminId): ?>
                                     <?= $this->Form->postLink(
@@ -125,15 +125,14 @@ $adminId = $this->request->getAttribute('identity')->id
                     </tbody>
                 </table>
             </div>
-            <div class="paginator">
-                <ul class="pagination">
-                    <?= $this->Paginator->first('<< ' . __('first')) ?>
-                    <?= $this->Paginator->prev('< ' . __('previous')) ?>
-                    <?= $this->Paginator->numbers() ?>
-                    <?= $this->Paginator->next(__('next') . ' >') ?>
-                    <?= $this->Paginator->last(__('last') . ' >>') ?>
-                </ul>
-                <p><?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} record(s) out of {{count}} total')) ?></p>
-            </div>
-        </div>
-
+    <div class="paginator">
+        <ul class="pagination">
+            <?= $this->Paginator->first('<< ' . __('first')) ?>
+            <?= $this->Paginator->prev('< ' . __('previous')) ?>
+            <?= $this->Paginator->numbers() ?>
+            <?= $this->Paginator->next(__('next') . ' >') ?>
+            <?= $this->Paginator->last(__('last') . ' >>') ?>
+        </ul>
+        <p><?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} record(s) out of {{count}} total')) ?></p>
+    </div>
+</div>
