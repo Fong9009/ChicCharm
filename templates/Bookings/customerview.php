@@ -68,6 +68,12 @@
                 <label><?= __('Total Cost') ?></label>
                 <p class="form-control-static">$<?= number_format($booking->total_cost, 2) ?></p>
             </div>
+            <?php if ($booking->remaining_cost != 0): ?>
+            <div class="info-group">
+                <label><?= __('Remaining Cost') ?></label>
+                <p class="form-control-static">$<?= number_format($booking->remaining_cost, 2) ?></p>
+            </div>
+            <?php endif; ?>
             <div class="info-group">
                 <label><?= __('Booking Notes') ?></label>
                 <p class="form-control-static" style="word-wrap: break-word; overflow-wrap: break-word; white-space: normal;">
@@ -80,7 +86,7 @@
             <div id="payment-options" class="mt-4">
                 <h4>Payment Options</h4>
                 <p>Your booking is confirmed. Please complete your payment below. You can pay via PayPal or a debit/credit card.</p>
-                
+
                 <p class="mt-3">Alternatively, you may choose to pay at the salon upon arrival.</p>
             </div>
 
@@ -145,7 +151,7 @@
                     ) ?>
                 <?php endif; ?>
 
-                <?php 
+                <?php
                 if (in_array($booking->status, ['active', 'Confirmed - Payment Due'])): ?>
                     <?= $this->Form->postLink(
                         __('Cancel Booking'),
