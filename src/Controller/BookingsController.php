@@ -452,13 +452,13 @@ class BookingsController extends AppController
                 }
 
                 if ($totalCost < $totalPreviousCost) {
-                    // Refund the difference
+                    //Refund the difference
                     $refund = $totalPreviousCost - $totalCost;
                     $data['remaining_cost'] = 0;
-                    // PayPal Refund Required
+                    //PayPal Refund Required
                     $this->Flash->success(__('Refund of ' . $refund . ' has been returned'));
                 } elseif ($totalCost > $totalPreviousCost) {
-                    // Customer needs to pay more
+                    //Customer needs to pay more
                     $data['remaining_cost'] = $totalCost - $totalPreviousCost;
                     $booking->status = 'Confirmed - Payment Due';
                 } else {
@@ -467,26 +467,26 @@ class BookingsController extends AppController
                 }
 
             } elseif ($booking->status === 'Confirmed - Payment Due') {
-                // Compare the new total with the sum of (total originally owed - remaining unpaid)
+                //Compare the new total with the sum of (total originally owed - remaining unpaid)
                 $paidSoFar = $booking->total_cost - $booking->remaining_cost;
 
                 if ($totalCost < $paidSoFar) {
-                    // Total cost is now less than what was already paid — refund
+                    //Refund
                     $refund = $paidSoFar - $totalCost;
                     $data['remaining_cost'] = 0;
                     $booking->status = 'Confirmed - Paid';
                     $this->Flash->success(__('Refund of ' . $refund . ' has been returned'));
                 } elseif ($totalCost > $paidSoFar) {
-                    // They still owe more
+                    //They still owe more
                     $data['remaining_cost'] = $totalCost - $paidSoFar;
                 } else {
-                    // They've already paid exactly what's needed
+                    //They've already paid exactly what's needed
                     $data['remaining_cost'] = 0;
                     $booking->status = 'Confirmed - Paid';
                 }
             } else {
                 // For new or unconfirmed bookings
-                // If all
+                // If all else fails
                 $data['remaining_cost'] = $totalCost;
             }
 
