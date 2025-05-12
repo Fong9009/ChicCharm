@@ -15,6 +15,7 @@ use Cake\View\Exception\MissingTemplateException;
 use DateTime;
 use Exception;
 use Throwable;
+use Cake\ORM\TableRegistry;
 use Cake\Core\Configure;
 
 /**
@@ -220,10 +221,10 @@ class BookingsController extends AppController
         $query = $this->Bookings->find()
             ->where([
                 'customer_id' => $this->Authentication->getIdentity()->id,
-                'status IN' => ['active', 'Confirmed - Payment Due', 'Confirmed - Paid'], 
+                'status IN' => ['active', 'Confirmed - Payment Due', 'Confirmed - Paid'],
             ])
             ->contain([
-                'Customers', 
+                'Customers',
                 'BookingsServices' => [
                     'Services',
                     'Stylists' => [
@@ -232,14 +233,14 @@ class BookingsController extends AppController
                 ],
                 'PaymentHistories' => function ($q) {
                     return $q->select(['PaymentHistories.booking_id', 'PaymentHistories.invoice_pdf', 'PaymentHistories.payment_date'])
-                               ->orderBy(['PaymentHistories.payment_date' => 'DESC']); 
+                               ->orderBy(['PaymentHistories.payment_date' => 'DESC']);
                 }
             ])
             ->orderBy([
                 'ABS(DATEDIFF(booking_date, CURDATE()))' => 'ASC',
                 'booking_date' => 'ASC',
             ]);
-        
+
         $bookings = $this->paginate($query);
 
         // Post-process to attach the most recent payment history (if any) directly to the booking entity
@@ -436,14 +437,44 @@ class BookingsController extends AppController
                     $totalCost += floatval($serviceData['service_cost'] ?? 0);
                 }
             }
+
+            $totalPreviousCost = 0;
+            if ($booking->status === 'Confirmed - Paid') {
+                $bookingServicesTable = TableRegistry::getTableLocator()->get('BookingsServices');
+                $services = $bookingServicesTable->find()
+                    ->where(['booking_id' => $bookingId])
+                    ->all();
+
+                foreach ($services as $service) {
+                    $totalPreviousCost += $service->service_cost;
+                }
+            }
+
+            if ($totalPreviousCost != 0) {
+                if ($totalCost < $totalPreviousCost) {
+                    //Refund
+                    $data['remaining_cost'] = 0;
+                    $refund = $totalPreviousCost - $totalCost;
+                    $this->Flash->success(__('Refund of ' . $refund . 'Has been returned'));
+                } elseif ($totalCost > $totalPreviousCost) {
+                    // They pay more
+                    $data['remaining_cost'] = $totalCost - $totalPreviousCost;
+                    $booking->status = 'Confirmed - Payment Due';
+                } elseif ($totalCost == $totalPreviousCost) {
+                    $data['remaining_cost'] = 0;
+                    $this->Flash->success(__('Cost is the same no change required'));
+                }
+            } else {
+                $data['remaining_cost'] = $totalCost;
+            }
+
             $data['total_cost'] = $totalCost;
-            $data['remaining_cost'] = $totalCost; // Recalculate remaining cost based on new total
             $data['notes'] = $data['notes'] ?? null;
 
             // Check if any service data was submitted (might be empty if all services unchecked)
             $hasServiceData = !empty($data['bookings_services']);
 
-            // Start Transaction    
+            // Start Transaction
             $connection = $this->Bookings->getConnection();
             try {
                 $connection->begin();
@@ -464,12 +495,12 @@ class BookingsController extends AppController
                     'notes' => $data['notes'],
                  ], ['associated' => []]);
 
-                // Save main booking changes    
+                // Save main booking changes
                 if (!$this->Bookings->save($booking)) {
                     throw new Exception('Failed to save main booking updates.');
                 }
 
-                $allServicesTimes = [];     
+                $allServicesTimes = [];
                 // Fetch service durations if we have services
                 $servicesDetails = [];
                 if ($hasServiceData) {
@@ -794,11 +825,11 @@ class BookingsController extends AppController
             $booking = $this->Bookings->newEntity([
                 'customer_id' => $data['customer_id'],
                 'booking_name' => $data['booking_name'],
-                'booking_date' => $data['booking_date'], 
+                'booking_date' => $data['booking_date'],
                 'total_cost' => $data['total_cost'],
-                'remaining_cost' => $data['total_cost'], 
+                'remaining_cost' => $data['total_cost'],
                 'notes' => $data['notes'] ?? null,
-                'status' => 'Confirmed - Payment Due', 
+                'status' => 'Confirmed - Payment Due',
             ]);
 
             $stylistTimeSlots = [];
@@ -818,7 +849,7 @@ class BookingsController extends AppController
 
                 foreach ($data['bookings_services'] as $serviceData) {
                     if (!isset($serviceData['stylist_id'], $serviceData['start_time'], $serviceData['service_id'])) {
-                         continue; 
+                         continue;
                     }
                     $stylistId = (int)$serviceData['stylist_id'];
                     $serviceId = (int)$serviceData['service_id'];
@@ -1022,7 +1053,7 @@ class BookingsController extends AppController
             $data = $this->request->getData();
 
             if (isset($data['booking_date'])) {
-                $data['booking_date_formatted'] = $data['booking_date']; 
+                $data['booking_date_formatted'] = $data['booking_date'];
             } else {
                 $this->Flash->error(__('Booking date is missing.'));
 
@@ -1061,14 +1092,14 @@ class BookingsController extends AppController
             $booking = $this->Bookings->newEntity([
                 'customer_id' => $data['customer_id'],
                 'booking_name' => $data['booking_name'],
-                'booking_date' => $data['booking_date_formatted'], 
+                'booking_date' => $data['booking_date_formatted'],
                 'total_cost' => $data['total_cost'],
                 'remaining_cost' => $data['remaining_cost'],
                 'notes' => $data['notes'] ?? null,
                 'status' => 'Confirmed - Payment Due',
             ]);
 
-            // Server-Side Time Conflict Validation 
+            // Server-Side Time Conflict Validation
             $stylistTimeSlotsAdmin = [];
             $hasConflictAdmin = false;
             $conflictMessageAdmin = '';
@@ -1272,7 +1303,7 @@ class BookingsController extends AppController
             $guestUser = $customersTable->find()
                 ->where([
                     'type' => 'guest',
-                    'email' => 'guest@chiccharm.com', 
+                    'email' => 'guest@chiccharm.com',
                 ])
                 ->first();
             if ($guestUser) {
@@ -1280,7 +1311,7 @@ class BookingsController extends AppController
             }
         }
 
-        $bookingEntity = $this->Bookings->newEmptyEntity(); 
+        $bookingEntity = $this->Bookings->newEmptyEntity();
 
         if ($this->request->is('post')) {
             if ($this->Recaptcha->verify()) {
@@ -1304,11 +1335,11 @@ class BookingsController extends AppController
                 $totalCost = 0;
                 if (!empty($data['bookings_services'])) {
                     foreach ($data['bookings_services'] as $serviceData) {
-                        $totalCost += floatval($serviceData['service_cost'] ?? 0); 
+                        $totalCost += floatval($serviceData['service_cost'] ?? 0);
                     }
                 }
                 $data['total_cost'] = $totalCost;
-                $data['remaining_cost'] = $totalCost; 
+                $data['remaining_cost'] = $totalCost;
                 $data['notes'] = $data['notes'] ?? null;
 
                 $stylistTimeSlots = [];
@@ -1369,7 +1400,7 @@ class BookingsController extends AppController
                     $this->set('booking', $this->Bookings->patchEntity($bookingEntity, $data));
                     $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
                     $services = $this->fetchTable('Services')->find('all')->all();
-                    $this->request = $this->request->withParsedBody($data); 
+                    $this->request = $this->request->withParsedBody($data);
                     return $this->render('guestbooking');
                 }
 
@@ -1379,7 +1410,7 @@ class BookingsController extends AppController
                         if (!isset($serviceData['service_id'], $serviceData['start_time'])) continue;
                         $serviceId = (int)$serviceData['service_id'];
                         $startTimeString = $serviceData['start_time'];
-                        $duration = $servicesDetailsForValidation[$serviceId] ?? 0; 
+                        $duration = $servicesDetailsForValidation[$serviceId] ?? 0;
                         if ($duration <= 0) continue;
 
                         try {
@@ -1395,7 +1426,7 @@ class BookingsController extends AppController
                         }
                     }
                 }
-                
+
                 // Calculate overall start/end times for the booking to store in session
                 $overallStartTimeForSession = null;
                 $overallEndTimeForSession = null;
@@ -1412,7 +1443,7 @@ class BookingsController extends AppController
                 $data['overall_start_time'] = $overallStartTimeForSession;
                 $data['overall_end_time'] = $overallEndTimeForSession;
 
-                // Show service and stylist names in the booking summary 
+                // Show service and stylist names in the booking summary
                 $enrichedBookingServices = [];
                 if (!empty($data['bookings_services'])) {
                     $serviceIds = array_unique(array_column($data['bookings_services'], 'service_id'));
@@ -1435,13 +1466,13 @@ class BookingsController extends AppController
                     }
 
                     foreach ($data['bookings_services'] as $bs) {
-                        $enrichedBs = $bs; 
+                        $enrichedBs = $bs;
                         $enrichedBs['service_name'] = $serviceNameMap[$bs['service_id']] ?? 'Unknown Service';
                         $enrichedBs['stylist_name'] = $stylistNameMap[$bs['stylist_id']] ?? 'Unknown Stylist';
                         $enrichedBookingServices[] = $enrichedBs;
                     }
                 }
-                $data['bookings_services_summary'] = $enrichedBookingServices; 
+                $data['bookings_services_summary'] = $enrichedBookingServices;
 
                 // Generate and add a unique token for the pending booking
                 $pendingBookingToken = bin2hex(random_bytes(16));
@@ -1459,13 +1490,13 @@ class BookingsController extends AppController
                 $this->Flash->error(__('Please confirm that you are not a bot.'));
                 $this->set('booking', $this->Bookings->patchEntity($bookingEntity, $this->request->getData()));
             }
-        } 
+        }
 
         $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
         $services = $this->fetchTable('Services')->find('all')->all();
-        $this->set('booking', $bookingEntity); 
+        $this->set('booking', $bookingEntity);
         $this->set(compact('stylists', 'services'));
-        $this->render('guestbooking'); 
+        $this->render('guestbooking');
     }
 
     /**
@@ -1477,7 +1508,7 @@ class BookingsController extends AppController
      */
     public function customerview($id = null)
     {
-        $booking = $this->Bookings->get($id, 
+        $booking = $this->Bookings->get($id,
             contain: [
                 'Customers',
                 'BookingsStylists' => [
@@ -1500,7 +1531,7 @@ class BookingsController extends AppController
             // The payment_histories are already sorted by payment_date DESC from the query
             $booking->latest_payment_history = $booking->payment_histories[0];
         } else {
-            $booking->latest_payment_history = null; 
+            $booking->latest_payment_history = null;
         }
 
         $this->set(compact('booking'));
@@ -2653,7 +2684,7 @@ class BookingsController extends AppController
     public function viewPendingGuestBooking($token = null) // Add $token parameter
     {
         $bookingData = $this->request->getSession()->read('GuestBooking.pending_details');
-        
+
         if (!$bookingData) {
             $this->Flash->error(__('No pending booking found in your session. It may have expired or been completed. Please start a new booking if needed.'));
             return $this->redirect(['controller' => 'Bookings', 'action' => 'guestbooking']);
