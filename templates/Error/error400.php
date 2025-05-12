@@ -30,9 +30,11 @@ endif;
         <a href="javascript:history.back()" class="error-btn primary">
             Go Back
         </a>
-        <a href="<?= $this->Url->build('/') ?>" class="error-btn secondary">
-            Go to Homepage
-        </a>
+        <?= $this->Html->link(
+            'Go to Homepage',
+            ['controller' => 'Pages', 'action' => 'display'],
+            ['class' => 'error-btn secondary']
+        ) ?>
     </div>
 </div>
 
