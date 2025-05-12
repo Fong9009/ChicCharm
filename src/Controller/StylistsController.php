@@ -408,6 +408,10 @@ class StylistsController extends AppController
     public function dashboard(): void
     {
         $stylist = $this->Stylists->get($this->Authentication->getIdentity()->id);
+        $user = $this->Authentication->getIdentity();
+        if($user->type === 'customer') {
+            $this->redirect(['controller' => 'Customers', 'action' => 'dashboard']);
+        }
 
         //Bookings that have the selected Stylist
         $bookingsTable = $this->fetchTable('Bookings');
@@ -454,7 +458,7 @@ class StylistsController extends AppController
         ];
         // Search functionality
         $query = $this->Stylists->find()
-            ->select($this->Stylists)   
+            ->select($this->Stylists)
             ->contain(['Services'])
             ->matching('Services')
             ->group(['Stylists.id'])
@@ -466,7 +470,7 @@ class StylistsController extends AppController
                 'OR' => [
                     'Stylists.first_name LIKE' => '%' . $search . '%',
                     'Stylists.last_name LIKE' => '%' . $search . '%',
-                    'Services.service_name LIKE' => '%' . $search . '%', 
+                    'Services.service_name LIKE' => '%' . $search . '%',
                 ],
             ]);
         }
