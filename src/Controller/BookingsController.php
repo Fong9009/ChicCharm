@@ -439,7 +439,9 @@ class BookingsController extends AppController
             }
 
             $totalPreviousCost = 0;
+
             if ($booking->status === 'Confirmed - Paid') {
+                //Already paid, comparison on what was already charged
                 $bookingServicesTable = TableRegistry::getTableLocator()->get('BookingsServices');
                 $services = $bookingServicesTable->find()
                     ->where(['booking_id' => $bookingId])
@@ -448,23 +450,42 @@ class BookingsController extends AppController
                 foreach ($services as $service) {
                     $totalPreviousCost += $service->service_cost;
                 }
-            }
 
-            if ($totalPreviousCost != 0) {
                 if ($totalCost < $totalPreviousCost) {
-                    //Refund
-                    $data['remaining_cost'] = 0;
+                    // Refund the difference
                     $refund = $totalPreviousCost - $totalCost;
-                    $this->Flash->success(__('Refund of ' . $refund . 'Has been returned'));
+                    $data['remaining_cost'] = 0;
+                    $this->Flash->success(__('Refund of ' . $refund . ' has been returned'));
                 } elseif ($totalCost > $totalPreviousCost) {
-                    // They pay more
+                    // Customer needs to pay more
                     $data['remaining_cost'] = $totalCost - $totalPreviousCost;
                     $booking->status = 'Confirmed - Payment Due';
-                } elseif ($totalCost == $totalPreviousCost) {
+                } else {
                     $data['remaining_cost'] = 0;
-                    $this->Flash->success(__('Cost is the same no change required'));
+                    $this->Flash->success(__('Cost is the same, no change required'));
+                }
+
+            } elseif ($booking->status === 'Confirmed - Payment Due') {
+                // Compare the new total with the sum of (total originally owed - remaining unpaid)
+                $paidSoFar = $booking->total_cost - $booking->remaining_cost;
+
+                if ($totalCost < $paidSoFar) {
+                    // Total cost is now less than what was already paid — refund
+                    $refund = $paidSoFar - $totalCost;
+                    $data['remaining_cost'] = 0;
+                    $booking->status = 'Confirmed - Paid';
+                    $this->Flash->success(__('Refund of ' . $refund . ' has been returned'));
+                } elseif ($totalCost > $paidSoFar) {
+                    // They still owe more
+                    $data['remaining_cost'] = $totalCost - $paidSoFar;
+                } else {
+                    // They've already paid exactly what's needed
+                    $data['remaining_cost'] = 0;
+                    $booking->status = 'Confirmed - Paid';
                 }
             } else {
+                // For new or unconfirmed bookings
+                // If all
                 $data['remaining_cost'] = $totalCost;
             }
 
