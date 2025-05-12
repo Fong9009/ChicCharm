@@ -455,6 +455,7 @@ class BookingsController extends AppController
                     // Refund the difference
                     $refund = $totalPreviousCost - $totalCost;
                     $data['remaining_cost'] = 0;
+                    // PayPal Refund Required
                     $this->Flash->success(__('Refund of ' . $refund . ' has been returned'));
                 } elseif ($totalCost > $totalPreviousCost) {
                     // Customer needs to pay more
