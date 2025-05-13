@@ -68,7 +68,7 @@
                             ?>
                         </td>
                         <td>
-                            <?php 
+                            <?php
                             if ($payment->hasValue('booking') && $payment->booking) {
                                 echo $this->Html->link($payment->booking->booking_name, ['controller' => 'Bookings', 'action' => 'view', $payment->booking->id]);
                             } else {
@@ -81,7 +81,9 @@
                         <td><?= h($payment->paypal_transaction_id) ?></td>
                         <td>
                             <?php if (!empty($payment->invoice_pdf)): ?>
-                                <a href="/<?= h($payment->invoice_pdf) ?>" target="_blank">Check/Download Invoice</a>
+                                <a href="<?= $this->Url->build(['controller' => 'Payments', 'action' => 'viewInvoice', h($payment->id)]) ?>" target="_blank">
+                                    Check/Download Invoice
+                                </a>
                             <?php else: ?>
                                 N/A
                             <?php endif; ?>

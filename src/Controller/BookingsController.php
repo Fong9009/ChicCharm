@@ -168,7 +168,7 @@ class BookingsController extends AppController
                 'Bookings.booking_date',
                 'Bookings.total_cost',
                 'Bookings.remaining_cost',
-                'Bookings.refund_due_amount', 
+                'Bookings.refund_due_amount',
                 'Bookings.status',
                 'Bookings.notes',
             ])
@@ -190,7 +190,7 @@ class BookingsController extends AppController
                         'fields' => ['id', 'first_name', 'last_name'],
                     ],
                 ],
-                'PaymentHistories' => function ($q) { 
+                'PaymentHistories' => function ($q) {
                     return $q->select([
                         'PaymentHistories.booking_id',
                         'PaymentHistories.payment_method',
@@ -235,13 +235,13 @@ class BookingsController extends AppController
         $query = $this->Bookings->find()
             ->select([
                 'Bookings.id',
-                'Bookings.customer_id', 
+                'Bookings.customer_id',
                 'Bookings.booking_name',
                 'Bookings.booking_date',
                 'Bookings.total_cost',
                 'Bookings.remaining_cost',
                 'Bookings.status',
-                'Bookings.refund_due_amount' 
+                'Bookings.refund_due_amount'
             ])
             ->where([
                 'customer_id' => $this->Authentication->getIdentity()->id,
@@ -249,7 +249,7 @@ class BookingsController extends AppController
                 'booking_date >=' => $today,
             ])
             ->contain([
-                'Customers', 
+                'Customers',
                 'BookingsServices' => [
                     'Services',
                     'Stylists' => [
@@ -261,8 +261,8 @@ class BookingsController extends AppController
                         'PaymentHistories.booking_id',
                         'PaymentHistories.invoice_pdf',
                         'PaymentHistories.payment_date',
-                        'PaymentHistories.payment_method', 
-                        'PaymentHistories.payment_status'  
+                        'PaymentHistories.payment_method',
+                        'PaymentHistories.payment_status'
                     ])
                                ->orderBy(['PaymentHistories.payment_date' => 'DESC']);
                 }
@@ -276,7 +276,7 @@ class BookingsController extends AppController
 
         foreach ($bookings as $booking) {
             if (!empty($booking->payment_histories)) {
-                $booking->latest_payment_history = $booking->payment_histories[0]; 
+                $booking->latest_payment_history = $booking->payment_histories[0];
             } else {
                 $booking->latest_payment_history = null;
             }
@@ -707,12 +707,12 @@ class BookingsController extends AppController
                             'type' => 'refund_due',
                             'amount' => $refundAmount,
                             'original_total' => $originalTotalCost,
-                            'paid_so_far' => $originalTotalCost, 
+                            'paid_so_far' => $originalTotalCost,
                             'new_total' => $newTotalCost,
                             'customer_email' => $customerEmail
                         ];
                     } elseif ($newTotalCost > $originalTotalCost) {
-                        $additionalAmount = $newTotalCost - $originalTotalCost; 
+                        $additionalAmount = $newTotalCost - $originalTotalCost;
                         $emailDetails = [
                             'type' => 'additional_payment_due',
                             'amount' => $additionalAmount,
@@ -749,7 +749,7 @@ class BookingsController extends AppController
 
                 if ($emailDetails) {
                     Log::info('[AdminEditNotification] Prepared email details: ' . json_encode($emailDetails), ['scope' => ['admin_edit_email']]);
-                    
+
                     $newPaymentHistoryForEdit = null;
                     $paymentHistoriesTable = TableRegistry::getTableLocator()->get('PaymentHistories');
 
@@ -759,7 +759,7 @@ class BookingsController extends AppController
                             'customer_id' => $booking->customer_id,
                             'payment_amount' => $emailDetails['amount'],
                             'payment_currency' => 'AUD',
-                            'payment_status' => 'Pending - Admin Processing', 
+                            'payment_status' => 'Pending - Admin Processing',
                             'payment_method' => 'Admin Adjustment',
                             'payment_date' => FrozenTime::now(),
                             'notes' => 'Additional charge due to booking modification by admin. Original Total: ' . $numberHelper->currency($emailDetails['original_total'], 'AUD') . ', Paid So Far: ' . $numberHelper->currency($emailDetails['paid_so_far'] ?? 0, 'AUD') . ', New Total: ' . $numberHelper->currency($emailDetails['new_total'], 'AUD') . '.'
@@ -768,9 +768,9 @@ class BookingsController extends AppController
                         $newPaymentHistoryForEdit = $paymentHistoriesTable->newEntity([
                             'booking_id' => $booking->id,
                             'customer_id' => $booking->customer_id,
-                            'payment_amount' => $emailDetails['amount'], 
+                            'payment_amount' => $emailDetails['amount'],
                             'payment_currency' => 'AUD',
-                            'payment_status' => 'Refunded - Admin Processed', 
+                            'payment_status' => 'Refunded - Admin Processed',
                             'payment_method' => 'Admin Adjustment',
                             'payment_date' => FrozenTime::now(),
                             'notes' => 'Refund due to booking modification by admin. Original Total: ' . $numberHelper->currency($emailDetails['original_total'], 'AUD') . ', Paid So Far: ' . $numberHelper->currency($emailDetails['paid_so_far'] ?? $emailDetails['original_total'], 'AUD') . ', New Total: ' . $numberHelper->currency($emailDetails['new_total'], 'AUD') . '. Refund Amount: ' . $numberHelper->currency($emailDetails['amount'], 'AUD') . '.'
@@ -787,7 +787,7 @@ class BookingsController extends AppController
                                 $originalPaymentHistory = $paymentHistoriesTable->find()
                                     ->where([
                                         'booking_id' => $booking->id,
-                                        'id !=' => $newPaymentHistoryForEdit->id, 
+                                        'id !=' => $newPaymentHistoryForEdit->id,
                                     ])
                                     ->orderBy(['payment_date' => 'DESC'])
                                     ->first();
@@ -795,16 +795,16 @@ class BookingsController extends AppController
                                 $pdfView = new View();
                                 $pdfView->set([
                                     // 'booking' will be set below with full details
-                                    'paymentHistory' => $originalPaymentHistory,        
-                                    'editedPaymentHistory' => $newPaymentHistoryForEdit, 
+                                    'paymentHistory' => $originalPaymentHistory,
+                                    'editedPaymentHistory' => $newPaymentHistoryForEdit,
                                     'companyName' => Configure::read('MyApp.companyName', 'ChicCharm'),
                                     'companyAddress' => Configure::read('MyApp.companyAddress', '123 Beauty Lane, Styleville'),
                                     'companyPhone' => Configure::read('MyApp.companyPhone', '03 9000 0000'),
                                     'companyEmail' => Configure::read('MyApp.companyEmail', 'contact@chiccharm.com'),
                                     'companyABN' => Configure::read('MyApp.companyABN', '12 345 678 910'),
                                     'isPdfContext' => true,
-                                    'isAdminEditNotification' => true, 
-                                    'changeDetails' => $emailDetails, 
+                                    'isAdminEditNotification' => true,
+                                    'changeDetails' => $emailDetails,
                                 ]);
                                 // Ensure the booking entity passed to the template has all necessary associations
                                 $bookingWithDetailsForPdf = $this->Bookings->get($booking->id, [
@@ -814,7 +814,7 @@ class BookingsController extends AppController
 
 
                                 $html = $pdfView->render('email/html/invoice', false);
-                                $mpdf = new Mpdf(['tempDir' => TMP . 'mpdf']); 
+                                $mpdf = new Mpdf(['tempDir' => TMP . 'mpdf']);
                                 $mpdf->WriteHTML($html);
 
                                 $pdfDir = WWW_ROOT . 'invoices' . DS;
@@ -825,7 +825,7 @@ class BookingsController extends AppController
                                 $pdfPath = 'invoices/' . $pdfFileName;
                                 $fullPdfPath = WWW_ROOT . $pdfPath;
                                 $mpdf->Output($fullPdfPath, \Mpdf\Output\Destination::FILE);
-                                
+
                                 $newPaymentHistoryForEdit->invoice_pdf = $pdfPath;
                                 if ($paymentHistoriesTable->save($newPaymentHistoryForEdit)) {
                                     Log::info("[AdminEditNotification] Successfully generated and saved PDF {$pdfPath} for PaymentHistory ID: {$newPaymentHistoryForEdit->id}");
@@ -846,7 +846,7 @@ class BookingsController extends AppController
                         $bookingWithCustomer = $this->Bookings->get($booking->id, ['contain' => ['Customers', 'PaymentHistories' => function($q){ return $q->orderBy(['PaymentHistories.payment_date' => 'DESC']);} ]]);
                         if ($bookingWithCustomer && $bookingWithCustomer->customer && $bookingWithCustomer->customer->email) {
                             $mailer = new \App\Mailer\InvoiceMailer();
-                            $mailer->sendAdminEditNotification($bookingWithCustomer, $emailDetails, $newPaymentHistoryForEdit); 
+                            $mailer->sendAdminEditNotification($bookingWithCustomer, $emailDetails, $newPaymentHistoryForEdit);
                             Log::info('[AdminEditNotification] Mailer method called successfully for booking ID: ' . $booking->id, ['scope' => ['admin_edit_email']]);
                         } else {
                             Log::error('[AdminEditNotification] Could not send email: Customer data or email missing for booking ID: ' . $booking->id, ['scope' => ['admin_edit_email']]);
@@ -868,7 +868,7 @@ class BookingsController extends AppController
                 $this->Flash->error(__('The booking could not be updated. Please, try again. Error: {0}', $e->getMessage()));
                  $booking->setErrors(json_decode($e->getMessage(), true) ?: []);
             }
-        } 
+        }
 
         $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
         $customers = $this->Bookings->Customers->find('list', limit: 200)->all();
@@ -976,9 +976,9 @@ class BookingsController extends AppController
         }
 
         $this->request->allowMethod(['post', 'delete']);
-        $booking = $this->Bookings->get($id, ['contain' => ['Customers']]); 
+        $booking = $this->Bookings->get($id, ['contain' => ['Customers']]);
         $originalStatus = $booking->status;
-        $originalTotalCost = $booking->total_cost; 
+        $originalTotalCost = $booking->total_cost;
 
         // Change status to 'cancelled'
         $booking->status = 'cancelled';
@@ -997,7 +997,7 @@ class BookingsController extends AppController
                 // Create a PaymentHistory record for the refund
                 $refundPaymentHistory = $paymentHistoriesTable->newEntity([
                     'booking_id' => $id,
-                    'customer_id' => $booking->customer_id, 
+                    'customer_id' => $booking->customer_id,
                     'payment_amount' => $originalTotalCost,
                     'payment_currency' => 'AUD',
                     'payment_status' => 'Refunded - Admin Processed',
@@ -1012,9 +1012,9 @@ class BookingsController extends AppController
                     Log::info("Admin: Created refund PaymentHistory ID {$refundPaymentHistory->id} for cancelled booking ID {$id}.");
                     try {
                         if ($booking->customer && $booking->customer->email) {
-                            $mailer = new \App\Mailer\InvoiceMailer(); 
+                            $mailer = new \App\Mailer\InvoiceMailer();
                             $refundAmountFloat = (float)$originalTotalCost;
-                            $mailer->sendAdminCancellationRefundNotification($booking, $refundAmountFloat); 
+                            $mailer->sendAdminCancellationRefundNotification($booking, $refundAmountFloat);
                             Log::info("Admin cancellation/refund email initiated for booking ID {$id} to customer {$booking->customer->email}.");
                         } else {
                             Log::warning("Admin cancellation: Customer email not found for booking ID {$id}, cannot send notification email.");
@@ -1104,9 +1104,9 @@ class BookingsController extends AppController
     {
         $booking = $this->Bookings->newEmptyEntity();
         if ($this->request->is('post')) {
-            Log::debug('[CustomerBooking] POST request received.'); 
+            Log::debug('[CustomerBooking] POST request received.');
             $data = $this->request->getData();
-            Log::debug('[CustomerBooking] Request Data: ' . json_encode($data)); 
+            Log::debug('[CustomerBooking] Request Data: ' . json_encode($data));
 
             // Check if end time exceeds 5 PM
             if (isset($data['end_time'])) {
@@ -1894,12 +1894,12 @@ class BookingsController extends AppController
                     ],
                 'PaymentHistories' => [
                     'fields' => [
-                        'id', 
-                        'booking_id', 
-                        'invoice_pdf', 
+                        'id',
+                        'booking_id',
+                        'invoice_pdf',
                         'payment_date',
-                        'payment_method', 
-                        'payment_status'  
+                        'payment_method',
+                        'payment_status'
                     ],
                     'sort' => ['PaymentHistories.payment_date' => 'DESC']
                 ]
@@ -2381,8 +2381,8 @@ class BookingsController extends AppController
                 })
                 ->where([
                     'BookingsServices.stylist_id' => $stylistId,
-                    'BookingsServices.start_time <' => $endTimeString,  
-                    'BookingsServices.end_time >' => $startTimeString, 
+                    'BookingsServices.start_time <' => $endTimeString,
+                    'BookingsServices.end_time >' => $startTimeString,
                     'BookingsServices.start_time IS NOT NULL',
                     'BookingsServices.end_time IS NOT NULL',
                 ]);
@@ -2760,10 +2760,10 @@ class BookingsController extends AppController
         try {
             $bookingDateTime = new FrozenTime($bookingDateTimeStr);
             $now = new FrozenTime();
-            $minEditTime = $now->addHours(24);
+            $minEditTime = $now->addHours(3);
 
             if ($bookingDateTime <= $minEditTime) {
-                $this->Flash->error(__('Bookings cannot be changed less than 24 hours before the scheduled time.'));
+                $this->Flash->error(__('Bookings cannot be changed less than 3 hours before the scheduled time.'));
                 return $this->redirect(['action' => 'customerindex']);
             }
         } catch (Exception $e) {
@@ -2790,7 +2790,7 @@ class BookingsController extends AppController
             // Customer ID and Name should be fixed to the logged-in user
             $data['customer_id'] = $currentUserId;
             // Regenerate booking name based on logged-in customer
-            $customer = $this->Bookings->Customers->get($currentUserId); 
+            $customer = $this->Bookings->Customers->get($currentUserId);
             $data['booking_name'] = 'Booking for ' . $customer->first_name . ' ' . $customer->last_name;
 
 
@@ -2903,7 +2903,7 @@ class BookingsController extends AppController
                               Log::error('[CustomerEdit] Validation time processing error: ' . $e->getMessage());
                               throw new Exception('Validation time processing error: ' . $e->getMessage());
                          }
-                     } 
+                     }
 
                     if ($hasConflictEdit) {
                         throw new Exception($conflictMessageEdit ?: 'A time conflict was detected. Please adjust service times.');
@@ -2921,7 +2921,7 @@ class BookingsController extends AppController
                         $startTimeString = $serviceData['start_time'];
                         $duration = $servicesDetails[$serviceId] ?? 0;
 
-                        if ($duration <= 0) continue; 
+                        if ($duration <= 0) continue;
 
                         // Use the potentially updated date
                         $startTime = new DateTime($data['booking_date_formatted'] . ' ' . $startTimeString);
@@ -2934,7 +2934,7 @@ class BookingsController extends AppController
                             'stylist_id' => (int)$serviceData['stylist_id'],
                             'start_time' => $startTime->format('H:i:s'),
                             'end_time' => $endTime->format('H:i:s'),
-                            'service_cost' => $serviceData['service_cost'], 
+                            'service_cost' => $serviceData['service_cost'],
                         ]);
 
                         if (!$bookingsServicesTable->save($bookingService)) {
@@ -3060,7 +3060,7 @@ class BookingsController extends AppController
             return $this->redirect(['action' => 'customerindex']);
         }
 
-        $this->request->allowMethod(['post']); 
+        $this->request->allowMethod(['post']);
         $booking = $this->Bookings->get($id);
 
         if ($booking->refund_due_amount > 0) {
