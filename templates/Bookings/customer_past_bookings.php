@@ -69,6 +69,22 @@
                                     ['escape' => false, 'class' => 'card-link-wrapper d-block text-decoration-none']
                                 ) ?>
                             </div>
+                            <div class="col-lg-4 col-md-6 col-sm-12 mb-3 side-nav-item">
+                                <?= $this->Html->link(
+                                    '<div class="card h-100">
+                                    <div class="card-header new-card-header d-flex justify-content-between align-items-center flex-wrap">
+                                        <h4 class="view-card-h4 mb-0 flex-grow-1 text-truncate">Current Bookings</h4>
+                                        <i class="material-icons view-icon ms-2">visibility</i>
+                                    </div>
+                                    <div class="card-body new-card-body"></div>
+                                    <div class="card-footer new-card-footer">
+                                        <span class="mb-0 text-truncate">View Current Bookings Bookings</span>
+                                    </div>
+                                </div>',
+                                    ['action' => 'customerindex'],
+                                    ['escape' => false, 'class' => 'card-link-wrapper d-block text-decoration-none']
+                                ) ?>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -114,10 +130,10 @@
                                                                 if (!isset($stylistServices[$stylistId])) {
                                                                     $stylistServices[$stylistId] = [
                                                                         'stylist' => $bookingService->stylist,
-                                                                        'booking_services' => [] 
+                                                                        'booking_services' => []
                                                                     ];
                                                                 }
-                                                                $stylistServices[$stylistId]['booking_services'][] = $bookingService; 
+                                                                $stylistServices[$stylistId]['booking_services'][] = $bookingService;
                                                             }
                                                             ?>
                                                             <?php foreach ($stylistServices as $stylistData): ?>

@@ -311,7 +311,7 @@ $this->layout = 'default';
                                                         <div class="booking-info d-flex flex-column justify-content-between">
                                                             <div>
                                                                 <div class="status-badge">
-                                                                     <span class="status-text cancelled">
+                                                                     <span class="status-text <?= $booking->status === 'active' ? 'active' : ($booking->status === 'Confirmed - Payment Due' ? 'payment-due' : ($booking->status === 'Confirmed - Paid' ? 'paid' : ($booking->status === 'cancelled' ? 'cancelled' :'' ) )) ?>">
                                                                         <?= strtoupper(h($booking->status)) ?>
                                                                     </span>
                                                                 </div>

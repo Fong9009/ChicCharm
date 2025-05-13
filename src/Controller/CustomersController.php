@@ -5,6 +5,7 @@ namespace App\Controller;
 
 use Cake\Event\EventInterface;
 use Cake\Auth\DefaultPasswordHasher;
+use Cake\I18n\FrozenDate;
 
 /**
  * Customers Controller
@@ -71,11 +72,13 @@ class CustomersController extends AppController
         $customer = $this->Customers->get($this->Authentication->getIdentity()->id);
         $bookingsTable = $this->fetchTable('Bookings');
 
+        $today = FrozenDate::today();
         // Get upcoming active bookings (limited to 3)
         $activeBookingsQuery = $bookingsTable->find()
             ->where([
                 'customer_id' => $this->Authentication->getIdentity()->id,
-                'status IN' => ['active', 'Confirmed - Payment Due', 'Confirmed - Paid']
+                'status IN' => ['active', 'Confirmed - Payment Due', 'Confirmed - Paid'],
+                'booking_date >=' => $today,
             ])
             ->contain([
                 'Customers',
@@ -90,18 +93,18 @@ class CustomersController extends AppController
                     'sort' => ['PaymentHistories.payment_date' => 'DESC']
                 ]
             ])
-            ->order([
+            ->orderBy([
                 'ABS(DATEDIFF(booking_date, CURDATE()))' => 'ASC',
                 'booking_date' => 'ASC'
             ])
             ->limit(3);
 
-        $activeBookings = $activeBookingsQuery->all(); 
+        $activeBookings = $activeBookingsQuery->all();
 
         foreach ($activeBookings as $booking) {
             $latestPayment = null;
             if (!empty($booking->payment_histories)) {
-                $latestPayment = $booking->payment_histories[0]; 
+                $latestPayment = $booking->payment_histories[0];
             }
             $booking->latest_payment_history = $latestPayment;
         }
@@ -110,7 +113,8 @@ class CustomersController extends AppController
         $cancelledBookings = $bookingsTable->find()
             ->where([
                 'customer_id' => $this->Authentication->getIdentity()->id,
-                'status' => 'cancelled'
+                'status IN' => ['cancelled', 'Confirmed - Payment Due', 'Confirmed - Paid'],
+                'booking_date <' => $today,
             ])
             ->contain([
                 'BookingsServices' => [
@@ -120,7 +124,7 @@ class CustomersController extends AppController
                     ]
                 ],
             ])
-            ->order(['Bookings.booking_date' => 'DESC'])
+            ->orderBy(['Bookings.booking_date' => 'DESC'])
             ->limit(3);
 
         $this->set(compact('customer', 'activeBookings', 'cancelledBookings'));
