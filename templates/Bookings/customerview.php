@@ -17,6 +17,35 @@
                 </p>
             </div>
 
+            <div class="info-group">
+                <label><?= __('Booking Status') ?></label>
+                <p class="form-control-static">
+                    <?php 
+                    $cvDisplayStatus = h($booking->status);
+                    $cvStatusClass = ''; 
+                    $cvIsRefundProcessed = false;
+
+                    if (!empty($booking->payment_histories)) {
+                        foreach ($booking->payment_histories as $ph) {
+                            if ($ph->payment_method === 'Admin Adjustment' && $ph->payment_status === 'Refunded - Admin Processed') {
+                                $cvIsRefundProcessed = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if ($booking->refund_due_amount > 0) {
+                        $cvDisplayStatus = strtoupper(h($booking->status)) . '<br><span style="font-size:0.9em; color:orange;">(Refund Pending: ' . $this->Number->currency($booking->refund_due_amount, 'AUD') . ')</span>';
+                    } elseif ($cvIsRefundProcessed) {
+                        $cvDisplayStatus = strtoupper(h($booking->status)) . '<br><span style="font-size:0.9em; color:green;">(Refund Processed)</span>';
+                    } else {
+                        $cvDisplayStatus = strtoupper(h($booking->status));
+                    }
+                    ?>
+                    <?= $cvDisplayStatus ?>
+                </p>
+            </div>
+
             <?php if (!empty($booking->bookings_stylists)): ?>
             <div class="info-group">
                 <label><?= __('Selected Stylists and Services') ?></label>
@@ -70,7 +99,7 @@
             </div>
             <?php if ($booking->remaining_cost != 0): ?>
             <div class="info-group">
-                <label><?= __('Remaining Cost') ?></label>
+                <label><?= __('Amount Due') ?></label>
                 <p class="form-control-static">$<?= number_format($booking->remaining_cost, 2) ?></p>
             </div>
             <?php endif; ?>
@@ -156,28 +185,73 @@
             <?php // Edit/Cancel buttons logic for other statuses (excluding Confirmed - Paid)
             if (!in_array($booking->status, ['Confirmed - Paid'])):
             ?>
-                <?php // Show edit button if status allows (e.g., active or payment due)
-                if (in_array($booking->status, ['active', 'Confirmed - Payment Due'])): ?>
-                    <?php if ($booking->total_cost - $booking->remaining_cost == 0): ?>
-                    <?= $this->Html->link(
-                        __('Edit Booking'),
-                        ['action' => 'customeredit', $booking->id],
-                        ['class' => 'btn btn-primary']
-                    ) ?>
-                    <?php endif; ?>
-                <?php endif; ?>
-
                 <?php
-                if (in_array($booking->status, ['active', 'Confirmed - Payment Due'])): ?>
-                    <?= $this->Form->postLink(
-                        __('Cancel Booking'),
-                        ['action' => 'customerdelete', $booking->id],
-                        [
-                            'method' => 'delete',
-                            'confirm' => __('Are you sure you want to cancel this booking? This action cannot be undone.'),
-                            'class' => 'btn btn-danger',
-                        ]
-                    ) ?>
+                    $statusAllowsActions = in_array($booking->status, ['active', 'Confirmed - Payment Due']);
+                    $interactionAllowedByTime = true;
+                    $cancellationCutoffHours = 1;
+                    $cancellationMessage = "Cannot edit or cancel (within 1h)";
+
+                    if ($statusAllowsActions) {
+                        try {
+                            $earliestStartTime = null;
+                            if (!empty($booking->bookings_services)) {
+                                foreach ($booking->bookings_services as $bs) {
+                                    if ($bs->start_time) {
+                                        if (is_null($earliestStartTime) || $bs->start_time < $earliestStartTime) {
+                                            $earliestStartTime = $bs->start_time;
+                                        }
+                                    }
+                                }
+                            }
+
+                            if ($booking->booking_date && $earliestStartTime) {
+                                $bookingDateTime = new \Cake\I18n\FrozenTime(
+                                    $booking->booking_date->format('Y-m-d') . ' ' . $earliestStartTime->format('H:i:s')
+                                );
+                                $cutoffTime = (new \Cake\I18n\FrozenTime())->addHours($cancellationCutoffHours);
+
+                                if ($bookingDateTime < $cutoffTime) {
+                                    $interactionAllowedByTime = false;
+                                }
+                            } else {
+                                error_log("[customerview] Could not determine booking date or earliest start time for booking ID: " . $booking->id);
+                                $interactionAllowedByTime = false;
+                                $cancellationMessage = "Cannot determine booking time.";
+                            }
+                        } catch (Exception $e) {
+                            error_log("[customerview] Error calculating booking time for booking ID " . $booking->id . ": " . $e->getMessage());
+                            $interactionAllowedByTime = false;
+                            $cancellationMessage = "Error checking time window.";
+                        }
+                    } else {
+                         $interactionAllowedByTime = false; 
+                    }
+                ?>
+
+                <?php if ($interactionAllowedByTime): ?>
+                    <?php if (in_array($booking->status, ['active', 'Confirmed - Payment Due'])): ?>
+                        <?php if ($booking->total_cost - $booking->remaining_cost == 0): ?>
+                             <?= $this->Html->link(
+                                 __('Edit Booking'),
+                                 ['action' => 'customeredit', $booking->id],
+                                 ['class' => 'btn btn-primary']
+                             ) ?>
+                        <?php endif; ?>
+                    <?php endif; ?>
+
+                    <?php if (in_array($booking->status, ['active', 'Confirmed - Payment Due'])): ?>
+                        <?= $this->Form->postLink(
+                            __('Cancel Booking'),
+                            ['action' => 'customerdelete', $booking->id],
+                            [
+                                'method' => 'delete',
+                                'confirm' => __('Are you sure you want to cancel this booking? This action cannot be undone.'),
+                                'class' => 'btn btn-danger',
+                            ]
+                        ) ?>
+                    <?php endif; ?>
+                <?php else: // Interaction not allowed by time or status ?>
+                     <p class="text-muted small d-block mt-1"><?= h($cancellationMessage) ?></p>
                 <?php endif; ?>
             <?php endif; ?>
         </div>

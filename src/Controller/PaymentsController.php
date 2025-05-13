@@ -86,6 +86,18 @@ class PaymentsController extends AppController
             
             $orderData = [
                 'intent' => 'CAPTURE',
+                'application_context' => [
+                    'return_url' => Router::url(['controller' => 'Payments', 'action' => 'success', $booking->id], true),
+                    'cancel_url' => Router::url(['controller' => 'Payments', 'action' => 'cancel', $booking->id], true),
+                    'locale' => 'en-AU',
+                    'shipping_preference' => 'NO_SHIPPING',
+                    'user_action' => 'PAY_NOW',
+                ],
+                'payer' => [
+                    'address' => [
+                        'country_code' => 'AU'
+                    ]
+                ],
                 'purchase_units' => [
                     [
                         'amount' => [
@@ -187,25 +199,34 @@ class PaymentsController extends AppController
                 $booking->status = 'Confirmed - Paid'; 
                 $this->Bookings->save($booking);
 
-                // Record payment history
-                $paymentHistory = $this->PaymentHistories->newEmptyEntity();
+                // Attempt to find existing 'Pending' PaymentHistory
+                $paymentHistory = $this->PaymentHistories->find()
+                    ->where(['booking_id' => $bookingId, 'payment_status' => 'Pending'])
+                    ->orderByDesc('payment_date')
+                    ->first();
+
+                if (!$paymentHistory) {
+                    Log::warning("[PaymentsController.captureOrder] No 'Pending' PaymentHistory found for Booking ID: {$bookingId}. Creating a new one as fallback.");
+                    $paymentHistory = $this->PaymentHistories->newEmptyEntity();
+                }
                 
                 $captureDetails = $captureData['purchase_units'][0]['payments']['captures'][0] ?? null;
                 $paypalApiStatus = strtolower($captureData['status'] ?? 'unknown'); 
                 $internalPaymentStatus = ($paypalApiStatus === 'completed') ? 'Completed' : $paypalApiStatus;
 
                 $paymentHistoryData = [
-                    'booking_id' => $bookingId,
+                    'booking_id' => $bookingId, 
                     'customer_id' => $booking->customer_id, 
                     'paypal_transaction_id' => $captureData['id'] ?? $orderID,
                     'paypal_payer_id' => $captureData['payer']['payer_id'] ?? null,
-                    'payment_amount' => $captureDetails ? ($captureDetails['amount']['value'] ?? null) : $booking->total_cost,
-                    'payment_currency' => $captureDetails ? ($captureDetails['amount']['currency_code'] ?? 'AUD') : 'AUD',
+                    'payment_amount' => $captureDetails ? ($captureDetails['amount']['value'] ?? $booking->total_cost) : $booking->total_cost, 
+                    'payment_currency' => $captureDetails ? ($captureDetails['amount']['currency_code'] ?? 'AUD') : 'AUD', 
                     'payment_status' => $internalPaymentStatus, 
-                    'payment_method' => 'paypal',
+                    'payment_method' => 'paypal', 
                     'payment_date' => isset($captureDetails['create_time']) 
                                         ? \Cake\I18n\FrozenTime::parse($captureDetails['create_time'])->format('Y-m-d H:i:s') 
-                                        : gmdate("Y-m-d H:i:s"),
+                                        : FrozenTime::now()->format('Y-m-d H:i:s'), 
+                    'notes' => 'Payment captured via server-side API call. PayPal Order ID: ' . $orderID
                 ];
                 
                 $paymentHistory = $this->PaymentHistories->patchEntity($paymentHistory, $paymentHistoryData);
@@ -241,8 +262,16 @@ class PaymentsController extends AppController
                 $booking->remaining_cost = 0;
                 
                 if ($this->Bookings->save($booking)) {
-                    // Record Payment History
-                    $paymentHistory = $this->PaymentHistories->newEmptyEntity();
+                    // Attempt to find existing 'Pending' PaymentHistory
+                    $paymentHistory = $this->PaymentHistories->find()
+                        ->where(['booking_id' => $bookingId, 'payment_status' => 'Pending'])
+                        ->orderByDesc('payment_date') 
+                        ->first();
+
+                    if (!$paymentHistory) {
+                        Log::warning("[PaymentsController.success] No 'Pending' PaymentHistory found for Booking ID: {$bookingId}. Creating a new one as fallback.");
+                        $paymentHistory = $this->PaymentHistories->newEmptyEntity();
+                    }
 
                     // Attempt to get PayPal Transaction ID from request
                     $payPalTransactionID = $this->request->getQuery('transaction_id', 
@@ -252,17 +281,18 @@ class PaymentsController extends AppController
                                             );
 
                     $paymentHistoryData = [
-                        'booking_id' => $bookingId,
+                        'booking_id' => $bookingId, 
                         'customer_id' => $booking->customer_id,
                         'paypal_transaction_id' => $payPalTransactionID, 
                         'paypal_payer_id' => $this->request->getQuery('payer_id', $this->request->getQuery('paypal_payer_id')), 
                         'payment_amount' => $booking->total_cost,   
                         'payment_currency' => 'AUD',    
-                        'payment_status' => 'Completed',
-                        'payment_method' => 'PayPal',
+                        'payment_status' => 'Completed', 
+                        'payment_method' => 'PayPal',   
                         'payment_date' => FrozenTime::now()->format('Y-m-d H:i:s'),
-                        'notes' => 'Payment confirmed',
+                        'notes' => 'Payment confirmed via client-side success redirect.' 
                     ];
+                    
                     $paymentHistory = $this->PaymentHistories->patchEntity($paymentHistory, $paymentHistoryData);
 
                     $saveResult = $this->PaymentHistories->save($paymentHistory);

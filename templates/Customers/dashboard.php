@@ -103,12 +103,45 @@ $this->layout = 'default';
 
                                                         <div class="booking-info d-flex flex-column justify-content-between">
                                                             <div>
+                                                                <!-- Booking Status -->
                                                                 <div class="status-badge">
-                                                                    <span class="status-text <?= $booking->status === 'active' ? 'active' : ($booking->status === 'Confirmed - Payment Due' ? 'payment-due' : ($booking->status === 'Confirmed - Paid' ? 'paid' : '')) ?>">
-                                                                        <?= strtoupper(h($booking->status)) ?>
+                                                                    <?php
+                                                                    $dashIsRefundProcessed = false;
+                                                                    if (!empty($booking->payment_histories)) {
+                                                                        foreach ($booking->payment_histories as $ph) {
+                                                                            if ($ph->payment_method === 'Admin Adjustment' && $ph->payment_status === 'Refunded - Admin Processed') {
+                                                                                $dashIsRefundProcessed = true;
+                                                                                break;
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                    
+                                                                    $baseStatusText = strtoupper(h($booking->status));
+
+                                                                    if ($booking->status === 'active') {
+                                                                        $dashStatusClass = 'active';
+                                                                    } elseif ($booking->status === 'Confirmed - Payment Due') {
+                                                                        $dashStatusClass = 'payment-due';
+                                                                    } elseif ($booking->status === 'Confirmed - Paid') {
+                                                                        $dashStatusClass = 'paid'; 
+                                                                    } else {
+                                                                        $dashStatusClass = '';
+                                                                    }
+
+                                                                    if ($booking->refund_due_amount > 0) {
+                                                                        $dashDisplayStatus = $baseStatusText . '<br><span style="font-size:0.8em; color:white;">(Refund Pending: ' . $this->Number->currency($booking->refund_due_amount, 'AUD') . ')</span>';
+                                                                    } elseif ($dashIsRefundProcessed) {
+                                                                        $dashDisplayStatus = $baseStatusText . '<br><span style="font-size:0.8em; color:white;">(Refund Processed)</span>';
+                                                                    } else {
+                                                                        $dashDisplayStatus = $baseStatusText;
+                                                                    }
+                                                                    ?>
+                                                                    <span class="status-text <?= $dashStatusClass ?>">
+                                                                        <?= $dashDisplayStatus ?>
                                                                     </span>
                                                                 </div>
 
+                                                                <!-- Service Details -->
                                                                 <div class="service-details">
                                                                     <?php
                                                                     // Group services by stylist
@@ -184,12 +217,12 @@ $this->layout = 'default';
                                                                     ?>
                                                                 <?php endif; // End invoice link check ?>
 
-                                                                <?php // Message only for paid bookings
+                                                                <?php 
                                                                 if ($booking->status === 'Confirmed - Paid'): ?>
                                                                     <p class="text-muted small mt-1 mb-0 align-self-center">This booking is paid. Contact store for changes.</p>
                                                                 <?php endif; ?>
 
-                                                                <?php // Edit/Cancel buttons logic for other statuses (excluding Confirmed - Paid)
+                                                                <?php 
                                                                 if (!in_array($booking->status, ['Confirmed - Paid'])):
                                                                 ?>
                                                                     <?php

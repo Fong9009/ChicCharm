@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: May 13, 2025 at 05:13 AM
+-- Generation Time: May 13, 2025 at 02:09 PM
 -- Server version: 9.3.0
 -- PHP Version: 8.4.6
 
@@ -62,17 +62,11 @@ CREATE TABLE `bookings` (
   `booking_date` date NOT NULL,
   `total_cost` decimal(10,2) NOT NULL,
   `remaining_cost` decimal(10,2) NOT NULL,
+  `refund_due_amount` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Amount of refund due to customer after an admin edit, pending manual processing.',
   `customer_id` int DEFAULT NULL,
   `status` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `notes` text COLLATE utf8mb4_general_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `bookings`
---
-
-INSERT INTO `bookings` (`id`, `booking_name`, `booking_date`, `total_cost`, `remaining_cost`, `customer_id`, `status`, `notes`) VALUES
-(198, 'Booking for Chay Fong Hong', '2025-05-15', 220.00, 0.00, 1, 'Confirmed - Paid', '');
 
 -- --------------------------------------------------------
 
@@ -92,13 +86,6 @@ CREATE TABLE `bookings_services` (
   `end_time` time DEFAULT NULL COMMENT 'End time specific to this service within the booking'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `bookings_services`
---
-
-INSERT INTO `bookings_services` (`id`, `booking_id`, `service_id`, `service_cost`, `created`, `modified`, `stylist_id`, `start_time`, `end_time`) VALUES
-(359, 198, 2, 220.00, '2025-05-13 04:40:21', '2025-05-13 04:40:21', 2, '09:00:00', '10:30:00');
-
 -- --------------------------------------------------------
 
 --
@@ -112,13 +99,6 @@ CREATE TABLE `bookings_stylists` (
   `booking_id` int NOT NULL,
   `stylist_id` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `bookings_stylists`
---
-
-INSERT INTO `bookings_stylists` (`id`, `stylist_date`, `selected_cost`, `booking_id`, `stylist_id`) VALUES
-(324, '2025-05-15', 220.00, 198, 2);
 
 -- --------------------------------------------------------
 
@@ -313,7 +293,8 @@ INSERT INTO `customers` (`id`, `first_name`, `last_name`, `email`, `password`, `
 (1, 'Chay Fong', 'Hong', 'chayfong9009@gmail.com', '$2y$10$hIXeX/RjXv4ox29mSuSZiuxclpjRXzyhjO9bgG5is13uBubV8gbqq', 'cc15950b7cef51a668b0f471703d014cb0951e29a7774c49847a669a719ad4bf972d19fdc3cf2ba6ab3adfa14ec3b63a49047e642ebca46469bd429cd37b8471', '2025-04-20 13:28:57', '2025-03-26 11:10:12', '2025-04-18 04:50:05', 'customer', '11662_sung-jin-woo.png', 1),
 (2, 'Christian', 'Cochrane', 'cakephp@example.com', '$2y$10$4oCG2ResnEQbYk2rgtdTGe1faLZPOu29GZma4EfRmQ.B6vyHOk7u6', '', NULL, '2025-04-04 02:31:18', '2025-04-16 13:25:10', 'customer', NULL, 1),
 (61, 'Guest', 'Account', 'guest@chiccharm.com', '$2y$10$331arAgxUzMQjrnxAAh91uxGonTi.NiZm/1C8upN6cYRIu/66zqfG', NULL, NULL, '2025-05-02 18:55:30', '2025-05-02 19:00:00', 'guest', NULL, 1),
-(62, 'Steve', 'Davidson', 'customer@chiccharm.com', '$2y$10$FOl32Hpf6hWbYI0S4c7fZeq8VT43RDwFwj3K8spMAGm1p3fwIePUu', NULL, NULL, '2025-05-09 14:38:25', '2025-05-09 14:38:25', 'customer', NULL, 1);
+(62, 'Steve', 'Davidson', 'customer@chiccharm.com', '$2y$10$FOl32Hpf6hWbYI0S4c7fZeq8VT43RDwFwj3K8spMAGm1p3fwIePUu', NULL, NULL, '2025-05-09 14:38:25', '2025-05-09 14:38:25', 'customer', NULL, 1),
+(63, 'Chay', 'Hong', 'chayfong820@gmail.com', '$2y$12$n9GBvyQfzTQMxTO5BvjS5ut6fO6jxzZyJpc.ikuhpUn7n7b8m5jne', NULL, NULL, '2025-05-13 20:38:27', '2025-05-13 20:38:27', 'customer', NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -338,14 +319,6 @@ CREATE TABLE `payment_histories` (
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `payment_histories`
---
-
-INSERT INTO `payment_histories` (`id`, `booking_id`, `customer_id`, `paypal_transaction_id`, `invoice_pdf`, `paypal_payer_id`, `payment_amount`, `payment_currency`, `payment_status`, `payment_method`, `payment_date`, `notes`, `created_at`, `updated_at`) VALUES
-(27, 198, 1, NULL, NULL, NULL, 220.00, 'AUD', 'Pending', NULL, '2025-05-13 14:40:16', 'Placeholder record created on booking confirmation.', '2025-05-13 04:40:16', '2025-05-13 04:40:16'),
-(28, 198, 1, '13D99128F8685725G', 'invoices/invoice_28.pdf', '${payerId}', 220.00, 'AUD', 'Completed', 'PayPal', '2025-05-13 14:45:13', 'Payment confirmed', '2025-05-13 04:45:13', '2025-05-13 04:45:13');
-
 -- --------------------------------------------------------
 
 --
@@ -367,6 +340,27 @@ CREATE TABLE `paypal_webhook_events` (
   `amount` decimal(10,2) DEFAULT NULL,
   `currency` varchar(3) COLLATE utf8mb4_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `phinxlog`
+--
+
+CREATE TABLE `phinxlog` (
+  `version` bigint NOT NULL,
+  `migration_name` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `start_time` timestamp NULL DEFAULT NULL,
+  `end_time` timestamp NULL DEFAULT NULL,
+  `breakpoint` tinyint(1) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `phinxlog`
+--
+
+INSERT INTO `phinxlog` (`version`, `migration_name`, `start_time`, `end_time`, `breakpoint`) VALUES
+(20250513065601, 'AddRefundDueAmountToBookings', '2025-05-13 16:56:39', '2025-05-13 16:56:39', 0);
 
 -- --------------------------------------------------------
 
@@ -536,6 +530,12 @@ ALTER TABLE `paypal_webhook_events`
   ADD KEY `idx_received_at` (`received_at`);
 
 --
+-- Indexes for table `phinxlog`
+--
+ALTER TABLE `phinxlog`
+  ADD PRIMARY KEY (`version`);
+
+--
 -- Indexes for table `services`
 --
 ALTER TABLE `services`
@@ -571,19 +571,19 @@ ALTER TABLE `admins`
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=199;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=220;
 
 --
 -- AUTO_INCREMENT for table `bookings_services`
 --
 ALTER TABLE `bookings_services`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=360;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=468;
 
 --
 -- AUTO_INCREMENT for table `bookings_stylists`
 --
 ALTER TABLE `bookings_stylists`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=325;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=419;
 
 --
 -- AUTO_INCREMENT for table `contacts`
@@ -601,13 +601,13 @@ ALTER TABLE `content_blocks`
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- AUTO_INCREMENT for table `payment_histories`
 --
 ALTER TABLE `payment_histories`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=91;
 
 --
 -- AUTO_INCREMENT for table `paypal_webhook_events`

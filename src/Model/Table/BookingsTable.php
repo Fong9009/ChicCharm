@@ -128,6 +128,10 @@ class BookingsTable extends Table
             ->integer('customer_id')
             ->allowEmptyString('customer_id');
 
+        $validator
+            ->decimal('refund_due_amount')
+            ->allowEmptyString('refund_due_amount');
+
         return $validator;
     }
 

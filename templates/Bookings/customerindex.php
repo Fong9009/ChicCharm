@@ -169,30 +169,53 @@
                                                     <?= !empty($booking->notes) ? h($booking->notes) : 'No notes' ?>
                                                 </td>
                                                 <td>
-                                                    <?php
+                                                    <?php 
+                                                    $displayStatus = h($booking->status);
                                                     $statusClass = '';
-                                                    switch ($booking->status) {
-                                                        case 'active':
-                                                            $statusClass = 'active';
-                                                            break;
-                                                        case 'Confirmed - Payment Due':
-                                                            $statusClass = 'payment-due';
-                                                            break;
-                                                        case 'Confirmed - Paid':
-                                                            $statusClass = 'paid';
-                                                            break;
-                                                        case 'cancelled':
-                                                            $statusClass = 'cancelled';
-                                                            break;
-                                                        case 'finished':
-                                                            $statusClass = 'finished';
-                                                            break;
-                                                        default:
-                                                            $statusClass = 'text-muted';
+                                                    $isRefundProcessed = false;
+
+                                                    // Check if a refund was processed for this booking
+                                                    if (!empty($booking->payment_histories)) {
+                                                        foreach ($booking->payment_histories as $ph) {
+                                                            if ($ph->payment_method === 'Admin Adjustment' && $ph->payment_status === 'Refunded - Admin Processed') {
+                                                                $isRefundProcessed = true;
+                                                                break;
+                                                            }
+                                                        }
+                                                    }
+
+                                                    if ($booking->refund_due_amount > 0) {
+                                                        // Combine original status with refund pending info
+                                                        $displayStatus = strtoupper(h($booking->status)) . ' <br><span style="font-size:0.9em; color:white;">(Refund Pending: ' . $this->Number->currency($booking->refund_due_amount, 'AUD') . ')</span>';
+                                                        switch ($booking->status) {
+                                                            case 'active': $statusClass = 'active refund-pending'; break;
+                                                            case 'Confirmed - Payment Due': $statusClass = 'payment-due refund-pending'; break;
+                                                            case 'Confirmed - Paid': $statusClass = 'paid refund-pending'; break;
+                                                            default: $statusClass = 'text-muted refund-pending';
+                                                        }
+                                                    } elseif ($isRefundProcessed) { 
+                                                        $displayStatus = strtoupper(h($booking->status)) . ' <br><span style="font-size:0.9em; color:white;">(Refund Processed)</span>';
+                                                        switch ($booking->status) {
+                                                            case 'active': $statusClass = 'active refund-processed'; break;
+                                                            case 'Confirmed - Paid': $statusClass = 'paid refund-processed'; break;
+                                                            default: $statusClass = 'text-muted refund-processed';
+                                                        }
+                                                    } else {
+                                                        // Original status and class logic if no refund aspect
+                                                        $displayStatus = strtoupper(h($booking->status));
+                                                        switch ($booking->status) {
+                                                            case 'active': $statusClass = 'active'; break;
+                                                            case 'Confirmed - Payment Due': $statusClass = 'payment-due'; break;
+                                                            case 'Confirmed - Paid': $statusClass = 'paid'; break;
+                                                            case 'cancelled': $statusClass = 'cancelled'; break;
+                                                            case 'finished': $statusClass = 'finished'; break;
+                                                            default: $statusClass = 'text-muted';
+                                                        }
                                                     }
                                                     ?>
                                                     <span class="status-text <?= $statusClass ?>">
-                                                        <?= strtoupper(h($booking->status)) ?>
+                                                        <?= $displayStatus 
+                                                        ?>
                                                     </span>
                                                 </td>
                                                 <td class="actions">
@@ -221,54 +244,74 @@
                                                     <?php else: ?>
                                                         <?php
                                                         $statusAllowsActionsIndex = in_array($booking->status, ['active', 'Confirmed - Payment Due']);
-                                                        $interactionAllowedByIndex = true;
+                                                        $interactionAllowedByTimeIndex = true;
+                                                        $cancellationMessageIndex = "";
+                                                        $cancellationCutoffHoursIndex = 1; // Hours before booking to restrict cancellation
+                                                        $editCutoffHoursIndex = 24;       // Hours before booking to restrict editing
 
                                                         if ($statusAllowsActionsIndex) {
                                                             try {
-                                                                $bookingDateTimeIndex = new \Cake\I18n\FrozenTime($booking->booking_date->format('d-m-Y') . ' ' . ($booking->start_time ? $booking->start_time->format('H:i:s') : '00:00:00'));
-                                                                if ($bookingDateTimeIndex < (new \Cake\I18n\FrozenTime())->addHours(24)) {
-                                                                    $interactionAllowedByIndex = false;
+                                                                $earliestStartTimeIndex = null;
+                                                                if (!empty($booking->bookings_services)) {
+                                                                    foreach ($booking->bookings_services as $bs) {
+                                                                        if ($bs->start_time) {
+                                                                            if (is_null($earliestStartTimeIndex) || $bs->start_time < $earliestStartTimeIndex) {
+                                                                                $earliestStartTimeIndex = $bs->start_time;
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+
+                                                                if ($booking->booking_date && $earliestStartTimeIndex) {
+                                                                    $bookingDateTimeIndex = new \Cake\I18n\FrozenTime(
+                                                                        $booking->booking_date->format('Y-m-d') . ' ' . $earliestStartTimeIndex->format('H:i:s')
+                                                                    );
+                                                                    $nowIndex = new \Cake\I18n\FrozenTime();
+                                                                    $editCutoffDateTimeIndex = $nowIndex->addHours($editCutoffHoursIndex);
+                                                                    $cancelCutoffDateTimeIndex = $nowIndex->addHours($cancellationCutoffHoursIndex);
+
+                                                                    if ($bookingDateTimeIndex <= $editCutoffDateTimeIndex) {
+                                                                        $interactionAllowedByTimeIndex = false;
+                                                                        $cancellationMessageIndex = "Cannot change/cancel (&lt;{$editCutoffHoursIndex}h).";
+                                                                    } elseif ($bookingDateTimeIndex <= $cancelCutoffDateTimeIndex) {
+                                                                        $cancellationMessageIndex = "Cancel within {$cancellationCutoffHoursIndex}h not allowed.";
+                                                                    }
+
+                                                                } else {
+                                                                    $interactionAllowedByTimeIndex = false;
+                                                                    $cancellationMessageIndex = "Time N/A for edit/cancel check.";
                                                                 }
                                                             } catch (Exception $e) {
-                                                                $interactionAllowedByIndex = false;
+                                                                $interactionAllowedByTimeIndex = false;
+                                                                $cancellationMessageIndex = "Error checking time window.";
+                                                                error_log("[customerindex] Time calc error for booking ID {$booking->id}: " . $e->getMessage());
                                                             }
+                                                        } else {
+                                                             $interactionAllowedByTimeIndex = false; 
+                                                             $cancellationMessageIndex = "Status does not allow actions.";
                                                         }
-                                                        ?>
 
-                                                        <?php if ($statusAllowsActionsIndex): ?>
-                                                            <?php if ($interactionAllowedByIndex): ?>
-                                                                <?php if ($booking->total_cost - $booking->remaining_cost == 0) :?>
-                                                                    <?= $this->Html->link(__('Edit'), ['action' => 'customeredit', $booking->id], [
-                                                                        'class' => 'button',
-                                                                        'style' => 'background-color: #007bff; border-color: #007bff; color: white; transition: background-color 0.2s, border-color 0.2s;',
-                                                                        'onmouseover' => 'this.style.backgroundColor="#0056b3"; this.style.borderColor="#0056b3"',
-                                                                        'onmouseout' => 'this.style.backgroundColor="#007bff"; this.style.borderColor="#007bff"'
-                                                                    ]) ?>
-                                                                <?php endif; ?>
-                                                                <?= $this->Form->postLink(
-                                                                    __('Cancel'),
-                                                                    ['action' => 'customerdelete', $booking->id],
-                                                                    [
-                                                                        'method' => 'delete',
-                                                                        'confirm' => __('Are you sure you want to cancel this booking?'),
-                                                                        'class' => 'button',
-                                                                        'style' => 'background-color: #dc3545; border-color: #dc3545; transition: background-color 0.2s;',
-                                                                        'onmouseover' => 'this.style.backgroundColor="#bb2d3b"; this.style.borderColor="#bb2d3b"',
-                                                                        'onmouseout' => 'this.style.backgroundColor="#dc3545"; this.style.borderColor="#dc3545"'
-                                                                    ]
-                                                                ) ?>
-                                                            <?php else: ?>
-                                                                <?php if ($booking->total_cost - $booking->remaining_cost == 0) :?>
-                                                                    <?= $this->Html->link(__('Edit'), ['action' => 'customeredit', $booking->id], [
-                                                                        'class' => 'button',
-                                                                        'style' => 'background-color: #007bff; border-color: #007bff; color: white; transition: background-color 0.2s, border-color 0.2s;',
-                                                                        'onmouseover' => 'this.style.backgroundColor="#0056b3"; this.style.borderColor="#0056b3"',
-                                                                        'onmouseout' => 'this.style.backgroundColor="#007bff"; this.style.borderColor="#007bff"'
-                                                                    ]) ?>
-                                                                    <p class="text-muted small mb-0" style="white-space: normal;">Cannot cancel (within 24h).</p>
-                                                                <?php endif; ?>
-                                                            <?php endif; ?>
-                                                        <?php endif; ?>
+                                                        if ($statusAllowsActionsIndex && $interactionAllowedByTimeIndex) {
+                                                            // Edit Button
+                                                            echo $this->Html->link(
+                                                                'Edit',
+                                                                ['action' => 'customeredit', $booking->id],
+                                                                ['class' => 'button button-primary', 'style' => 'background-color: #f0ad4e; border-color: #eea236; margin-top: 5px;',
+                                                                'onmouseover' => 'this.style.backgroundColor="#ec971f"; this.style.borderColor="#d58512"',
+                                                                'onmouseout' => 'this.style.backgroundColor="#f0ad4e"; this.style.borderColor="#eea236"']
+                                                            );
+                                                            // Cancel Button
+                                                            echo $this->Form->postLink(
+                                                                'Cancel',
+                                                                ['action' => 'customerdelete', $booking->id],
+                                                                ['confirm' => __('Are you sure you want to cancel booking # {0}?', $booking->id), 'class' => 'button button-danger', 'style' => 'background-color: #c9302c; border-color: #ac2925; margin-top: 5px;',
+                                                                'onmouseover' => 'this.style.backgroundColor="#ac2925"; this.style.borderColor="#8c2320"',
+                                                                'onmouseout' => 'this.style.backgroundColor="#c9302c"; this.style.borderColor="#ac2925"']
+                                                            );
+                                                        } elseif (!$interactionAllowedByTimeIndex && !empty($cancellationMessageIndex)) {
+                                                            echo '<p class="text-muted small mb-0" style="white-space: normal;">' . h($cancellationMessageIndex) . '</p>';
+                                                        } 
+                                                        ?>
                                                     <?php endif; ?>
                                                 </td>
                                             </tr>
