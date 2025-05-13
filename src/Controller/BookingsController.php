@@ -219,10 +219,12 @@ class BookingsController extends AppController
      */
     public function customerindex(): void
     {
+        $today = FrozenDate::today();
         $query = $this->Bookings->find()
             ->where([
                 'customer_id' => $this->Authentication->getIdentity()->id,
                 'status IN' => ['active', 'Confirmed - Payment Due', 'Confirmed - Paid'],
+                'booking_date >=' => $today,
             ])
             ->contain([
                 'Customers',
@@ -2266,10 +2268,12 @@ class BookingsController extends AppController
             return $this->redirect(['controller' => 'Pages', 'action' => 'display', 'home']);
         }
 
+        $today = FrozenDate::today();
         $query = $this->Bookings->find()
             ->where([
                 'customer_id' => $user->id,
-                'status IN' => ['finished', 'cancelled'],
+                'status IN' => ['finished','cancelled', 'Confirmed - Payment Due', 'Confirmed - Paid'],
+                'booking_date <' => $today,
             ])
             ->contain([
                 'BookingsServices' => [
