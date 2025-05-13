@@ -223,7 +223,7 @@ class BookingsController extends AppController
                 'status IN' => ['active', 'Confirmed - Payment Due', 'Confirmed - Paid'], 
             ])
             ->contain([
-                'Customers', 
+                'Customers',
                 'BookingsServices' => [
                     'Services',
                     'Stylists' => [
@@ -1488,7 +1488,7 @@ class BookingsController extends AppController
                 'BookingsServices' => [
                     'Services',
                     'Stylists'
-                ],
+                    ],
                 'PaymentHistories' => [
                     'fields' => ['booking_id', 'invoice_pdf', 'payment_date'],
                     'sort' => ['PaymentHistories.payment_date' => 'DESC']
