@@ -160,8 +160,15 @@ $this->layout = 'default';
                                                                     ['class' => 'view-btn']
                                                                 ) ?>
 
-                                                                <?php if ($booking->status === 'Confirmed - Paid'): ?>
-                                                                    <?php if (!empty($booking->latest_payment_history) && !empty($booking->latest_payment_history->invoice_pdf)):
+                                                                <?php 
+                                                                // Show invoice link if paid (and PDF exists) OR if payment is due (and history exists)
+                                                                if (!empty($booking->latest_payment_history) && 
+                                                                    ( ($booking->status === 'Confirmed - Paid' && !empty($booking->latest_payment_history->invoice_pdf)) || 
+                                                                      ($booking->status === 'Confirmed - Payment Due') 
+                                                                    )
+                                                                ): 
+                                                                ?>
+                                                                    <?php 
                                                                         echo $this->Html->link(
                                                                             __('Check/Download Invoice'),
                                                                             ['controller' => 'Payments', 'action' => 'viewInvoice', $booking->latest_payment_history->id],
@@ -174,9 +181,17 @@ $this->layout = 'default';
                                                                                 'escape' => false
                                                                             ]
                                                                         );
-                                                                    endif; ?>
+                                                                    ?>
+                                                                <?php endif; // End invoice link check ?>
+                                                                    
+                                                                <?php // Message only for paid bookings
+                                                                if ($booking->status === 'Confirmed - Paid'): ?>
                                                                     <p class="text-muted small mt-1 mb-0 align-self-center">This booking is paid. Contact store for changes.</p>
-                                                                <?php else: ?>
+                                                                <?php endif; ?>
+
+                                                                <?php // Edit/Cancel buttons logic for other statuses (excluding Confirmed - Paid)
+                                                                if (!in_array($booking->status, ['Confirmed - Paid'])):
+                                                                ?>
                                                                     <?php
                                                                     $statusAllowsActions = in_array($booking->status, ['active', 'Confirmed - Payment Due']);
                                                                     $interactionAllowedByTime = true; 
