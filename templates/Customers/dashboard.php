@@ -239,11 +239,13 @@ $this->layout = 'default';
 
                                                                     <?php if ($statusAllowsActions): ?>
                                                                         <?php if ($interactionAllowedByTime): ?>
-                                                                            <?= $this->Html->link(
-                                                                                'Edit Booking',
-                                                                                ['controller' => 'Bookings', 'action' => 'customeredit', $booking->id],
-                                                                                ['class' => 'btn-edit-customer-dashboard']
-                                                                            ) ?>
+                                                                            <?php if ($booking->total_cost - $booking->remaining_cost == 0): ?>
+                                                                                <?= $this->Html->link(
+                                                                                    'Edit Booking',
+                                                                                    ['controller' => 'Bookings', 'action' => 'customeredit', $booking->id],
+                                                                                    ['class' => 'btn-edit-customer-dashboard']
+                                                                                ) ?>
+                                                                            <?php endif; ?>
                                                                             <?= $this->Form->postLink(
                                                                                 'Cancel Booking',
                                                                                 ['controller' => 'Bookings', 'action' => 'customerdelete', $booking->id],
