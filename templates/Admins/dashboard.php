@@ -242,29 +242,6 @@ $identity = $this->request->getAttribute('identity');
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
-                <div class="card h-100">
-                    <div class="card-header payment-card-header d-flex justify-content-between align-items-center">
-                        <div>
-                            <h4 class="payment-card-h4">Payments</h4>
-                        </div>
-                        <i class="material-icons payment-icon">payments</i>
-                    </div>
-                    <div class="card-body payment-card-body">
-                        <h3 class="payment-card-h3">PayPal Transactions</h3>
-                        <div class="total-value-container">
-                            <p class="payment-card-count">Live Updates</p>
-                        </div>
-                    </div>
-                    <div class="card-footer payment-card-footer">
-                        <?= $this->Html->link(
-                            '<span class="fs-5">View Payment Dashboard</span><i class="material-icons">visibility</i>',
-                            ['controller' => 'PaypalWebhooks', 'action' => 'dashboard'],
-                            ['class' => 'payment-button', 'escape' => false]
-                        ) ?>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </main>

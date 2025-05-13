@@ -103,12 +103,45 @@ $this->layout = 'default';
 
                                                         <div class="booking-info d-flex flex-column justify-content-between">
                                                             <div>
+                                                                <!-- Booking Status -->
                                                                 <div class="status-badge">
-                                                                    <span class="status-text <?= $booking->status === 'active' ? 'active' : ($booking->status === 'Confirmed - Payment Due' ? 'payment-due' : ($booking->status === 'Confirmed - Paid' ? 'paid' : '')) ?>">
-                                                                        <?= strtoupper(h($booking->status)) ?>
+                                                                    <?php
+                                                                    $dashIsRefundProcessed = false;
+                                                                    if (!empty($booking->payment_histories)) {
+                                                                        foreach ($booking->payment_histories as $ph) {
+                                                                            if ($ph->payment_method === 'Admin Adjustment' && $ph->payment_status === 'Refunded - Admin Processed') {
+                                                                                $dashIsRefundProcessed = true;
+                                                                                break;
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                    
+                                                                    $baseStatusText = strtoupper(h($booking->status));
+
+                                                                    if ($booking->status === 'active') {
+                                                                        $dashStatusClass = 'active';
+                                                                    } elseif ($booking->status === 'Confirmed - Payment Due') {
+                                                                        $dashStatusClass = 'payment-due';
+                                                                    } elseif ($booking->status === 'Confirmed - Paid') {
+                                                                        $dashStatusClass = 'paid'; 
+                                                                    } else {
+                                                                        $dashStatusClass = '';
+                                                                    }
+
+                                                                    if ($booking->refund_due_amount > 0) {
+                                                                        $dashDisplayStatus = $baseStatusText . '<br><span style="font-size:0.8em; color:white;">(Refund Pending: ' . $this->Number->currency($booking->refund_due_amount, 'AUD') . ')</span>';
+                                                                    } elseif ($dashIsRefundProcessed) {
+                                                                        $dashDisplayStatus = $baseStatusText . '<br><span style="font-size:0.8em; color:white;">(Refund Processed)</span>';
+                                                                    } else {
+                                                                        $dashDisplayStatus = $baseStatusText;
+                                                                    }
+                                                                    ?>
+                                                                    <span class="status-text <?= $dashStatusClass ?>">
+                                                                        <?= $dashDisplayStatus ?>
                                                                     </span>
                                                                 </div>
 
+                                                                <!-- Service Details -->
                                                                 <div class="service-details">
                                                                     <?php
                                                                     // Group services by stylist
@@ -182,7 +215,7 @@ $this->layout = 'default';
                                                                             ]
                                                                         );
                                                                     ?>
-                                                                <?php endif; // End invoice link check ?>
+                                                                <?php endif; ?>
                                                                     
                                                                 <?php // Message only for paid bookings
                                                                 if ($booking->status === 'Confirmed - Paid'): ?>
@@ -385,21 +418,6 @@ $this->layout = 'default';
                                         <p>You have no recently cancelled bookings.</p>
                                     </div>
                                 <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!--Past Invoices-->
-                <div class="row">
-                    <div class="col-12 mb-4">
-                        <div class="card">
-                            <div class="card-header d-flex justify-content-between align-items-center"  style="background-color:#D7CCC8">
-                                <h3 class="card-title">Past Invoices</h3>
-                            </div>
-                            <div class="card-body">
-                                <!-- Past invoices content -->
-                                <p>No past invoices found.</p>
                             </div>
                         </div>
                     </div>

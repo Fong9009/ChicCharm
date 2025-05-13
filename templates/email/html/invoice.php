@@ -3,6 +3,10 @@
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Booking $booking
  * @var \App\Model\Entity\PaymentHistory $paymentHistory
+ * @var \App\Model\Entity\PaymentHistory|null $editedPaymentHistory
+ * @var array|null $changeDetails
+ * @var bool|null $isPdfContext
+ * @var bool|null $isAdminEditNotification
  * @var string $companyName
  * @var string $companyAddress
  * @var string $companyPhone
@@ -15,7 +19,10 @@
 $bookingDateFormatted = $booking->booking_date ? $booking->booking_date->format('l, F jS, Y') : 'Date N/A';
 $bookingOverallStartTime = $booking->start_time ? $booking->start_time->format('h:i A') : null;
 $bookingOverallEndTime = $booking->end_time ? $booking->end_time->format('h:i A') : null;
-$paymentDateFormatted = $paymentHistory->payment_date ? $paymentHistory->payment_date->format('d/m/Y H:i') : 'N/A';
+
+// Ensure $paymentHistory is available for date formatting, fallback for $editedPaymentHistory if primary is null
+$dateSourceForPayment = $paymentHistory ?? $editedPaymentHistory;
+$paymentDateFormatted = $dateSourceForPayment && $dateSourceForPayment->payment_date ? $dateSourceForPayment->payment_date->format('d/m/Y H:i') : 'N/A';
 
 ?>
 <!DOCTYPE html>
@@ -117,10 +124,11 @@ $paymentDateFormatted = $paymentHistory->payment_date ? $paymentHistory->payment
 </head>
 <body>
     <div class="invoice-container">
-        <?php if (!empty($isAdminEditNotification) && !empty($changeDetails)): ?>
+        <?php // Admin Edit Notification Block - Primarily for Email Body ?>
+        <?php if (!empty($isAdminEditNotification) && empty($isPdfContext) && isset($changeDetails)): ?>
             <div class="admin-edit-summary" style="padding: 15px; margin-bottom: 20px; border: 1px solid #ffc107; background-color: #fff3cd; border-radius: 5px;">
                 <h3 style="margin-top: 0; color: #856404;">Update Regarding Your Recent Booking Changes</h3>
-                <p>An administrator has recently updated your booking (ID: <?= h($booking->id) ?>). Please see the details below:</p>
+                <p>An administrator has recently updated your booking (ID: <?= h($booking->id) ?>).</p>
                 
                 <?php if ($changeDetails['type'] === 'refund_due'): ?>
                     <p style="font-weight: bold; color: #155724;">
@@ -129,16 +137,22 @@ $paymentDateFormatted = $paymentHistory->payment_date ? $paymentHistory->payment
                     <p>Your new booking total is <?= $this->Number->currency($booking->total_cost, 'AUD') ?>.
                        This refund will be processed manually by our team shortly. Please allow a few business days for it to reflect in your account.
                     </p>
+                     <?php if ($editedPaymentHistory && $editedPaymentHistory->invoice_pdf): ?>
+                        <p>A credit note with details of this refund is attached to this email.</p>
+                    <?php endif; ?>
                 <?php elseif ($changeDetails['type'] === 'additional_payment_due'): ?>
                     <p style="font-weight: bold; color: #721c24;">
                         An additional payment of <?= $this->Number->currency($changeDetails['amount'], 'AUD') ?> is required due to these changes.
                     </p>
                     <p>Your new booking total is <?= $this->Number->currency($booking->total_cost, 'AUD') ?>.
-                       Please settle the outstanding amount of <?= $this->Number->currency($changeDetails['amount'], 'AUD') ?> when you arrive for your appointment.
+                       Please settle the outstanding amount of <?= $this->Number->currency($booking->remaining_cost > 0 ? $booking->remaining_cost : $changeDetails['amount'], 'AUD') ?> when you arrive for your appointment, or via the payment link if available.
                     </p>
+                    <?php if ($editedPaymentHistory && $editedPaymentHistory->invoice_pdf): ?>
+                        <p>An updated invoice reflecting this additional amount is attached to this email.</p>
+                    <?php endif; ?>
                 <?php endif; ?>
                 <hr style="border-top: 1px solid #ffc107;">
-                <p>Below is the summary of your updated booking details.</p>
+                <p>Below is a summary of your updated booking details. For full details, please see the attached document (if applicable).</p>
             </div>
         <?php endif; ?>
 
@@ -149,7 +163,17 @@ $paymentDateFormatted = $paymentHistory->payment_date ? $paymentHistory->payment
                    Phone: <?= h($companyPhone) ?> | Email: <?= h($companyEmail) ?><br>
                    <?php if (!empty($companyABN)): ?>ABN: <?= h($companyABN) ?><?php endif; ?>
                 </p>
-                <h2>Invoice / Booking Confirmation</h2>
+                <?php
+                $documentTitle = "Invoice / Booking Confirmation"; // Default
+                if (!empty($isPdfContext) && !empty($isAdminEditNotification) && isset($changeDetails)) {
+                    if ($changeDetails['type'] === 'refund_due') {
+                        $documentTitle = "Credit Note / Refund Confirmation";
+                    } elseif ($changeDetails['type'] === 'additional_payment_due') {
+                        $documentTitle = "Updated Invoice / Additional Amount Due";
+                    }
+                }
+                ?>
+                <h2><?= h($documentTitle) ?></h2>
             </div>
 
             <div class="invoice-details">
@@ -157,15 +181,37 @@ $paymentDateFormatted = $paymentHistory->payment_date ? $paymentHistory->payment
                 <table>
                     <tr>
                         <th>Invoice #:</th>
+                        <?php 
+                        $invoiceIdToShow = 'N/A';
+                        if (!empty($isAdminEditNotification) && $editedPaymentHistory) {
+                            $invoiceIdToShow = 'ADJ-' . h($editedPaymentHistory->id);
+                        } elseif ($paymentHistory) {
+                            $invoiceIdToShow = 'PAY-' . h($paymentHistory->id);
+                        }
+                        ?>
+                        <td><?= $invoiceIdToShow ?></td>
+                    </tr>
+                     <?php if (!empty($isAdminEditNotification) && $paymentHistory && $editedPaymentHistory && $paymentHistory->id !== $editedPaymentHistory->id): ?>
+                    <tr>
+                        <th>Original Invoice #:</th>
                         <td>PAY-<?= h($paymentHistory->id) ?></td>
                     </tr>
+                    <?php endif; ?>
                     <tr>
                         <th>Booking Ref #:</th>
                         <td><?= h($booking->id) ?></td>
                     </tr>
                     <tr>
                         <th>Date Issued:</th>
-                        <td><?= h($paymentDateFormatted) ?></td>
+                        <?php
+                        $dateIssuedToShow = 'N/A';
+                        if (!empty($isAdminEditNotification) && $editedPaymentHistory && $editedPaymentHistory->payment_date) {
+                            $dateIssuedToShow = $editedPaymentHistory->payment_date->format('d/m/Y H:i');
+                        } elseif ($paymentHistory && $paymentHistory->payment_date) {
+                            $dateIssuedToShow = $paymentHistory->payment_date->format('d/m/Y H:i');
+                        }
+                        ?>
+                        <td><?= h($dateIssuedToShow) ?></td>
                     </tr>
                     <tr>
                         <th>Booking Date:</th>
@@ -269,20 +315,107 @@ $paymentDateFormatted = $paymentHistory->payment_date ? $paymentHistory->payment
                         <?php else: ?>
                             <tr><td colspan="3">No services detailed for this booking.</td></tr>
                         <?php endif; ?>
-                        <tr class="total-row">
-                            <?php if ($booking->status === 'Confirmed - Payment Due'): ?>
-                                <td colspan="2" style="text-align:right;"><strong>Total Amount Due:</strong></td>
-                                <td style="text-align: right;"><strong><?= $this->Number->currency($booking->remaining_cost ?? $booking->total_cost ?? 0, 'AUD') ?></strong></td>
-                            <?php else: ?>
-                                <td colspan="2" style="text-align:right;"><strong>Total Amount Paid:</strong></td>
-                                <td style="text-align: right;"><strong><?= $this->Number->currency($paymentHistory->payment_amount ?? 0, 'AUD') ?></strong></td>
+                        
+                        <?php if (!empty($isPdfContext) && !empty($isAdminEditNotification) && isset($changeDetails) && isset($editedPaymentHistory) && $editedPaymentHistory): ?>
+                            <tr>
+                                <td colspan="2" style="text-align:right;">Original Booking Total:</td>
+                                <td style="text-align: right;"><?= $this->Number->currency($changeDetails['original_total'] ?? 0, 'AUD') ?></td>
+                            </tr>
+
+                            <?php if ($changeDetails['type'] === 'additional_payment_due'): ?>
+                                <?php if (array_key_exists('paid_so_far', $changeDetails)): ?>
+                                    <tr>
+                                        <td colspan="2" style="text-align:right;">Amount Previously Paid:</td>
+                                        <td style="text-align: right;"><?= $this->Number->currency($changeDetails['paid_so_far'], 'AUD') ?></td>
+                                    </tr>
+                                <?php endif; ?>
+                                <tr>
+                                    <td colspan="2" style="text-align:right;">New Booking Total:</td>
+                                    <td style="text-align: right;"><?= $this->Number->currency($booking->total_cost ?? $changeDetails['new_total'] ?? 0, 'AUD') ?></td>
+                                </tr>
+                                <tr class="total-row">
+                                    <td colspan="2" style="text-align:right;"><strong>Amount Due:</strong></td>
+                                    <td style="text-align: right;"><strong><?= $this->Number->currency($changeDetails['amount'], 'AUD') ?></strong></td>
+                                </tr>
+                            <?php elseif ($changeDetails['type'] === 'refund_due'): ?>
+                                <tr class="total-row" style="color: #155724; border-top: 1px solid #c3e6cb; background-color: #d4edda !important;">
+                                    <td colspan="2" style="text-align:right;"><strong>Credit / Refund Due to You:</strong></td>
+                                    <td style="text-align: right;"><strong><?= $this->Number->currency($changeDetails['amount'], 'AUD') ?></strong></td>
+                                </tr>
+                                <tr class="total-row">
+                                    <td colspan="2" style="text-align:right;"><strong>New Booking Total (After Credit):</strong></td>
+                                    <td style="text-align: right;"><strong><?= $this->Number->currency($booking->total_cost ?? 0, 'AUD') ?></strong></td>
+                                </tr>
                             <?php endif; ?>
-                        </tr>
+
+                        <?php else: ?>
+                            <tr class="total-row">
+                                <?php 
+                                $showPaymentDue = $booking->status === 'Confirmed - Payment Due';
+                                if (!$isPdfContext && !empty($isAdminEditNotification) && !empty($changeDetails) && $changeDetails['type'] === 'additional_payment_due' && $booking->remaining_cost > 0) {
+                                    $showPaymentDue = true;
+                                }
+
+                                if ($showPaymentDue): ?>
+                                    <td colspan="2" style="text-align:right;"><strong>Total Amount Due:</strong></td>
+                                    <td style="text-align: right;"><strong><?= $this->Number->currency($booking->remaining_cost ?? $booking->total_cost ?? 0, 'AUD') ?></strong></td>
+                                <?php else: ?>  
+                                    <?php
+                                        $amountToDisplay = 0;
+                                        $basePaymentEntity = $editedPaymentHistory ?? $paymentHistory;
+                                        if ($basePaymentEntity) {
+                                            $amountToDisplay = $basePaymentEntity->payment_amount ?? 0;
+                                        }
+                                        
+                                        $labelText = "Total Amount Paid:";
+                                        if (!empty($isAdminEditNotification) && isset($changeDetails)) {
+                                            if ($changeDetails['type'] === 'refund_due') {
+                                                $labelText = "New Booking Total (After Refund):";
+                                                $amountToDisplay = $booking->total_cost ?? 0;
+                                            } elseif ($changeDetails['type'] === 'additional_payment_due') {
+                                                $labelText = "New Booking Total:";
+                                                $amountToDisplay = $booking->total_cost ?? 0;
+                                            }
+                                        } elseif ($booking->status !== 'Confirmed - Payment Due' && $paymentHistory) {
+                                            // Standard paid invoice
+                                             $amountToDisplay = $paymentHistory->payment_amount ?? 0;
+                                        } elseif ($booking->status === 'Confirmed - Payment Due') {
+                                            $labelText = "Total Booking Cost:";
+                                            $amountToDisplay = $booking->total_cost ?? 0;
+                                        }
+                                    ?>
+                                    <td colspan="2" style="text-align:right;"><strong><?= h($labelText) ?></strong></td>
+                                    <td style="text-align: right;"><strong><?= $this->Number->currency($amountToDisplay, 'AUD') ?></strong></td>
+                                <?php endif; ?>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
 
-            <?php if ($booking->status === 'Confirmed - Payment Due' && empty($isPdfContext)): ?>
+            <?php if (!empty($isPdfContext) && !empty($isAdminEditNotification) && isset($changeDetails) && $changeDetails['type'] === 'refund_due'): ?>
+            <div class="refund-details" style="padding: 15px; margin-bottom: 25px; border: 1px solid #eee; background-color: #f9f9f9; border-radius: 5px;">
+                <h4 style="color: #d9534f; margin-top:0; border-bottom: 1px solid #eee; padding-bottom: 5px;">Credit Note / Refund Due</h4>
+                <p style="font-size: 1.1em;">Due to recent changes to your booking (Ref #<?= h($booking->id) ?>), the following credit is due to you.</p>
+                <p style="font-size: 1.2em; font-weight: bold;">
+                    Credit Amount: <?= $this->Number->currency($changeDetails['amount'], 'AUD') ?>
+                </p>
+                <p>This amount will be processed by our team and returned to your original payment method. Please allow 5-7 business days for the transaction to reflect in your account once processed.</p>
+                <p>Your new final booking total is: <?= $this->Number->currency($booking->total_cost ?? 0, 'AUD') ?></p>
+            </div>
+            <?php endif; ?>
+
+            <?php 
+            $displayPaymentLink = false;
+            if (empty($isPdfContext) && $booking->status === 'Confirmed - Payment Due' && $booking->remaining_cost > 0) {
+                $displayPaymentLink = true;
+            }
+            // Also show payment link in email if admin edit results in additional payment and there's a remaining balance
+            if (empty($isPdfContext) && !empty($isAdminEditNotification) && isset($changeDetails) && $changeDetails['type'] === 'additional_payment_due' && $booking->remaining_cost > 0) {
+                 $displayPaymentLink = true;
+            }
+
+            if ($displayPaymentLink): ?>
                 <div class="payment-link" style="margin-top: 25px; padding: 15px; border: 1px solid #007bff; background-color: #e7f3ff; text-align: center; border-radius: 5px;">
                     <p style="margin-bottom: 10px; font-size: 1.1em;"><strong>Complete Your Booking Payment Online:</strong></p>
                     <?= $this->Html->link(
@@ -294,16 +427,26 @@ $paymentDateFormatted = $paymentHistory->payment_date ? $paymentHistory->payment
                 </div>
             <?php endif; ?>
 
-            <?php if ($booking->status !== 'Confirmed - Payment Due'): ?>
+            <?php 
+            // Determine which payment history to show details for
+            $paymentDetailsToShow = null;
+            if (!empty($isAdminEditNotification) && isset($editedPaymentHistory) && $editedPaymentHistory) {
+            } elseif ($booking->status !== 'Confirmed - Payment Due' && isset($paymentHistory) && $paymentHistory) {
+                // For standard paid invoices, show the original payment history
+                $paymentDetailsToShow = $paymentHistory; 
+            }
+
+            if ($paymentDetailsToShow): ?>
             <div class="payment-summary">
-                <h4>Payment Details:</h4>
+                <h4>Payment Details</h4>
                 <p>
-                    <strong>Transaction ID:</strong> <?= h($paymentHistory->paypal_transaction_id ?? 'N/A') ?><br>
-                    <strong>Payment Method:</strong> <?= h($paymentHistory->payment_method ?? 'N/A') ?><br>
-                    <strong>Payment Status:</strong> <?= h($paymentHistory->payment_status ?? 'Completed') ?>
+                    <strong>Transaction ID:</strong> <?= h($paymentDetailsToShow->paypal_transaction_id) ?><br>
+                    <strong>Payment Method:</strong> <?= h($paymentDetailsToShow->payment_method) ?><br>
+                    <strong>Payment Status:</strong> <?= h($paymentDetailsToShow->payment_status) ?>
                 </p>
             </div>
             <?php endif; ?>
+
 
             <?php if (!empty($booking->notes)): ?>
             <div class="booking-notes">

@@ -109,7 +109,7 @@ $this->Html->script('custom', ['block' => true]);
                     <th><?= __('Notes') ?></th>
                     <th><?= $this->Paginator->sort('total_cost') ?></th>
                     <th><?= $this->Paginator->sort('remaining_cost', 'Amount Due') ?></th>
-                    <th><?= $this->Paginator->sort('refund_due_amount', 'Refund Pending') ?></th>
+                    <th><?= $this->Paginator->sort('refund_due_amount', 'Refund Amount Pending') ?></th>
                     <th><?= $this->Paginator->sort('status') ?></th>
                     <th class="actions"><?= __('Actions') ?></th>
                 </tr>
@@ -198,29 +198,44 @@ $this->Html->script('custom', ['block' => true]);
                         </td>
                         <td>
                             <?php
-                            $statusClassAdmin = '';
-                            switch ($booking->status) {
-                                case 'active':
-                                    $statusClassAdmin = 'active';
-                                    break;
-                                case 'Confirmed - Payment Due':
-                                    $statusClassAdmin = 'payment-due';
-                                    break;
-                                case 'Confirmed - Paid':
-                                    $statusClassAdmin = 'paid';
-                                    break;
-                                case 'cancelled':
-                                    $statusClassAdmin = 'cancelled';
-                                    break;
-                                case 'finished':
-                                    $statusClassAdmin = 'finished';
-                                    break;
-                                default:
-                                    $statusClassAdmin = 'text-muted';
+                            $adminDisplayStatus = h($booking->status);
+                            $adminStatusClass = '';
+                            $isAdminRefundProcessed = false;
+
+                            // Check if a refund was processed for this booking
+                            if (!empty($booking->payment_histories)) {
+                                foreach ($booking->payment_histories as $ph) {
+                                    if ($ph->payment_method === 'Admin Adjustment' && $ph->payment_status === 'Refunded - Admin Processed') {
+                                        $isAdminRefundProcessed = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if ($booking->refund_due_amount > 0) {
+                                $adminDisplayStatus = strtoupper(h($booking->status)) . ' <br><span style="font-size:0.9em; color:orange;">(Refund Pending)</span>';
+                                switch ($booking->status) {
+                                    case 'Confirmed - Payment Due': $adminStatusClass = 'payment-due refund-pending'; break;
+                                    case 'Confirmed - Paid': $adminStatusClass = 'paid refund-pending'; break;
+                                    default: $adminStatusClass = 'text-muted refund-pending'; 
+                                }
+                            } elseif ($isAdminRefundProcessed) {
+                                $adminDisplayStatus = strtoupper(h($booking->status)) . ' <br><span style="font-size:0.9em; color:green;">(Refund Processed)</span>';
+                                switch ($booking->status) {
+                                     case 'Confirmed - Paid': $adminStatusClass = 'paid refund-processed'; break;
+                                     default: $adminStatusClass = 'text-muted refund-processed';
+                                }
+                            } else {
+                                $adminDisplayStatus = strtoupper(h($booking->status));
+                                switch ($booking->status) {
+                                    case 'Confirmed - Payment Due': $adminStatusClass = 'payment-due'; break;
+                                    case 'Confirmed - Paid': $adminStatusClass = 'paid'; break;
+                                    default: $adminStatusClass = 'text-muted';
+                                }
                             }
                             ?>
-                            <span class="status-text <?= $statusClassAdmin ?>">
-                                <?= strtoupper(h($booking->status)) ?>
+                            <span class="status-text <?= $adminStatusClass ?>">
+                                <?= $adminDisplayStatus ?>
                             </span>
                         </td>
                         <td class="actions">
