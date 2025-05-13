@@ -886,10 +886,8 @@ class BookingsController extends AppController
                          $endTime->modify("+{$duration} minutes");
                          $newSlot = ['start' => $startTime->getTimestamp(), 'end' => $endTime->getTimestamp(), 'service_id' => $serviceId];
 
-                        // Check for conflicts with existing slots for THIS stylist in THIS request
                         if (isset($stylistTimeSlots[$stylistId])) {
                             foreach ($stylistTimeSlots[$stylistId] as $existingSlot) {
-                                // Check for overlap: new start is before existing end AND new end is after existing start
                                 if ($newSlot['start'] < $existingSlot['end'] && $newSlot['end'] > $existingSlot['start']) {
                                     $hasConflict = true;
                                     $conflictMessage = "Time conflict detected for one of the selected stylists. Please ensure service times do not overlap.";
@@ -897,13 +895,11 @@ class BookingsController extends AppController
                                 }
                             }
                         }
-                         // Add the new slot if no conflict found yet for this stylist
                          $stylistTimeSlots[$stylistId][] = $newSlot;
 
                     } catch (Exception $e) {
                          Log::error('Validation time processing error: ' . $e->getMessage());
                          $this->Flash->error(__('An error occurred while validating booking times. Please check the selected times.'));
-                         // Reload necessary data for the view and render again
                          $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
                          $services = $this->fetchTable('Services')->find('all')->all();
                          $this->set(compact('booking', 'stylists', 'services'));
@@ -915,23 +911,51 @@ class BookingsController extends AppController
 
             if ($hasConflict) {
                 $this->Flash->error($conflictMessage ?: __('A time conflict was detected. Please ensure service times for the same stylist do not overlap.'));
-                // Reload necessary data for the view and render again
                 $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
                 $services = $this->fetchTable('Services')->find('all')->all();
-                // Patch the entity with the data *attempted* to be saved so the form repopulates
                 $booking = $this->Bookings->patchEntity($booking, $data, ['associated' => []]);
                 $this->set(compact('booking', 'stylists', 'services'));
-                // Add the submitted service data back to the request scope for the template
                 $this->request = $this->request->withParsedBody($data);
 
-                 return $this->render('customerbooking'); // Re-render the form
+                 return $this->render('customerbooking'); 
             }
-             // --- Server-Side Time Conflict Validation ---
 
-            // Try saving the main booking record
             if ($this->Bookings->save($booking)) {
                 Log::debug('[CustomerBooking] Initial booking save successful. ID: ' . $booking->id);
                 $bookingId = $booking->id;
+
+                $paymentHistoriesTable = $this->fetchTable('PaymentHistories');
+                $placeholderPayment = $paymentHistoriesTable->newEntity([
+                    'booking_id' => $bookingId,
+                    'customer_id' => $booking->customer_id,
+                    'payment_amount' => $booking->total_cost, 
+                    'payment_currency' => 'AUD', 
+                    'payment_status' => 'Pending', 
+                    'payment_method' => null, 
+                    'payment_date' => FrozenTime::now(), 
+                    'notes' => 'Placeholder record created on booking confirmation.'
+                ]);
+                if (!$paymentHistoriesTable->save($placeholderPayment)) {
+                    Log::error('Failed to save placeholder PaymentHistory for Booking ID: ' . $bookingId . ' Errors: ' . json_encode($placeholderPayment->getErrors()));
+                    $this->Flash->warning('Booking confirmed, but there was an issue initializing payment record. Please contact support if payment issues occur.');
+                }
+
+                try {
+                    $bookingWithDetails = $this->Bookings->get($bookingId, [
+                        'contain' => ['Customers', 'BookingsServices.Services'] 
+                    ]);
+                    // Ensure placeholderPayment is the entity saved above
+                    if ($bookingWithDetails && $placeholderPayment) {
+                        $mailer = new \App\Mailer\InvoiceMailer(); 
+                        $mailer->sendBookingConfirmedInvoice($bookingWithDetails, $placeholderPayment);
+                        Log::info("Booking confirmation email sent for Booking ID: {$bookingId} to {$bookingWithDetails->customer->email}");
+                    } else {
+                        Log::error("Could not fetch booking/payment details needed to send confirmation email for Booking ID: {$bookingId}");
+                    }
+                } catch (\Exception $e) {
+                    Log::error("Failed to send booking confirmation email for Booking ID: {$bookingId}. Error: " . $e->getMessage());
+                }
+
                 $allServicesTimes = [];
 
                 // Fetch service durations
@@ -1190,11 +1214,42 @@ class BookingsController extends AppController
 
                 return $this->render('adminbooking');
             }
-            // --- END Server-Side Time Conflict Validation ---
 
             // Try saving the main booking record
             if ($this->Bookings->save($booking)) {
                 $bookingId = $booking->id;
+
+                $paymentHistoriesTable = $this->fetchTable('PaymentHistories');
+                $placeholderPayment = $paymentHistoriesTable->newEntity([
+                    'booking_id' => $bookingId,
+                    'customer_id' => $booking->customer_id,
+                    'payment_amount' => $booking->total_cost,
+                    'payment_currency' => 'AUD', 
+                    'payment_status' => 'Pending',
+                    'payment_method' => null,
+                    'payment_date' => FrozenTime::now(),
+                    'notes' => 'Placeholder record created on booking by admin.'
+                ]);
+                if (!$paymentHistoriesTable->save($placeholderPayment)) {
+                    Log::error('Failed to save placeholder PaymentHistory for Booking ID (Admin): ' . $bookingId . ' Errors: ' . json_encode($placeholderPayment->getErrors()));
+                    $this->Flash->warning('Booking created, but there was an issue initializing the payment record. The customer might face issues if they need to pay online.');
+                }
+
+                try {
+                    $bookingWithDetails = $this->Bookings->get($bookingId, [
+                        'contain' => ['Customers', 'BookingsServices.Services'] 
+                    ]);
+                    if ($bookingWithDetails && $placeholderPayment) {
+                        $mailer = new \App\Mailer\InvoiceMailer(); 
+                        $mailer->sendBookingConfirmedInvoice($bookingWithDetails, $placeholderPayment);
+                        Log::info("Booking confirmation email sent for Booking ID (Admin): {$bookingId} to {$bookingWithDetails->customer->email}");
+                    } else {
+                        Log::error("Could not fetch booking/payment details needed to send confirmation email for Booking ID (Admin): {$bookingId}");
+                    }
+                } catch (\Exception $e) {
+                    Log::error("Failed to send booking confirmation email for Booking ID (Admin): {$bookingId}. Error: " . $e->getMessage());
+                }
+
                 $allServicesTimes = [];
 
                 // Fetch service durations
@@ -1541,16 +1596,15 @@ class BookingsController extends AppController
                 'BookingsServices' => [
                     'Services',
                     'Stylists'
-                ],
+                    ],
                 'PaymentHistories' => [
-                    'fields' => ['booking_id', 'invoice_pdf', 'payment_date'],
+                    'fields' => ['id', 'booking_id', 'invoice_pdf', 'payment_date'],
                     'sort' => ['PaymentHistories.payment_date' => 'DESC']
                 ]
             ]
         );
 
         if (!empty($booking->payment_histories)) {
-            // The payment_histories are already sorted by payment_date DESC from the query
             $booking->latest_payment_history = $booking->payment_histories[0];
         } else {
             $booking->latest_payment_history = null;
@@ -2602,15 +2656,13 @@ class BookingsController extends AppController
                             Log::error('[CustomerEdit] Failed to save booking service. Errors: ' . json_encode($bookingService->getErrors()));
                             throw new \Exception('Failed to save updated booking service details.');
                         }
-                         $allServicesTimes[] = ['start' => $startTime, 'end' => $endTime]; // Store for overall calculation
+                         $allServicesTimes[] = ['start' => $startTime, 'end' => $endTime]; 
                     }
-                } // end if hasServiceData
+                } 
 
-                 // Calculate and update overall start/end time for the booking
                  $overallStartTime = null;
                  $overallEndTime = null;
                  if (!empty($allServicesTimes)) {
-                     // Find min start time and max end time from all saved services
                      $startTimestamps = array_map(function($t) { return $t['start']->getTimestamp(); }, $allServicesTimes);
                      $endTimestamps = array_map(function($t) { return $t['end']->getTimestamp(); }, $allServicesTimes);
 
@@ -2624,7 +2676,6 @@ class BookingsController extends AppController
                      }
                  }
 
-                 // Update booking with overall times (can be null if no services)
                  $booking = $this->Bookings->patchEntity($booking, [
                      'start_time' => $overallStartTime ? $overallStartTime->format('H:i:s') : null,
                      'end_time' => $overallEndTime ? $overallEndTime->format('H:i:s') : null
@@ -2632,7 +2683,6 @@ class BookingsController extends AppController
 
                  if (!$this->Bookings->save($booking)) {
                      Log::error('[CustomerEdit] Failed to save overall times. Errors: ' . json_encode($booking->getErrors()));
-                     // Decide if this is critical - maybe just warn?
                      throw new Exception('Failed to save overall times on booking update.');
                  }
 
@@ -2641,60 +2691,44 @@ class BookingsController extends AppController
                 if ($hasServiceData) {
                     $processedStylists = [];
                     foreach ($data['bookings_services'] as $serviceData) {
-                        if (!isset($serviceData['stylist_id'])) continue; // Skip if no stylist ID
+                        if (!isset($serviceData['stylist_id'])) continue; 
                         $stylistId = (int)$serviceData['stylist_id'];
-                        // Only save one record per stylist for the booking
                         if (!in_array($stylistId, $processedStylists)) {
                             $bookingStylist = $bookingsStylistsTable->newEntity([
                                  'booking_id' => $bookingId,
                                  'stylist_id' => $stylistId,
-                                 // Use the main booking date (potentially updated)
                                  'stylist_date' => $booking->booking_date->format('Y-m-d'),
-                                 // selected_cost seems ambiguous here, link to total cost? Use booking total?
                                  'selected_cost' => $booking->total_cost,
                             ]);
                             if (!$bookingsStylistsTable->save($bookingStylist)) {
                                 Log::error('[CustomerEdit] Failed to save booking stylist. Errors: ' . json_encode($bookingStylist->getErrors()));
                                  throw new Exception('Failed to save updated booking stylist details.');
                             }
-                             $processedStylists[] = $stylistId; // Mark stylist as processed
+                             $processedStylists[] = $stylistId; 
                         }
                     }
                 }
 
-                // If everything succeeded, commit the transaction
                 $connection->commit();
                 $this->Flash->success(__('Your booking has been updated successfully.'));
 
-                // Redirect to customer's booking list or dashboard
                 return $this->redirect(['action' => 'customerindex']);
 
             } catch (Exception $e) {
-                // If any error occurred, rollback the transaction
                 $connection->rollback();
                 Log::error('[CustomerEdit] Booking update failed: ' . $e->getMessage() . ' Booking ID: ' . $bookingId . ' Data: ' . json_encode($data));
                 $this->Flash->error(__('The booking could not be updated. Please, try again. Error: {0}', $e->getMessage()));
-                 // Repopulate form data for rendering? Or just redirect?
-                 // Need to reload data for the view if rendering again
-                 $booking->setError('general', $e->getMessage()); // Set a general error
+                 $booking->setError('general', $e->getMessage()); 
             }
-            // --- End Transaction ---
 
-        } // end if request is post/put/patch
+        } 
 
-        // Prepare data for the view (GET request or if POST failed and needs re-render)
-        // Only allow the current customer in the dropdown (though it shouldn't be changeable)
         $customers = $this->Bookings->Customers->find('list', ['limit' => 1])->where(['id' => $currentUserId])->all();
         $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
-        $services = $this->fetchTable('Services')->find('all')->all(); // Fetch all service details for the form
+        $services = $this->fetchTable('Services')->find('all')->all(); 
 
-        // Pass booking, stylists, services, and the single customer to the view
         $this->set(compact('booking', 'stylists', 'services', 'customers'));
 
-        // Explicitly render the customeredit template if it exists, otherwise try 'edit'
-        // This assumes you might create a specific template `templates/Bookings/customeredit.php`
-        // If not, it might fall back to `templates/Bookings/edit.php` if configured,
-        // or you can explicitly render the 'edit' template.
         try {
              $this->render('customeredit');
         } catch (MissingTemplateException $e) {
@@ -2703,7 +2737,7 @@ class BookingsController extends AppController
         }
     }
 
-    public function viewPendingGuestBooking($token = null) // Add $token parameter
+    public function viewPendingGuestBooking($token = null) 
     {
         $bookingData = $this->request->getSession()->read('GuestBooking.pending_details');
 
@@ -2716,19 +2750,11 @@ class BookingsController extends AppController
         if ($token !== null) {
             if (!isset($bookingData['pending_booking_token']) || $bookingData['pending_booking_token'] !== $token) {
                 $this->Flash->error(__('The booking link used is invalid or does not match your current pending booking. Please start a new booking if needed.'));
-                // Optionally clear the session if there's a mismatch to avoid confusion
-                // $this->request->getSession()->delete('GuestBooking.pending_details');
                 return $this->redirect(['controller' => 'Bookings', 'action' => 'guestbooking']);
             }
         } elseif (isset($bookingData['pending_booking_token'])) {
-            // If no token in URL, but one exists in session, redirect to the URL with the token
-            // This ensures the URL always shows the token for bookmarking/sharing.
             return $this->redirect(['controller' => 'Bookings', 'action' => 'viewPendingGuestBooking', $bookingData['pending_booking_token']]);
         }
-        // If $token is null AND no 'pending_booking_token' in session, it's an old state or direct access attempt without context.
-        // The initial check for $bookingData would have caught if session is empty.
-        // If $bookingData exists but has no token, it implies it was created before this token logic was added.
-        // For simplicity, we assume new bookings will always generate and use tokens.
 
         $this->set(compact('bookingData'));
     }

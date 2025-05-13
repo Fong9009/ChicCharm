@@ -86,7 +86,7 @@ class CustomersController extends AppController
                     ]
                 ],
                 'PaymentHistories' => [
-                    'fields' => ['booking_id', 'invoice_pdf', 'payment_date'],
+                    'fields' => ['id', 'booking_id', 'invoice_pdf', 'payment_date'],
                     'sort' => ['PaymentHistories.payment_date' => 'DESC']
                 ]
             ])

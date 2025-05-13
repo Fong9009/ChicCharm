@@ -234,7 +234,7 @@ $paymentDateFormatted = $paymentHistory->payment_date ? $paymentHistory->payment
                             <tr>
                                 <td>
                                     <?= h($bs->service->service_name ?? 'N/A') ?><br>
-                                    <small class="text-muted">Stylist: <?= $stylistNameDisplay ?></small>
+                                    
                                 </td>
                                 <td><?= h($serviceTimeInfo) ?></td>
                                 <td style="text-align: right;"><?= $this->Number->currency($bs->service_cost ?? 0, 'AUD') ?></td>
@@ -244,32 +244,40 @@ $paymentDateFormatted = $paymentHistory->payment_date ? $paymentHistory->payment
                         <tr><td colspan="3">No services detailed for this booking.</td></tr>
                     <?php endif; ?>
                     <tr class="total-row">
-                        <td colspan="2" style="text-align:right;"><strong>Total Amount Paid:</strong></td>
-                        <td style="text-align: right;"><strong><?= $this->Number->currency($paymentHistory->payment_amount ?? 0, 'AUD') ?></strong></td>
+                        <?php if ($booking->status === 'Confirmed - Payment Due'): ?>
+                            <td colspan="2" style="text-align:right;"><strong>Total Amount Due:</strong></td>
+                            <td style="text-align: right;"><strong><?= $this->Number->currency($booking->remaining_cost ?? $booking->total_cost ?? 0, 'AUD') ?></strong></td>
+                        <?php else: ?>
+                            <td colspan="2" style="text-align:right;"><strong>Total Amount Paid:</strong></td>
+                            <td style="text-align: right;"><strong><?= $this->Number->currency($paymentHistory->payment_amount ?? 0, 'AUD') ?></strong></td>
+                        <?php endif; ?>
                     </tr>
                 </tbody>
             </table>
         </div>
 
-        <?php if (!empty($booking->bookings_stylists)): ?>
-        <div class="stylist-details">
-            <h4>Stylists:</h4>
-            <ul class="stylist-list">
-                <?php foreach ($booking->bookings_stylists as $bookingStylist): ?>
-                    <li><?= h($bookingStylist->stylist->full_name ?? 'N/A') ?></li>
-                <?php endforeach; ?>
-            </ul>
-        </div>
+        <?php if ($booking->status === 'Confirmed - Payment Due' && empty($isPdfContext)): ?>
+            <div class="payment-link" style="margin-top: 25px; padding: 15px; border: 1px solid #007bff; background-color: #e7f3ff; text-align: center; border-radius: 5px;">
+                <p style="margin-bottom: 10px; font-size: 1.1em;"><strong>Complete Your Booking Payment Online:</strong></p>
+                <?= $this->Html->link(
+                    'Click Here to Pay via PayPal',
+                    ['controller' => 'Bookings', 'action' => 'customerview', $booking->id, '_full' => true],
+                    ['style' => 'display: inline-block; padding: 12px 25px; background-color: #005ea6; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 1.1em;']
+                ) ?>
+                <p style="margin-top: 10px; font-size: 0.9em; color: #555;">You will be redirected to the booking details page where you can complete the payment.</p>
+            </div>
         <?php endif; ?>
 
+        <?php if ($booking->status !== 'Confirmed - Payment Due'): ?>
         <div class="payment-summary">
             <h4>Payment Details:</h4>
             <p>
                 <strong>Transaction ID:</strong> <?= h($paymentHistory->paypal_transaction_id ?? 'N/A') ?><br>
                 <strong>Payment Method:</strong> <?= h($paymentHistory->payment_method ?? 'N/A') ?><br>
-                <strong>Payment Status:</strong> <?= h($paymentHistory->payment_status ?? 'N/A') ?>
+                <strong>Payment Status:</strong> <?= h($paymentHistory->payment_status ?? 'Completed') ?>
             </p>
         </div>
+        <?php endif; ?>
 
         <?php if (!empty($booking->notes)): ?>
         <div class="booking-notes">

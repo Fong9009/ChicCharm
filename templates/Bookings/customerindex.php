@@ -208,8 +208,8 @@
                                                     <?php if ($booking->status === 'Confirmed - Paid'): ?>
                                                         <?php if (!empty($booking->latest_payment_history) && !empty($booking->latest_payment_history->invoice_pdf)):
                                                             echo $this->Html->link(
-                                                                __('Download/Check Invoice'),
-                                                                '/' . h($booking->latest_payment_history->invoice_pdf),
+                                                                __('Check/Download Invoice'),
+                                                                ['controller' => 'Payments', 'action' => 'viewInvoice', $booking->latest_payment_history->id],
                                                                 [
                                                                     'class' => 'button button-outline',
                                                                     'style' => 'background-color: #6c757d; border-color: #6c757d; color: white; margin-top: 5px;',
