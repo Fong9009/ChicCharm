@@ -160,11 +160,18 @@ $this->layout = 'default';
                                                                     ['class' => 'view-btn']
                                                                 ) ?>
 
-                                                                <?php if ($booking->status === 'Confirmed - Paid'): ?>
-                                                                    <?php if (!empty($booking->latest_payment_history) && !empty($booking->latest_payment_history->invoice_pdf)):
+                                                                <?php 
+                                                                // Show invoice link if paid (and PDF exists) OR if payment is due (and history exists)
+                                                                if (!empty($booking->latest_payment_history) && 
+                                                                    ( ($booking->status === 'Confirmed - Paid' && !empty($booking->latest_payment_history->invoice_pdf)) || 
+                                                                      ($booking->status === 'Confirmed - Payment Due') 
+                                                                    )
+                                                                ): 
+                                                                ?>
+                                                                    <?php 
                                                                         echo $this->Html->link(
-                                                                            __('Download/Check Invoice'),
-                                                                            '/' . h($booking->latest_payment_history->invoice_pdf),
+                                                                            __('Check/Download Invoice'),
+                                                                            ['controller' => 'Payments', 'action' => 'viewInvoice', $booking->latest_payment_history->id],
                                                                             [
                                                                                 'class' => 'view-btn',
                                                                                 'style' => 'background-color: #6c757d; border-color: #6c757d; color: white;',
@@ -174,23 +181,59 @@ $this->layout = 'default';
                                                                                 'escape' => false
                                                                             ]
                                                                         );
-                                                                    endif; ?>
+                                                                    ?>
+                                                                <?php endif; // End invoice link check ?>
+                                                                    
+                                                                <?php // Message only for paid bookings
+                                                                if ($booking->status === 'Confirmed - Paid'): ?>
                                                                     <p class="text-muted small mt-1 mb-0 align-self-center">This booking is paid. Contact store for changes.</p>
-                                                                <?php else: ?>
-                                                                    <?php 
-                                                                    // Check if the booking status allows editing or cancellation initially
+                                                                <?php endif; ?>
+
+                                                                <?php // Edit/Cancel buttons logic for other statuses (excluding Confirmed - Paid)
+                                                                if (!in_array($booking->status, ['Confirmed - Paid'])):
+                                                                ?>
+                                                                    <?php
                                                                     $statusAllowsActions = in_array($booking->status, ['active', 'Confirmed - Payment Due']);
-                                                                    $interactionAllowedByTime = true;
+                                                                    $interactionAllowedByTime = true; 
+                                                                    $cancellationCutoffHours = 1; 
+                                                                    $cancellationMessage = "Cannot edit or cancel (within 1h)"; 
 
                                                                     if ($statusAllowsActions) {
+
                                                                         try {
-                                                                            $bookingDateTime = new \Cake\I18n\FrozenTime($booking->booking_date->format('Y-m-d') . ' ' . ($booking->start_time ? $booking->start_time->format('H:i:s') : '00:00:00'));
-                                                                            if ($bookingDateTime < (new \Cake\I18n\FrozenTime())->addHours(24)) {
+                                                                            // Find the earliest start time among the booking's services
+                                                                            $earliestStartTime = null;
+                                                                            if (!empty($booking->bookings_services)) {
+                                                                                foreach ($booking->bookings_services as $bs) {
+                                                                                    if ($bs->start_time) {
+                                                                                        if (is_null($earliestStartTime) || $bs->start_time < $earliestStartTime) {
+                                                                                            $earliestStartTime = $bs->start_time;
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            }
+
+                                                                            if ($booking->booking_date && $earliestStartTime) {
+                                                                                $bookingDateTime = new \Cake\I18n\FrozenTime(
+                                                                                    $booking->booking_date->format('Y-m-d') . ' ' . $earliestStartTime->format('H:i:s')
+                                                                                );
+                                                                                $cutoffTime = (new \Cake\I18n\FrozenTime())->addHours($cancellationCutoffHours);
+
+                                                                                if ($bookingDateTime < $cutoffTime) {
+                                                                                    $interactionAllowedByTime = false; 
+                                                                                }
+                                                                            } else {
+                                                                                error_log("Could not determine booking date or earliest start time for booking ID: " . $booking->id);
                                                                                 $interactionAllowedByTime = false;
+                                                                                $cancellationMessage = "Cannot determine booking time.";
                                                                             }
                                                                         } catch (Exception $e) {
+                                                                            error_log("Error calculating booking time for booking ID " . $booking->id . ": " . $e->getMessage());
                                                                             $interactionAllowedByTime = false;
+                                                                            $cancellationMessage = "Error checking time window.";
                                                                         }
+                                                                    } else {
+                                                                         $interactionAllowedByTime = false; 
                                                                     }
                                                                     ?>
 
@@ -210,15 +253,8 @@ $this->layout = 'default';
                                                                                     'class' => 'cancel-btn'
                                                                                 ]
                                                                             ) ?>
-                                                                        <?php else:  ?>
-                                                                            <?= $this->Html->link(
-                                                                                'Edit Booking',
-                                                                                ['controller' => 'Bookings', 'action' => 'customeredit', $booking->id],
-                                                                                [
-                                                                                    'class' => 'btn-edit-customer-dashboard',
-                                                                                ]
-                                                                            ) ?>
-                                                                            <span class="text-muted small d-block mt-1 align-self-center">Cannot cancel (within 24h)</span>
+                                                                        <?php else: ?>
+                                                                            <span class="text-muted small d-block mt-1 align-self-center"><?= h($cancellationMessage) ?></span>
                                                                         <?php endif; ?>
                                                                     <?php endif; ?>
                                                                 <?php endif; ?>

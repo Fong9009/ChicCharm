@@ -8,7 +8,7 @@
 <div class="booking-details-wrapper">
     <div class="booking-details">
         <h2><?= __('My Booking Details') ?></h2>
-
+        <?= $this->Flash->render() ?>
         <div class="booking-info">
             <div class="info-group">
                 <label><?= __('Booking Date') ?></label>
@@ -124,24 +124,38 @@
                 ]
             ) ?>
 
-            <?php if ($booking->status === 'Confirmed - Paid' && !empty($booking->latest_payment_history) && !empty($booking->latest_payment_history->invoice_pdf)):
-                echo $this->Html->link(
-                    __('Download/Check Invoice'),
-                    '/' . h($booking->latest_payment_history->invoice_pdf),
-                    [
-                        'class' => 'btn',
-                        'style' => 'background-color: #6c757d; border-color: #6c757d; color: white;',
-                        'onmouseover' => "this.style.backgroundColor='#5a6268'; this.style.borderColor='#5a6268';",
-                        'onmouseout' => "this.style.backgroundColor='#6c757d'; this.style.borderColor='#6c757d';",
-                        'target' => '_blank',
-                        'escape' => false
-                    ]
-                );
-            endif; ?>
+            <?php 
+            // Show invoice link if paid (and PDF exists) OR if payment is due (and history exists)
+            if (!empty($booking->latest_payment_history) && 
+                ( ($booking->status === 'Confirmed - Paid' && !empty($booking->latest_payment_history->invoice_pdf)) || 
+                  ($booking->status === 'Confirmed - Payment Due') 
+                )
+            ):
+            ?>
+                <?php
+                    echo $this->Html->link(
+                        __('Check/Download Invoice'),
+                        ['controller' => 'Payments', 'action' => 'viewInvoice', $booking->latest_payment_history->id],
+                        [
+                            'class' => 'btn',
+                            'style' => 'background-color: #6c757d; border-color: #6c757d; color: white;',
+                            'onmouseover' => "this.style.backgroundColor='#5a6268'; this.style.borderColor='#5a6268';",
+                            'onmouseout' => "this.style.backgroundColor='#6c757d'; this.style.borderColor='#6c757d';",
+                            'target' => '_blank',
+                            'escape' => false
+                        ]
+                    );
+                ?>
+            <?php endif; // End invoice link check ?>
 
-            <?php if ($booking->status === 'Confirmed - Paid'): ?>
+            <?php // Message only for paid bookings
+            if ($booking->status === 'Confirmed - Paid'): ?>
                 <p class="mt-3 text-muted">This booking has been paid. Please contact the store if you want to cancel or make changes.</p>
-            <?php else: ?>
+            <?php endif; ?>
+
+            <?php // Edit/Cancel buttons logic for other statuses (excluding Confirmed - Paid)
+            if (!in_array($booking->status, ['Confirmed - Paid'])):
+            ?>
                 <?php // Show edit button if status allows (e.g., active or payment due)
                 if (in_array($booking->status, ['active', 'Confirmed - Payment Due'])): ?>
                     <?= $this->Html->link(

@@ -81,7 +81,7 @@
                         <td><?= h($payment->paypal_transaction_id) ?></td>
                         <td>
                             <?php if (!empty($payment->invoice_pdf)): ?>
-                                <a href="/<?= h($payment->invoice_pdf) ?>" target="_blank">Download/Check Invoice</a>
+                                <a href="/<?= h($payment->invoice_pdf) ?>" target="_blank">Check/Download Invoice</a>
                             <?php else: ?>
                                 N/A
                             <?php endif; ?>

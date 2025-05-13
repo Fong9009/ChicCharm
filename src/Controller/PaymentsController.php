@@ -25,7 +25,7 @@ class PaymentsController extends AppController
         parent::initialize();
         $this->Bookings = $this->getTableLocator()->get('Bookings');
         $this->PaymentHistories = $this->getTableLocator()->get('PaymentHistories');
-
+        
         if (!$this->components()->has('Authentication')) {
             $this->loadComponent('Authentication.Authentication');
         }
@@ -63,7 +63,7 @@ class PaymentsController extends AppController
             $tokenUrl,
             ['grant_type' => 'client_credentials'],
             [
-                'auth' => ['user' => $clientId, 'pass' => $clientSecret],
+                'auth' => ['user' => $clientId, 'pass' => $clientSecret], 
                 'headers' => ['Content-Type' => 'application/x-www-form-urlencoded']
             ]
         );
@@ -83,7 +83,7 @@ class PaymentsController extends AppController
                 Log::error("Cannot create PayPal order for booking ID {$bookingId} with zero or negative amount: {$booking->total_cost}", ['scope' => ['paypal']]);
                 return $this->response->withStatus(400)->withType('application/json')->withStringBody(json_encode(['error' => 'Invalid amount for payment.']));
             }
-
+            
             $orderData = [
                 'intent' => 'CAPTURE',
                 'purchase_units' => [
@@ -93,11 +93,11 @@ class PaymentsController extends AppController
                             'value' => $orderAmount
                         ],
                         'description' => 'Payment for booking #' . $booking->id,
-                        'custom_id' => 'BOOKING_ID_' . $booking->id
+                        'custom_id' => 'BOOKING_ID_' . $booking->id 
                     ]
                 ],
             ];
-
+            
             // Create order
             $orderApiUrl = "https://api-m." . ($mode === 'sandbox' ? 'sandbox.' : '') . "paypal.com/v2/checkout/orders";
 
@@ -115,11 +115,11 @@ class PaymentsController extends AppController
             if ($orderResponse->isOk()) {
                 return $this->response
                     ->withType('application/json')
-                    ->withStringBody($orderResponse->getStringBody());
+                    ->withStringBody($orderResponse->getStringBody()); 
             } else {
                 Log::error("Failed to create PayPal Order for booking ID: {$bookingId}. Status: " . $orderResponse->getStatusCode() . ". Response: " . $orderResponse->getStringBody(), ['scope' => ['paypal']]);
                 return $this->response
-                    ->withStatus($orderResponse->getStatusCode())
+                    ->withStatus($orderResponse->getStatusCode()) 
                     ->withType('application/json')
                     ->withStringBody(json_encode(['error' => 'Failed to create PayPal order.', 'paypal_response' => $orderResponse->getJson() ?? $orderResponse->getStringBody()]));
             }
@@ -180,34 +180,34 @@ class PaymentsController extends AppController
 
             if ($captureResponse->isOk()) {
                 $captureData = $captureResponse->getJson();
-
+                
                 // Update booking status
                 $booking = $this->Bookings->get($bookingId);
                 $booking->remaining_cost = 0;
-                $booking->status = 'Confirmed - Paid';
+                $booking->status = 'Confirmed - Paid'; 
                 $this->Bookings->save($booking);
 
                 // Record payment history
                 $paymentHistory = $this->PaymentHistories->newEmptyEntity();
-
+                
                 $captureDetails = $captureData['purchase_units'][0]['payments']['captures'][0] ?? null;
-                $paypalApiStatus = strtolower($captureData['status'] ?? 'unknown');
+                $paypalApiStatus = strtolower($captureData['status'] ?? 'unknown'); 
                 $internalPaymentStatus = ($paypalApiStatus === 'completed') ? 'Completed' : $paypalApiStatus;
 
                 $paymentHistoryData = [
                     'booking_id' => $bookingId,
-                    'customer_id' => $booking->customer_id,
+                    'customer_id' => $booking->customer_id, 
                     'paypal_transaction_id' => $captureData['id'] ?? $orderID,
                     'paypal_payer_id' => $captureData['payer']['payer_id'] ?? null,
                     'payment_amount' => $captureDetails ? ($captureDetails['amount']['value'] ?? null) : $booking->total_cost,
                     'payment_currency' => $captureDetails ? ($captureDetails['amount']['currency_code'] ?? 'AUD') : 'AUD',
-                    'payment_status' => $internalPaymentStatus,
+                    'payment_status' => $internalPaymentStatus, 
                     'payment_method' => 'paypal',
-                    'payment_date' => isset($captureDetails['create_time'])
-                                        ? \Cake\I18n\FrozenTime::parse($captureDetails['create_time'])->format('Y-m-d H:i:s')
+                    'payment_date' => isset($captureDetails['create_time']) 
+                                        ? \Cake\I18n\FrozenTime::parse($captureDetails['create_time'])->format('Y-m-d H:i:s') 
                                         : gmdate("Y-m-d H:i:s"),
                 ];
-
+                
                 $paymentHistory = $this->PaymentHistories->patchEntity($paymentHistory, $paymentHistoryData);
 
                 if (!$this->PaymentHistories->save($paymentHistory)) {
@@ -239,14 +239,14 @@ class PaymentsController extends AppController
                 // Update Booking
                 $booking->status = 'Confirmed - Paid';
                 $booking->remaining_cost = 0;
-
+                
                 if ($this->Bookings->save($booking)) {
                     // Record Payment History
                     $paymentHistory = $this->PaymentHistories->newEmptyEntity();
 
                     // Attempt to get PayPal Transaction ID from request
-                    $payPalTransactionID = $this->request->getQuery('transaction_id',
-                                             $this->request->getQuery('paypal_order_id',
+                    $payPalTransactionID = $this->request->getQuery('transaction_id', 
+                                             $this->request->getQuery('paypal_order_id', 
                                                                   $this->request->getQuery('orderID')
                                                                  )
                                             );
@@ -254,10 +254,10 @@ class PaymentsController extends AppController
                     $paymentHistoryData = [
                         'booking_id' => $bookingId,
                         'customer_id' => $booking->customer_id,
-                        'paypal_transaction_id' => $payPalTransactionID,
-                        'paypal_payer_id' => $this->request->getQuery('payer_id', $this->request->getQuery('paypal_payer_id')),
-                        'payment_amount' => $booking->total_cost,
-                        'payment_currency' => 'AUD',
+                        'paypal_transaction_id' => $payPalTransactionID, 
+                        'paypal_payer_id' => $this->request->getQuery('payer_id', $this->request->getQuery('paypal_payer_id')), 
+                        'payment_amount' => $booking->total_cost,   
+                        'payment_currency' => 'AUD',    
                         'payment_status' => 'Completed',
                         'payment_method' => 'PayPal',
                         'payment_date' => FrozenTime::now()->format('Y-m-d H:i:s'),
@@ -269,7 +269,7 @@ class PaymentsController extends AppController
 
                     if ($saveResult) {
                         $this->Flash->success(__('Payment successful! Your booking is confirmed and paid.'));
-
+                        
                         // Send invoice email
                         try {
                             $bookingWithDetails = $this->Bookings->get($bookingId, [
@@ -279,30 +279,12 @@ class PaymentsController extends AppController
                                     'BookingsStylists.Stylists',
                                 ]
                             ]);
-                            $view = new View();
-                            $view->set([
-                                'booking' => $bookingWithDetails,
-                                'paymentHistory' => $paymentHistory,
-                                'companyName' => Configure::read('MyApp.companyName', 'ChicCharm'),
-                                'companyAddress' => Configure::read('MyApp.companyAddress', '123 Beauty Lane, Styleville'),
-                                'companyPhone' => Configure::read('MyApp.companyPhone', '03 9000 0000'),
-                                'companyEmail' => Configure::read('MyApp.companyEmail', 'contact@chiccharm.com'),
-                                'companyABN' => Configure::read('MyApp.companyABN', '12 345 678 910'),
-                            ]);
-                            $html = $view->render('email/html/invoice', false);
-                            $mpdf = new Mpdf();
-                            $mpdf->WriteHTML($html);
-                            $pdfDir = WWW_ROOT . 'invoices' . DS;
-                            if (!file_exists($pdfDir)) {
-                                mkdir($pdfDir, 0775, true);
-                            }
-                            $pdfPath = 'invoices/invoice_' . $paymentHistory->id . '.pdf';
-                            $mpdf->Output(WWW_ROOT . $pdfPath, \Mpdf\Output\Destination::FILE);
-                            $paymentHistory->invoice_pdf = $pdfPath;
-                            $this->PaymentHistories->save($paymentHistory);
+                            
+                            // Generate and save PDF invoice
+                            $this->_generateInvoicePdf($bookingWithDetails, $paymentHistory, true);
 
                             $mailer = new InvoiceMailer();
-                            $mailer->sendInvoice($bookingWithDetails, $paymentHistory);
+                            $mailer->sendPaidInvoice($bookingWithDetails, $paymentHistory);
                             Log::info("Invoice email sent for Booking ID: {$bookingId} to {$bookingWithDetails->customer->email}");
                         } catch (\Exception $e) {
                             Log::error("Failed to send invoice email for Booking ID: {$bookingId}. Error: " . $e->getMessage());
@@ -350,7 +332,7 @@ class PaymentsController extends AppController
 
         // Build the query first
         $query = $this->PaymentHistories->find()
-            ->contain(['Bookings' => ['Customers']])
+            ->contain(['Bookings' => ['Customers']]) 
             ->order(['PaymentHistories.payment_date' => 'DESC']);
 
         $payments = $this->paginate($query);
@@ -369,7 +351,7 @@ class PaymentsController extends AppController
             $this->Flash->error(__('Your booking session has expired or is invalid. Please try creating your booking again.'));
             return $this->redirect(['controller' => 'Bookings', 'action' => 'guestbooking']);
         }
-
+        
         // Log the data being passed to the view for debugging
         Log::debug('[ProcessGuestPayment] Booking data for view: ' . json_encode($bookingData), ['scope' => ['paypal']]);
 
@@ -417,12 +399,12 @@ class PaymentsController extends AppController
 
             // 1. Create and Save the Booking entity
             $newBooking = $this->Bookings->newEntity([
-                'customer_id' => $bookingData['customer_id'],
+                'customer_id' => $bookingData['customer_id'], 
                 'booking_name' => $bookingData['booking_name'],
                 'booking_date' => $bookingData['booking_date'],
                 'total_cost' => $bookingData['total_cost'],
-                'remaining_cost' => 0.00,
-                'status' => 'Confirmed - Paid',
+                'remaining_cost' => 0.00, 
+                'status' => 'Confirmed - Paid', 
                 'notes' => $bookingData['notes'] ?? null,
                 'start_time' => $bookingData['overall_start_time'] ?? null,
                 'end_time' => $bookingData['overall_end_time'] ?? null,
@@ -432,9 +414,9 @@ class PaymentsController extends AppController
                 Log::error('[successGuest] Failed to save new Booking. Errors: ' . json_encode($newBooking->getErrors()));
                 throw new \Exception('Could not save the booking details.');
             }
-            $newBookingId = $newBooking->id;
+            $newBookingId = $newBooking->id; 
 
-            // Save BookingsServices
+            // Save BookingsServices 
             $bookingsServicesTable = $this->fetchTable('BookingsServices');
             $bookingsStylistsTable = $this->fetchTable('BookingsStylists');
             $processedStylists = [];
@@ -463,8 +445,8 @@ class PaymentsController extends AppController
                         'booking_id' => $newBookingId,
                         'service_id' => $serviceDataFromSession['service_id'],
                         'stylist_id' => $serviceDataFromSession['stylist_id'],
-                        'start_time' => $serviceDataFromSession['start_time_formatted'],
-                        'end_time' => $serviceDataFromSession['end_time_formatted'],
+                        'start_time' => $serviceDataFromSession['start_time_formatted'], 
+                        'end_time' => $serviceDataFromSession['end_time_formatted'],  
                         'service_cost' => $serviceDataFromSession['service_cost'],
                     ]);
                     if (!$bookingsServicesTable->save($bookingService)) {
@@ -477,8 +459,8 @@ class PaymentsController extends AppController
                         $bookingStylist = $bookingsStylistsTable->newEntity([
                             'booking_id' => $newBookingId,
                             'stylist_id' => $stylistId,
-                            'stylist_date' => $bookingDateForStorage,
-                            'selected_cost' => $newBooking->total_cost,
+                            'stylist_date' => $bookingDateForStorage, 
+                            'selected_cost' => $newBooking->total_cost, 
                         ]);
                         if (!$bookingsStylistsTable->save($bookingStylist)) {
                             Log::error('[successGuest] Failed to save BookingsStylist for stylist ID: ' . $stylistId . ' Errors: ' . json_encode($bookingStylist->getErrors()));
@@ -501,7 +483,7 @@ class PaymentsController extends AppController
                 'paypal_transaction_id' => $payPalTransactionID,
                 'paypal_payer_id' => $payPalPayerID,
                 'payment_amount' => $newBooking->total_cost,
-                'payment_currency' => 'AUD',
+                'payment_currency' => 'AUD', 
                 'payment_status' => 'Completed',
                 'payment_method' => 'PayPal (Guest)',
                 'payment_date' => FrozenTime::now()->format('Y-m-d H:i:s'),
@@ -528,27 +510,10 @@ class PaymentsController extends AppController
                         'BookingsStylists.Stylists',
                     ]
                 ]);
-                $view = new View();
-                $view->set([
-                    'booking' => $bookingWithDetails,
-                    'paymentHistory' => $paymentHistory,
-                    'companyName' => Configure::read('MyApp.companyName', 'ChicCharm'),
-                    'companyAddress' => Configure::read('MyApp.companyAddress', '123 Beauty Lane, Styleville'),
-                    'companyPhone' => Configure::read('MyApp.companyPhone', '03 9000 0000'),
-                    'companyEmail' => Configure::read('MyApp.companyEmail', 'contact@chiccharm.com'),
-                    'companyABN' => Configure::read('MyApp.companyABN', '12 345 678 910'),
-                ]);
-                $html = $view->render('email/html/invoice', false);
-                $mpdf = new Mpdf();
-                $mpdf->WriteHTML($html);
-                $pdfDir = WWW_ROOT . 'invoices' . DS;
-                if (!file_exists($pdfDir)) {
-                    mkdir($pdfDir, 0775, true);
-                }
-                $pdfPath = 'invoices/invoice_' . $paymentHistory->id . '.pdf';
-                $mpdf->Output(WWW_ROOT . $pdfPath, \Mpdf\Output\Destination::FILE);
-                $paymentHistory->invoice_pdf = $pdfPath;
-                $this->PaymentHistories->save($paymentHistory);
+                
+                // Generate and save PDF invoice
+                $this->_generateInvoicePdf($bookingWithDetails, $paymentHistory, true);
+
             } catch (\Exception $e) {
                 Log::error('Failed to generate PDF invoice for PaymentHistory ID: ' . $paymentHistory->id . '. Error: ' . $e->getMessage());
             }
@@ -566,7 +531,7 @@ class PaymentsController extends AppController
                 ]);
 
                 $mailer = new InvoiceMailer();
-                $mailer->sendInvoice($bookingWithDetails, $paymentHistory);
+                $mailer->sendPaidInvoice($bookingWithDetails, $paymentHistory);
                 Log::info("Invoice email sent for Guest Booking ID: {$newBookingId} to {$bookingWithDetails->customer->email}");
             } catch (\Exception $e) {
                 Log::error("Failed to send invoice email for Guest Booking ID: {$newBookingId}. Error: " . $e->getMessage());
@@ -577,7 +542,7 @@ class PaymentsController extends AppController
             Log::debug('[successGuest] GuestBooking.pending_details session data deleted.');
 
             $this->Flash->success(__('Thank you! Your payment was successful and your booking is confirmed.'));
-            return $this->redirect(['action' => 'guestPaymentSuccess', $newBookingId]);
+            return $this->redirect(['action' => 'guestPaymentSuccess', $newBookingId]); 
 
         } catch (\Exception $e) {
             $connection->rollback();
@@ -621,4 +586,143 @@ class PaymentsController extends AppController
         }
     }
 
+    /**
+     * Allows a customer or admin to view/download an invoice PDF.
+     * Ensures that only the customer who owns the invoice or an admin can access it.
+     *
+     * @param string|null $paymentHistoryId The ID of the payment history record.
+     * @return \Cake\Http\Response|null
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException When payment history not found.
+     */
+    public function viewInvoice($paymentHistoryId = null)
+    {
+        $currentUser = $this->Authentication->getIdentity();
+
+        if (!$currentUser) {
+            $this->Flash->error(__('Please log in to view invoices.'));
+            return $this->redirect(['controller' => 'Auth', 'action' => 'login']);
+        }
+
+        if (!$paymentHistoryId) {
+            $this->Flash->error(__('No invoice specified.'));
+            return $this->redirect($this->referer(['controller' => 'Customers', 'action' => 'dashboard']));
+        }
+
+        try {
+            $paymentHistory = $this->PaymentHistories->get($paymentHistoryId, [
+                'contain' => ['Customers', 'Bookings']
+            ]);
+        } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
+            $this->Flash->error(__('Invoice record not found.'));
+            Log::warning("[viewInvoice] PaymentHistory record not found for ID: {$paymentHistoryId}");
+            return $this->redirect($this->referer(['controller' => 'Customers', 'action' => 'dashboard']));
+        }
+
+        // Check if the associated booking exists
+        if (empty($paymentHistory->booking)) {
+             $this->Flash->error(__('Associated booking not found for this invoice.'));
+             Log::error("[viewInvoice] Associated Booking not found for PaymentHistory ID: {$paymentHistoryId}");
+             return $this->redirect($this->referer(['controller' => 'Customers', 'action' => 'dashboard']));
+        }
+
+        // Check if invoice PDF exists or if we need to generate it
+        if (empty($paymentHistory->invoice_pdf)) {
+            // No PDF saved, check if we can generate a "Payment Due" version
+            if ($paymentHistory->booking->status === 'Confirmed - Payment Due') {
+                 Log::debug("[viewInvoice] Generating Payment Due invoice on-the-fly for PaymentHistory ID: {$paymentHistoryId}");
+                 // Load full booking details needed for the PDF template
+                 try {
+                    $bookingWithDetails = $this->Bookings->get($paymentHistory->booking->id, [
+                        'contain' => [
+                            'Customers',
+                            'BookingsServices' => ['Services', 'Stylists'],
+                            'BookingsStylists.Stylists',
+                        ]
+                    ]);
+                    // Generate and output PDF directly to browser
+                    return $this->_generateInvoicePdf($bookingWithDetails, $paymentHistory, false); 
+                 } catch (\Exception $e) {
+                    $this->Flash->error(__('Could not generate the invoice preview. Please contact support.'));
+                    Log::error("[viewInvoice] Error generating on-the-fly invoice for PaymentHistory ID: {$paymentHistoryId}. Error: " . $e->getMessage());
+                    return $this->redirect($this->referer(['controller' => 'Customers', 'action' => 'dashboard']));
+                 }
+            } else {
+                // PDF is missing, and status is not Payment Due - show error
+                $this->Flash->error(__('Invoice PDF not found for this payment.'));
+                Log::warning("[viewInvoice] Invoice PDF path is empty and status is not 'Confirmed - Payment Due' for PaymentHistory ID: {$paymentHistoryId}");
+                return $this->redirect($this->referer(['controller' => 'Customers', 'action' => 'dashboard']));
+            }
+        } else {
+            // Invoice PDF path exists, serve the file
+            $filePath = WWW_ROOT . $paymentHistory->invoice_pdf;
+
+            if (!file_exists($filePath)) {
+                $this->Flash->error(__('Invoice file could not be found. Please contact support.'));
+                Log::error("[viewInvoice] Invoice PDF file not found at path: {$filePath} for PaymentHistory ID: {$paymentHistoryId}");
+                return $this->redirect($this->referer(['controller' => 'Customers', 'action' => 'dashboard']));
+            }
+
+            $response = $this->response->withFile($filePath, [
+                'download' => false, 
+                'name' => basename($paymentHistory->invoice_pdf)
+            ]);
+            $response = $response->withHeader('Content-Disposition', 'inline; filename="' . basename($paymentHistory->invoice_pdf) . '"');
+            return $response;
+        }
+    }
+
+    /**
+     * Generates the Invoice PDF using Mpdf.
+     *
+     * @param \App\Model\Entity\Booking $booking The booking entity with necessary associations (Customer, Services, Stylists).
+     * @param \App\Model\Entity\PaymentHistory $paymentHistory The payment history entity.
+     * @param bool $saveToFile If true, saves the PDF to file and updates payment history. If false, outputs directly to browser.
+     * @return string|null The file path if saved, or null if outputted to browser or an error occurred.
+     */
+    private function _generateInvoicePdf(\App\Model\Entity\Booking $booking, \App\Model\Entity\PaymentHistory $paymentHistory, bool $saveToFile = true): ?string
+    {
+        try {
+            $view = new View();
+            $view->set([
+                'booking' => $booking,
+                'paymentHistory' => $paymentHistory,
+                'companyName' => Configure::read('MyApp.companyName', 'ChicCharm'),
+                'companyAddress' => Configure::read('MyApp.companyAddress', '123 Beauty Lane, Styleville'),
+                'companyPhone' => Configure::read('MyApp.companyPhone', '03 9000 0000'),
+                'companyEmail' => Configure::read('MyApp.companyEmail', 'contact@chiccharm.com'),
+                'companyABN' => Configure::read('MyApp.companyABN', '12 345 678 910'),
+                'isPdfContext' => true,
+            ]);
+            $html = $view->render('email/html/invoice', false);
+            $mpdf = new Mpdf();
+            $mpdf->WriteHTML($html);
+
+            if ($saveToFile) {
+                $pdfDir = WWW_ROOT . 'invoices' . DS;
+                if (!file_exists($pdfDir)) {
+                    mkdir($pdfDir, 0775, true);
+                }
+                $pdfPath = 'invoices/invoice_' . $paymentHistory->id . '.pdf';
+                $fullPdfPath = WWW_ROOT . $pdfPath;
+                $mpdf->Output($fullPdfPath, \Mpdf\Output\Destination::FILE);
+                
+                // Update and save PaymentHistory only if saving the file
+                $paymentHistory->invoice_pdf = $pdfPath;
+                if (!$this->PaymentHistories->save($paymentHistory)) {
+                     Log::error("Failed to save invoice_pdf path ({$pdfPath}) for PaymentHistory ID: {$paymentHistory->id}. Errors: " . json_encode($paymentHistory->getErrors()));
+                     return null; // Indicate failure
+                }
+                return $pdfPath;
+            } else {
+                // Output directly to browser (inline)
+                $filename = 'invoice_' . ($booking->id ?? 'booking') . '.pdf';
+                $mpdf->Output($filename, \Mpdf\Output\Destination::INLINE);
+                // Since we are outputting directly, exit script after PDF is sent
+                exit;
+            }
+        } catch (\Exception $e) {
+            Log::error("Failed to generate PDF invoice for PaymentHistory ID: {$paymentHistory->id}. Error: " . $e->getMessage());
+            return null; // Indicate failure
+        }
+    }
 }

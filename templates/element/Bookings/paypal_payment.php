@@ -47,8 +47,8 @@ if (empty($clientId)) {
 
 <?php $this->append('script'); ?>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const payPalContainer = document.getElementById('paypal-button-container');
+    document.addEventListener('DOMContentLoaded', function() {
+        const payPalContainer = document.getElementById('paypal-button-container'); 
     const resultMessageContainer = document.getElementById('result-message');
     const clientIdIsConfigured = <?= !empty($clientId) && $validUrls ? 'true' : 'false' ?>;
 
@@ -74,66 +74,66 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     try {
-        paypal.Buttons({
+            paypal.Buttons({
             style: {
                 shape: "rect",
                 layout: "vertical",
                 color: "gold",
                 label: "paypal",
             },
-            createOrder: function(data, actions) {
+                createOrder: function(data, actions) {
                 console.log('Client-side createOrder: Amount: <?= h($paymentAmount) ?>, Currency: <?= h($currencyCode) ?>');
-                return actions.order.create({
-                    purchase_units: [{
-                        amount: {
-                            value: '<?= h($paymentAmount) ?>',
+                    return actions.order.create({
+                        purchase_units: [{
+                            amount: {
+                                value: '<?= h($paymentAmount) ?>',
                             currency_code: 'AUD'
                         }
                     }],
                     application_context: {
                         shipping_preference: 'NO_SHIPPING',
                         user_country: 'AU'
-                    }
-                });
-            },
-            onApprove: function(data, actions) {
+                            }
+                    });
+                },
+                onApprove: function(data, actions) {
                 console.log('Client-side onApprove. OrderID: ' + data.orderID);
-                return actions.order.capture().then(function(details) {
+                    return actions.order.capture().then(function(details) {
                     console.log('Payment captured:', details);
-                    const transactionId = details.id;
+                        const transactionId = details.id;
                     const payerId = details.payer && details.payer.payer_id ? details.payer.payer_id : null;
-                    let successUrl = '<?= $finalSuccessUrl ?>';
+                        let successUrl = '<?= $finalSuccessUrl ?>'; 
 
-                    successUrl += (successUrl.includes('?') ? '&' : '?') + `transaction_id=${transactionId}`;
-                    if (payerId) {
+                        successUrl += (successUrl.includes('?') ? '&' : '?') + `transaction_id=${transactionId}`;
+                        if (payerId) {
                         successUrl += `&paypal_payer_id=\${payerId}`;
-                    }
+                        }
                     // Include the original PayPal Order ID for server-side reference if needed
                     successUrl += `&paypal_order_id=\${data.orderID}`;
 
-                    window.location.href = successUrl;
+                        window.location.href = successUrl;
                 }).catch(function(err) {
                     console.error('Error during payment capture:', err);
                     displayError('An error occurred while capturing your payment. Please try again or contact support.');
-                });
-            },
-            onCancel: function(data) {
+                    });
+                },
+                onCancel: function(data) {
                 console.log('Payment cancelled. OrderID: ' + (data && data.orderID ? data.orderID : 'N/A'));
                 let cancelUrl = '<?= $finalCancelUrl ?>';
                 if (data && data.orderID) {
                     cancelUrl += (cancelUrl.includes('?') ? '&' : '?') + `paypal_order_id=\${data.orderID}`;
                 }
                 window.location.href = cancelUrl;
-            },
-            onError: function(err) {
+                },
+                onError: function(err) {
                 console.error('PayPal Buttons onError:', err);
                 displayError('An error occurred with the PayPal payment process. Please try again or contact support.');
-            }
-        }).render('#' + payPalContainer.id);
+                }
+            }).render('#' + payPalContainer.id); 
     } catch (error) {
         console.error('Failed to render PayPal Buttons:', error);
         displayError('Could not initialize PayPal payment options. Please try refreshing the page.');
-    }
-});
-</script>
+        }
+    });
+</script> 
 <?php $this->end(); ?> 
