@@ -71,8 +71,7 @@ class PaymentHistoriesTable extends Table
         $validator
             ->scalar('paypal_transaction_id')
             ->maxLength('paypal_transaction_id', 255)
-            ->requirePresence('paypal_transaction_id', 'create')
-            ->notEmptyString('paypal_transaction_id');
+            ->allowEmptyString('paypal_transaction_id');
 
         $validator
             ->scalar('paypal_payer_id')
