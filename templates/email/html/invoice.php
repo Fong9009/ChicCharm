@@ -116,179 +116,206 @@ $paymentDateFormatted = $paymentHistory->payment_date ? $paymentHistory->payment
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1><?= h($companyName) ?></h1>
-            <p><?= nl2br(h($companyAddress)) ?><br>
-               Phone: <?= h($companyPhone) ?> | Email: <?= h($companyEmail) ?><br>
-               <?php if (!empty($companyABN)): ?>ABN: <?= h($companyABN) ?><?php endif; ?>
-            </p>
-            <h2>Invoice / Booking Confirmation</h2>
-        </div>
-
-        <div class="invoice-details">
-            <h4>Details:</h4>
-            <table>
-                <tr>
-                    <th>Invoice #:</th>
-                    <td>PAY-<?= h($paymentHistory->id) ?></td>
-                </tr>
-                <tr>
-                    <th>Booking Ref #:</th>
-                    <td><?= h($booking->id) ?></td>
-                </tr>
-                <tr>
-                    <th>Date Issued:</th>
-                    <td><?= h($paymentDateFormatted) ?></td>
-                </tr>
-                <tr>
-                    <th>Booking Date:</th>
-                    <td><?= h($bookingDateFormatted) ?></td>
-                </tr>
-                <?php if ($bookingOverallStartTime && $bookingOverallEndTime): ?>
-                <tr>
-                    <th>Booking Time:</th>
-                    <td><?= h($bookingOverallStartTime) ?> - <?= h($bookingOverallEndTime) ?></td>
-                </tr>
-                <?php elseif ($bookingOverallStartTime): ?>
-                 <tr>
-                    <th>Booking Start Time:</th>
-                    <td><?= h($bookingOverallStartTime) ?></td>
-                </tr>
+    <div class="invoice-container">
+        <?php if (!empty($isAdminEditNotification) && !empty($changeDetails)): ?>
+            <div class="admin-edit-summary" style="padding: 15px; margin-bottom: 20px; border: 1px solid #ffc107; background-color: #fff3cd; border-radius: 5px;">
+                <h3 style="margin-top: 0; color: #856404;">Update Regarding Your Recent Booking Changes</h3>
+                <p>An administrator has recently updated your booking (ID: <?= h($booking->id) ?>). Please see the details below:</p>
+                
+                <?php if ($changeDetails['type'] === 'refund_due'): ?>
+                    <p style="font-weight: bold; color: #155724;">
+                        A refund of <?= $this->Number->currency($changeDetails['amount'], 'AUD') ?> is due to you because of these changes.
+                    </p>
+                    <p>Your new booking total is <?= $this->Number->currency($booking->total_cost, 'AUD') ?>.
+                       This refund will be processed manually by our team shortly. Please allow a few business days for it to reflect in your account.
+                    </p>
+                <?php elseif ($changeDetails['type'] === 'additional_payment_due'): ?>
+                    <p style="font-weight: bold; color: #721c24;">
+                        An additional payment of <?= $this->Number->currency($changeDetails['amount'], 'AUD') ?> is required due to these changes.
+                    </p>
+                    <p>Your new booking total is <?= $this->Number->currency($booking->total_cost, 'AUD') ?>.
+                       Please settle the outstanding amount of <?= $this->Number->currency($changeDetails['amount'], 'AUD') ?> when you arrive for your appointment.
+                    </p>
                 <?php endif; ?>
-            </table>
-        </div>
-
-        <div class="customer-details">
-            <h4>Billed To:</h4>
-            <p>
-                <?php 
-                $customerName = 'N/A';
-                if ($booking->customer && !empty(trim((string)$booking->customer->full_name)) && strtolower(trim((string)$booking->customer->full_name)) !== 'guest user') {
-                    $customerName = h($booking->customer->full_name);
-                } elseif (!empty($booking->booking_name)) {
-                    if (stripos($booking->booking_name, 'Booking for ') === 0) {
-                        $extractedName = trim(substr($booking->booking_name, strlen('Booking for ')));
-                        if (!empty($extractedName)) {
-                            $customerName = h($extractedName);
-                        }
-                    } else {
-                        $customerName = h($booking->booking_name); 
-                    }
-                }
-                ?>
-                <?= $customerName ?><br>
-                <?= h($booking->customer->email ?? 'N/A') ?><br>
-                <?php if (!empty($booking->customer->phone_number)): ?>
-                    Phone: <?= h($booking->customer->phone_number) ?><br>
-                <?php endif; ?>
-            </p>
-        </div>
-
-        <div class="booking-summary">
-            <h4>Services:</h4>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Service</th>
-                        <th>Duration/Time</th>
-                        <th style="text-align: right;">Cost</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (!empty($booking->bookings_services)): ?>
-                        <?php foreach ($booking->bookings_services as $bs): ?>
-                            <?php
-                                $serviceTimeInfo = 'N/A';
-                                if ($bs->start_time && $bs->end_time) {
-                                    $serviceStartTime = $bs->start_time->format('h:i A');
-                                    $serviceEndTime = $bs->end_time->format('h:i A');
-                                    $serviceTimeInfo = $serviceStartTime . ' - ' . $serviceEndTime;
-                                }
-
-                                $stylistNameDisplay = 'N/A'; 
-                                if ($bs && !empty($bs->stylist)) {
-                                    $fullName = trim((string)($bs->stylist->full_name ?? ''));
-                                    $firstName = trim((string)($bs->stylist->first_name ?? ''));
-                                    $lastName = trim((string)($bs->stylist->last_name ?? ''));
-
-                                    $resolvedName = '';
-                                    if (!empty($fullName) && !in_array(strtolower($fullName), ['unknown stylist', 'unknown', 'n/a', ''])) {
-                                        $resolvedName = $fullName;
-                                    } 
-                                    else {
-                                        $constructedName = trim($firstName . ' ' . $lastName);
-                                        if (!empty($constructedName) && !in_array(strtolower($constructedName), ['unknown stylist', 'unknown', 'n/a', ''])) {
-                                            if (!in_array(strtolower($firstName), ['unknown stylist', 'unknown', 'n/a', '']) && 
-                                                !in_array(strtolower($lastName), ['unknown stylist', 'unknown', 'n/a', ''])) {
-                                                $resolvedName = $constructedName;
-                                            }
-                                        }
-                                    }
-
-                                    if (!empty($resolvedName)) {
-                                        $stylistNameDisplay = h($resolvedName);
-                                    }
-                                }
-                            ?>
-                            <tr>
-                                <td>
-                                    <?= h($bs->service->service_name ?? 'N/A') ?><br>
-                                    
-                                </td>
-                                <td><?= h($serviceTimeInfo) ?></td>
-                                <td style="text-align: right;"><?= $this->Number->currency($bs->service_cost ?? 0, 'AUD') ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr><td colspan="3">No services detailed for this booking.</td></tr>
-                    <?php endif; ?>
-                    <tr class="total-row">
-                        <?php if ($booking->status === 'Confirmed - Payment Due'): ?>
-                            <td colspan="2" style="text-align:right;"><strong>Total Amount Due:</strong></td>
-                            <td style="text-align: right;"><strong><?= $this->Number->currency($booking->remaining_cost ?? $booking->total_cost ?? 0, 'AUD') ?></strong></td>
-                        <?php else: ?>
-                            <td colspan="2" style="text-align:right;"><strong>Total Amount Paid:</strong></td>
-                            <td style="text-align: right;"><strong><?= $this->Number->currency($paymentHistory->payment_amount ?? 0, 'AUD') ?></strong></td>
-                        <?php endif; ?>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <?php if ($booking->status === 'Confirmed - Payment Due' && empty($isPdfContext)): ?>
-            <div class="payment-link" style="margin-top: 25px; padding: 15px; border: 1px solid #007bff; background-color: #e7f3ff; text-align: center; border-radius: 5px;">
-                <p style="margin-bottom: 10px; font-size: 1.1em;"><strong>Complete Your Booking Payment Online:</strong></p>
-                <?= $this->Html->link(
-                    'Click Here to Pay via PayPal',
-                    ['controller' => 'Bookings', 'action' => 'customerview', $booking->id, '_full' => true],
-                    ['style' => 'display: inline-block; padding: 12px 25px; background-color: #005ea6; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 1.1em;']
-                ) ?>
-                <p style="margin-top: 10px; font-size: 0.9em; color: #555;">You will be redirected to the booking details page where you can complete the payment.</p>
+                <hr style="border-top: 1px solid #ffc107;">
+                <p>Below is the summary of your updated booking details.</p>
             </div>
         <?php endif; ?>
 
-        <?php if ($booking->status !== 'Confirmed - Payment Due'): ?>
-        <div class="payment-summary">
-            <h4>Payment Details:</h4>
-            <p>
-                <strong>Transaction ID:</strong> <?= h($paymentHistory->paypal_transaction_id ?? 'N/A') ?><br>
-                <strong>Payment Method:</strong> <?= h($paymentHistory->payment_method ?? 'N/A') ?><br>
-                <strong>Payment Status:</strong> <?= h($paymentHistory->payment_status ?? 'Completed') ?>
-            </p>
-        </div>
-        <?php endif; ?>
+        <div class="container">
+            <div class="header">
+                <h1><?= h($companyName) ?></h1>
+                <p><?= nl2br(h($companyAddress)) ?><br>
+                   Phone: <?= h($companyPhone) ?> | Email: <?= h($companyEmail) ?><br>
+                   <?php if (!empty($companyABN)): ?>ABN: <?= h($companyABN) ?><?php endif; ?>
+                </p>
+                <h2>Invoice / Booking Confirmation</h2>
+            </div>
 
-        <?php if (!empty($booking->notes)): ?>
-        <div class="booking-notes">
-            <h4>Notes:</h4>
-            <p><?= nl2br(h($booking->notes)) ?></p>
-        </div>
-        <?php endif; ?>
+            <div class="invoice-details">
+                <h4>Details:</h4>
+                <table>
+                    <tr>
+                        <th>Invoice #:</th>
+                        <td>PAY-<?= h($paymentHistory->id) ?></td>
+                    </tr>
+                    <tr>
+                        <th>Booking Ref #:</th>
+                        <td><?= h($booking->id) ?></td>
+                    </tr>
+                    <tr>
+                        <th>Date Issued:</th>
+                        <td><?= h($paymentDateFormatted) ?></td>
+                    </tr>
+                    <tr>
+                        <th>Booking Date:</th>
+                        <td><?= h($bookingDateFormatted) ?></td>
+                    </tr>
+                    <?php if ($bookingOverallStartTime && $bookingOverallEndTime): ?>
+                    <tr>
+                        <th>Booking Time:</th>
+                        <td><?= h($bookingOverallStartTime) ?> - <?= h($bookingOverallEndTime) ?></td>
+                    </tr>
+                    <?php elseif ($bookingOverallStartTime): ?>
+                     <tr>
+                        <th>Booking Start Time:</th>
+                        <td><?= h($bookingOverallStartTime) ?></td>
+                    </tr>
+                    <?php endif; ?>
+                </table>
+            </div>
 
-        <div class="footer">
-            <p>Thank you for your booking with <?= h($companyName) ?>!</p>
-            <p>If you have any questions, please contact us at <?= h($companyEmail) ?> or call <?= h($companyPhone) ?>.</p>
+            <div class="customer-details">
+                <h4>Billed To:</h4>
+                <p>
+                    <?php 
+                    $customerName = 'N/A';
+                    if ($booking->customer && !empty(trim((string)$booking->customer->full_name)) && strtolower(trim((string)$booking->customer->full_name)) !== 'guest user') {
+                        $customerName = h($booking->customer->full_name);
+                    } elseif (!empty($booking->booking_name)) {
+                        if (stripos($booking->booking_name, 'Booking for ') === 0) {
+                            $extractedName = trim(substr($booking->booking_name, strlen('Booking for ')));
+                            if (!empty($extractedName)) {
+                                $customerName = h($extractedName);
+                            }
+                        } else {
+                            $customerName = h($booking->booking_name); 
+                        }
+                    }
+                    ?>
+                    <?= $customerName ?><br>
+                    <?= h($booking->customer->email ?? 'N/A') ?><br>
+                    <?php if (!empty($booking->customer->phone_number)): ?>
+                        Phone: <?= h($booking->customer->phone_number) ?><br>
+                    <?php endif; ?>
+                </p>
+            </div>
+
+            <div class="booking-summary">
+                <h4>Services:</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Service</th>
+                            <th>Duration/Time</th>
+                            <th style="text-align: right;">Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (!empty($booking->bookings_services)): ?>
+                            <?php foreach ($booking->bookings_services as $bs): ?>
+                                <?php
+                                    $serviceTimeInfo = 'N/A';
+                                    if ($bs->start_time && $bs->end_time) {
+                                        $serviceStartTime = $bs->start_time->format('h:i A');
+                                        $serviceEndTime = $bs->end_time->format('h:i A');
+                                        $serviceTimeInfo = $serviceStartTime . ' - ' . $serviceEndTime;
+                                    }
+
+                                    $stylistNameDisplay = 'N/A'; 
+                                    if ($bs && !empty($bs->stylist)) {
+                                        $fullName = trim((string)($bs->stylist->full_name ?? ''));
+                                        $firstName = trim((string)($bs->stylist->first_name ?? ''));
+                                        $lastName = trim((string)($bs->stylist->last_name ?? ''));
+
+                                        $resolvedName = '';
+                                        if (!empty($fullName) && !in_array(strtolower($fullName), ['unknown stylist', 'unknown', 'n/a', ''])) {
+                                            $resolvedName = $fullName;
+                                        } 
+                                        else {
+                                            $constructedName = trim($firstName . ' ' . $lastName);
+                                            if (!empty($constructedName) && !in_array(strtolower($constructedName), ['unknown stylist', 'unknown', 'n/a', ''])) {
+                                                if (!in_array(strtolower($firstName), ['unknown stylist', 'unknown', 'n/a', '']) && 
+                                                    !in_array(strtolower($lastName), ['unknown stylist', 'unknown', 'n/a', ''])) {
+                                                    $resolvedName = $constructedName;
+                                                }
+                                            }
+                                        }
+
+                                        if (!empty($resolvedName)) {
+                                            $stylistNameDisplay = h($resolvedName);
+                                        }
+                                    }
+                                ?>
+                                <tr>
+                                    <td>
+                                        <?= h($bs->service->service_name ?? 'N/A') ?><br>
+                                        
+                                    </td>
+                                    <td><?= h($serviceTimeInfo) ?></td>
+                                    <td style="text-align: right;"><?= $this->Number->currency($bs->service_cost ?? 0, 'AUD') ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr><td colspan="3">No services detailed for this booking.</td></tr>
+                        <?php endif; ?>
+                        <tr class="total-row">
+                            <?php if ($booking->status === 'Confirmed - Payment Due'): ?>
+                                <td colspan="2" style="text-align:right;"><strong>Total Amount Due:</strong></td>
+                                <td style="text-align: right;"><strong><?= $this->Number->currency($booking->remaining_cost ?? $booking->total_cost ?? 0, 'AUD') ?></strong></td>
+                            <?php else: ?>
+                                <td colspan="2" style="text-align:right;"><strong>Total Amount Paid:</strong></td>
+                                <td style="text-align: right;"><strong><?= $this->Number->currency($paymentHistory->payment_amount ?? 0, 'AUD') ?></strong></td>
+                            <?php endif; ?>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <?php if ($booking->status === 'Confirmed - Payment Due' && empty($isPdfContext)): ?>
+                <div class="payment-link" style="margin-top: 25px; padding: 15px; border: 1px solid #007bff; background-color: #e7f3ff; text-align: center; border-radius: 5px;">
+                    <p style="margin-bottom: 10px; font-size: 1.1em;"><strong>Complete Your Booking Payment Online:</strong></p>
+                    <?= $this->Html->link(
+                        'Click Here to Pay via PayPal',
+                        ['controller' => 'Bookings', 'action' => 'customerview', $booking->id, '_full' => true],
+                        ['style' => 'display: inline-block; padding: 12px 25px; background-color: #005ea6; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 1.1em;']
+                    ) ?>
+                    <p style="margin-top: 10px; font-size: 0.9em; color: #555;">You will be redirected to the booking details page where you can complete the payment.</p>
+                </div>
+            <?php endif; ?>
+
+            <?php if ($booking->status !== 'Confirmed - Payment Due'): ?>
+            <div class="payment-summary">
+                <h4>Payment Details:</h4>
+                <p>
+                    <strong>Transaction ID:</strong> <?= h($paymentHistory->paypal_transaction_id ?? 'N/A') ?><br>
+                    <strong>Payment Method:</strong> <?= h($paymentHistory->payment_method ?? 'N/A') ?><br>
+                    <strong>Payment Status:</strong> <?= h($paymentHistory->payment_status ?? 'Completed') ?>
+                </p>
+            </div>
+            <?php endif; ?>
+
+            <?php if (!empty($booking->notes)): ?>
+            <div class="booking-notes">
+                <h4>Notes:</h4>
+                <p><?= nl2br(h($booking->notes)) ?></p>
+            </div>
+            <?php endif; ?>
+
+            <div class="footer">
+                <p>Thank you for your booking with <?= h($companyName) ?>!</p>
+                <p>If you have any questions, please contact us at <?= h($companyEmail) ?> or call <?= h($companyPhone) ?>.</p>
+            </div>
         </div>
     </div>
 </body>

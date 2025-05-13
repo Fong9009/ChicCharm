@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // State 
     let serviceSelections = []; 
+    let pageLoadedWithDate = false; 
 
     // Initialization 
 
@@ -81,6 +82,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize state from potentially pre-checked boxes (edit mode)
     function initializeBookingState() {
         serviceSelections = [];
+        if (bookingDateInput && bookingDateInput.value) {
+            pageLoadedWithDate = true;
+        } else {
+            pageLoadedWithDate = false;
+        }
+
         serviceCheckboxes.forEach(checkbox => {
             if (checkbox.checked) {
                 const serviceIdStr = checkbox.value;
@@ -119,25 +126,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update enable/disable state of inputs
     function updateInputStates() {
         const anyServiceCheckboxSelected = serviceSelections.length > 0;
-        const isEditModeWithDate = bookingDateInput && bookingDateInput.value !== ''; // Check if date is pre-filled
 
-        // --- Date Input State ---
         // Enable date input if in edit mode with a date OR if a service checkbox is selected
         if (bookingDateInput) { // Ensure bookingDateInput exists
-            if (isEditModeWithDate || anyServiceCheckboxSelected) {
+            if ((pageLoadedWithDate && bookingDateInput.value) || anyServiceCheckboxSelected) {
                 bookingDateInput.disabled = false;
             } else {
                 bookingDateInput.disabled = true;
-                // bookingDateInput.value = ''; // Don't clear if just no checkbox selected yet but could be edit mode without active services
-                // Clear stylist and time selections only if truly no services are selected AND not in edit mode with a date
-                if (!anyServiceCheckboxSelected && !isEditModeWithDate && serviceStylistSelectionsContainer) {
+                if (!anyServiceCheckboxSelected && !pageLoadedWithDate && serviceStylistSelectionsContainer) {
                     serviceStylistSelectionsContainer.innerHTML = '';
                 }
             }
     
-            // If no services are *checked* AND no initial date was set (i.e., not edit mode or edit mode with no date), then clear date & warning
-            if (!anyServiceCheckboxSelected && !isEditModeWithDate) {
-                bookingDateInput.value = ''; // Safe to clear now
+            if (!anyServiceCheckboxSelected && !pageLoadedWithDate) {
+                bookingDateInput.value = ''; 
                 clearClosingTimeWarning();
             }
         }
@@ -175,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log("[calculateAndUpdateSummary] Elements:", serviceCountDisplay, serviceTotalDisplay, totalCostInput);
 
         // Update DOM elements
-        if (totalCostInput) totalCostInput.value = totalCost.toFixed(2); 
+        if (totalCostInput) totalCostInput.value = totalCost.toFixed(2);  
         if (serviceCountDisplay) serviceCountDisplay.textContent = serviceSelections.length;
         if (serviceTotalDisplay) serviceTotalDisplay.textContent = totalCost.toFixed(2);
     }

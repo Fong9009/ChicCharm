@@ -171,4 +171,56 @@ class InvoiceMailer extends Mailer
             throw $e; // Re-throw for paid invoice errors? Or handle differently?
         }
     }
+
+    /**
+     * Sends a notification to the customer after an admin edits their booking,
+     * detailing refunds due or additional payments required.
+     *
+     * @param \App\Model\Entity\Booking $booking The updated booking entity (with Customer loaded).
+     * @param array $changeDetails Details about the change (type: refund_due|additional_payment_due, amount, etc.).
+     * @return void
+     */
+    public function sendAdminEditNotification(Booking $booking, array $changeDetails): void
+    {
+        if (empty($booking->customer) || empty($booking->customer->email)) {
+            Log::warning("[InvoiceMailer.sendAdminEditNotification] Customer email not available for booking ID: {$booking->id}");
+            return;
+        }
+
+        $subject = '';
+        if ($changeDetails['type'] === 'refund_due') {
+            $subject = 'Update to your booking - Refund Due';
+        } elseif ($changeDetails['type'] === 'additional_payment_due') {
+            $subject = 'Update to your booking - Additional Payment Required';
+        } else {
+            $subject = 'Important Update to Your Booking'; 
+        }
+
+        // View variables
+        $viewVars = [
+            'booking' => $booking, 
+            'changeDetails' => $changeDetails, 
+            'paymentHistory' => $booking->latest_payment_history ?? null, 
+            'companyName' => Configure::read('MyApp.companyName', 'ChicCharm'),
+            'companyAddress' => Configure::read('MyApp.companyAddress', '123 Beauty Lane, Styleville'),
+            'companyPhone' => Configure::read('MyApp.companyPhone', '03 9000 0000'),
+            'companyEmail' => Configure::read('MyApp.companyEmail', 'contact@chiccharm.com'),
+            'companyABN' => Configure::read('MyApp.companyABN', '12 345 678 910'),
+            'isPdfContext' => false, 
+            'isAdminEditNotification' => true 
+        ];
+
+        try {
+            $this->setTo($booking->customer->email)
+                ->setSubject($subject)
+                ->setViewVars($viewVars)
+                ->viewBuilder()
+                    ->setTemplate('email/html/invoice'); 
+
+            $this->deliver();
+            Log::info("[InvoiceMailer.sendAdminEditNotification] Email sent for Booking ID {$booking->id} to {$booking->customer->email}. Type: {$changeDetails['type']}");
+        } catch (\Exception $e) {
+            Log::error("[InvoiceMailer.sendAdminEditNotification] Error during deliver() for Booking ID {$booking->id}: " . $e->getMessage());
+        }
+    }
 } 
