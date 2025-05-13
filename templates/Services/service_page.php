@@ -38,6 +38,8 @@ use Cake\Routing\Router;
         $imagePath = $service->service_image;
         if ($imagePath != null) {
            $imagePath = Router::url('/img/service/' . $service->service_image, true);
+        } else {
+            $imagePath = Router::url('/img/service/service-placeholder.jpg', true);
         }
         if ($counter % 3 === 0): ?>
             <div class="row justify-content-center">
