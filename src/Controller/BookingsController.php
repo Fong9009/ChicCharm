@@ -2437,13 +2437,11 @@ class BookingsController extends AppController
             'BookingsStylists' => ['Stylists'],
             'BookingsServices' => ['Services', 'Stylists'],
         ]);
-
-        // ---- ADD THIS CHECK ----
+ 
         if ($booking->status === 'Confirmed - Paid') {
             $this->Flash->error(__('This booking has been paid and can no longer be edited.'));
             return $this->redirect(['action' => 'customerindex']);
         }
-        // ---- END CHECK ----
 
         $currentUserId = $this->Authentication->getIdentity()->id;
 
@@ -2511,7 +2509,6 @@ class BookingsController extends AppController
 
             $hasServiceData = !empty($data['bookings_services']);
 
-            // --- Start Transaction ---
             $connection = $this->Bookings->getConnection();
             try {
                 $connection->begin();
@@ -2522,35 +2519,28 @@ class BookingsController extends AppController
                 $bookingsServicesTable->deleteAll(['booking_id' => $bookingId]);
                 $bookingsStylistsTable->deleteAll(['booking_id' => $bookingId]);
 
-                // Patch main booking entity
-                 $booking = $this->Bookings->patchEntity($booking, [
-                    // customer_id and booking_name are set above from $user
+                $booking = $this->Bookings->patchEntity($booking, [
                     'customer_id' => $data['customer_id'],
                     'booking_name' => $data['booking_name'],
-                    'booking_date' => $data['booking_date_formatted'], // Use the validated/formatted date
+                    'booking_date' => $data['booking_date_formatted'], 
                     'total_cost' => $data['total_cost'],
                     'remaining_cost' => $data['remaining_cost'],
                     'notes' => $data['notes'],
-                    // Keep status as 'active' unless changed explicitly? Needs clarification.
-                    // 'status' => 'active',
+                    'status' => 'active',
                  ], [
-                     'associated' => [], // Don't process associations here
-                     'guard' => false // Allow modification of customer_id if needed (though we override)
+                     'associated' => [], 
+                     'guard' => false 
                  ]);
 
-                 // Save main booking changes (without times)
-                 // Add checkRules=false temporarily if needed, but rules should ideally allow this
-                if (!$this->Bookings->save($booking /*, ['checkRules' => false] */)) {
-                    // Log detailed error
+                 if (!$this->Bookings->save($booking)) {
                     Log::error('[CustomerEdit] Failed to save main booking updates. Errors: ' . json_encode($booking->getErrors()));
                     throw new Exception('Failed to save main booking updates.');
                 }
 
-                $allServicesTimes = []; // To store start/end times for overall calculation
-                $servicesDetails = []; // To store service durations
+                $allServicesTimes = []; 
+                $servicesDetails = []; 
 
                 if ($hasServiceData) {
-                    // Fetch service durations for calculation
                     $serviceIds = array_column($data['bookings_services'], 'service_id');
                     if (!empty($serviceIds)) {
                         $servicesDetails = $this->Services->find('list', [
@@ -2559,7 +2549,6 @@ class BookingsController extends AppController
                         ])->where(['id IN' => $serviceIds])->toArray();
                     }
 
-                    // --- START Server-Side Time Conflict Validation (Customer Edit) ---
                     $stylistTimeSlotsEdit = [];
                     $hasConflictEdit = false;
                     $conflictMessageEdit = '';
@@ -2567,17 +2556,17 @@ class BookingsController extends AppController
                     foreach ($data['bookings_services'] as $serviceData) {
                          if (!isset($serviceData['stylist_id'], $serviceData['start_time'], $serviceData['service_id'])) {
                              Log::warning('[CustomerEdit] Skipping service data due to missing fields: ' . json_encode($serviceData));
-                             continue; // Skip if essential data is missing
+                             continue; 
                          }
                          $stylistIdEdit = (int)$serviceData['stylist_id'];
                          $serviceIdEdit = (int)$serviceData['service_id'];
                          $startTimeStrEdit = $serviceData['start_time'];
-                         $bookingDateStrEdit = $data['booking_date_formatted']; // Use the potentially new date
+                         $bookingDateStrEdit = $data['booking_date_formatted']; 
                          $durationEdit = $servicesDetails[$serviceIdEdit] ?? 0;
 
                          if ($durationEdit <= 0) {
                              Log::warning("[CustomerEdit] Service ID {$serviceIdEdit} has zero or invalid duration.");
-                             continue; // Skip services with no duration
+                             continue; 
                          }
 
                          try {
@@ -2589,23 +2578,20 @@ class BookingsController extends AppController
                              // Check for conflicts within the submitted services for the same stylist
                              if (isset($stylistTimeSlotsEdit[$stylistIdEdit])) {
                                  foreach ($stylistTimeSlotsEdit[$stylistIdEdit] as $existingSlotEdit) {
-                                     // Simple overlap check: new start < existing end AND new end > existing start
                                      if ($newSlotEdit['start'] < $existingSlotEdit['end'] && $newSlotEdit['end'] > $existingSlotEdit['start']) {
                                          $hasConflictEdit = true;
                                          $conflictMessageEdit = "Time conflict detected for stylist. Please ensure service times do not overlap.";
                                          Log::warning("[CustomerEdit] Internal conflict detected: " . $conflictMessageEdit);
-                                         break 2; // Exit both loops
+                                         break 2; 
                                      }
                                  }
                              }
 
-                             // Check for conflicts with OTHER bookings for the same stylist (more complex)
-                             // Reuse checkSegmentAvailability logic if possible, adapting for *this* booking being edited
                               if (!$this->checkSegmentAvailability($bookingDateStrEdit, $startTimeEdit->format('H:i:s'), $endTimeEdit->format('H:i:s'), $serviceIdEdit, $stylistIdEdit, $bookingId)) {
                                  $hasConflictEdit = true;
                                  $conflictMessageEdit = "The selected time slot for a service conflicts with another booking.";
                                  Log::warning("[CustomerEdit] External conflict detected via checkSegmentAvailability.");
-                                 break; // Exit current loop
+                                 break; 
                               }
 
 
