@@ -53,5 +53,6 @@ class Booking extends Entity
         'bookings_services' => true,
         'bookings_stylists' => true,
         'invoices' => true,
+        'refund_due_amount' => true,
     ];
 }

@@ -36,7 +36,7 @@ if (empty($clientId)) {
     // Use the $currencyCode variable in the SDK URL
     echo $this->Html->script(
         sprintf(
-            'https://www.paypal.com/sdk/js?client-id=%s&currency=%s&components=buttons&enable-funding=venmo,paylater,card',
+            'https://www.paypal.com/sdk/js?client-id=%s&currency=%s&components=buttons&enable-funding=venmo,paylater,card&locale=en_AU&buyer-country=AU',
             h($clientId),
             h($currencyCode)
         ),
@@ -87,12 +87,11 @@ if (empty($clientId)) {
                         purchase_units: [{
                             amount: {
                                 value: '<?= h($paymentAmount) ?>',
-                            currency_code: 'AUD'
+                                currency_code: '<?= h($currencyCode) ?>'
                         }
                     }],
                     application_context: {
-                        shipping_preference: 'NO_SHIPPING',
-                        user_country: 'AU'
+                        shipping_preference: 'NO_SHIPPING'
                             }
                     });
                 },

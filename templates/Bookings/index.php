@@ -14,6 +14,7 @@ $this->Html->script('custom', ['block' => true]);
         <!-- Action Menu -->
         <aside class="column">
             <div class="side-nav">
+                <?= $this->Flash->render() ?>
                 <h4 class="heading"><?= __('Actions') ?></h4>
                 <div class="row gx-2">
                     <div class="col-lg-4 col-md-6 col-sm-12 mb-3 side-nav-item">
@@ -107,6 +108,8 @@ $this->Html->script('custom', ['block' => true]);
                     <th><?= __('Stylists & Services') ?></th>
                     <th><?= __('Notes') ?></th>
                     <th><?= $this->Paginator->sort('total_cost') ?></th>
+                    <th><?= $this->Paginator->sort('remaining_cost', 'Amount Due') ?></th>
+                    <th><?= $this->Paginator->sort('refund_due_amount', 'Refund Amount Pending') ?></th>
                     <th><?= $this->Paginator->sort('status') ?></th>
                     <th class="actions"><?= __('Actions') ?></th>
                 </tr>
@@ -172,35 +175,83 @@ $this->Html->script('custom', ['block' => true]);
                         </td>
                         <td><?= $this->Number->currency($booking->total_cost) ?></td>
                         <td>
+                            <?php if ($booking->status === 'Confirmed - Payment Due' && $booking->remaining_cost > 0): ?>
+                                <span style="color: red; font-weight: bold;">
+                                    <?= $this->Number->currency($booking->remaining_cost) ?>
+                                </span>
+                            <?php elseif ($booking->status === 'Confirmed - Paid' && $booking->remaining_cost > 0): ?>
+                                <span style="color: orange; font-weight: bold;" title="Originally paid, now has outstanding amount after edit">
+                                    <?= $this->Number->currency($booking->remaining_cost) ?>
+                                </span>
+                            <?php else: ?>
+                                <?= $this->Number->currency(0) ?>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <?php if ($booking->refund_due_amount > 0): ?>
+                                <span style="color: purple; font-weight: bold;" title="Refund needs to be processed manually.">
+                                    <?= $this->Number->currency($booking->refund_due_amount) ?>
+                                </span>
+                            <?php else: ?>
+                                <?= $this->Number->currency(0) ?>
+                            <?php endif; ?>
+                        </td>
+                        <td>
                             <?php
-                            $statusClassAdmin = '';
-                            switch ($booking->status) {
-                                case 'active':
-                                    $statusClassAdmin = 'active';
-                                    break;
-                                case 'Confirmed - Payment Due':
-                                    $statusClassAdmin = 'payment-due';
-                                    break;
-                                case 'Confirmed - Paid':
-                                    $statusClassAdmin = 'paid';
-                                    break;
-                                case 'cancelled':
-                                    $statusClassAdmin = 'cancelled';
-                                    break;
-                                case 'finished':
-                                    $statusClassAdmin = 'finished';
-                                    break;
-                                default:
-                                    $statusClassAdmin = 'text-muted';
+                            $adminDisplayStatus = h($booking->status);
+                            $adminStatusClass = '';
+                            $isAdminRefundProcessed = false;
+
+                            // Check if a refund was processed for this booking
+                            if (!empty($booking->payment_histories)) {
+                                foreach ($booking->payment_histories as $ph) {
+                                    if ($ph->payment_method === 'Admin Adjustment' && $ph->payment_status === 'Refunded - Admin Processed') {
+                                        $isAdminRefundProcessed = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if ($booking->refund_due_amount > 0) {
+                                $adminDisplayStatus = strtoupper(h($booking->status)) . ' <br><span style="font-size:0.9em; color:orange;">(Refund Pending)</span>';
+                                switch ($booking->status) {
+                                    case 'Confirmed - Payment Due': $adminStatusClass = 'payment-due refund-pending'; break;
+                                    case 'Confirmed - Paid': $adminStatusClass = 'paid refund-pending'; break;
+                                    default: $adminStatusClass = 'text-muted refund-pending'; 
+                                }
+                            } elseif ($isAdminRefundProcessed) {
+                                $adminDisplayStatus = strtoupper(h($booking->status)) . ' <br><span style="font-size:0.9em; color:green;">(Refund Processed)</span>';
+                                switch ($booking->status) {
+                                     case 'Confirmed - Paid': $adminStatusClass = 'paid refund-processed'; break;
+                                     default: $adminStatusClass = 'text-muted refund-processed';
+                                }
+                            } else {
+                                $adminDisplayStatus = strtoupper(h($booking->status));
+                                switch ($booking->status) {
+                                    case 'Confirmed - Payment Due': $adminStatusClass = 'payment-due'; break;
+                                    case 'Confirmed - Paid': $adminStatusClass = 'paid'; break;
+                                    default: $adminStatusClass = 'text-muted';
+                                }
                             }
                             ?>
-                            <span class="status-text <?= $statusClassAdmin ?>">
-                                <?= strtoupper(h($booking->status)) ?>
+                            <span class="status-text <?= $adminStatusClass ?>">
+                                <?= $adminDisplayStatus ?>
                             </span>
                         </td>
                         <td class="actions">
                             <?= $this->Html->link(__('View'), ['action' => 'view', $booking->id], ['class' => 'button']) ?>
                             <?= $this->Html->link(__('Edit'), ['action' => 'edit', $booking->id], ['class' => 'button']) ?>
+                            <?php if ($booking->refund_due_amount > 0): ?>
+                                <?= $this->Form->postLink(
+                                    __('Refund Processed'),
+                                    ['action' => 'markRefundProcessed', $booking->id],
+                                    [
+                                        'confirm' => __('Are you sure you have processed the refund of {0} for booking #{1}?', $this->Number->currency($booking->refund_due_amount), $booking->id),
+                                        'class' => 'button btn-success',
+                                        'style' => 'margin-top: 5px;' 
+                                    ]
+                                ) ?>
+                            <?php endif; ?>
                             <?= $this->Form->postLink(
                                 __('Cancel'),
                                 ['action' => 'delete', $booking->id],
