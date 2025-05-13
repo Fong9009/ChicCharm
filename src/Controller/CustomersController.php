@@ -86,9 +86,19 @@ class CustomersController extends AppController
                     ]
                 ],
                 'PaymentHistories' => [
-                    'fields' => ['id', 'booking_id', 'invoice_pdf', 'payment_date'],
+                    'fields' => ['id', 'booking_id', 'invoice_pdf', 'payment_date', 'payment_method', 'payment_status'],
                     'sort' => ['PaymentHistories.payment_date' => 'DESC']
                 ]
+            ])
+            ->select([
+                'Bookings.id',
+                'Bookings.customer_id',
+                'Bookings.booking_name',
+                'Bookings.booking_date',
+                'Bookings.total_cost',
+                'Bookings.remaining_cost',
+                'Bookings.status',
+                'Bookings.refund_due_amount',
             ])
             ->order([
                 'ABS(DATEDIFF(booking_date, CURDATE()))' => 'ASC',

@@ -17,6 +17,35 @@
                 </p>
             </div>
 
+            <div class="info-group">
+                <label><?= __('Booking Status') ?></label>
+                <p class="form-control-static">
+                    <?php 
+                    $cvDisplayStatus = h($booking->status);
+                    $cvStatusClass = ''; 
+                    $cvIsRefundProcessed = false;
+
+                    if (!empty($booking->payment_histories)) {
+                        foreach ($booking->payment_histories as $ph) {
+                            if ($ph->payment_method === 'Admin Adjustment' && $ph->payment_status === 'Refunded - Admin Processed') {
+                                $cvIsRefundProcessed = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if ($booking->refund_due_amount > 0) {
+                        $cvDisplayStatus = strtoupper(h($booking->status)) . '<br><span style="font-size:0.9em; color:orange;">(Refund Pending: ' . $this->Number->currency($booking->refund_due_amount, 'AUD') . ')</span>';
+                    } elseif ($cvIsRefundProcessed) {
+                        $cvDisplayStatus = strtoupper(h($booking->status)) . '<br><span style="font-size:0.9em; color:green;">(Refund Processed)</span>';
+                    } else {
+                        $cvDisplayStatus = strtoupper(h($booking->status));
+                    }
+                    ?>
+                    <?= $cvDisplayStatus ?>
+                </p>
+            </div>
+
             <?php if (!empty($booking->bookings_stylists)): ?>
             <div class="info-group">
                 <label><?= __('Selected Stylists and Services') ?></label>

@@ -68,7 +68,7 @@
                             ?>
                         </td>
                         <td>
-                            <?php // Check if booking relationship is loaded and not null
+                            <?php 
                             if ($payment->hasValue('booking') && $payment->booking) {
                                 echo $this->Html->link($payment->booking->booking_name, ['controller' => 'Bookings', 'action' => 'view', $payment->booking->id]);
                             } else {

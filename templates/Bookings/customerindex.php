@@ -170,29 +170,52 @@
                                                 </td>
                                                 <td>
                                                     <?php 
+                                                    $displayStatus = h($booking->status);
                                                     $statusClass = '';
-                                                    switch ($booking->status) {
-                                                        case 'active':
-                                                            $statusClass = 'active';
-                                                            break;
-                                                        case 'Confirmed - Payment Due':
-                                                            $statusClass = 'payment-due';
-                                                            break;
-                                                        case 'Confirmed - Paid':
-                                                            $statusClass = 'paid';
-                                                            break;
-                                                        case 'cancelled':
-                                                            $statusClass = 'cancelled';
-                                                            break;
-                                                        case 'finished':
-                                                            $statusClass = 'finished';
-                                                            break;
-                                                        default:
-                                                            $statusClass = 'text-muted';
+                                                    $isRefundProcessed = false;
+
+                                                    // Check if a refund was processed for this booking
+                                                    if (!empty($booking->payment_histories)) {
+                                                        foreach ($booking->payment_histories as $ph) {
+                                                            if ($ph->payment_method === 'Admin Adjustment' && $ph->payment_status === 'Refunded - Admin Processed') {
+                                                                $isRefundProcessed = true;
+                                                                break;
+                                                            }
+                                                        }
+                                                    }
+
+                                                    if ($booking->refund_due_amount > 0) {
+                                                        // Combine original status with refund pending info
+                                                        $displayStatus = strtoupper(h($booking->status)) . ' <br><span style="font-size:0.9em; color:white;">(Refund Pending: ' . $this->Number->currency($booking->refund_due_amount, 'AUD') . ')</span>';
+                                                        switch ($booking->status) {
+                                                            case 'active': $statusClass = 'active refund-pending'; break;
+                                                            case 'Confirmed - Payment Due': $statusClass = 'payment-due refund-pending'; break;
+                                                            case 'Confirmed - Paid': $statusClass = 'paid refund-pending'; break;
+                                                            default: $statusClass = 'text-muted refund-pending';
+                                                        }
+                                                    } elseif ($isRefundProcessed) { 
+                                                        $displayStatus = strtoupper(h($booking->status)) . ' <br><span style="font-size:0.9em; color:white;">(Refund Processed)</span>';
+                                                        switch ($booking->status) {
+                                                            case 'active': $statusClass = 'active refund-processed'; break;
+                                                            case 'Confirmed - Paid': $statusClass = 'paid refund-processed'; break;
+                                                            default: $statusClass = 'text-muted refund-processed';
+                                                        }
+                                                    } else {
+                                                        // Original status and class logic if no refund aspect
+                                                        $displayStatus = strtoupper(h($booking->status));
+                                                        switch ($booking->status) {
+                                                            case 'active': $statusClass = 'active'; break;
+                                                            case 'Confirmed - Payment Due': $statusClass = 'payment-due'; break;
+                                                            case 'Confirmed - Paid': $statusClass = 'paid'; break;
+                                                            case 'cancelled': $statusClass = 'cancelled'; break;
+                                                            case 'finished': $statusClass = 'finished'; break;
+                                                            default: $statusClass = 'text-muted';
+                                                        }
                                                     }
                                                     ?>
                                                     <span class="status-text <?= $statusClass ?>">
-                                                        <?= strtoupper(h($booking->status)) ?>
+                                                        <?= $displayStatus 
+                                                        ?>
                                                     </span>
                                                 </td>
                                                 <td class="actions">
