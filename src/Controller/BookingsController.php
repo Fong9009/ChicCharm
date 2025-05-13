@@ -10,6 +10,7 @@ use Cake\Event\EventInterface;
 use Cake\Http\Response;
 use Cake\I18n\DateTime as CakeDateTime;
 use Cake\I18n\FrozenTime;
+use Cake\I18n\FrozenDate;
 use Cake\Log\Log;
 use Cake\View\Exception\MissingTemplateException;
 use DateTime;
@@ -74,7 +75,7 @@ class BookingsController extends AppController
             if (!$user || $user->type !== 'customer') {
                 $this->Flash->error('Access denied. This area is for customers only.');
 
-                return $this->redirect(['controller' => 'Pages', 'action' => 'display', 'home']);
+                return $this->redirect(['controller' => 'Pages', 'action' => 'display', 'landing']);
             }
         }
 
@@ -84,7 +85,7 @@ class BookingsController extends AppController
             if (!$user || $user->type !== 'admin') {
                 $this->Flash->error('Access denied. This area is for administrators only.');
 
-                return $this->redirect(['controller' => 'Pages', 'action' => 'display', 'home']);
+                return $this->redirect(['controller' => 'Pages', 'action' => 'display', 'landing']);
             }
         }
 
@@ -94,7 +95,7 @@ class BookingsController extends AppController
             if (!$user || $user->type !== 'stylist') {
                 $this->Flash->error('Access denied. This area is for Stylists only.');
 
-                return $this->redirect(['controller' => 'Pages', 'action' => 'display', 'home']);
+                return $this->redirect(['controller' => 'Pages', 'action' => 'display', 'landing']);
             }
         }
 
@@ -265,6 +266,7 @@ class BookingsController extends AppController
     {
         $stylist = $this->Stylists->get($this->Authentication->getIdentity()->id);
 
+        $today = FrozenDate::today();
         //Bookings that have the selected Stylist
         $bookingsTable = $this->fetchTable('Bookings');
         $query = $bookingsTable->find()
@@ -280,7 +282,10 @@ class BookingsController extends AppController
             ->matching('BookingsStylists', function ($q) use ($stylist) {
                 return $q->where(['BookingsStylists.stylist_id' => $stylist->id]);
             })
-            ->where(['Bookings.status' => 'active'])
+            ->where([
+                'Bookings.status IN' => ['finished', 'cancelled','Confirmed - Paid'],
+                'Bookings.booking_date >=' => $today
+            ])
             ->orderBy([
                 'ABS(DATEDIFF(booking_date, CURDATE()))' => 'ASC',
                 'booking_date' => 'ASC',
@@ -677,6 +682,27 @@ class BookingsController extends AppController
         $this->set(compact('booking', 'stylists', 'services', 'customers'));
     }
 
+    public function editStatus($id = null)
+    {
+        // Check if user is admin
+        $user = $this->Authentication->getIdentity();
+        if (!$user || $user->type !== 'admin') {
+            $this->Flash->error('Access denied. Admin only area.');
+
+            return $this->redirect(['action' => 'customerindex']);
+        }
+
+        $booking = $this->Bookings->get($id);
+        $booking->status = 'Confirmed - Paid';
+        $booking->remaining_cost = 0;
+        if ($this->Bookings->save($booking)) {
+            $this->Flash->success(__('The Booking Has been payed in store'));
+        } else {
+            $this->Flash->error(__('The booking could not be saved. Please, try again.'));
+        }
+
+        return $this->redirect(['action' => 'index']);
+    }
     //Remove Stylists from a booking
 
     /**
@@ -917,7 +943,7 @@ class BookingsController extends AppController
                 $this->set(compact('booking', 'stylists', 'services'));
                 $this->request = $this->request->withParsedBody($data);
 
-                 return $this->render('customerbooking'); 
+                 return $this->render('customerbooking');
             }
 
             if ($this->Bookings->save($booking)) {
@@ -928,11 +954,11 @@ class BookingsController extends AppController
                 $placeholderPayment = $paymentHistoriesTable->newEntity([
                     'booking_id' => $bookingId,
                     'customer_id' => $booking->customer_id,
-                    'payment_amount' => $booking->total_cost, 
-                    'payment_currency' => 'AUD', 
-                    'payment_status' => 'Pending', 
-                    'payment_method' => null, 
-                    'payment_date' => FrozenTime::now(), 
+                    'payment_amount' => $booking->total_cost,
+                    'payment_currency' => 'AUD',
+                    'payment_status' => 'Pending',
+                    'payment_method' => null,
+                    'payment_date' => FrozenTime::now(),
                     'notes' => 'Placeholder record created on booking confirmation.'
                 ]);
                 if (!$paymentHistoriesTable->save($placeholderPayment)) {
@@ -942,11 +968,11 @@ class BookingsController extends AppController
 
                 try {
                     $bookingWithDetails = $this->Bookings->get($bookingId, [
-                        'contain' => ['Customers', 'BookingsServices.Services'] 
+                        'contain' => ['Customers', 'BookingsServices.Services']
                     ]);
                     // Ensure placeholderPayment is the entity saved above
                     if ($bookingWithDetails && $placeholderPayment) {
-                        $mailer = new \App\Mailer\InvoiceMailer(); 
+                        $mailer = new \App\Mailer\InvoiceMailer();
                         $mailer->sendBookingConfirmedInvoice($bookingWithDetails, $placeholderPayment);
                         Log::info("Booking confirmation email sent for Booking ID: {$bookingId} to {$bookingWithDetails->customer->email}");
                     } else {
@@ -1224,7 +1250,7 @@ class BookingsController extends AppController
                     'booking_id' => $bookingId,
                     'customer_id' => $booking->customer_id,
                     'payment_amount' => $booking->total_cost,
-                    'payment_currency' => 'AUD', 
+                    'payment_currency' => 'AUD',
                     'payment_status' => 'Pending',
                     'payment_method' => null,
                     'payment_date' => FrozenTime::now(),
@@ -1237,10 +1263,10 @@ class BookingsController extends AppController
 
                 try {
                     $bookingWithDetails = $this->Bookings->get($bookingId, [
-                        'contain' => ['Customers', 'BookingsServices.Services'] 
+                        'contain' => ['Customers', 'BookingsServices.Services']
                     ]);
                     if ($bookingWithDetails && $placeholderPayment) {
-                        $mailer = new \App\Mailer\InvoiceMailer(); 
+                        $mailer = new \App\Mailer\InvoiceMailer();
                         $mailer->sendBookingConfirmedInvoice($bookingWithDetails, $placeholderPayment);
                         Log::info("Booking confirmation email sent for Booking ID (Admin): {$bookingId} to {$bookingWithDetails->customer->email}");
                     } else {
@@ -1646,6 +1672,7 @@ class BookingsController extends AppController
 
     public function stylistPastBookings () {
         $stylist = $this->Stylists->get($this->Authentication->getIdentity()->id);
+        $today = FrozenDate::today();
 
         //Bookings that have the selected Stylist
         $bookingsTable = $this->fetchTable('Bookings');
@@ -1662,7 +1689,10 @@ class BookingsController extends AppController
             ->matching('BookingsServices', function ($q) use ($stylist) {
                 return $q->where(['BookingsServices.stylist_id' => $stylist->id]);
             })
-            ->where(['Bookings.status IN' => ['finished', 'cancelled']])
+            ->where([
+                'Bookings.status' => 'Confirmed - Paid',
+                'Bookings.booking_date <' => $today
+            ])
             ->orderBy(['Bookings.booking_date' => 'DESC']);
         $bookings = $this->paginate($query);
 
@@ -2437,7 +2467,7 @@ class BookingsController extends AppController
             'BookingsStylists' => ['Stylists'],
             'BookingsServices' => ['Services', 'Stylists'],
         ]);
- 
+
         if ($booking->status === 'Confirmed - Paid') {
             $this->Flash->error(__('This booking has been paid and can no longer be edited.'));
             return $this->redirect(['action' => 'customerindex']);
@@ -2522,14 +2552,14 @@ class BookingsController extends AppController
                 $booking = $this->Bookings->patchEntity($booking, [
                     'customer_id' => $data['customer_id'],
                     'booking_name' => $data['booking_name'],
-                    'booking_date' => $data['booking_date_formatted'], 
+                    'booking_date' => $data['booking_date_formatted'],
                     'total_cost' => $data['total_cost'],
                     'remaining_cost' => $data['remaining_cost'],
                     'notes' => $data['notes'],
                     'status' => 'active',
                  ], [
-                     'associated' => [], 
-                     'guard' => false 
+                     'associated' => [],
+                     'guard' => false
                  ]);
 
                  if (!$this->Bookings->save($booking)) {
@@ -2537,8 +2567,8 @@ class BookingsController extends AppController
                     throw new Exception('Failed to save main booking updates.');
                 }
 
-                $allServicesTimes = []; 
-                $servicesDetails = []; 
+                $allServicesTimes = [];
+                $servicesDetails = [];
 
                 if ($hasServiceData) {
                     $serviceIds = array_column($data['bookings_services'], 'service_id');
@@ -2556,17 +2586,17 @@ class BookingsController extends AppController
                     foreach ($data['bookings_services'] as $serviceData) {
                          if (!isset($serviceData['stylist_id'], $serviceData['start_time'], $serviceData['service_id'])) {
                              Log::warning('[CustomerEdit] Skipping service data due to missing fields: ' . json_encode($serviceData));
-                             continue; 
+                             continue;
                          }
                          $stylistIdEdit = (int)$serviceData['stylist_id'];
                          $serviceIdEdit = (int)$serviceData['service_id'];
                          $startTimeStrEdit = $serviceData['start_time'];
-                         $bookingDateStrEdit = $data['booking_date_formatted']; 
+                         $bookingDateStrEdit = $data['booking_date_formatted'];
                          $durationEdit = $servicesDetails[$serviceIdEdit] ?? 0;
 
                          if ($durationEdit <= 0) {
                              Log::warning("[CustomerEdit] Service ID {$serviceIdEdit} has zero or invalid duration.");
-                             continue; 
+                             continue;
                          }
 
                          try {
@@ -2582,7 +2612,7 @@ class BookingsController extends AppController
                                          $hasConflictEdit = true;
                                          $conflictMessageEdit = "Time conflict detected for stylist. Please ensure service times do not overlap.";
                                          Log::warning("[CustomerEdit] Internal conflict detected: " . $conflictMessageEdit);
-                                         break 2; 
+                                         break 2;
                                      }
                                  }
                              }
@@ -2591,7 +2621,7 @@ class BookingsController extends AppController
                                  $hasConflictEdit = true;
                                  $conflictMessageEdit = "The selected time slot for a service conflicts with another booking.";
                                  Log::warning("[CustomerEdit] External conflict detected via checkSegmentAvailability.");
-                                 break; 
+                                 break;
                               }
 
 
@@ -2642,9 +2672,9 @@ class BookingsController extends AppController
                             Log::error('[CustomerEdit] Failed to save booking service. Errors: ' . json_encode($bookingService->getErrors()));
                             throw new \Exception('Failed to save updated booking service details.');
                         }
-                         $allServicesTimes[] = ['start' => $startTime, 'end' => $endTime]; 
+                         $allServicesTimes[] = ['start' => $startTime, 'end' => $endTime];
                     }
-                } 
+                }
 
                  $overallStartTime = null;
                  $overallEndTime = null;
@@ -2677,7 +2707,7 @@ class BookingsController extends AppController
                 if ($hasServiceData) {
                     $processedStylists = [];
                     foreach ($data['bookings_services'] as $serviceData) {
-                        if (!isset($serviceData['stylist_id'])) continue; 
+                        if (!isset($serviceData['stylist_id'])) continue;
                         $stylistId = (int)$serviceData['stylist_id'];
                         if (!in_array($stylistId, $processedStylists)) {
                             $bookingStylist = $bookingsStylistsTable->newEntity([
@@ -2690,7 +2720,7 @@ class BookingsController extends AppController
                                 Log::error('[CustomerEdit] Failed to save booking stylist. Errors: ' . json_encode($bookingStylist->getErrors()));
                                  throw new Exception('Failed to save updated booking stylist details.');
                             }
-                             $processedStylists[] = $stylistId; 
+                             $processedStylists[] = $stylistId;
                         }
                     }
                 }
@@ -2704,14 +2734,14 @@ class BookingsController extends AppController
                 $connection->rollback();
                 Log::error('[CustomerEdit] Booking update failed: ' . $e->getMessage() . ' Booking ID: ' . $bookingId . ' Data: ' . json_encode($data));
                 $this->Flash->error(__('The booking could not be updated. Please, try again. Error: {0}', $e->getMessage()));
-                 $booking->setError('general', $e->getMessage()); 
+                 $booking->setError('general', $e->getMessage());
             }
 
-        } 
+        }
 
         $customers = $this->Bookings->Customers->find('list', ['limit' => 1])->where(['id' => $currentUserId])->all();
         $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
-        $services = $this->fetchTable('Services')->find('all')->all(); 
+        $services = $this->fetchTable('Services')->find('all')->all();
 
         $this->set(compact('booking', 'stylists', 'services', 'customers'));
 
@@ -2723,7 +2753,7 @@ class BookingsController extends AppController
         }
     }
 
-    public function viewPendingGuestBooking($token = null) 
+    public function viewPendingGuestBooking($token = null)
     {
         $bookingData = $this->request->getSession()->read('GuestBooking.pending_details');
 

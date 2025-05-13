@@ -9,6 +9,8 @@ use Cake\Routing\Router;
 $imageServicePath = $serviceInQuestion->service_image;
 if ($imageServicePath != null) {
     $imageServicePath = Router::url('/img/service/' . $serviceInQuestion->service_image, true);
+} else {
+    $imageServicePath = Router::url('/img/service/service-placeholder.jpg', true);
 }
 ?>
 <section class="px-5 mt-4">
@@ -64,6 +66,8 @@ if ($imageServicePath != null) {
         $imagePath = $stylist->profile_picture;
         if ($imagePath != null) {
             $imagePath = Router::url('/img/profile/' . $stylist->profile_picture, true);
+        } else {
+            $imagePath = Router::url('/img/profile/stylist-placeholder.jpg', true);
         }
         if ($counter % 2 === 0): ?>
             <div class="row justify-content-center">
