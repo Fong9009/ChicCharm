@@ -124,11 +124,11 @@
                 ]
             ) ?>
 
-            <?php 
+            <?php
             // Show invoice link if paid (and PDF exists) OR if payment is due (and history exists)
-            if (!empty($booking->latest_payment_history) && 
-                ( ($booking->status === 'Confirmed - Paid' && !empty($booking->latest_payment_history->invoice_pdf)) || 
-                  ($booking->status === 'Confirmed - Payment Due') 
+            if (!empty($booking->latest_payment_history) &&
+                ( ($booking->status === 'Confirmed - Paid' && !empty($booking->latest_payment_history->invoice_pdf)) ||
+                  ($booking->status === 'Confirmed - Payment Due')
                 )
             ):
             ?>
@@ -158,11 +158,13 @@
             ?>
                 <?php // Show edit button if status allows (e.g., active or payment due)
                 if (in_array($booking->status, ['active', 'Confirmed - Payment Due'])): ?>
+                    <?php if ($booking->total_cost - $booking->remaining_cost == 0): ?>
                     <?= $this->Html->link(
                         __('Edit Booking'),
                         ['action' => 'customeredit', $booking->id],
                         ['class' => 'btn btn-primary']
                     ) ?>
+                    <?php endif; ?>
                 <?php endif; ?>
 
                 <?php
