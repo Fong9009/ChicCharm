@@ -209,6 +209,9 @@ $this->Html->script('custom', ['block' => true]);
                                     'class' => 'button btn-danger',
                                 ]
                             ) ?>
+                            <?php if ($booking->status == 'Confirmed - Payment Due'): ?>
+                                 <?= $this->Html->link(__('Mark As Paid'), ['action' => 'editStatus', $booking->id], ['class' => 'button', 'confirm' => 'Are you sure this booking was paid in store']) ?>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>

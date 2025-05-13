@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controller;
 use Authentication\PasswordHasher\DefaultPasswordHasher;
 use Cake\Event\EventInterface;
+use Cake\I18n\FrozenDate;
 /**
  * Stylists Controller
  *
@@ -28,6 +29,8 @@ class StylistsController extends AppController
             $this->redirect(['controller' => 'Customers', 'action' => 'dashboard']);
         } elseif ($user->type === 'stylist') {
             $this->redirect(['controller' => 'Stylists', 'action' => 'dashboard']);
+        } elseif ($user->type === 'guest') {
+            $this->redirect(['controller' => 'Pages', 'action' => 'display', 'landing']);
         }
     }
 
@@ -368,6 +371,12 @@ class StylistsController extends AppController
      */
     public function delete($id = null)
     {
+        $user = $this->Authentication->getIdentity();
+        //Only admins can edit profiles
+        if ($user->type !== 'admin') {
+            return $this->redirect(['action' => 'dashboard']);
+        }
+
         $this->request->allowMethod(['post', 'delete']);
         $stylist = $this->Stylists->get($id, [
             'contain' => ['BookingsStylists' => function ($q) {
@@ -412,6 +421,7 @@ class StylistsController extends AppController
         if($user->type === 'customer') {
             $this->redirect(['controller' => 'Customers', 'action' => 'dashboard']);
         }
+        $today = FrozenDate::today();
 
         //Bookings that have the selected Stylist
         $bookingsTable = $this->fetchTable('Bookings');
@@ -428,7 +438,10 @@ class StylistsController extends AppController
             ->matching('BookingsStylists', function ($q) use ($stylist) {
                 return $q->where(['BookingsStylists.stylist_id' => $stylist->id]);
             })
-            ->where(['Bookings.status' => 'active'])
+            ->where([
+                'Bookings.status' => 'Confirmed - Paid',
+                'Bookings.booking_date >=' => $today
+            ])
             ->orderBy(['Bookings.booking_date' => 'DESC'])
             ->limit(3);
 
@@ -445,7 +458,10 @@ class StylistsController extends AppController
             ->matching('BookingsServices', function ($q) use ($stylist) {
                 return $q->where(['BookingsServices.stylist_id' => $stylist->id]);
             })
-            ->where(['Bookings.status IN' => ['finished', 'cancelled']])
+            ->where([
+                'Bookings.status IN' => ['finished', 'cancelled','Confirmed - Paid'],
+                'Bookings.booking_date <' => $today
+            ])
             ->orderBy(['Bookings.booking_date' => 'DESC'])
             ->limit(3);
         $this->set(compact('stylist', 'activeBookings', 'finishedBookings'));

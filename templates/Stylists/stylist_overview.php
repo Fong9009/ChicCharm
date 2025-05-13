@@ -38,6 +38,8 @@ use Cake\Routing\Router;
         $imagePath = $stylist->profile_picture;
         if ($imagePath != null) {
             $imagePath = Router::url('/img/profile/' . $stylist->profile_picture, true);
+        } else {
+            $imagePath = Router::url('/img/profile/stylist-placeholder.jpg', true);
         }
         if ($counter % 2 === 0): ?>
             <div class="row justify-content-center">

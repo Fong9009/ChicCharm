@@ -160,15 +160,15 @@ $this->layout = 'default';
                                                                     ['class' => 'view-btn']
                                                                 ) ?>
 
-                                                                <?php 
+                                                                <?php
                                                                 // Show invoice link if paid (and PDF exists) OR if payment is due (and history exists)
-                                                                if (!empty($booking->latest_payment_history) && 
-                                                                    ( ($booking->status === 'Confirmed - Paid' && !empty($booking->latest_payment_history->invoice_pdf)) || 
-                                                                      ($booking->status === 'Confirmed - Payment Due') 
+                                                                if (!empty($booking->latest_payment_history) &&
+                                                                    ( ($booking->status === 'Confirmed - Paid' && !empty($booking->latest_payment_history->invoice_pdf)) ||
+                                                                      ($booking->status === 'Confirmed - Payment Due')
                                                                     )
-                                                                ): 
+                                                                ):
                                                                 ?>
-                                                                    <?php 
+                                                                    <?php
                                                                         echo $this->Html->link(
                                                                             __('Check/Download Invoice'),
                                                                             ['controller' => 'Payments', 'action' => 'viewInvoice', $booking->latest_payment_history->id],
@@ -183,7 +183,7 @@ $this->layout = 'default';
                                                                         );
                                                                     ?>
                                                                 <?php endif; // End invoice link check ?>
-                                                                    
+
                                                                 <?php // Message only for paid bookings
                                                                 if ($booking->status === 'Confirmed - Paid'): ?>
                                                                     <p class="text-muted small mt-1 mb-0 align-self-center">This booking is paid. Contact store for changes.</p>
@@ -194,9 +194,9 @@ $this->layout = 'default';
                                                                 ?>
                                                                     <?php
                                                                     $statusAllowsActions = in_array($booking->status, ['active', 'Confirmed - Payment Due']);
-                                                                    $interactionAllowedByTime = true; 
-                                                                    $cancellationCutoffHours = 1; 
-                                                                    $cancellationMessage = "Cannot edit or cancel (within 1h)"; 
+                                                                    $interactionAllowedByTime = true;
+                                                                    $cancellationCutoffHours = 1;
+                                                                    $cancellationMessage = "Cannot edit or cancel (within 1h)";
 
                                                                     if ($statusAllowsActions) {
 
@@ -220,7 +220,7 @@ $this->layout = 'default';
                                                                                 $cutoffTime = (new \Cake\I18n\FrozenTime())->addHours($cancellationCutoffHours);
 
                                                                                 if ($bookingDateTime < $cutoffTime) {
-                                                                                    $interactionAllowedByTime = false; 
+                                                                                    $interactionAllowedByTime = false;
                                                                                 }
                                                                             } else {
                                                                                 error_log("Could not determine booking date or earliest start time for booking ID: " . $booking->id);
@@ -233,7 +233,7 @@ $this->layout = 'default';
                                                                             $cancellationMessage = "Error checking time window.";
                                                                         }
                                                                     } else {
-                                                                         $interactionAllowedByTime = false; 
+                                                                         $interactionAllowedByTime = false;
                                                                     }
                                                                     ?>
 
@@ -385,21 +385,6 @@ $this->layout = 'default';
                                         <p>You have no recently cancelled bookings.</p>
                                     </div>
                                 <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!--Past Invoices-->
-                <div class="row">
-                    <div class="col-12 mb-4">
-                        <div class="card">
-                            <div class="card-header d-flex justify-content-between align-items-center"  style="background-color:#D7CCC8">
-                                <h3 class="card-title">Past Invoices</h3>
-                            </div>
-                            <div class="card-body">
-                                <!-- Past invoices content -->
-                                <p>No past invoices found.</p>
                             </div>
                         </div>
                     </div>

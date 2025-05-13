@@ -9,7 +9,7 @@ if ($identity) {
     } elseif ($identity->type === 'admin') {
         $link = ['controller' => 'Bookings', 'action' => 'adminbooking'];
     } elseif ($identity->type === 'stylist') {
-        $link = ['controller' => 'Stylist', 'action' => 'Dashboard'];
+        $link = ['controller' => 'Stylists', 'action' => 'dashboard'];
     } else {
         $link = ['controller' => 'Bookings', 'action' => 'guestbooking'];
     }
