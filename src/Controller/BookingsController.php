@@ -164,6 +164,8 @@ class BookingsController extends AppController
                 'Bookings.booking_name',
                 'Bookings.booking_date',
                 'Bookings.total_cost',
+                'Bookings.remaining_cost',
+                'Bookings.refund_due_amount', 
                 'Bookings.status',
                 'Bookings.notes',
             ])
@@ -390,11 +392,17 @@ class BookingsController extends AppController
             return $this->redirect(['action' => 'customerindex']);
         }
 
+        $numberHelper = new \Cake\View\Helper\NumberHelper(new \Cake\View\View());
+
         $booking = $this->Bookings->get($id, contain: [
             'Customers',
             'BookingsStylists' => ['Stylists'],
             'BookingsServices' => ['Services', 'Stylists'],
         ]);
+
+        $originalTotalCost = $booking->total_cost;
+        $originalRemainingCost = $booking->remaining_cost;
+        $originalStatus = $booking->status;
 
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
@@ -455,14 +463,15 @@ class BookingsController extends AppController
                     //Refund the difference
                     $refund = $totalPreviousCost - $totalCost;
                     $data['remaining_cost'] = 0;
-                    //PayPal Refund Required
-                    $this->Flash->success(__('Refund of ' . $refund . ' has been returned'));
+                    $data['refund_due_amount'] = $refund; // Set refund_due_amount
+                    $this->Flash->info(__('A refund of {0} is due to the customer. Please process this manually via PayPal.', $numberHelper->currency($refund, 'AUD')));
                 } elseif ($totalCost > $totalPreviousCost) {
-                    //Customer needs to pay more
                     $data['remaining_cost'] = $totalCost - $totalPreviousCost;
+                    $data['refund_due_amount'] = 0; // Reset if now owes more
                     $booking->status = 'Confirmed - Payment Due';
                 } else {
                     $data['remaining_cost'] = 0;
+                    $data['refund_due_amount'] = 0; // Reset if cost is same
                     $this->Flash->success(__('Cost is the same, no change required'));
                 }
 
@@ -471,23 +480,24 @@ class BookingsController extends AppController
                 $paidSoFar = $booking->total_cost - $booking->remaining_cost;
 
                 if ($totalCost < $paidSoFar) {
-                    //Refund
                     $refund = $paidSoFar - $totalCost;
                     $data['remaining_cost'] = 0;
+                    $data['refund_due_amount'] = $refund; // Set refund_due_amount
                     $booking->status = 'Confirmed - Paid';
-                    $this->Flash->success(__('Refund of ' . $refund . ' has been returned'));
+                    $this->Flash->info(__('A refund of {0} is due to the customer as their new total is less than what they have already paid. Please process this manually via PayPal.', $numberHelper->currency($refund, 'AUD')));
                 } elseif ($totalCost > $paidSoFar) {
-                    //They still owe more
                     $data['remaining_cost'] = $totalCost - $paidSoFar;
+                    $data['refund_due_amount'] = 0; // Reset if still owes more or owes different amount
                 } else {
-                    //They've already paid exactly what's needed
                     $data['remaining_cost'] = 0;
+                    $data['refund_due_amount'] = 0; // Reset if paid exactly
                     $booking->status = 'Confirmed - Paid';
                 }
             } else {
                 // For new or unconfirmed bookings
                 // If all else fails
                 $data['remaining_cost'] = $totalCost;
+                $data['refund_due_amount'] = 0; // Ensure it's 0 for new/active bookings
             }
 
             $data['total_cost'] = $totalCost;
@@ -514,6 +524,7 @@ class BookingsController extends AppController
                     'booking_date' => $data['booking_date_formatted'],
                     'total_cost' => $data['total_cost'],
                     'remaining_cost' => $data['remaining_cost'],
+                    'refund_due_amount' => $data['refund_due_amount'], // Add to patch data
                     'notes' => $data['notes'],
                  ], ['associated' => []]);
 
@@ -534,7 +545,6 @@ class BookingsController extends AppController
                         ])->where(['id IN' => $serviceIds])->toArray();
                     }
 
-                    // --- START Server-Side Time Conflict Validation (Edit) ---
                     $stylistTimeSlotsEdit = [];
                     $hasConflictEdit = false;
                     $conflictMessageEdit = '';
@@ -579,7 +589,6 @@ class BookingsController extends AppController
                         // Throw exception to trigger transaction rollback
                         throw new Exception($conflictMessageEdit ?: 'A time conflict was detected. Please ensure service times for the same stylist do not overlap.');
                     }
-                    // --- END Server-Side Time Conflict Validation (Edit) ---
 
                     // Re-Save BookingsServices records with individual start/end times
                     foreach ($data['bookings_services'] as $serviceIdKey => $serviceData) {
@@ -653,9 +662,77 @@ class BookingsController extends AppController
                 $connection->commit();
                 $this->Flash->success(__('The booking has been updated successfully.'));
 
+                $newTotalCost = $booking->total_cost;
+                $newRemainingCost = $booking->remaining_cost;
+                $newStatus = $booking->status;
+                $customerEmail = $booking->customer->email;
+
+                $emailDetails = null;
+
+                if ($originalStatus === 'Confirmed - Paid') {
+                    if ($newTotalCost < $originalTotalCost) {
+                        $refundAmount = $originalTotalCost - $newTotalCost;
+                        $emailDetails = [
+                            'type' => 'refund_due',
+                            'amount' => $refundAmount,
+                            'original_total' => $originalTotalCost,
+                            'new_total' => $newTotalCost,
+                            'customer_email' => $customerEmail
+                        ];
+                    } elseif ($newTotalCost > $originalTotalCost) {
+                        $additionalAmount = $newTotalCost - $originalTotalCost; 
+                        $emailDetails = [
+                            'type' => 'additional_payment_due',
+                            'amount' => $additionalAmount,
+                            'original_total' => $originalTotalCost,
+                            'new_total' => $newTotalCost,
+                            'customer_email' => $customerEmail
+                        ];
+                    }
+                } elseif ($originalStatus === 'Confirmed - Payment Due') {
+                    $paidSoFar = $originalTotalCost - $originalRemainingCost;
+                    if ($newTotalCost < $paidSoFar) {
+                        $refundAmount = $paidSoFar - $newTotalCost;
+                        $emailDetails = [
+                            'type' => 'refund_due',
+                            'amount' => $refundAmount,
+                            'original_total' => $originalTotalCost,
+                            'paid_so_far' => $paidSoFar,
+                            'new_total' => $newTotalCost,
+                            'customer_email' => $customerEmail
+                        ];
+                    } elseif ($newTotalCost > $paidSoFar) {
+                        // $newRemainingCost already reflects the total additional amount needed
+                        $emailDetails = [
+                            'type' => 'additional_payment_due',
+                            'amount' => $newRemainingCost,
+                            'original_total' => $originalTotalCost,
+                            'paid_so_far' => $paidSoFar,
+                            'new_total' => $newTotalCost,
+                            'customer_email' => $customerEmail
+                        ];
+                    }
+                }
+
+                if ($emailDetails) {
+                    Log::info('[AdminEditNotification] Prepared email details: ' . json_encode($emailDetails), ['scope' => ['admin_edit_email']]);
+                    try {
+                        // Ensure Customer entity is loaded with the booking for the mailer
+                        $bookingWithCustomer = $this->Bookings->get($booking->id, ['contain' => ['Customers', 'PaymentHistories' => function($q){ return $q->orderBy(['PaymentHistories.payment_date' => 'DESC']);} ]]);
+                        if ($bookingWithCustomer && $bookingWithCustomer->customer && $bookingWithCustomer->customer->email) {
+                            $mailer = new \App\Mailer\InvoiceMailer();
+                            $mailer->sendAdminEditNotification($bookingWithCustomer, $emailDetails);
+                            Log::info('[AdminEditNotification] Mailer method called successfully for booking ID: ' . $booking->id, ['scope' => ['admin_edit_email']]);
+                        } else {
+                            Log::error('[AdminEditNotification] Could not send email: Customer data or email missing for booking ID: ' . $booking->id, ['scope' => ['admin_edit_email']]);
+                        }
+                    } catch (\Exception $e) {
+                        Log::error('[AdminEditNotification] Error sending email for booking ID: ' . $booking->id . '. Error: ' . $e->getMessage(), ['scope' => ['admin_edit_email']]);
+                    }
+                }
+
                 return $this->redirect(['action' => 'index']);
             } catch (Exception $e) {
-                // Rollback transaction on any error
                 $connection->rollback();
                 Log::error('[Edit] Booking update failed: '
                     . $e->getMessage() .
@@ -664,20 +741,15 @@ class BookingsController extends AppController
                     . ' Data: '
                     . json_encode($data));
                 $this->Flash->error(__('The booking could not be updated. Please, try again. Error: {0}', $e->getMessage()));
-                 // Repopulate form data for rendering
                  $booking->setErrors(json_decode($e->getMessage(), true) ?: []);
             }
-            // --- End Transaction ---
-        } // end if request is post/put/patch
+        } 
 
-        // No need to format the date here as CakePHP will handle it through the form helper
         $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
         $customers = $this->Bookings->Customers->find('list', limit: 200)->all();
         $services = $this->fetchTable('Services')->find('all')->all();
         $this->set(compact('booking', 'stylists', 'services', 'customers'));
     }
-
-    //Remove Stylists from a booking
 
     /**
      * @param $stylistId
@@ -2525,6 +2597,7 @@ class BookingsController extends AppController
                     'booking_date' => $data['booking_date_formatted'], 
                     'total_cost' => $data['total_cost'],
                     'remaining_cost' => $data['remaining_cost'],
+                    'refund_due_amount' => $data['refund_due_amount'], // Add to patch data
                     'notes' => $data['notes'],
                     'status' => 'active',
                  ], [
@@ -2743,5 +2816,39 @@ class BookingsController extends AppController
         }
 
         $this->set(compact('bookingData'));
+    }
+
+    /**
+     * Marks a pending refund as processed by the admin.
+     *
+     * @param string|null $id Booking id.
+     * @return \Cake\Http\Response|null|void Redirects to index.
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     */
+    public function markRefundProcessed($id = null)
+    {
+        // Check if user is admin
+        $user = $this->Authentication->getIdentity();
+        if (!$user || $user->type !== 'admin') {
+            $this->Flash->error('Access denied. Admin only area.');
+            return $this->redirect(['action' => 'customerindex']);
+        }
+
+        $this->request->allowMethod(['post']); 
+        $booking = $this->Bookings->get($id);
+
+        if ($booking->refund_due_amount > 0) {
+            $booking->refund_due_amount = 0.00;
+            if ($this->Bookings->save($booking)) {
+                $this->Flash->success(__('Refund for booking #{0} marked as processed.', $booking->id));
+            } else {
+                Log::error('Admin: Failed to mark refund as processed for booking ID ' . $id . '. Errors: ' . json_encode($booking->getErrors()));
+                $this->Flash->error(__('Could not mark refund as processed. Please, try again.'));
+            }
+        } else {
+            $this->Flash->info(__('No pending refund found for this booking.'));
+        }
+
+        return $this->redirect(['action' => 'index']);
     }
 }

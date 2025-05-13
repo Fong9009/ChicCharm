@@ -14,6 +14,7 @@ $this->Html->script('custom', ['block' => true]);
         <!-- Action Menu -->
         <aside class="column">
             <div class="side-nav">
+                <?= $this->Flash->render() ?>
                 <h4 class="heading"><?= __('Actions') ?></h4>
                 <div class="row gx-2">
                     <div class="col-lg-4 col-md-6 col-sm-12 mb-3 side-nav-item">
@@ -107,6 +108,8 @@ $this->Html->script('custom', ['block' => true]);
                     <th><?= __('Stylists & Services') ?></th>
                     <th><?= __('Notes') ?></th>
                     <th><?= $this->Paginator->sort('total_cost') ?></th>
+                    <th><?= $this->Paginator->sort('remaining_cost', 'Amount Due') ?></th>
+                    <th><?= $this->Paginator->sort('refund_due_amount', 'Refund Pending') ?></th>
                     <th><?= $this->Paginator->sort('status') ?></th>
                     <th class="actions"><?= __('Actions') ?></th>
                 </tr>
@@ -172,6 +175,28 @@ $this->Html->script('custom', ['block' => true]);
                         </td>
                         <td><?= $this->Number->currency($booking->total_cost) ?></td>
                         <td>
+                            <?php if ($booking->status === 'Confirmed - Payment Due' && $booking->remaining_cost > 0): ?>
+                                <span style="color: red; font-weight: bold;">
+                                    <?= $this->Number->currency($booking->remaining_cost) ?>
+                                </span>
+                            <?php elseif ($booking->status === 'Confirmed - Paid' && $booking->remaining_cost > 0): ?>
+                                <span style="color: orange; font-weight: bold;" title="Originally paid, now has outstanding amount after edit">
+                                    <?= $this->Number->currency($booking->remaining_cost) ?>
+                                </span>
+                            <?php else: ?>
+                                <?= $this->Number->currency(0) ?>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <?php if ($booking->refund_due_amount > 0): ?>
+                                <span style="color: purple; font-weight: bold;" title="Refund needs to be processed manually.">
+                                    <?= $this->Number->currency($booking->refund_due_amount) ?>
+                                </span>
+                            <?php else: ?>
+                                <?= $this->Number->currency(0) ?>
+                            <?php endif; ?>
+                        </td>
+                        <td>
                             <?php
                             $statusClassAdmin = '';
                             switch ($booking->status) {
@@ -201,6 +226,17 @@ $this->Html->script('custom', ['block' => true]);
                         <td class="actions">
                             <?= $this->Html->link(__('View'), ['action' => 'view', $booking->id], ['class' => 'button']) ?>
                             <?= $this->Html->link(__('Edit'), ['action' => 'edit', $booking->id], ['class' => 'button']) ?>
+                            <?php if ($booking->refund_due_amount > 0): ?>
+                                <?= $this->Form->postLink(
+                                    __('Refund Processed'),
+                                    ['action' => 'markRefundProcessed', $booking->id],
+                                    [
+                                        'confirm' => __('Are you sure you have processed the refund of {0} for booking #{1}?', $this->Number->currency($booking->refund_due_amount), $booking->id),
+                                        'class' => 'button btn-success',
+                                        'style' => 'margin-top: 5px;' 
+                                    ]
+                                ) ?>
+                            <?php endif; ?>
                             <?= $this->Form->postLink(
                                 __('Cancel'),
                                 ['action' => 'delete', $booking->id],

@@ -222,15 +222,40 @@
                                                         <?php 
                                                         $statusAllowsActionsIndex = in_array($booking->status, ['active', 'Confirmed - Payment Due']);
                                                         $interactionAllowedByIndex = true;
+                                                        $cancellationCutoffHoursIndex = 1; 
+                                                        $cancellationMessageIndex = "Cannot edit or cancel (within 1h)"; 
 
                                                         if ($statusAllowsActionsIndex) {
                                                             try {
-                                                                $bookingDateTimeIndex = new \Cake\I18n\FrozenTime($booking->booking_date->format('d-m-Y') . ' ' . ($booking->start_time ? $booking->start_time->format('H:i:s') : '00:00:00'));
-                                                                if ($bookingDateTimeIndex < (new \Cake\I18n\FrozenTime())->addHours(24)) {
+                                                                $earliestStartTimeIndex = null;
+                                                                if (!empty($booking->bookings_services)) {
+                                                                    foreach ($booking->bookings_services as $bs) {
+                                                                        if ($bs->start_time) {
+                                                                            if (is_null($earliestStartTimeIndex) || $bs->start_time < $earliestStartTimeIndex) {
+                                                                                $earliestStartTimeIndex = $bs->start_time;
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+
+                                                                if ($booking->booking_date && $earliestStartTimeIndex) {
+                                                                    $bookingDateTimeIndex = new \Cake\I18n\FrozenTime(
+                                                                        $booking->booking_date->format('Y-m-d') . ' ' . $earliestStartTimeIndex->format('H:i:s')
+                                                                    );
+                                                                    $cutoffTimeIndex = (new \Cake\I18n\FrozenTime())->addHours($cancellationCutoffHoursIndex);
+
+                                                                    if ($bookingDateTimeIndex < $cutoffTimeIndex) {
+                                                                        $interactionAllowedByIndex = false;
+                                                                    }
+                                                                } else {
+                                                                    error_log("[customerindex] Could not determine booking date/time for booking ID: " . $booking->id);
                                                                     $interactionAllowedByIndex = false;
+                                                                    $cancellationMessageIndex = "Cannot determine booking time.";
                                                                 }
                                                             } catch (Exception $e) {
+                                                                error_log("[customerindex] Error calculating booking time for ID " . $booking->id . ": " . $e->getMessage());
                                                                 $interactionAllowedByIndex = false;
+                                                                $cancellationMessageIndex = "Error checking time window.";
                                                             }
                                                         }
                                                         ?>
@@ -248,21 +273,13 @@
                                                                     ['action' => 'customerdelete', $booking->id],
                                                                     [
                                                                         'method' => 'delete',
-                                                                        'confirm' => __('Are you sure you want to cancel this booking?'),
-                                                                        'class' => 'button',
-                                                                        'style' => 'background-color: #dc3545; border-color: #dc3545; transition: background-color 0.2s;',
-                                                                        'onmouseover' => 'this.style.backgroundColor="#bb2d3b"; this.style.borderColor="#bb2d3b"',
-                                                                        'onmouseout' => 'this.style.backgroundColor="#dc3545"; this.style.borderColor="#dc3545"'
+                                                                        'confirm' => __('Are you sure you want to cancel this booking? This action cannot be undone.'),
+                                                                        'class' => 'button button-outline',
+                                                                        'style' => 'background-color: #dc3545; border-color: #dc3545; color: white; margin-top: 5px;'
                                                                     ]
                                                                 ) ?>
                                                             <?php else: ?>
-                                                                <?= $this->Html->link(__('Edit'), ['action' => 'customeredit', $booking->id], [
-                                                                    'class' => 'button',
-                                                                    'style' => 'background-color: #007bff; border-color: #007bff; color: white; transition: background-color 0.2s, border-color 0.2s;',
-                                                                    'onmouseover' => 'this.style.backgroundColor="#0056b3"; this.style.borderColor="#0056b3"',
-                                                                    'onmouseout' => 'this.style.backgroundColor="#007bff"; this.style.borderColor="#007bff"'
-                                                                ]) ?>
-                                                                <p class="text-muted small mb-0" style="white-space: normal;">Cannot cancel (within 24h).</p>
+                                                                <p class="text-muted small mb-0 mt-2" style="white-space: normal;"><?= h($cancellationMessageIndex) ?></p>
                                                             <?php endif; ?>
                                                         <?php endif; ?>
                                                     <?php endif; ?>
