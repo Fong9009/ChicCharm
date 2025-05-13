@@ -128,7 +128,7 @@
                                                             if (!isset($stylistServices[$stylistId])) {
                                                                 $stylistServices[$stylistId] = [
                                                                     'stylist' => $bookingService->stylist,
-                                                                    'booking_services' => [] 
+                                                                    'booking_services' => []
                                                                 ];
                                                             }
                                                             $stylistServices[$stylistId]['booking_services'][] = $bookingService;
@@ -169,7 +169,7 @@
                                                     <?= !empty($booking->notes) ? h($booking->notes) : 'No notes' ?>
                                                 </td>
                                                 <td>
-                                                    <?php 
+                                                    <?php
                                                     $statusClass = '';
                                                     switch ($booking->status) {
                                                         case 'active':
@@ -199,8 +199,8 @@
                                                     <?= $this->Html->link(
                                                         'View',
                                                         ['action' => 'customerview', $booking->id],
-                                                        ['class' => 'button', 'style' => 'background-color: #59B3B3; border-color: #59B3B3; transition: background-color 0.2s;', 
-                                                        'onmouseover' => 'this.style.backgroundColor="#4A9595"; this.style.borderColor="#4A9595"', 
+                                                        ['class' => 'button', 'style' => 'background-color: #59B3B3; border-color: #59B3B3; transition: background-color 0.2s;',
+                                                        'onmouseover' => 'this.style.backgroundColor="#4A9595"; this.style.borderColor="#4A9595"',
                                                         'onmouseout' => 'this.style.backgroundColor="#59B3B3"; this.style.borderColor="#59B3B3"'
                                                         ]
                                                     ) ?>
@@ -219,7 +219,7 @@
                                                         endif; ?>
                                                         <p class="text-muted small mb-0 mt-2" style="white-space: normal;">This booking is paid. Contact store for changes.</p>
                                                     <?php else: ?>
-                                                        <?php 
+                                                        <?php
                                                         $statusAllowsActionsIndex = in_array($booking->status, ['active', 'Confirmed - Payment Due']);
                                                         $interactionAllowedByIndex = true;
 
@@ -237,12 +237,14 @@
 
                                                         <?php if ($statusAllowsActionsIndex): ?>
                                                             <?php if ($interactionAllowedByIndex): ?>
-                                                                <?= $this->Html->link(__('Edit'), ['action' => 'customeredit', $booking->id], [
-                                                                    'class' => 'button',
-                                                                    'style' => 'background-color: #007bff; border-color: #007bff; color: white; transition: background-color 0.2s, border-color 0.2s;',
-                                                                    'onmouseover' => 'this.style.backgroundColor="#0056b3"; this.style.borderColor="#0056b3"',
-                                                                    'onmouseout' => 'this.style.backgroundColor="#007bff"; this.style.borderColor="#007bff"'
-                                                                ]) ?>
+                                                                <?php if ($booking->total_cost - $booking->remaining_cost == 0) :?>
+                                                                    <?= $this->Html->link(__('Edit'), ['action' => 'customeredit', $booking->id], [
+                                                                        'class' => 'button',
+                                                                        'style' => 'background-color: #007bff; border-color: #007bff; color: white; transition: background-color 0.2s, border-color 0.2s;',
+                                                                        'onmouseover' => 'this.style.backgroundColor="#0056b3"; this.style.borderColor="#0056b3"',
+                                                                        'onmouseout' => 'this.style.backgroundColor="#007bff"; this.style.borderColor="#007bff"'
+                                                                    ]) ?>
+                                                                <?php endif; ?>
                                                                 <?= $this->Form->postLink(
                                                                     __('Cancel'),
                                                                     ['action' => 'customerdelete', $booking->id],
@@ -256,13 +258,15 @@
                                                                     ]
                                                                 ) ?>
                                                             <?php else: ?>
-                                                                <?= $this->Html->link(__('Edit'), ['action' => 'customeredit', $booking->id], [
-                                                                    'class' => 'button',
-                                                                    'style' => 'background-color: #007bff; border-color: #007bff; color: white; transition: background-color 0.2s, border-color 0.2s;',
-                                                                    'onmouseover' => 'this.style.backgroundColor="#0056b3"; this.style.borderColor="#0056b3"',
-                                                                    'onmouseout' => 'this.style.backgroundColor="#007bff"; this.style.borderColor="#007bff"'
-                                                                ]) ?>
-                                                                <p class="text-muted small mb-0" style="white-space: normal;">Cannot cancel (within 24h).</p>
+                                                                <?php if ($booking->total_cost - $booking->remaining_cost == 0) :?>
+                                                                    <?= $this->Html->link(__('Edit'), ['action' => 'customeredit', $booking->id], [
+                                                                        'class' => 'button',
+                                                                        'style' => 'background-color: #007bff; border-color: #007bff; color: white; transition: background-color 0.2s, border-color 0.2s;',
+                                                                        'onmouseover' => 'this.style.backgroundColor="#0056b3"; this.style.borderColor="#0056b3"',
+                                                                        'onmouseout' => 'this.style.backgroundColor="#007bff"; this.style.borderColor="#007bff"'
+                                                                    ]) ?>
+                                                                    <p class="text-muted small mb-0" style="white-space: normal;">Cannot cancel (within 24h).</p>
+                                                                <?php endif; ?>
                                                             <?php endif; ?>
                                                         <?php endif; ?>
                                                     <?php endif; ?>
