@@ -8,7 +8,7 @@
 <div class="booking-details-wrapper">
     <div class="booking-details">
         <h2><?= __('My Booking Details') ?></h2>
-
+        <?= $this->Flash->render() ?>
         <div class="booking-info">
             <div class="info-group">
                 <label><?= __('Booking Date') ?></label>
@@ -120,8 +120,8 @@
 
             <?php if ($booking->status === 'Confirmed - Paid' && !empty($booking->latest_payment_history) && !empty($booking->latest_payment_history->invoice_pdf)):
                 echo $this->Html->link(
-                    __('Download/Check Invoice'),
-                    '/' . h($booking->latest_payment_history->invoice_pdf),
+                    __('Check/Download Invoice'),
+                    ['controller' => 'Payments', 'action' => 'viewInvoice', $booking->latest_payment_history->id],
                     [
                         'class' => 'btn',
                         'style' => 'background-color: #6c757d; border-color: #6c757d; color: white;',

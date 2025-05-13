@@ -621,4 +621,66 @@ class PaymentsController extends AppController
         }
     }
 
+    /**
+     * Allows a customer or admin to view/download an invoice PDF.
+     * Ensures that only the customer who owns the invoice or an admin can access it.
+     *
+     * @param string|null $paymentHistoryId The ID of the payment history record.
+     * @return \Cake\Http\Response|null
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException When payment history not found.
+     */
+    public function viewInvoice($paymentHistoryId = null)
+    {
+        $currentUser = $this->Authentication->getIdentity();
+
+        if (!$currentUser) {
+            $this->Flash->error(__('Please log in to view invoices.'));
+            return $this->redirect(['controller' => 'Auth', 'action' => 'login']);
+        }
+
+        if (!$paymentHistoryId) {
+            $this->Flash->error(__('No invoice specified.'));
+            return $this->redirect($this->referer(['controller' => 'Customers', 'action' => 'dashboard']));
+        }
+
+        try {
+            $paymentHistory = $this->PaymentHistories->get($paymentHistoryId, [
+                'contain' => ['Customers']
+            ]);
+        } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
+            $this->Flash->error(__('Invoice not found.'));
+            Log::warning("[viewInvoice] PaymentHistory record not found for ID: {$paymentHistoryId}");
+            return $this->redirect($this->referer(['controller' => 'Customers', 'action' => 'dashboard']));
+        }
+
+        // Authorization check:
+        // 1. User must be an admin OR
+        // 2. User must be the customer associated with the payment history.
+        if ($currentUser->type !== 'admin' && $paymentHistory->customer_id !== $currentUser->id) {
+            $this->Flash->error(__('You are not authorized to view this invoice.'));
+            Log::warning("[viewInvoice] Unauthorized access attempt for PaymentHistory ID: {$paymentHistoryId} by User ID: {$currentUser->id}");
+            return $this->redirect(['controller' => 'Customers', 'action' => 'dashboard']);
+        }
+
+        if (empty($paymentHistory->invoice_pdf)) {
+            $this->Flash->error(__('Invoice PDF not found for this payment.'));
+            Log::warning("[viewInvoice] Invoice PDF path is empty for PaymentHistory ID: {$paymentHistoryId}");
+            return $this->redirect($this->referer(['controller' => 'Customers', 'action' => 'dashboard']));
+        }
+
+        $filePath = WWW_ROOT . $paymentHistory->invoice_pdf;
+
+        if (!file_exists($filePath)) {
+            $this->Flash->error(__('Invoice file could not be found. Please contact support.'));
+            Log::error("[viewInvoice] Invoice PDF file not found at path: {$filePath} for PaymentHistory ID: {$paymentHistoryId}");
+            return $this->redirect($this->referer(['controller' => 'Customers', 'action' => 'dashboard']));
+        }
+
+        $response = $this->response->withFile($filePath, [
+            'download' => false, 
+            'name' => basename($paymentHistory->invoice_pdf)
+        ]);
+        $response = $response->withHeader('Content-Disposition', 'inline; filename="' . basename($paymentHistory->invoice_pdf) . '"');
+        return $response;
+    }
 }
