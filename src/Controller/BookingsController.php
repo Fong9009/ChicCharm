@@ -733,7 +733,7 @@ class BookingsController extends AppController
                             'new_total' => $newTotalCost,
                             'customer_email' => $customerEmail
                         ];
-                    } elseif ($newTotalCost > $paidSoFar) { 
+                    } elseif ($newTotalCost > $paidSoFar) {
                         $emailDetails = [
                             'type' => 'additional_payment_due',
                             'amount' => $newRemainingCost,
@@ -745,7 +745,7 @@ class BookingsController extends AppController
                     }
                 }
 
-                // Set conditional flash messages 
+                // Set conditional flash messages
                 if ($emailDetails) {
                     if ($emailDetails['type'] === 'refund_due') {
                         $this->Flash->info(__(
@@ -1005,10 +1005,10 @@ class BookingsController extends AppController
         }
 
         if ($this->Bookings->save($booking)) {
-            $numberHelper = new \Cake\View\Helper\NumberHelper(new \Cake\View\View());  
+            $numberHelper = new \Cake\View\Helper\NumberHelper(new \Cake\View\View());
             // Conditional Flash Message
             if ($originalStatus === 'Confirmed - Paid') {
-                $this->Flash->success(__('The booking has been cancelled. Refund of {0} is being processed.', $numberHelper->currency($originalTotalCost, 'AUD'))); 
+                $this->Flash->success(__('The booking has been cancelled. Refund of {0} is being processed.', $numberHelper->currency($originalTotalCost, 'AUD')));
             } else {
                 $this->Flash->success(__('The booking has been cancelled.'));
             }
@@ -1126,16 +1126,16 @@ class BookingsController extends AppController
     }
 
     // Helper method to determine redirect URL
-    private function getRedirectUrlAfterCustomerAction($bookingId = null) 
+    private function getRedirectUrlAfterCustomerAction($bookingId = null)
     {
-        $referer = $this->request->getHeaderLine('Referer'); 
+        $referer = $this->request->getHeaderLine('Referer');
 
         if ($bookingId && !empty($referer) && strpos($referer, 'bookings/customerview') !== false) {
             return ['controller' => 'Bookings', 'action' => 'customerview', $bookingId];
         } elseif (!empty($referer) && strpos($referer, 'customers/dashboard') !== false) {
             return ['controller' => 'Customers', 'action' => 'dashboard'];
         }
-        return ['controller' => 'Customers', 'action' => 'dashboard']; 
+        return ['controller' => 'Customers', 'action' => 'dashboard'];
     }
 
     public function customerbooking()
@@ -2579,7 +2579,7 @@ class BookingsController extends AppController
             ->where([
                 'customer_id' => $user->id,
                 'OR' => [
-                    ['Bookings.status' => 'cancelled'], 
+                    ['Bookings.status' => 'cancelled'],
                     [
                         'Bookings.status IN' => ['finished', 'Confirmed - Payment Due', 'Confirmed - Paid'],
                         'Bookings.booking_date <' => $today,
@@ -2801,6 +2801,19 @@ class BookingsController extends AppController
         // Combine booking date and start time to get the full booking datetime
         $bookingDateTimeStr = $booking->booking_date->format('Y-m-d') . ' ' . ($booking->start_time ? $booking->start_time->format('H:i:s') : '00:00:00');
         try {
+            $bookingServicesTable = TableRegistry::getTableLocator()->get('BookingsServices');
+            $earliestService = $bookingServicesTable->find()
+                ->where(['booking_id' => $id])
+                ->orderByAsc('start_time')
+                ->first();
+
+            if (!$earliestService) {
+                $this->Flash->error(__('No services found for this booking.'));
+                return $this->redirect(['action' => 'customerindex']);
+            }
+            $bookingDate = $booking->booking_date;
+            $startTime = $earliestService->start_time;
+            $bookingDateTimeStr = $bookingDate->format('Y-m-d') . ' ' . $startTime;
             $bookingDateTime = new FrozenTime($bookingDateTimeStr);
             $now = new FrozenTime();
             $minEditTime = $now->addHours(3);
@@ -2849,7 +2862,7 @@ class BookingsController extends AppController
             $data['total_cost'] = $totalCost;
             $data['remaining_cost'] = $totalCost;
             $data['notes'] = $data['notes'] ?? $booking->notes;
-            $data['refund_due_amount'] = 0.00; 
+            $data['refund_due_amount'] = 0.00;
 
 
             $hasServiceData = !empty($data['bookings_services']);
@@ -2870,7 +2883,7 @@ class BookingsController extends AppController
                     'booking_date' => $data['booking_date_formatted'],
                     'total_cost' => $data['total_cost'],
                     'remaining_cost' => $data['remaining_cost'],
-                    'refund_due_amount' => $data['refund_due_amount'], 
+                    'refund_due_amount' => $data['refund_due_amount'],
                     'notes' => $data['notes'],
                  ], [
                      'associated' => [],
