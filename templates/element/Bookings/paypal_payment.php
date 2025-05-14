@@ -88,7 +88,7 @@ if (empty($clientId)) {
                             amount: {
                                 value: '<?= h($paymentAmount) ?>',
                                 currency_code: '<?= h($currencyCode) ?>'
-                        }
+                            }
                     }],
                     application_context: {
                         shipping_preference: 'NO_SHIPPING'

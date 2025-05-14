@@ -291,4 +291,48 @@ class InvoiceMailer extends Mailer
             Log::error("[InvoiceMailer.sendAdminCancellationRefundNotification] Error during deliver() for Booking ID {$booking->id}: " . $e->getMessage());
         }
     }
+
+    /**
+     * Sends an email notification to the customer after an admin cancels their non-paid booking.
+     *
+     * @param \App\Model\Entity\Booking $booking The cancelled booking entity (with Customer loaded).
+     * @return void
+     */
+    public function sendAdminCancellationNotification(Booking $booking): void
+    {
+        if (empty($booking->customer) || empty($booking->customer->email)) {
+            Log::warning("[InvoiceMailer.sendAdminCancellationNotification] Customer email not available for booking ID: {$booking->id}");
+            return;
+        }
+
+        $fromEmail = Configure::read('Email.default.from_address', env('EMAIL_FROM_ADDRESS', 'nemobyte071@gmail.com'));
+        $fromName = Configure::read('Email.default.from_name', env('EMAIL_FROM_NAME', 'ChicCharm'));
+
+        $subject = sprintf('Your ChicCharm Booking #%s Has Been Cancelled by Administration', $booking->id);
+
+        $viewVars = [
+            'booking' => $booking,
+            'customerName' => $booking->customer->full_name ?? 'Valued Customer',
+            'companyName' => Configure::read('MyApp.companyName', 'ChicCharm'),
+            'companyPhone' => Configure::read('MyApp.companyPhone', '03 9000 0000'),
+            'companyEmail' => Configure::read('MyApp.companyEmail', 'contact@chiccharm.com'),
+        ];
+
+        try {
+            $this
+                ->setTo($booking->customer->email, $booking->customer->full_name ?? $booking->customer->email)
+                ->setFrom([$fromEmail => $fromName])
+                ->setSubject($subject)
+                ->setViewVars($viewVars)
+                ->setEmailFormat('both')
+                ->viewBuilder()
+                    ->setTemplate('admin_cancellation') 
+                    ->setLayout('default');
+            
+            $this->deliver();
+            Log::info("[InvoiceMailer.sendAdminCancellationNotification] Email sent for Booking ID {$booking->id} to {$booking->customer->email}.");
+        } catch (\Exception $e) {
+            Log::error("[InvoiceMailer.sendAdminCancellationNotification] Error during deliver() for Booking ID {$booking->id}: " . $e->getMessage());
+        }
+    }
 } 

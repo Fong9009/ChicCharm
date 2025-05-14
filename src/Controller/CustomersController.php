@@ -119,12 +119,17 @@ class CustomersController extends AppController
             $booking->latest_payment_history = $latestPayment;
         }
 
-        // Get recent cancelled bookings (limited to 3)
-        $cancelledBookings = $bookingsTable->find()
+        // Get recent past or all cancelled bookings (limited to 3 for dashboard)
+        $pastOrCancelledBookings = $bookingsTable->find()
             ->where([
                 'customer_id' => $this->Authentication->getIdentity()->id,
-                'status IN' => ['cancelled', 'Confirmed - Payment Due', 'Confirmed - Paid'],
-                'booking_date <' => $today,
+                'OR' => [
+                    ['Bookings.status' => 'cancelled'], 
+                    [
+                        'Bookings.status IN' => ['finished', 'Confirmed - Payment Due', 'Confirmed - Paid'], 
+                        'Bookings.booking_date <' => $today
+                    ]
+                ]
             ])
             ->contain([
                 'BookingsServices' => [
@@ -133,11 +138,35 @@ class CustomersController extends AppController
                         'fields' => ['id', 'first_name', 'last_name']
                     ]
                 ],
+                'PaymentHistories' => [
+                    'fields' => ['id', 'booking_id', 'invoice_pdf', 'payment_date', 'payment_method', 'payment_status'],
+                    'sort' => ['PaymentHistories.payment_date' => 'DESC']
+                ]
             ])
-            ->orderBy(['Bookings.booking_date' => 'DESC'])
+            ->select([
+                'Bookings.id',
+                'Bookings.customer_id',
+                'Bookings.booking_name',
+                'Bookings.booking_date',
+                'Bookings.total_cost',
+                'Bookings.status',
+                'Bookings.refund_due_amount'
+            ])
+            ->order([
+                'Bookings.booking_date' => 'DESC'
+            ])
             ->limit(3);
 
-        $this->set(compact('customer', 'activeBookings', 'cancelledBookings'));
+        // Process latest_payment_history for these bookings as well
+        foreach ($pastOrCancelledBookings as $booking) {
+            $latestPayment = null;
+            if (!empty($booking->payment_histories)) {
+                $latestPayment = $booking->payment_histories[0];
+            }
+            $booking->latest_payment_history = $latestPayment;
+        }
+
+        $this->set(compact('customer', 'activeBookings', 'pastOrCancelledBookings'));
     }
 
     /**

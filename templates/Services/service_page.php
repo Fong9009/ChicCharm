@@ -74,7 +74,7 @@ use Cake\Routing\Router;
     if ($counter % 3 !== 0): ?>
         </div>
     <?php endif; ?>
-    <div class="paginator text-center p-2">
+    <div class="paginator text-center p-2" style="margin-bottom: 130px; margin-top: 130px;">
         <ul class="pagination justify-content-center">
             <?= $this->Paginator->first('<<') ?>
             <?= $this->Paginator->prev('<') ?>
