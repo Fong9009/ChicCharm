@@ -256,8 +256,8 @@
                                                         $statusAllowsActionsIndex = in_array($booking->status, ['active', 'Confirmed - Payment Due']);
                                                         $interactionAllowedByTimeIndex = true;
                                                         $cancellationMessageIndex = "";
-                                                        $cancellationCutoffHoursIndex = 1; // Hours before booking to restrict cancellation
-                                                        $editCutoffHoursIndex = 1;       // Hours before booking to restrict editing
+                                                        $cancellationCutoffHoursIndex = 3; // Hours before booking to restrict cancellation
+                                                        $editCutoffHoursIndex = 3;       // Hours before booking to restrict editing
 
                                                         if ($statusAllowsActionsIndex) {
                                                             try {
@@ -282,7 +282,7 @@
 
                                                                     if ($bookingDateTimeIndex <= $editCutoffDateTimeIndex && $bookingDateTimeIndex <= $cancelCutoffDateTimeIndex) {
                                                                         $interactionAllowedByTimeIndex = false;
-                                                                        $cancellationMessageIndex = "Cannot edit or cancel (within 1h)";
+                                                                        $cancellationMessageIndex = "Cannot edit or cancel (within 3h). Please contact store to make changes.";
                                                                     } 
                                                                 } else {
                                                                     $interactionAllowedByTimeIndex = false;
