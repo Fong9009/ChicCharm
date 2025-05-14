@@ -427,7 +427,7 @@ $this->layout = 'default';
 
                                                              <div class="booking-actions d-flex flex-column flex-sm-row gap-2">
                                                                  <?= $this->Html->link(
-                                                                    'View Details',
+                                                                    'View/Pay',
                                                                     ['controller' => 'Bookings', 'action' => 'customerview', $booking->id],
                                                                     ['class' => 'view-btn']
                                                                 ) ?>

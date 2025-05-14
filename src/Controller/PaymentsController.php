@@ -665,35 +665,62 @@ class PaymentsController extends AppController
              return $this->redirect($this->referer(['controller' => 'Customers', 'action' => 'dashboard']));
         }
 
+        Log::debug("[viewInvoice] Processing PaymentHistory ID: {$paymentHistoryId} with invoice_pdf: '{$paymentHistory->invoice_pdf}' and booking status: '{$paymentHistory->booking->status}'");
+
         // Check if invoice PDF exists or if we need to generate it
         if (empty($paymentHistory->invoice_pdf)) {
+            Log::debug("[viewInvoice] invoice_pdf is EMPTY for PaymentHistory ID: {$paymentHistoryId}. Checking if on-the-fly generation is possible.");
             // No PDF saved, check if we can generate a "Payment Due" version
             if ($paymentHistory->booking->status === 'Confirmed - Payment Due') {
-                 Log::debug("[viewInvoice] Generating Payment Due invoice on-the-fly for PaymentHistory ID: {$paymentHistoryId}");
+                 Log::info("[viewInvoice] Attempting ON-THE-FLY PDF generation for Payment Due. PaymentHistory ID: {$paymentHistoryId}, Booking ID: {$paymentHistory->booking->id}");
                  // Load full booking details needed for the PDF template
                  try {
-                    $bookingWithDetails = $this->Bookings->get($paymentHistory->booking->id, [
+                    $bookingIdToFetch = $paymentHistory->booking->id;
+                    Log::info("[viewInvoice] Attempting to fetch Booking ID: {$bookingIdToFetch} for on-the-fly invoice.");
+                    $bookingWithDetails = $this->Bookings->get($bookingIdToFetch, [
                         'contain' => [
                             'Customers',
                             'BookingsServices' => ['Services', 'Stylists'],
                             'BookingsStylists.Stylists',
                         ]
                     ]);
-                    // Generate and output PDF directly to browser
+                    Log::info("[viewInvoice] Successfully fetched Booking ID: {$bookingIdToFetch} (SIMPLIFIED CONTAIN). Object type: " . (is_object($bookingWithDetails) ? get_class($bookingWithDetails) : gettype($bookingWithDetails)));
+                    if (!$bookingWithDetails) {
+                        Log::error("[viewInvoice] Fetching Booking ID: {$bookingIdToFetch} returned a non-object/falsey value.");
+                        throw new \Exception("Failed to retrieve complete booking details for invoice generation.");
+                    }
+
+                    Log::info("[viewInvoice] Preparing to call toArray() on BookingWithDetails for Booking ID: {$bookingIdToFetch}");
+                    $bookingDetailsArray = $bookingWithDetails->toArray();
+                    Log::info("[viewInvoice] Successfully called toArray() on BookingWithDetails. Array has " . count($bookingDetailsArray) . " top-level elements.");
+
+                    Log::debug("[viewInvoice] Data for on-the-fly PDF (BookingWithDetails): " . json_encode($bookingDetailsArray, JSON_PRETTY_PRINT), ['scope' => 'invoice_debug']);
+                    
+                    Log::info("[viewInvoice] Preparing to call toArray() on PaymentHistory for PH ID: {$paymentHistoryId}");
+                    $paymentHistoryArray = $paymentHistory->toArray();
+                    Log::info("[viewInvoice] Successfully called toArray() on PaymentHistory. Array has " . count($paymentHistoryArray) . " top-level elements.");
+
+                    Log::debug("[viewInvoice] Data for on-the-fly PDF (PaymentHistory): " . json_encode($paymentHistoryArray, JSON_PRETTY_PRINT), ['scope' => 'invoice_debug']);
+                    
+                    // Generate and output PDF directly 
                     return $this->_generateInvoicePdf($bookingWithDetails, $paymentHistory, false);
-                 } catch (\Exception $e) {
+                 } catch (\Cake\Datasource\Exception\RecordNotFoundException $rnfe) {
+                    $this->Flash->error(__('The booking details associated with this invoice could not be found.'));
+                    Log::error("[viewInvoice] RecordNotFoundException during on-the-fly invoice generation for PH ID: {$paymentHistoryId}, Booking ID: {$paymentHistory->booking->id}. Error: " . $rnfe->getMessage() . "\nTRACE: " . $rnfe->getTraceAsString());
+                    return $this->redirect($this->referer(['controller' => 'Customers', 'action' => 'dashboard']));
+                 } catch (\Exception $e) { 
                     $this->Flash->error(__('Could not generate the invoice preview. Please contact support.'));
-                    Log::error("[viewInvoice] Error generating on-the-fly invoice for PaymentHistory ID: {$paymentHistoryId}. Error: " . $e->getMessage());
+                    Log::error("[viewInvoice] EXCEPTION during on-the-fly invoice generation for PH ID: {$paymentHistoryId}. Error: " . $e->getMessage() . "\nTRACE: " . $e->getTraceAsString());
                     return $this->redirect($this->referer(['controller' => 'Customers', 'action' => 'dashboard']));
                  }
             } else {
-                // PDF is missing, and status is not Payment Due - show error
+                Log::warning("[viewInvoice] invoice_pdf is EMPTY and status is NOT 'Confirmed - Payment Due' (it is '{$paymentHistory->booking->status}'). Cannot generate. PH ID: {$paymentHistoryId}");
                 $this->Flash->error(__('Invoice PDF not found for this payment.'));
-                Log::warning("[viewInvoice] Invoice PDF path is empty and status is not 'Confirmed - Payment Due' for PaymentHistory ID: {$paymentHistoryId}");
                 return $this->redirect($this->referer(['controller' => 'Customers', 'action' => 'dashboard']));
             }
         } else {
             // Invoice PDF path exists, serve the file
+            Log::info("[viewInvoice] invoice_pdf FOUND: '{$paymentHistory->invoice_pdf}'. Attempting to serve file. PH ID: {$paymentHistoryId}");
             $filePath = WWW_ROOT . $paymentHistory->invoice_pdf;
 
             if (!file_exists($filePath)) {
