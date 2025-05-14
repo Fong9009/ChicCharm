@@ -264,7 +264,7 @@ class BookingsController extends AppController
                         'PaymentHistories.payment_method',
                         'PaymentHistories.payment_status'
                     ])
-                               ->orderBy(['PaymentHistories.payment_date' => 'DESC']);
+                    ->orderBy(['PaymentHistories.payment_date' => 'DESC']);
                 }
             ])
             ->orderBy([
@@ -2797,7 +2797,6 @@ class BookingsController extends AppController
             return $this->redirect(['action' => 'customerindex']);
         }
 
-        // Check the 24-hour rule
         // Combine booking date and start time to get the full booking datetime
         $bookingDateTimeStr = $booking->booking_date->format('Y-m-d') . ' ' . ($booking->start_time ? $booking->start_time->format('H:i:s') : '00:00:00');
         try {
@@ -2816,10 +2815,10 @@ class BookingsController extends AppController
             $bookingDateTimeStr = $bookingDate->format('Y-m-d') . ' ' . $startTime;
             $bookingDateTime = new FrozenTime($bookingDateTimeStr);
             $now = new FrozenTime();
-            $minEditTime = $now->addHours(3);
+            $minEditTime = $now->addHours(1);
 
             if ($bookingDateTime <= $minEditTime) {
-                $this->Flash->error(__('Bookings cannot be changed less than 3 hours before the scheduled time.'));
+                $this->Flash->error(__('Bookings cannot be changed less than 1 hour before the scheduled time.'));
                 return $this->redirect(['action' => 'customerindex']);
             }
         } catch (Exception $e) {
@@ -2828,7 +2827,6 @@ class BookingsController extends AppController
             $this->Flash->error(__('Could not verify booking time for editing. Please contact support.'));
             return $this->redirect(['action' => 'customerindex']);
         }
-
 
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();

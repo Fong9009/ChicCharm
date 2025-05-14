@@ -220,7 +220,7 @@
                                                 </td>
                                                 <td class="actions">
                                                     <?= $this->Html->link(
-                                                        'View',
+                                                        'View/Pay',
                                                         ['action' => 'customerview', $booking->id],
                                                         ['class' => 'button', 'style' => 'background-color: #59B3B3; border-color: #59B3B3; transition: background-color 0.2s;',
                                                         'onmouseover' => 'this.style.backgroundColor="#4A9595"; this.style.borderColor="#4A9595"',
@@ -228,18 +228,28 @@
                                                         ]
                                                     ) ?>
 
-                                                    <?php if ($booking->status === 'Confirmed - Paid'): ?>
-                                                        <?php if (!empty($booking->latest_payment_history) && !empty($booking->latest_payment_history->invoice_pdf)):
+                                                    <?php
+                                                    /* 
+                                                    if ($booking->status === 'Confirmed - Paid' || $booking->status === 'Confirmed - Payment Due') {
+                                                        if (!empty($booking->payment_histories)) {
+                                                            // Find the latest payment history entry, assuming it's the most relevant
+                                                            $latestPaymentHistory = $booking->payment_histories[0]; // Assuming sorted by date DESC
                                                             echo $this->Html->link(
-                                                                __('Check/Download Invoice'),
-                                                                ['controller' => 'Payments', 'action' => 'viewInvoice', $booking->latest_payment_history->id],
-                                                                [
-                                                                    'class' => 'button button-outline',
-                                                                    'style' => 'background-color: #6c757d; border-color: #6c757d; color: white; margin-top: 5px;',
-                                                                    'target' => '_blank'
-                                                                ]
+                                                                'Check/Download Invoice',
+                                                                ['controller' => 'Payments', 'action' => 'viewInvoice', $latestPaymentHistory->id],
+                                                                ['class' => 'button button-outline', 'style' => 'margin-left: 5px;', 'target' => '_blank']
                                                             );
-                                                        endif; ?>
+                                                        } else {
+                                                            // This case might occur if a booking is 'Confirmed - Payment Due' but has no payment_histories yet (e.g. cash payment pending)
+                                                            // Or if data is inconsistent. For now, don't show the link.
+                                                            // echo $this->Html->tag('span', 'Invoice N/A (No Payment History)', ['class' => 'text-muted', 'style' => 'margin-left: 5px;']);
+                                                        }
+                                                    }
+                                                    */
+                                                    ?>
+
+                                                    <?php // Message for paid bookings OR Edit/Cancel buttons for other statuses
+                                                    if ($booking->status === 'Confirmed - Paid'): ?>
                                                         <p class="text-muted small mb-0 mt-2" style="white-space: normal;">This booking is paid. Contact store for changes.</p>
                                                     <?php else: ?>
                                                         <?php
