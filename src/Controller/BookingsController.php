@@ -2815,7 +2815,7 @@ class BookingsController extends AppController
             $bookingDateTimeStr = $bookingDate->format('Y-m-d') . ' ' . $startTime;
             $bookingDateTime = new FrozenTime($bookingDateTimeStr);
             $now = new FrozenTime();
-            $minEditTime = $now->addHours(1);
+            $minEditTime = $now->addHours(3);
 
             if ($bookingDateTime <= $minEditTime) {
                 $this->Flash->error(__('Bookings cannot be changed less than 1 hour before the scheduled time.'));

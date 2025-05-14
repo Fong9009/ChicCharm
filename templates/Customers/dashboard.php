@@ -228,8 +228,8 @@ $this->layout = 'default';
                                                                     <?php
                                                                     $statusAllowsActions = in_array($booking->status, ['active', 'Confirmed - Payment Due']);
                                                                     $interactionAllowedByTime = true;
-                                                                    $cancellationCutoffHours = 1;
-                                                                    $cancellationMessage = "Cannot edit or cancel (within 1h)";
+                                                                    $cancellationCutoffHours = 3;
+                                                                    $cancellationMessage = "Cannot edit or cancel (within 3h). Please contact store to make changes.";
 
                                                                     if ($statusAllowsActions) {
 

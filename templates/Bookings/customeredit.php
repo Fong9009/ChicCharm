@@ -175,13 +175,13 @@ if (!empty($booking->bookings_services)) {
                             </div>
                         </div>
                     </div>
-                     <div class="row" style="display: none;"> <?php // Hidden total cost field used by JS ?>
+                     <div class="row" style="display: none;"> 
                          <div class="col-md-6">
                              <?php
                              echo $this->Form->control('total_cost', [
                                  'readonly' => true,
-                                 'value' => $booking->total_cost ?? '0.00', // Pre-fill with current cost
-                                 'id' => 'total-cost-input', // Added ID for potential JS use
+                                 'value' => $booking->total_cost ?? '0.00', 
+                                 'id' => 'total-cost-input', 
                                  'class' => 'form-control',
                                  'error' => ['class' => 'invalid-feedback']
                              ]);
@@ -213,11 +213,10 @@ if (!empty($booking->bookings_services)) {
                 </div>
                 <div class="row mt-3">
                     <div class="col-md-12">
-                        <?= $this->Form->button(__('Update Your Booking'), [ // Changed Button Text
+                        <?= $this->Form->button(__('Update Your Booking'), [ 
                             'class' => 'btn btn-primary',
-                            // Removed admin-specific confirmation
                         ]) ?>
-                        <?= $this->Html->link(__('Cancel Changes'), ['action' => 'customerindex'], ['class' => 'btn btn-secondary']) // Changed Cancel URL ?>
+                        <?= $this->Html->link(__('Cancel Changes'), ['action' => 'customerindex'], ['class' => 'btn btn-secondary']) ?>
                     </div>
                 </div>
                 <?= $this->Form->end() ?>
