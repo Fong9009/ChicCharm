@@ -136,7 +136,7 @@ class AdminsController extends AppController
         $currentUser = $this->Authentication->getIdentity();
 
         // Only allow admins to edit their own profile
-        if ($currentUser->id != $id) {
+        if ($currentUser->id != $id && $currentUser->type !== 'admin') {
             $this->Flash->error('Access denied. You can only edit your own profile.');
 
             return $this->redirect(['action' => 'index']);
@@ -145,55 +145,50 @@ class AdminsController extends AppController
         $admin = $this->Admins->get($id, contain: []);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
-            $error = 0;
+
+            $domain = substr(strrchr($data['email'], '@'), 1);
+            if (!$domain || !checkdnsrr($domain . '.', 'MX')) {
+                $admin->setError('email', ['This is not a valid email']);
+            }
+
+            if ($data['email'] !== $admin->email) {
+                // Check if email exists in stylists table
+                $adminTable = $this->fetchTable('Admins');
+                $existingAdmin = $adminTable->find()
+                    ->where(['email' => $data['email']])
+                    ->first();
+            } else {
+                $existingAdmin = false;
+            }
+
+            //Check if email exists in customers table
+            $customersTable = $this->fetchTable('Customers');
+            $existingCustomer = $customersTable->find()
+                ->where(['email' => $data['email']])
+                ->first();
+
+            //Check if email exists in stylist table
+            $stylistTable = $this->fetchTable('Stylists');
+            $existingStylist = $stylistTable->find()
+                ->where(['email' => $data['email']])
+                ->first();
+
+            //Check for existing emails
+            if ($existingStylist || $existingCustomer || $existingAdmin) {
+                $admin->setError('email', ['This email is already registered. Please use a different one.']);
+            }
+
+            if (!preg_match("/^[a-zA-Z' ]+$/", $data['first_name'])) {
+                $admin->setError('first_name', ["First name can only be alphabetic or  '"]);
+            } elseif (!preg_match("/^[a-zA-Z' ]+$/", $data['last_name'])) {
+                $admin->setError('last_name', ["Last name can only be alphabetic or '"]);
+            }
+
             $password = $this->request->getData('password');
             if ($password == null || $password == '') {
                 $data['password'] = $admin->password;
             } else {
                 $data['password'] = $password;
-            }
-
-            //Profile Picture Upload
-            $profile = $this->request->getData('profile_picture');
-            if ($profile->getClientFilename() !== '' && $profile->getClientFilename() !== null) {
-                if ($profile && $profile->getClientFilename()) {
-                    //Max Size to prevent massive files from being inserted
-                    //This is measured in MB so max = 4MB
-                    $maxSize = 4 * 1024 * 1024;
-                    if ($profile->getSize() > $maxSize) {
-                        $error = 1;
-                        $this->Flash->error(__('The profile picture is too big please use something smaller than 4MB.'));
-                    }
-
-                    //Check Filetype
-                    $allowedFileTypes = ['image/jpeg', 'image/png','image/jpg'];
-                    if (!in_array($profile->getClientMediaType(), $allowedFileTypes)) {
-                        $error = 1;
-                        $this->Flash->error(__('The profile picture must be a jpeg/jpg or png format.'));
-                    }
-
-                    //Delete old Image if there is one
-                    if ($admin->profile_picture != null && $error !== 1) {
-                        $oldPath = WWW_ROOT . 'img/profile/' . $admin->profile_picture;
-                        if (file_exists($oldPath)) {
-                            unlink($oldPath);
-                        }
-                        //Stores file in directory
-                        $filename = rand(10000, 99999) . '_' . strtolower($profile->getClientFilename());
-                        $profile->moveTo(WWW_ROOT . 'img/profile/' . $filename);
-                        $data['profile_picture'] = $filename;
-                    }
-                    if ($admin->profile_picture === null && $error !== 1) {
-                        //Stores file in directory
-                        $filename = rand(10000, 99999) . '_' . strtolower($profile->getClientFilename());
-                        $profile->moveTo(WWW_ROOT . 'img/profile/' . $filename);
-                        $data['profile_picture'] = $filename;
-                    }
-                } else {
-                    $data['profile_picture'] = null;
-                }
-            } else {
-                    $data['profile_picture'] = $admin->profile_picture;
             }
 
             // Keep existing nonce and nonce_expiry values
@@ -202,14 +197,16 @@ class AdminsController extends AppController
                 $data['nonce_expiry'] = $admin->nonce_expiry;
             }
 
-            // Patch the entity with the data
-            $admin = $this->Admins->patchEntity($admin, $data);
+            if (empty($admin->getErrors())) {
+                $imageResult = $this->replaceImage($id);
+                $admin = $this->Admins->patchEntity($admin, $data);
+                if (!$imageResult['error']) {
+                    $admin->profile_picture = $imageResult['filename'];
+                    if ($this->Admins->save($admin)) {
+                        $this->Flash->success(__('Your profile has been updated.'));
 
-            if ($error !== 1) {
-                if ($this->Admins->save($admin)) {
-                    $this->Flash->success(__('Your profile has been updated.'));
-
-                    return $this->redirect(['action' => 'profile']);
+                        return $this->redirect(['action' => 'profile']);
+                    }
                 }
             }
 
@@ -225,6 +222,63 @@ class AdminsController extends AppController
             }
         }
         $this->set(compact('admin'));
+    }
+
+    private function replaceImage(string $id): array
+    {
+        //Service Image Updater
+        $admin = $this->Admins->get($id, contain: []);
+        $adminImage = $this->request->getData('profile_picture');
+        $data = ['error' => false, 'filename' => null];
+        if ($adminImage->getClientFilename() !== '' && $adminImage->getClientFilename() !== null) {
+            if ($adminImage && $adminImage->getClientFilename()) {
+                //Max Size to prevent massive files from being inserted
+                //This is measured in MB so max = 4MB
+                $maxSize = 4 * 1024 * 1024;
+                if ($adminImage->getSize() > $maxSize) {
+                    $data['error'] = true;
+                    $this->Flash->error(__('The profile picture is too big please use something smaller than 4MB.'));
+                }
+
+                //Check if the file is a real image
+                $tmpFile = $adminImage->getStream()->getMetadata('uri');
+                if (!getimagesize($tmpFile)) {
+                    $data['error'] = true;
+                    $this->Flash->error(__('The uploaded file is not a valid image.'));
+                }
+
+                //Check Filetype
+                $allowedFileTypes = ['image/jpeg', 'image/png','image/jpg'];
+                if (!in_array($adminImage->getClientMediaType(), $allowedFileTypes)) {
+                    $data['error'] = true;
+                    $this->Flash->error(__('The Profile image must be a jpeg/jpg or png format.'));
+                }
+
+                //Delete old Image if there is one
+                if ($admin->profile_picture != null && !$data['error']) {
+                    $oldPath = WWW_ROOT . 'img/profile/' .  $admin->profile_picture;
+                    if (file_exists($oldPath)) {
+                        unlink($oldPath);
+                    }
+                    //Stores file in directory
+                    $filename = rand(10000, 99999) . '_' . strtolower($adminImage->getClientFilename());
+                    $adminImage->moveTo(WWW_ROOT . 'img/profile/' . $filename);
+                    $data['filename'] = $filename;
+                }
+                if ($admin->profile_picture === null && !$data['error']) {
+                    //Stores file in directory
+                    $filename = rand(10000, 99999) . '_' . strtolower($adminImage->getClientFilename());
+                    $adminImage->moveTo(WWW_ROOT . 'img/profile/' . $filename);
+                    $data['filename'] = $filename;
+                }
+            } else {
+                $data['filename'] = null;
+            }
+        } else {
+            $data['filename'] = $admin->profile_picture;
+        }
+
+        return $data;
     }
 
     /**

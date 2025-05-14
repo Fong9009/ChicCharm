@@ -129,19 +129,6 @@
                         echo $this->Form->control('nonce', ['type' => 'hidden', 'empty' => true]);
                         echo $this->Form->control('nonce_expiry', ['type' => 'hidden', 'empty' => true]);
                         ?>
-                    <!-- Service Image Preview -->
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="profile-preview text-start">
-                                <?php if (!empty($stylist->profile_picture)): ?>
-                                    <img src="<?= $this->Url->image('profile/' . $stylist->profile_picture) ?>"
-                                         alt="Profile Picture"
-                                         class="img-fluid"
-                                         style="width: 400px; height: 400px; object-fit: cover; border-radius: 8px;">
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
                     <!-- File Upload Location -->
                     <div class="row">
                         <div class="col-12 col-md-12 col-sm-12">

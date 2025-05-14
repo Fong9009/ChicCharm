@@ -232,7 +232,7 @@ INSERT INTO `content_blocks` (`id`, `parent`, `slug`, `label`, `description`, `t
 (34, 'Portfolio Images', 'portfolio-2', 'Portfolio Image 2', 'Portfolio Image 2', 'image', '/content-blocks/uploads/portfolio-2.390ab119c46bf74ca6ea7a1ac2c0bdf4.jpg', NULL, '2025-05-06 18:10:14'),
 (35, 'Portfolio Images', 'portfolio-3', 'Portfolio Image 3', 'Portfolio Image 3', 'image', '/content-blocks/uploads/portfolio-3.723ce5fabd08d9165e8c3981ba077736.jpg', NULL, '2025-05-06 18:13:36'),
 (36, 'Photos', 'photo-meet', 'Meet Photo', 'Meet photo for Michonne', 'image', '/content-blocks/uploads/photo-meet.9218833aca3b2d5fd7b7d5ff1c1396ba.jpg', NULL, '2025-05-06 18:17:17'),
-(37, 'Services MotTo', 'services-motto-1', 'Services Motto 1', 'Services Motto 1', 'text', 'The Finest of Makeup Stylists', NULL, '2025-05-06 08:28:46'),
+(37, 'Services Motto', 'services-motto-1', 'Services Motto 1', 'Services Motto 1', 'text', 'The Finest of Makeup Stylists', NULL, '2025-05-06 08:28:46'),
 (38, 'Services Motto', 'services-motto-2', 'Services Motto 2', 'Services Motto 2', 'text', 'The Finest of Wig Stylists', NULL, '2025-05-06 08:28:02'),
 (39, 'Services Motto', 'services-motto-3', 'Services Motto 3', 'Services Motto 3', 'text', 'The Finest of Dress Makers', NULL, '2025-05-06 08:31:33'),
 (40, 'Services Motto', 'services-motto-4', 'Services Motto 4', 'Services Motto 4', 'text', 'The Finest of Hair Stylists', NULL, '2025-05-06 08:29:50'),
@@ -241,7 +241,22 @@ INSERT INTO `content_blocks` (`id`, `parent`, `slug`, `label`, `description`, `t
 (43, 'Service Page', 'service-page-stylist-title', 'Service Page Stylist Title', 'This is the title of the Service page for the Stylists', 'text', 'ChicCharm\'s Stylists For This Service', NULL, '2025-05-09 02:44:22'),
 (44, 'Service Page', 'service-page-stylist-description', 'Service page stylist Description', 'Second header', 'text', 'Here at ChicCharm we have stylists that can do this service', NULL, '2025-05-09 02:44:53'),
 (45, 'Stylist Page', 'stylist-page-title', 'Stylist Page Title', 'This is the Title for the public facing stylist page', 'text', 'The Team That Makes Up ChicCharm', NULL, '2025-05-09 03:40:28'),
-(46, 'Stylist Page', 'stylist-page-desc', 'Description for Public Stylist Page', 'This is the Description of the Public Stylist Page', 'text', 'ChicCharm would not be ChicCharm without its Stylists', NULL, '2025-05-09 03:43:01');
+(46, 'Stylist Page', 'stylist-page-desc', 'Description for Public Stylist Page', 'This is the Description of the Public Stylist Page', 'text', 'ChicCharm would not be ChicCharm without its Stylists', NULL, '2025-05-09 03:43:01'),
+(47, 'FAQ', 'faq-title', 'FAQ Title', 'This is the title for the FAQ Page', 'text', 'Frequently Asked Questions', NULL, '2025-05-11 10:56:30'),
+(48, 'FAQ', 'faq-preamble', 'FAQ Preamble', 'This is the smaller heading under the title', 'text', 'This is the place where you can find general questions that many ask and might answer yours.', NULL, '2025-05-11 10:57:40'),
+(49, 'FAQ', 'faq-question-title-1', 'FAQ Question Title 1', 'FAQ Question Title 1', 'text', 'How can I contact ChicCharm?', NULL, '2025-05-11 10:59:02'),
+(50, 'FAQ', 'faq-question-title-2', 'FAQ Question Title 2', 'FAQ Question Title 2', 'text', 'What services do you offer?', NULL, '2025-05-11 11:00:30'),
+(51, 'FAQ', 'faq-question-title-3', 'FAQ Question Title 3', 'FAQ Question Title 3', 'text', 'How to book an appointment?', NULL, '2025-05-11 11:01:07'),
+(52, 'FAQ', 'faq-question-title-4', 'FAQ Question Title 4', 'FAQ Question Title 4', 'text', 'How do I know which stylist is best fit for me?', NULL, '2025-05-11 11:02:32'),
+(53, 'FAQ', 'faq-question-title-5', 'FAQ Question Title 5', 'FAQ Question Title 5', 'text', 'How to register an account?', NULL, '2025-05-11 11:04:33'),
+(54, 'FAQ', 'faq-question-title-6', 'FAQ Question Title 6', 'FAQ Question Title 6', 'text', 'What payment methods are supported?', NULL, '2025-05-11 11:05:06'),
+(55, 'FAQ', 'faq-question-desc-1', 'FAQ Question Description 1', 'FAQ Question Description 1', 'text', 'We\'ve provided a contact form for you to fill in with essential information so that we can get in touch with you once we\'ve received your enquiry.', NULL, '2025-05-11 11:06:09'),
+(56, 'FAQ', 'faq-question-desc-2', 'FAQ Question Description 2', 'FAQ Question Description 2', 'text', 'ChicCharm is pleased to offer a comprehensive range of professional services, including hair styling, make-up application and dressmaking. If you need more info, check out our services page.', NULL, '2025-05-11 11:07:23'),
+(57, 'FAQ', 'faq-question-desc-3', 'FAQ Question Description 3', 'FAQ Question Description 3', 'text', 'To start the booking process, please click on the ‘Make a booking’ button, which you will find on the home page or personal page.', NULL, '2025-05-11 11:08:27'),
+(58, 'FAQ', 'faq-question-desc-4', 'FAQ Question Description 4', 'FAQ Question Description 4', 'text', 'Our stylist page will provide you with information about them and the skills they specialise in allowing you to make the best choice for your needs.', NULL, '2025-05-11 11:09:13'),
+(59, 'FAQ', 'faq-question-desc-5', 'FAQ Question Description 5', 'FAQ Question Description 5', 'text', 'If you click on the \'Login\' option in the top navigation bar, you will see a \'Sign up\' section under the orange login button. By clicking the \'Sign up\' button, you will be directed to the registration form, which will assist you in creating a personal account.', NULL, '2025-05-11 11:10:04'),
+(60, 'FAQ', 'faq-question-desc-6', 'FAQ Question Description 6', 'FAQ Question Description 6', 'text', 'Prior to your appointment, we will accept both credit and debit cards, as well as cash payment in person.', NULL, '2025-05-11 11:10:52');
+
 
 -- --------------------------------------------------------
 

@@ -254,7 +254,45 @@ class CustomersController extends AppController
         $customer = $this->Customers->get($id, contain: []);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
-            $error = 0;
+
+            //Check if Email is Valid
+            $domain = substr(strrchr($data['email'], '@'), 1);
+            if (!$domain || !checkdnsrr($domain . '.', 'MX')) {
+                $customer->setError('email', ['This is not a valid email']);
+            }
+
+            if ($data['email'] !== $customer->email) {
+                // Check if email exists in stylists table
+                $customerTable = $this->fetchTable('Customers');
+                $existingCustomer = $customerTable->find()
+                    ->where(['email' => $data['email']])
+                    ->first();
+            } else {
+                $existingCustomer = false;
+            }
+
+            // Check if email exists in customers table
+            $stylistTable = $this->fetchTable('Stylists');
+            $existingStylist = $stylistTable->find()
+                ->where(['email' => $data['email']])
+                ->first();
+
+            // Check if email exists in admins table
+            $adminsTable = $this->fetchTable('Admins');
+            $existingAdmin = $adminsTable->find()
+                ->where(['email' => $data['email']])
+                ->first();
+
+            //Check for existing emails
+            if ($existingStylist || $existingCustomer || $existingAdmin) {
+                $customer->setError('email', ['This email is already registered. Please use a different one.']);
+            }
+
+            if (!preg_match("/^[a-zA-Z' ]+$/", $data['first_name'])) {
+                $customer->setError('first_name', ["First name can only be alphabetic or  '"]);
+            } elseif (!preg_match("/^[a-zA-Z' ]+$/", $data['last_name'])) {
+                $customer->setError('last_name', ["Last name can only be alphabetic or '"]);
+            }
 
             $password = $this->request->getData('password');
             if ($password == null || $password == '') {
@@ -263,78 +301,103 @@ class CustomersController extends AppController
                 $data['password'] = $password;
             }
 
-            //Profile Picture Upload
-            $profile = $this->request->getData('profile_picture');
-            if ($profile->getClientFilename() !== '' && $profile->getClientFilename() !== null) {
-                if ($profile && $profile->getClientFilename()) {
-                    //Max Size to prevent massive files from being inserted
-                    //This is measured in MB so max = 4MB
-                    $maxSize = 4 * 1024 * 1024;
-                    if ($profile->getSize() > $maxSize) {
-                        $error = 1;
-                        $this->Flash->error(__('The profile picture is too big please use something smaller than 4MB.'));
-                    }
-
-                    //Check Filetype
-                    $allowedFileTypes = ['image/jpeg', 'image/png','image/jpg'];
-                    if (!in_array($profile->getClientMediaType(), $allowedFileTypes)) {
-                        $error = 1;
-                        $this->Flash->error(__('The profile picture must be a jpeg/jpg or png format.'));
-                    }
-
-                    //Delete old Image if there is one
-                    if ($customer->profile_picture != null && $error !== 1) {
-                        $oldPath = WWW_ROOT . 'img/profile/' . $customer->profile_picture;
-                        if (file_exists($oldPath)) {
-                            unlink($oldPath);
-                        }
-                        //Stores file in directory
-                        $filename = rand(10000, 99999) . '_' . strtolower($profile->getClientFilename());
-                        $profile->moveTo(WWW_ROOT . 'img/profile/' . $filename);
-                        $data['profile_picture'] = $filename;
-                    }
-                    if ($customer->profile_picture === null && $error !== 1) {
-                        //Stores file in directory
-                        $filename = rand(10000, 99999) . '_' . strtolower($profile->getClientFilename());
-                        $profile->moveTo(WWW_ROOT . 'img/profile/' . $filename);
-                        $data['profile_picture'] = $filename;
-                    }
-                } else {
-                    $data['profile_picture'] = null;
-                }
-            } else {
-                $data['profile_picture'] = $customer->profile_picture;
-            }
-
             // Keep existing nonce and nonce_expiry values
             if ($customer->nonce && $customer->nonce_expiry) {
                 $data['nonce'] = $customer->nonce;
                 $data['nonce_expiry'] = $customer->nonce_expiry;
             }
 
-            // Patch the entity with the data
-            $customer = $this->Customers->patchEntity($customer, $data);
-
-            if ($error !== 1) {
-                if ($this->Customers->save($customer)) {
-                    $this->Flash->success(__('Your profile has been updated.'));
-                    // Redirect based on user type
-                    if ($user->type === 'admin') {
-                        return $this->redirect(['action' => 'index']);
-                    } else {
-                        return $this->redirect(['action' => 'dashboard']);
+            if (empty($customer->getErrors())) {
+                $imageResult = $this->replaceImage($id);
+                $customer = $this->Customers->patchEntity($customer, $data);
+                if (!$imageResult['error']) {
+                    $customer->profile_picture = $imageResult['filename'];
+                    if ($this->Customers->save($customer)) {
+                        $this->Flash->success(__('Your profile has been updated.'));
+                        // Redirect based on user type
+                        if ($user->type === 'admin') {
+                            return $this->redirect(['action' => 'index']);
+                        } else {
+                            return $this->redirect(['action' => 'dashboard']);
+                        }
                     }
                 }
             }
 
-            // Always show the generic message if saving failed or if there was a non-validation error ($error === 1)
-            $this->Flash->error(__('Could not update the profile. Please check the form and try again.'));
+            // Show specific error messages for each field
+            if ($customer->getErrors()) {
+                foreach ($customer->getErrors() as $field => $errors) {
+                    foreach ($errors as $error) {
+                        $this->Flash->error(__("{0}: {1}", ucfirst($field), $error));
+                    }
+                }
+            } else {
+                $this->Flash->error(__('Could not update the profile. Please check the form and try again.'));
+            }
 
         }
         $this->set(compact('customer'));
         // Pass user type to view
         $this->set('userType', $user->type);
     }
+
+    private function replaceImage(string $id): array
+    {
+        //Service Image Updater
+        $customer = $this->Customers->get($id, contain: []);
+        $customerImage = $this->request->getData('profile_picture');
+        $data = ['error' => false, 'filename' => null];
+        if ($customerImage->getClientFilename() !== '' && $customerImage->getClientFilename() !== null) {
+            if ($customerImage && $customerImage->getClientFilename()) {
+                //Max Size to prevent massive files from being inserted
+                //This is measured in MB so max = 4MB
+                $maxSize = 4 * 1024 * 1024;
+                if ($customerImage->getSize() > $maxSize) {
+                    $data['error'] = true;
+                    $this->Flash->error(__('The profile picture is too big please use something smaller than 4MB.'));
+                }
+
+                //Check if the file is a real image
+                $tmpFile = $customerImage->getStream()->getMetadata('uri');
+                if (!getimagesize($tmpFile)) {
+                    $data['error'] = true;
+                    $this->Flash->error(__('The uploaded file is not a valid image.'));
+                }
+
+                //Check Filetype
+                $allowedFileTypes = ['image/jpeg', 'image/png','image/jpg'];
+                if (!in_array($customerImage->getClientMediaType(), $allowedFileTypes)) {
+                    $data['error'] = true;
+                    $this->Flash->error(__('The Profile image must be a jpeg/jpg or png format.'));
+                }
+
+                //Delete old Image if there is one
+                if ($customer->profile_picture != null && !$data['error']) {
+                    $oldPath = WWW_ROOT . 'img/profile/' . $customer->profile_picture;
+                    if (file_exists($oldPath)) {
+                        unlink($oldPath);
+                    }
+                    //Stores file in directory
+                    $filename = rand(10000, 99999) . '_' . strtolower($customerImage->getClientFilename());
+                    $customerImage->moveTo(WWW_ROOT . 'img/profile/' . $filename);
+                    $data['filename'] = $filename;
+                }
+                if ($customer->profile_picture === null && !$data['error']) {
+                    //Stores file in directory
+                    $filename = rand(10000, 99999) . '_' . strtolower($customerImage->getClientFilename());
+                    $customerImage->moveTo(WWW_ROOT . 'img/profile/' . $filename);
+                    $data['filename'] = $filename;
+                }
+            } else {
+                $data['filename'] = null;
+            }
+        } else {
+            $data['filename'] = $customer->profile_picture;
+        }
+
+        return $data;
+    }
+
 
     /**
      * Delete method
