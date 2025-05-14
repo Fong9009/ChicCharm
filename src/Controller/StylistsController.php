@@ -91,21 +91,39 @@ class StylistsController extends AppController
                 ->where(['email' => $data['email']])
                 ->first();
 
+            //Check for existing emails
             if ($existingStylist || $existingCustomer || $existingAdmin) {
-                $this->Flash->error(__('This email is already registered. Please use a different email address.'));
+                $stylist->setError('email', ['This email is already registered. Please use a different one.']);
+            }
 
-                return;
+            $domain = substr(strrchr($data['email'], '@'), 1);
+            if (!$domain || !checkdnsrr($domain . '.', 'MX')) {
+                $stylist->setError('email', ['This is not a valid email']);
+            }
+
+            $firstName = $data['first_name'];
+            $lastName = $data['last_name'];
+
+            if (!preg_match("/^[a-zA-Z' ]+$/", $firstName)) {
+                $stylist->setError('first_name', ["First name can only be alphabetic or  '"]);
+            } elseif (!preg_match("/^[a-zA-Z' ]+$/", $lastName)) {
+                $stylist->setError('last_name', ["Last name can only be alphabetic or '"]);
+            }
+            if ($data['password_confirm'] != $data['password']) {
+                $stylist->setError('password_confirm', ['Password does not match']);
             }
 
             $data['type'] = 'stylist';
-            $imageResult = $this->addNewImage();
-            $stylist = $this->Stylists->patchEntity($stylist, $data);
-            if (!$imageResult['error']) {
-                $stylist->profile_picture = $imageResult['filename'];
-                if ($this->Stylists->save($stylist)) {
-                    $this->Flash->success(__('The stylist has been saved.'));
+            if (empty($stylist->getErrors())){
+                $imageResult = $this->addNewImage();
+                $stylist = $this->Stylists->patchEntity($stylist, $data);
+                if (!$imageResult['error']) {
+                    $stylist->profile_picture = $imageResult['filename'];
+                    if ($this->Stylists->save($stylist)) {
+                        $this->Flash->success(__('The stylist has been saved.'));
 
-                    return $this->redirect(['action' => 'index']);
+                        return $this->redirect(['action' => 'index']);
+                    }
                 }
             }
 
@@ -195,6 +213,44 @@ class StylistsController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
 
+            $domain = substr(strrchr($data['email'], '@'), 1);
+            if (!$domain || !checkdnsrr($domain . '.', 'MX')) {
+                $stylist->setError('email', ['This is not a valid email']);
+            }
+
+            if ($data['email'] !== $stylist->email) {
+                // Check if email exists in stylists table
+                $stylistTable = $this->fetchTable('Stylists');
+                $existingStylist = $stylistTable->find()
+                    ->where(['email' => $data['email']])
+                    ->first();
+            } else {
+                $existingStylist = false;
+            }
+
+            //Check if email exists in customers table
+            $customersTable = $this->fetchTable('Customers');
+            $existingCustomer = $customersTable->find()
+                ->where(['email' => $data['email']])
+                ->first();
+
+            //Check if email exists in admins table
+            $adminsTable = $this->fetchTable('Admins');
+            $existingAdmin = $adminsTable->find()
+                ->where(['email' => $data['email']])
+                ->first();
+
+            //Check for existing emails
+            if ($existingStylist || $existingCustomer || $existingAdmin) {
+                $stylist->setError('email', ['This email is already registered. Please use a different one.']);
+            }
+
+            if (!preg_match("/^[a-zA-Z' ]+$/", $data['first_name'])) {
+                $stylist->setError('first_name', ["First name can only be alphabetic or  '"]);
+            } elseif (!preg_match("/^[a-zA-Z' ]+$/", $data['last_name'])) {
+                $stylist->setError('last_name', ["Last name can only be alphabetic or '"]);
+            }
+
             $password = $this->request->getData('password');
             if ($password == null || $password == '') {
                 $data['password'] = $stylist->password;
@@ -208,17 +264,19 @@ class StylistsController extends AppController
                 $data['nonce_expiry'] = $stylist->nonce_expiry;
             }
 
-            $imageResult = $this->replaceImage($id);
-            $stylist = $this->Stylists->patchEntity($stylist, $data);
-            if (!$imageResult['error']) {
-                $stylist->profile_picture = $imageResult['filename'];
-                if ($this->Stylists->save($stylist)) {
-                    $this->Flash->success(__('The stylist has been saved.'));
-                    // Redirect based on user type
-                    if ($user->type === 'admin') {
-                        return $this->redirect(['action' => 'index']);
-                    } else {
-                        return $this->redirect(['action' => 'dashboard']);
+            if (empty($stylist->getErrors())) {
+                $imageResult = $this->replaceImage($id);
+                $stylist = $this->Stylists->patchEntity($stylist, $data);
+                if (!$imageResult['error']) {
+                    $stylist->profile_picture = $imageResult['filename'];
+                    if ($this->Stylists->save($stylist)) {
+                        $this->Flash->success(__('The stylist has been saved.'));
+                        // Redirect based on user type
+                        if ($user->type === 'admin') {
+                            return $this->redirect(['action' => 'index']);
+                        } else {
+                            return $this->redirect(['action' => 'dashboard']);
+                        }
                     }
                 }
             }
@@ -315,13 +373,43 @@ class StylistsController extends AppController
         $stylist = $this->Stylists->get($id, contain: ['Services']);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
-            $error = 0;
 
-            $password = $this->request->getData('password');
-            if ($password == null || $password == '') {
-                $data['password'] = $stylist->password;
+            $domain = substr(strrchr($data['email'], '@'), 1);
+            if (!$domain || !checkdnsrr($domain . '.', 'MX')) {
+                $stylist->setError('email', ['This is not a valid email']);
+            }
+
+            if ($data['email'] !== $stylist->email) {
+                // Check if email exists in stylists table
+                $stylistTable = $this->fetchTable('Stylists');
+                $existingStylist = $stylistTable->find()
+                    ->where(['email' => $data['email']])
+                    ->first();
             } else {
-                $data['password'] = $password;
+                $existingStylist = false;
+            }
+
+            // Check if email exists in customers table
+            $customersTable = $this->fetchTable('Customers');
+            $existingCustomer = $customersTable->find()
+                ->where(['email' => $data['email']])
+                ->first();
+
+            // Check if email exists in admins table
+            $adminsTable = $this->fetchTable('Admins');
+            $existingAdmin = $adminsTable->find()
+                ->where(['email' => $data['email']])
+                ->first();
+
+            //Check for existing emails
+            if ($existingStylist || $existingCustomer || $existingAdmin) {
+                $stylist->setError('email', ['This email is already registered. Please use a different one.']);
+            }
+
+            if (!preg_match("/^[a-zA-Z' ]+$/", $data['first_name'])) {
+                $stylist->setError('first_name', ["First name can only be alphabetic or  '"]);
+            } elseif (!preg_match("/^[a-zA-Z' ]+$/", $data['last_name'])) {
+                $stylist->setError('last_name', ["Last name can only be alphabetic or '"]);
             }
 
             // Keep existing nonce and nonce_expiry values
@@ -330,17 +418,19 @@ class StylistsController extends AppController
                 $data['nonce_expiry'] = $stylist->nonce_expiry;
             }
 
-            $imageResult = $this->replaceImage($id);
-            $stylist = $this->Stylists->patchEntity($stylist, $data);
-            if (!$imageResult['error']) {
-                $stylist->profile_picture = $imageResult['filename'];
-                if ($this->Stylists->save($stylist)) {
-                    $this->Flash->success(__('The stylist has been saved.'));
-                    // Redirect based on user type
-                    if ($user->type === 'admin') {
-                        return $this->redirect(['action' => 'index']);
-                    } else {
-                        return $this->redirect(['action' => 'dashboard']);
+            if (empty($stylist->getErrors())) {
+                $imageResult = $this->replaceImage($id);
+                $stylist = $this->Stylists->patchEntity($stylist, $data);
+                if (!$imageResult['error']) {
+                    $stylist->profile_picture = $imageResult['filename'];
+                    if ($this->Stylists->save($stylist)) {
+                        $this->Flash->success(__('The stylist has been saved.'));
+                        // Redirect based on user type
+                        if ($user->type === 'admin') {
+                            return $this->redirect(['action' => 'index']);
+                        } else {
+                            return $this->redirect(['action' => 'dashboard']);
+                        }
                     }
                 }
             }
