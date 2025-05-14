@@ -219,7 +219,7 @@ $titleDescription = 'Landing Page';
                         <li class="nav-item">
                             <a class="nav-link"
                                href="<?= $this->Url->build([
-                                   'controller' => 'Stylists',
+                                   'controller' => 'Customers',
                                    'action' => 'dashboard']) ?>">Dashboard
                             </a>
                         </li>
@@ -237,7 +237,7 @@ $titleDescription = 'Landing Page';
                         <li class="nav-item">
                             <a class="nav-link"
                                href="<?= $this->Url->build([
-                                   'controller' => 'Customers',
+                                   'controller' => 'Stylists',
                                    'action' => 'dashboard']) ?>">Dashboard
                             </a>
                         </li>
