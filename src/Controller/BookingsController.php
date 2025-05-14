@@ -2828,7 +2828,6 @@ class BookingsController extends AppController
                     'remaining_cost' => $data['remaining_cost'],
                     'refund_due_amount' => $data['refund_due_amount'], // Add to patch data
                     'notes' => $data['notes'],
-                    'status' => 'active',
                  ], [
                      'associated' => [],
                      'guard' => false
