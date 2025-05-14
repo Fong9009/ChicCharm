@@ -241,28 +241,27 @@ $this->Html->script('custom', ['block' => true]);
                         <td class="actions">
                             <?= $this->Html->link(__('View'), ['action' => 'view', $booking->id], ['class' => 'button']) ?>
                             <?= $this->Html->link(__('Edit'), ['action' => 'edit', $booking->id], ['class' => 'button']) ?>
+                            <?php if ($booking->status === 'Confirmed - Payment Due'): ?>
+                                <?= $this->Form->postLink(
+                                    __('Mark as Paid'),
+                                    ['action' => 'editStatus', $booking->id],
+                                    [
+                                        'confirm' => __('Are you sure you want to mark booking #{0} as paid in store?', $booking->id),
+                                        'class' => 'button button-mark-paid'
+                                    ]
+                                ) ?>
+                            <?php endif; ?>
                             <?php if ($booking->refund_due_amount > 0): ?>
                                 <?= $this->Form->postLink(
                                     __('Refund Processed'),
                                     ['action' => 'markRefundProcessed', $booking->id],
                                     [
                                         'confirm' => __('Are you sure you have processed the refund of {0} for booking #{1}?', $this->Number->currency($booking->refund_due_amount), $booking->id),
-                                        'class' => 'button btn-success',
-                                        'style' => 'margin-top: 5px;' 
+                                        'class' => 'button button-refund-processed'
                                     ]
                                 ) ?>
                             <?php endif; ?>
-                            <?= $this->Form->postLink(
-                                __('Cancel'),
-                                ['action' => 'delete', $booking->id],
-                                [
-                                    'confirm' => __('Are you sure you want to cancel booking #{0} ({1})?', $booking->id, h($booking->booking_name)),
-                                    'class' => 'button btn-danger',
-                                ]
-                            ) ?>
-                            <?php if ($booking->status == 'Confirmed - Payment Due'): ?>
-                                 <?= $this->Html->link(__('Mark As Paid'), ['action' => 'editStatus', $booking->id], ['class' => 'button', 'confirm' => 'Are you sure this booking was paid in store']) ?>
-                            <?php endif; ?>
+                            <?= $this->Form->postLink(__('Cancel'), ['action' => 'delete', $booking->id], ['confirm' => __('Are you sure you want to cancel booking #{0}?', $booking->id), 'class' => 'button button-outline']) ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
