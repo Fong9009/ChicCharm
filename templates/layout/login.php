@@ -274,18 +274,13 @@ $appLocale = Configure::read('App.defaultLocale');
             <div class="col-md-3">
                 <h5 class="text-light fw-bold mb-3">Sign Up for Our Newsletter</h5>
                 <p class="text-light mb-3">Be the first to get notified about upcoming products and deals</p>
-                <form method="post" action="<?= $this->Url->build(['plugin' => false, 'controller' => 'Newsletter', 'action' => 'subscribe']); ?>" id="ContactFooter" class="needs-confirmation newsletter-signup">
-                    <?= $this->Form->hidden('_csrfToken', ['value' => $this->request->getAttribute('csrfToken')]) ?>
+                <form method="post" action="<?= $this->Url->build(['plugin' => false, 'controller' => 'Newsletter', 'action' => 'subscribe']); ?>" id="newsletterSubscribeForm" class="needs-confirmation newsletter-signup">
+                    <?= $this->Form->hidden('_csrfToken', ['value' => $this->request->getAttribute('csrfToken'), 'id' => 'newsletter-csrf-token']) ?>
                     <div class="input-group">
-                        <input type="email" class="form-control" name="email" placeholder="Enter your email" required>
+                        <input type="email" class="form-control" name="email" id="newsletter-email-input" placeholder="Enter your email" required>
                         <button type="submit" class="btn btn-primary">Subscribe</button>
                     </div>
-                    <?php if ($this->request->getSession()->read('newsletter_success')) : ?>
-                        <div class="newsletter-success text-light mt-2">
-                            <small>Thank you for subscribing!</small>
-                            <?php $this->request->getSession()->delete('newsletter_success'); ?>
-                        </div>
-                    <?php endif; ?>
+                    <div id="newsletter-response-message" class="mt-2"></div>
                 </form>
             </div>
 
@@ -324,6 +319,65 @@ $appLocale = Configure::read('App.defaultLocale');
         </div>
     </div>
 </footer>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const newsletterForm = document.getElementById('newsletterSubscribeForm');
+    if (newsletterForm) {
+        newsletterForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const emailInput = document.getElementById('newsletter-email-input');
+            const csrfTokenInput = document.getElementById('newsletter-csrf-token');
+            const messageArea = document.getElementById('newsletter-response-message');
+            
+            const email = emailInput.value;
+            const csrfToken = csrfTokenInput.value;
+            const actionUrl = newsletterForm.getAttribute('action');
+
+            messageArea.innerHTML = ''; 
+            messageArea.className = 'mt-2'; 
+
+            // Basic client-side validation (optional, server validates too)
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                messageArea.innerHTML = '<small style="color: #f4623a;">Please enter a valid email address.</small>';
+                messageArea.classList.add('text-danger'); // Example error styling
+                return;
+            }
+
+            const formData = new URLSearchParams();
+            formData.append('email', email);
+            // Note: CakePHP's CsrfProtectionMiddleware typically expects the token in the X-CSRF-Token header for AJAX,
+            // or as a form field named '_csrfToken'. Sending it as a form field is simpler here.
+            // If header is preferred, add it to fetch options and remove from formData.
+            formData.append('_csrfToken', csrfToken);
+
+
+            fetch(actionUrl, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest', 
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: formData.toString()
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    messageArea.innerHTML = '<small style="color: #d4edda; background-color: rgba(21, 87, 36, 0.3); border-left: 3px solid #155724; padding: 5px 10px; border-radius: 4px; display: inline-block;">' + data.message + '</small>';
+                    emailInput.value = ''; 
+                } else {
+                    messageArea.innerHTML = '<small style="color: #f4623a;">' + (data.message || 'An error occurred.') + '</small>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                messageArea.innerHTML = '<small style="color: #f4623a;">Subscription request failed. Please try again.</small>';
+                // Optionally, add a class for error styling
+            });
+        });
+    }
+});
+</script>
 <?= $this->Html->script('https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js') ?>
 <?= $this->Html->script('https://cdnjs.cloudflare.com/ajax/libs/SimpleLightbox/2.1.0/simpleLightbox.min.js') ?>
 <?= $this->Html->script('/landing-detail/js/scripts.js') ?>

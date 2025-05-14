@@ -32,34 +32,48 @@ class NewsletterController extends AppController
 
             // Basic validation
             if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                // Just return without setting success message
-                return $this->redirect($this->referer() . '#footer');
+                if ($this->request->is('ajax')) {
+                    return $this->response
+                        ->withType('application/json')
+                        ->withStringBody(json_encode(['success' => false, 'message' => 'Please enter a valid email address.']))
+                        ->withStatus(400);
+                }
+                return $this->redirect($this->referer() . '#footer'); 
             }
 
-            // Add log HERE to confirm this point is reached
-            Log::debug("NewsletterController::subscribe - Passed validation for email: {$email}");
+            Log::debug("NewsletterController::subscribe - Processing email: {$email}");
 
-            // TO Be Implemented
-            // 1. Check if the email is already subscribed
-            // 2. Store the email in a subscribers table
-            // 3. Add any additional user data (name, preferences, etc.)
-
-            // For now, we'll just set a success flag and send the confirmation email
             try {
+                // TO Be Implemented
+                // 1. Check if the email is already subscribed (important for production)
+                // 2. Store the email in a subscribers table
+
                 $mailer = new NewsletterMailer();
                 $mailer->sendWelcome($email);
-                Log::info("Newsletter welcome email attempt successful for {$email}");
-                
-                // Set a session variable instead of using Flash
-                $this->request->getSession()->write('newsletter_success', true);
-            } catch (\Exception $e) {
-                // Just log the error, don't show anything to user
-                $this->log('Newsletter subscription error: ' . $e->getMessage(), 'error');
-            }
+                Log::info("Newsletter welcome email sent successfully to {$email}");
 
-            // Redirect to the same page but with #footer anchor to keep focus on the footer area
-            return $this->redirect($this->referer() . '#footer');
+                if ($this->request->is('ajax')) {
+                    return $this->response
+                        ->withType('application/json')
+                        ->withStringBody(json_encode(['success' => true, 'message' => 'Thank you for subscribing!']));
+                } else {
+                    $this->request->getSession()->write('newsletter_success', true);
+                    return $this->redirect($this->referer() . '#footer'); 
+                }
+
+            } catch (\Exception $e) {
+                Log::error("Newsletter subscription error for {$email}: " . $e->getMessage());
+                if ($this->request->is('ajax')) {
+                    return $this->response
+                        ->withType('application/json')
+                        ->withStringBody(json_encode(['success' => false, 'message' => 'Subscription failed. Please try again later.']))
+                        ->withStatus(500);
+                } else {
+                    return $this->redirect($this->referer() . '#footer'); 
+                }
+            }
         }
+        return $this->redirect($this->referer('/') . '#footer');
     }
 
     /**
