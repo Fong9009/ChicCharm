@@ -495,7 +495,6 @@ class BookingsController extends AppController
                     $refund = $totalPreviousCost - $totalCost;
                     $data['remaining_cost'] = 0;
                     $data['refund_due_amount'] = $refund; // Set refund_due_amount
-                    $this->Flash->info(__('A refund of {0} is due to the customer. Please process this manually via PayPal.', $numberHelper->currency($refund, 'AUD')));
                 } elseif ($totalCost > $totalPreviousCost) {
                     $data['remaining_cost'] = $totalCost - $totalPreviousCost;
                     $data['refund_due_amount'] = 0; // Reset if now owes more
@@ -734,8 +733,7 @@ class BookingsController extends AppController
                             'new_total' => $newTotalCost,
                             'customer_email' => $customerEmail
                         ];
-                    } elseif ($newTotalCost > $paidSoFar) {
-                        // $newRemainingCost already reflects the total additional amount needed
+                    } elseif ($newTotalCost > $paidSoFar) { 
                         $emailDetails = [
                             'type' => 'additional_payment_due',
                             'amount' => $newRemainingCost,
@@ -745,6 +743,23 @@ class BookingsController extends AppController
                             'customer_email' => $customerEmail
                         ];
                     }
+                }
+
+                // Set conditional flash messages 
+                if ($emailDetails) {
+                    if ($emailDetails['type'] === 'refund_due') {
+                        $this->Flash->info(__(
+                            'A refund of {0} is due to the customer. Ensure this is processed. The customer will be notified.',
+                            $numberHelper->currency($emailDetails['amount'], 'AUD')
+                        ));
+                    } elseif ($emailDetails['type'] === 'additional_payment_due') {
+                        $this->Flash->info(__(
+                            'An additional payment of {0} is now due. The customer will be notified.',
+                            $numberHelper->currency($emailDetails['amount'], 'AUD')
+                        ));
+                    }
+                } else {
+                    $this->Flash->success(__('The booking has been updated successfully.'));
                 }
 
                 if ($emailDetails) {
@@ -890,7 +905,8 @@ class BookingsController extends AppController
         $booking->status = 'Confirmed - Paid';
         $booking->remaining_cost = 0;
         if ($this->Bookings->save($booking)) {
-            $this->Flash->success(__('The booking has been paid in store')); 
+            $customerName = $booking->has('customer') && $booking->customer ? $booking->customer->first_name . ' ' . $booking->customer->last_name : 'the customer';
+            $this->Flash->success(__('Booking #{0} for {1} has been marked as paid in store.', $booking->id, $customerName));
         } else {
             $this->Flash->error(__('The booking could not be saved. Please, try again.'));
         }
@@ -989,7 +1005,13 @@ class BookingsController extends AppController
         }
 
         if ($this->Bookings->save($booking)) {
-            $this->Flash->success(__('The booking has been cancelled.'));
+            $numberHelper = new \Cake\View\Helper\NumberHelper(new \Cake\View\View());  
+            // Conditional Flash Message
+            if ($originalStatus === 'Confirmed - Paid') {
+                $this->Flash->success(__('The booking has been cancelled. Refund of {0} is being processed.', $numberHelper->currency($originalTotalCost, 'AUD'))); 
+            } else {
+                $this->Flash->success(__('The booking has been cancelled.'));
+            }
 
             $paymentHistoriesTable = TableRegistry::getTableLocator()->get('PaymentHistories');
 
@@ -1390,7 +1412,7 @@ class BookingsController extends AppController
                 } else {
                      Log::debug('[CustomerBooking] Successfully saved overall times.');
                 }
-                $this->Flash->success(__('Your booking is confirmed! Please see payment options below.'));
+                $this->Flash->success(__('Your booking is confirmed! Please see payment options below. You will receive an invoice via email shortly.'));
                 Log::debug('[CustomerBooking] Redirecting to customerview for payment. ID: ' . $bookingId);
                 return $this->redirect(['action' => 'customerview', $bookingId]); // Redirect to customerview
             }
@@ -3088,12 +3110,13 @@ class BookingsController extends AppController
         }
 
         $this->request->allowMethod(['post']);
-        $booking = $this->Bookings->get($id);
+        $booking = $this->Bookings->get($id, ['contain' => ['Customers']]); // Ensure Customer is loaded
 
         if ($booking->refund_due_amount > 0) {
             $booking->refund_due_amount = 0.00;
             if ($this->Bookings->save($booking)) {
-                $this->Flash->success(__('Refund for booking #{0} marked as processed.', $booking->id));
+                $customerName = $booking->has('customer') && $booking->customer ? $booking->customer->first_name . ' ' . $booking->customer->last_name : 'the customer';
+                $this->Flash->success(__('Refund for booking #{0} for {1} has been marked as processed.', $booking->id, $customerName));
             } else {
                 Log::error('Admin: Failed to mark refund as processed for booking ID ' . $id . '. Errors: ' . json_encode($booking->getErrors()));
                 $this->Flash->error(__('Could not mark refund as processed. Please, try again.'));

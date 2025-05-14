@@ -14,7 +14,6 @@ $this->Html->script('custom', ['block' => true]);
         <!-- Action Menu -->
         <aside class="column">
             <div class="side-nav">
-                <?= $this->Flash->render() ?>
                 <h4 class="heading"><?= __('Actions') ?></h4>
                 <div class="row gx-2">
                     <div class="col-lg-4 col-md-6 col-sm-12 mb-3 side-nav-item">
@@ -68,6 +67,7 @@ $this->Html->script('custom', ['block' => true]);
                 </div>
             </div>
         </aside>
+        <?= $this->Flash->render() ?>
         <div class="table-responsive mt-4">
             <div class="container">
                 <div class="row align-items-center">

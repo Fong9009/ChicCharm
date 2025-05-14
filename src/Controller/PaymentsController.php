@@ -298,7 +298,7 @@ class PaymentsController extends AppController
                     $saveResult = $this->PaymentHistories->save($paymentHistory);
 
                     if ($saveResult) {
-                        $this->Flash->success(__('Payment successful! Your booking is confirmed and paid.'));
+                        $this->Flash->success(__('Payment successful! Your booking is confirmed and paid. You will receive an invoice(paid) via email shortly.'));
 
                         // Send invoice email
                         try {
