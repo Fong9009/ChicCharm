@@ -247,7 +247,7 @@
                                                         $interactionAllowedByTimeIndex = true;
                                                         $cancellationMessageIndex = "";
                                                         $cancellationCutoffHoursIndex = 1; // Hours before booking to restrict cancellation
-                                                        $editCutoffHoursIndex = 24;       // Hours before booking to restrict editing
+                                                        $editCutoffHoursIndex = 1;       // Hours before booking to restrict editing
 
                                                         if ($statusAllowsActionsIndex) {
                                                             try {
@@ -270,13 +270,10 @@
                                                                     $editCutoffDateTimeIndex = $nowIndex->addHours($editCutoffHoursIndex);
                                                                     $cancelCutoffDateTimeIndex = $nowIndex->addHours($cancellationCutoffHoursIndex);
 
-                                                                    if ($bookingDateTimeIndex <= $editCutoffDateTimeIndex) {
+                                                                    if ($bookingDateTimeIndex <= $editCutoffDateTimeIndex && $bookingDateTimeIndex <= $cancelCutoffDateTimeIndex) {
                                                                         $interactionAllowedByTimeIndex = false;
-                                                                        $cancellationMessageIndex = "Cannot change/cancel (&lt;{$editCutoffHoursIndex}h).";
-                                                                    } elseif ($bookingDateTimeIndex <= $cancelCutoffDateTimeIndex) {
-                                                                        $cancellationMessageIndex = "Cancel within {$cancellationCutoffHoursIndex}h not allowed.";
-                                                                    }
-
+                                                                        $cancellationMessageIndex = "Cannot edit or cancel (within 1h)";
+                                                                    } 
                                                                 } else {
                                                                     $interactionAllowedByTimeIndex = false;
                                                                     $cancellationMessageIndex = "Time N/A for edit/cancel check.";
