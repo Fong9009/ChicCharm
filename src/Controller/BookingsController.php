@@ -890,7 +890,7 @@ class BookingsController extends AppController
         $booking->status = 'Confirmed - Paid';
         $booking->remaining_cost = 0;
         if ($this->Bookings->save($booking)) {
-            $this->Flash->success(__('The Booking Has been payed in store'));
+            $this->Flash->success(__('The booking has been paid in store')); 
         } else {
             $this->Flash->error(__('The booking could not be saved. Please, try again.'));
         }
@@ -1039,6 +1039,19 @@ class BookingsController extends AppController
                         Log::error("Admin: Failed to void PaymentHistory ID {$payment->id} for cancelled booking ID {$id}. Errors: " . json_encode($payment->getErrors()));
                     }
                 }
+
+                // Send a cancellation email for non-paid bookings
+                try {
+                    if ($booking->customer && $booking->customer->email) {
+                        $mailer = new \App\Mailer\InvoiceMailer();
+                        $mailer->sendAdminCancellationNotification($booking);
+                        Log::info("Admin cancellation email (non-paid) initiated for booking ID {$id} to customer {$booking->customer->email}.");
+                    } else {
+                        Log::warning("Admin cancellation (non-paid): Customer email not found for booking ID {$id}, cannot send notification email.");
+                    }
+                } catch (\Exception $e) {
+                    Log::error("Admin cancellation (non-paid): Failed to send notification email for booking ID {$id}. Error: " . $e->getMessage());
+                }
             }
         } else {
             // Log the error for debugging
@@ -1057,7 +1070,7 @@ class BookingsController extends AppController
 
         if ($booking->status === 'Confirmed - Paid') {
             $this->Flash->error(__('This booking has been paid and can no longer be cancelled.'));
-            return $this->redirect($this->getRedirectUrlAfterCustomerAction());
+            return $this->redirect($this->getRedirectUrlAfterCustomerAction($id));
         }
 
         // Change status to 'cancelled'
@@ -1087,17 +1100,20 @@ class BookingsController extends AppController
             $this->Flash->error(__('The booking could not be cancelled. Please, try again.'));
         }
 
-        return $this->redirect($this->getRedirectUrlAfterCustomerAction());
+        return $this->redirect($this->getRedirectUrlAfterCustomerAction($id));
     }
 
     // Helper method to determine redirect URL
-    private function getRedirectUrlAfterCustomerAction()
+    private function getRedirectUrlAfterCustomerAction($bookingId = null) 
     {
-        $referer = $this->request->getHeader('Referer');
-        if (!empty($referer) && strpos($referer[0], 'dashboard') !== false) {
+        $referer = $this->request->getHeaderLine('Referer'); 
+
+        if ($bookingId && !empty($referer) && strpos($referer, 'bookings/customerview') !== false) {
+            return ['controller' => 'Bookings', 'action' => 'customerview', $bookingId];
+        } elseif (!empty($referer) && strpos($referer, 'customers/dashboard') !== false) {
             return ['controller' => 'Customers', 'action' => 'dashboard'];
         }
-        return ['action' => 'customerindex'];
+        return ['controller' => 'Customers', 'action' => 'dashboard']; 
     }
 
     public function customerbooking()
@@ -2540,8 +2556,13 @@ class BookingsController extends AppController
         $query = $this->Bookings->find()
             ->where([
                 'customer_id' => $user->id,
-                'status IN' => ['finished','cancelled', 'Confirmed - Payment Due', 'Confirmed - Paid'],
-                'booking_date <' => $today,
+                'OR' => [
+                    ['Bookings.status' => 'cancelled'], 
+                    [
+                        'Bookings.status IN' => ['finished', 'Confirmed - Payment Due', 'Confirmed - Paid'],
+                        'Bookings.booking_date <' => $today,
+                    ]
+                ]
             ])
             ->contain([
                 'BookingsServices' => [
@@ -2806,6 +2827,7 @@ class BookingsController extends AppController
             $data['total_cost'] = $totalCost;
             $data['remaining_cost'] = $totalCost;
             $data['notes'] = $data['notes'] ?? $booking->notes;
+            $data['refund_due_amount'] = 0.00; 
 
 
             $hasServiceData = !empty($data['bookings_services']);
@@ -2826,7 +2848,7 @@ class BookingsController extends AppController
                     'booking_date' => $data['booking_date_formatted'],
                     'total_cost' => $data['total_cost'],
                     'remaining_cost' => $data['remaining_cost'],
-                    'refund_due_amount' => $data['refund_due_amount'], // Add to patch data
+                    'refund_due_amount' => $data['refund_due_amount'], 
                     'notes' => $data['notes'],
                  ], [
                      'associated' => [],
@@ -2996,7 +3018,13 @@ class BookingsController extends AppController
                 $connection->commit();
                 $this->Flash->success(__('Your booking has been updated successfully.'));
 
-                return $this->redirect(['action' => 'customerindex']);
+                $referer = $this->request->getHeaderLine('Referer');
+                if ($id && !empty($referer) && strpos($referer, 'bookings/customerview') !== false) {
+                    return $this->redirect(['controller' => 'Bookings', 'action' => 'customerview', $id]);
+                } elseif (!empty($referer) && strpos($referer, 'customers/dashboard') !== false) {
+                    return $this->redirect(['controller' => 'Customers', 'action' => 'dashboard']);
+                }
+                return $this->redirect(['controller' => 'Customers', 'action' => 'dashboard']); // Default
 
             } catch (Exception $e) {
                 $connection->rollback();

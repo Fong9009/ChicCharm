@@ -324,11 +324,11 @@ $this->layout = 'default';
                                 </div>
                             </div>
                             <div class="card-body">
-                                <?php if (!empty($cancelledBookings) && $cancelledBookings->count() > 0): ?>
+                                <?php if (!empty($pastOrCancelledBookings) && $pastOrCancelledBookings->count() > 0): ?>
                                     <div class="row justify-content-center">
-                                        <?php foreach ($cancelledBookings as $booking): ?>
+                                        <?php foreach ($pastOrCancelledBookings as $booking): ?>
                                             <div class="col-12 col-xl-6">
-                                                <div class="card booking-card cancelled-card">
+                                                <div class="card booking-card <?= ($booking->status === 'cancelled') ? 'cancelled-card' : '' ?>">
                                                     <div class="d-flex">
                                                         <div class="booking-datetime">
                                                             <div class="month">
@@ -346,8 +346,31 @@ $this->layout = 'default';
                                                         <div class="booking-info d-flex flex-column justify-content-between">
                                                             <div>
                                                                 <div class="status-badge">
-                                                                     <span class="status-text <?= $booking->status === 'active' ? 'active' : ($booking->status === 'Confirmed - Payment Due' ? 'payment-due' : ($booking->status === 'Confirmed - Paid' ? 'paid' : ($booking->status === 'cancelled' ? 'cancelled' :'' ) )) ?>">
-                                                                        <?= strtoupper(h($booking->status)) ?>
+                                                                     <?php
+                                                                        $dashPastStatusClass = '';
+                                                                        $dashPastDisplayText = strtoupper(h($booking->status)); 
+
+                                                                        if ($booking->status === 'cancelled') {
+                                                                            $dashPastStatusClass = 'cancelled'; 
+                                                                            // Check for admin-cancelled paid bookings
+                                                                            if ($booking->latest_payment_history && $booking->latest_payment_history->payment_status === 'Refunded - Admin Processed') {
+                                                                                $dashPastDisplayText = 'CANCELLED (REFUND PROCESSED)';
+                                                                            } elseif ($booking->refund_due_amount > 0) {
+                                                                                $dashPastDisplayText = 'CANCELLED (REFUND DUE)';
+                                                                            }
+                                                                            // Else, it remains 'CANCELLED' from the default
+                                                                        } elseif ($booking->status === 'active') {
+                                                                            $dashPastStatusClass = 'active';
+                                                                        } elseif ($booking->status === 'Confirmed - Payment Due') {
+                                                                            $dashPastStatusClass = 'payment-due';
+                                                                        } elseif ($booking->status === 'Confirmed - Paid') {
+                                                                            $dashPastStatusClass = 'paid';
+                                                                        } elseif ($booking->status === 'finished') {
+                                                                            $dashPastStatusClass = 'finished';
+                                                                        }
+                                                                     ?>
+                                                                    <span class="status-text <?= $dashPastStatusClass ?>">
+                                                                        <?= $dashPastDisplayText ?>
                                                                     </span>
                                                                 </div>
 
@@ -417,7 +440,7 @@ $this->layout = 'default';
                                     </div>
                                 <?php else: ?>
                                     <div class="text-center">
-                                        <p>You have no recently cancelled bookings.</p>
+                                        <p>You have no past or recently cancelled bookings to display here.</p>
                                     </div>
                                 <?php endif; ?>
                             </div>

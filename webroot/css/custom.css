@@ -3655,7 +3655,7 @@ footer .input-group .btn-primary:hover {
     padding: 2rem 2rem 1rem 2rem;
     background-color: #f8f9fa;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-    min-height: auto; /* Let it shrink to fit content */
+    min-height: auto;
     display: flex;
     align-items: flex-start;
     justify-content: center;
@@ -3667,4 +3667,30 @@ footer .input-group .btn-primary:hover {
 
 .admin-border {
     border: 8px solid #1e2125;
+}
+
+/* Brown for Mark as Paid button */
+.contacts.index.content .actions .button.button-mark-paid {
+    background-color: #A0522D !important; 
+    border-color: #A0522D !important;
+    color: white !important;
+}
+
+.contacts.index.content .actions .button.button-mark-paid:hover {
+    background-color: #8B4513 !important;
+    border-color: #7A3C10 !important;
+    color: white !important;
+}
+
+/* Purple for Refund Processed button */
+.contacts.index.content .actions .button.button-refund-processed {
+    background-color: #800080 !important;
+    border-color: #800080 !important;
+    color: white !important;
+}
+
+.contacts.index.content .actions .button.button-refund-processed:hover {
+    background-color: #6A0DAD !important; 
+    border-color: #5B009A !important;
+    color: white !important;
 }

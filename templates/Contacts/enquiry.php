@@ -7,8 +7,8 @@
 <?= $this->Html->css('/dashboard/profiledash.css') ?>
 <?= $this->Html->script('custom') ?>
 <?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
-<div class="customer-dashboard" style="background-image: url(<?= $this->Url->image('gradient.jpg')?>);">
-    <div class="contacts form content">
+<div class="customer-dashboard" style="background-image: url(<?= $this->Url->image('gradient.jpg')?>);" >
+    <div class="contacts form content" style="margin-bottom: 100px; margin-top: 100px;">
         <h2>Contact Us</h2>
         <p class="text-center mb-4">We'd love to hear from you. Please fill out the form below.</p>
         <?= $this->Form->create($contact) ?>
