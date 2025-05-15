@@ -33,6 +33,8 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
     <!-- Google fonts-->
     <link href="https://fonts.googleapis.com/css?family=Merriweather+Sans:400,700" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic" rel="stylesheet" type="text/css" />
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
@@ -350,6 +352,9 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
             <div class="col-md-3">
                 <h5 class="text-light fw-bold">Support</h5>
                 <ul class="list-unstyled">
+                    <li><i class="bi bi-telephone-fill"></i> 03 7012 8324</li>
+                </ul>
+                <ul class="list-unstyled">
                     <li><a href="<?= $this->Url->build('/contacts/enquiry') ?>" class="text-secondary">Contact us</a></li>
                 </ul>
                 <ul class="list-unstyled">
@@ -396,13 +401,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const emailInput = document.getElementById('newsletter-email-input');
             const csrfTokenInput = document.getElementById('newsletter-csrf-token');
             const messageArea = document.getElementById('newsletter-response-message');
-            
+
             const email = emailInput.value;
             const csrfToken = csrfTokenInput.value;
             const actionUrl = newsletterForm.getAttribute('action');
 
-            messageArea.innerHTML = ''; 
-            messageArea.className = 'mt-2'; 
+            messageArea.innerHTML = '';
+            messageArea.className = 'mt-2';
 
             // Basic client-side validation (optional, server validates too)
             if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -422,7 +427,7 @@ document.addEventListener('DOMContentLoaded', function() {
             fetch(actionUrl, {
                 method: 'POST',
                 headers: {
-                    'X-Requested-With': 'XMLHttpRequest', 
+                    'X-Requested-With': 'XMLHttpRequest',
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: formData.toString()
@@ -431,7 +436,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.success) {
                     messageArea.innerHTML = '<small style="color: #d4edda; background-color: rgba(21, 87, 36, 0.3); border-left: 3px solid #155724; padding: 5px 10px; border-radius: 4px; display: inline-block;">' + data.message + '</small>';
-                    emailInput.value = ''; 
+                    emailInput.value = '';
                 } else {
                     messageArea.innerHTML = '<small style="color: #f4623a;">' + (data.message || 'An error occurred.') + '</small>';
                 }

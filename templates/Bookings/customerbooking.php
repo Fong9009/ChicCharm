@@ -9,22 +9,27 @@
 
 // Add the JavaScript file
 $this->Html->script('booking', ['block' => 'script']);
-
-$this->Html->css('/utility/forms/forms.css') ?>
+?>
+<?= $this->Html->css('/utility/forms/forms.css') ?>
 <?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
 <script>
     const apiUrl = '<?= $this->Url->build("/bookings/get-stylists-for-service/") ?>';
     const apiUrl2 = '<?= $this->Url->build("/bookings/get-available-time-slots") ?>';
     const apiUrl3 = '<?= $this->Url->build("/bookings/get-availability-count") ?>';
 </script>
-<div class="booking-form-wrapper">
-    <div class="row">
-        <div class="side-nav">
-        <h4 class="heading"><?= __('Actions') ?></h4>
-        <?= $this->Html->link(__('My Bookings'), ['action' => 'customerindex'], ['class' => 'side-nav-item']) ?>
-        </div>
+<div class="customer-form-wrapper customer-background" style="background-image: url(<?= $this->Url->image('customerbackground.jpg')?>);">
+    <div class="row customer-form">
         <div class="column-edit">
-            <div class="bookings form content" id="booking-form">
+            <div class="bookings form content admin-border w-100" id="booking-form">
+                <div class="row">
+                    <div class="col-3 col-sm-4 col-6 text-center">
+                        <?= $this->Html->link(
+                            '<i class="fa fa-arrow-left"></i> ' . __('Back'),
+                            ['controller' => 'Customers', 'action' => 'dashboard'],
+                            ['class' => 'side-nav-item', 'escape' => false]
+                        ) ?>
+                    </div>
+                </div>
                 <?= $this->Form->create($booking) ?>
                 <fieldset>
                     <h2 class="text-center"><?= __('Add Booking') ?></h2><br>

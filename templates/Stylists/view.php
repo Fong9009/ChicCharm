@@ -108,14 +108,6 @@
                     <th><?= __('Email') ?></th>
                     <td><?= h($stylist->email) ?></td>
                 </tr>
-                <tr>
-                    <th><?= __('Created') ?></th>
-                    <td><?= h($stylist->created) ?></td>
-                </tr>
-                <tr>
-                    <th><?= __('Modified') ?></th>
-                    <td><?= h($stylist->modified) ?></td>
-                </tr>
             </table>
             <div class="related">
                 <h4><?= __('Related Bookings') ?></h4>

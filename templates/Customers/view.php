@@ -124,14 +124,6 @@
                         <th><?= __('Email') ?></th>
                         <td><?= h($customer->email) ?></td>
                     </tr>
-                    <tr>
-                        <th><?= __('Created') ?></th>
-                        <td><?= h($customer->created) ?></td>
-                    </tr>
-                    <tr>
-                        <th><?= __('Modified') ?></th>
-                        <td><?= h($customer->modified) ?></td>
-                    </tr>
                 </table>
             </div>
         </div>

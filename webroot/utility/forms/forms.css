@@ -1,0 +1,23 @@
+/* Customer Booking Form Styles */
+.customer-form-wrapper {
+    padding: 50px 20px 76px;
+    background-color: #f8f9fa;
+    min-height: 75vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.customer-form {
+    width: 700px;
+    max-width: 90vw;
+}
+
+.customer-background {
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+

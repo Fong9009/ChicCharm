@@ -71,7 +71,6 @@ return function (RouteBuilder $routes): void {
             ['_method' => 'POST']
         );
 
-
         /*
          * ROUTES FOR CONTENT BLOCKS
          */
@@ -98,7 +97,11 @@ return function (RouteBuilder $routes): void {
          * END OF ROUTES FOR CONTENT BLOCKS
          */
 
-
+        $builder->redirect(
+            '/content-blocks/content-blocks/*',
+            '/blocks/',
+            ['status' => 301],
+        );
         /*
          * Connect catchall routes for all controllers.
          *
