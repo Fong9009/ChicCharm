@@ -186,9 +186,6 @@
                                     <th><?= __('First Name') ?></th>
                                     <th><?= __('Last Name') ?></th>
                                     <th><?= __('Email') ?></th>
-                                    <th><?= __('Created') ?></th>
-                                    <th><?= __('Modified') ?></th>
-                                    <th><?= __('Profile Picture') ?></th>
                                     <th class="actions"><?= __('Actions') ?></th>
                                 </tr>
                             </thead>
@@ -198,9 +195,6 @@
                                     <td><?= h($stylist->stylist->first_name) ?></td>
                                     <td><?= h($stylist->stylist->last_name) ?></td>
                                     <td><?= h($stylist->stylist->email) ?></td>
-                                    <td><?= h($stylist->stylist->created) ?></td>
-                                    <td><?= h($stylist->stylist->modified) ?></td>
-                                    <td><?= h($stylist->stylist->profile_picture) ?></td>
                                     <td class="actions">
                                         <?= $this->Html->link(__('View'), ['controller' => 'Stylists', 'action' => 'view', $stylist->stylist->id], ['class' => 'button']) ?>
                                         <?= $this->Html->link(__('Edit'), ['controller' => 'Stylists', 'action' => 'edit', $stylist->stylist->id], ['class' => 'button']) ?>
