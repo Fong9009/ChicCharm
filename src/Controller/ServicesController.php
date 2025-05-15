@@ -301,7 +301,7 @@ class ServicesController extends AppController
 
     public function servicePage() {
         $this->paginate = [
-            'limit' => 12,
+            'limit' => 6,
         ];
 
         //Search functionality

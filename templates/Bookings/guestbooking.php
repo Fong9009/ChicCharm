@@ -15,21 +15,26 @@ $this->Html->script('booking', ['block' => 'script']);
     const apiUrl2 = '<?= $this->Url->build("/bookings/get-available-time-slots") ?>';
     const apiUrl3 = '<?= $this->Url->build("/bookings/get-availability-count") ?>';
 </script>
-<div class="booking-form-wrapper">
+<div class="booking-form-wrapper " style="background-image: url(<?= $this->Url->image('gradient.jpg')?>);">
     <div class="row">
-        <div class="side-nav">
-            <h4 class="heading"><?= __('Actions') ?></h4>
-            <?= $this->Html->link(__('Contact Us'), ['controller' => 'contacts', 'action' => 'enquiry'], ['class' => 'side-nav-item']) ?>
-        </div>
         <div class="column-edit">
-            <div class="bookings form content" id="booking-form">
+            <div class="bookings form content admin-border" id="booking-form">
                 <?= $this->Form->create($booking) ?>
                 <fieldset>
                     <h2 class="text-center"><?= __('Guest Booking') ?></h2><br>
                     <div class="row">
                         <div>
+                            <h5>Important Notes</h5>
+                            <p>- Guest bookings will not save unless payment has been completed. <br>
+                                - You will be emailed an invoice, on the payment of your booking. <br>
+                                - If you want us to make a booking on your behalf, <?= $this->Html->link(__('Contact Us'), ['controller' => 'contacts', 'action' => 'enquiry']) ?>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div>
                             <h5>Want to Sign in?</h5>
-                            <p>Join us for installment payment, booking management and much more</p>
+                            <p>Join us for installment payment, booking management and much more.</p>
                             <?= $this->Html->link(__('Sign in'), ['controller' => 'Auth', 'action' => 'guesttransfer'], ['class' => 'btn btn-secondary w-25']) ?>
                         </div>
                     </div>
@@ -167,4 +172,5 @@ $this->Html->script('booking', ['block' => 'script']);
             </div>
         </div>
     </div>
+</div>
 </div>
