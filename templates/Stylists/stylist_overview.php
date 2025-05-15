@@ -4,12 +4,30 @@
  * @var \App\Model\Entity\Stylist[] $stylists
  */
 use Cake\Routing\Router;
+$identity = $this->request->getAttribute('identity');
+$bookingButton = $this->ContentBlock->text('booking-button');
+// Set up the booking link based on user type
+if ($identity) {
+    if ($identity->type === 'customer') {
+        $link = ['controller' => 'Bookings', 'action' => 'customerbooking'];
+    } elseif ($identity->type === 'admin') {
+        $link = ['controller' => 'Bookings', 'action' => 'adminbooking'];
+    } elseif ($identity->type === 'stylist') {
+        $link = ['controller' => 'Stylists', 'action' => 'dashboard'];
+    } else {
+        $link = ['controller' => 'Bookings', 'action' => 'guestbooking'];
+    }
+} else {
+    $link = ['controller' => 'Bookings', 'action' => 'guestbooking'];
+}
 ?>
-<section class="px-5 mt-4">
+<div style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url(<?= $this->Url->image('stylistbackground.jpg')?>) center center / cover no-repeat;">
     <div class="row p-2 justify-content-center">
-        <div class="col-lg-12 text-center">
-            <h1 class="fw-bold"><?= $this->ContentBlock->text('stylist-page-title'); ?></h1>
-            <h2> <?= $this->ContentBlock->text('stylist-page-desc'); ?></h2>
+        <div class="col-lg-8 mt-5 text-center">
+            <h1 class="fw-bold text-white"><?= $this->ContentBlock->text('stylist-page-title'); ?></h1>
+            <h2 class="text-white"> <?= $this->ContentBlock->text('stylist-page-desc'); ?></h2>
+            <h3 class="text-white">Made your choice?</h3>
+            <a> <?= $this->Html->link($bookingButton, $link, ['class' => 'btn btn-primary btn-xl', 'onclick' => 'handleBookingClick(event)', 'style' =>"background-color: orange"]) ?></a>
         </div>
     </div>
     <div class="row p-2 justify-content-center">
@@ -26,12 +44,16 @@ use Cake\Routing\Router;
             <?= $this->Form->end() ?>
         </div>
         <div class="col-12 text-center p-2">
-            <h5> Can't find who you are looking for? <a href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'enquiry'])?>">
+            <h5 class="text-white"> Can't find who you are looking for? <a href="<?= $this->Url->build(['controller' => 'Contacts', 'action' => 'enquiry'])?>">
                     <span>Contact Us</span>
                 </a></h5>
         </div>
     </div>
     <hr class="flex-grow-1 mx-auto" style="border: none; height: 3px; background-color: #c99863;"/>
+</div>
+
+
+<section class="px-5 mt-4">
     <?php
     $counter = 0;
     foreach ($stylists as $stylist):
@@ -46,7 +68,7 @@ use Cake\Routing\Router;
         <?php endif; ?>
 
         <div class="col-lg-6 col-md-12 col-sm-12 mb-4">
-            <div class="card h-100 fade-in-title">
+            <div class="card h-100 fade-in-title service-border">
                 <div class="row g-0 h-100">
                     <!-- Left side: Image -->
                     <div class="col-md-5">
@@ -60,13 +82,21 @@ use Cake\Routing\Router;
                     <!-- Right side: Text -->
                     <div class="col-md-7 d-flex flex-column justify-content-center">
                         <div class="card-body">
-                            <h1>Stylist Details</h1>
+                            <h2>Stylist Details</h2>
                             <hr style="border: none; height: 3px; background-color: #c99863;"/>
                             <h4><strong>Stylist Name:</strong> <?= h($stylist->first_name) . " " . h($stylist->last_name) ?></h4>
-                            <h5><strong>Stylist Bio:</strong> <?= h($stylist->stylist_bio) ?></h5>
+                            <button class="btn btn-primary btn-sm mb-2" style="background-color: orange" type="button" data-bs-toggle="collapse" data-bs-target="#stylistBio<?= $stylist->id ?>" aria-expanded="false" aria-controls="stylistBio<?= $stylist->id ?>" >
+                                Show/Hide Bio
+                            </button>
+                            <div class="collapse" id="stylistBio<?= $stylist->id ?>">
+                                <div class="card card-body mb-3">
+                                    <h5><strong>Stylist Bio</strong></h5>
+                                    <?= h($stylist->stylist_bio) ?>
+                                </div>
+                            </div>
                             <h5><strong>Services that <?= h($stylist->first_name)?> Offers: </strong></h5>
                             <?php foreach ($stylist->services as $service): ?>
-                                <li><?= h($service->service_name) ?></li>
+                                <li style="font-family: Raleway, sans-serif;"><?= h($service->service_name) ?></li>
                             <?php endforeach; ?>
                         </div>
                     </div>
@@ -83,15 +113,18 @@ use Cake\Routing\Router;
 
     // Close row if last row has less than 3 cards
     if ($counter % 2 !== 0): ?>
-        </div>
     <?php endif; ?>
-    <div class="paginator text-center p-2">
-        <ul class="pagination justify-content-center">
-            <?= $this->Paginator->first('<<') ?>
-            <?= $this->Paginator->prev('<') ?>
-            <?= $this->Paginator->next('>') ?>
-            <?= $this->Paginator->last('>>') ?>
-        </ul>
-        <p><?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} Services out of {{count}} total')) ?></p>
-    </div>
+    <?php if (!empty($stylists)) : ?>
+        <?php if (count($stylists) > 6) : ?>
+            <div class="paginator text-center p-2">
+                <ul class="pagination justify-content-center">
+                    <?= $this->Paginator->first('<<') ?>
+                    <?= $this->Paginator->prev('Previous Page') ?>
+                    <?= $this->Paginator->next('Next Page') ?>
+                    <?= $this->Paginator->last('>>') ?>
+                </ul>
+                <p><?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} Services out of {{count}} total')) ?></p>
+            </div>
+        <?php endif; ?>
+    <?php endif; ?>
 </section>

@@ -3669,9 +3669,13 @@ footer .input-group .btn-primary:hover {
     border: 8px solid #1e2125;
 }
 
+.service-border {
+    border: 3px solid #1e2125;
+}
+
 /* Brown for Mark as Paid button */
 .contacts.index.content .actions .button.button-mark-paid {
-    background-color: #A0522D !important; 
+    background-color: #A0522D !important;
     border-color: #A0522D !important;
     color: white !important;
 }
@@ -3690,7 +3694,7 @@ footer .input-group .btn-primary:hover {
 }
 
 .contacts.index.content .actions .button.button-refund-processed:hover {
-    background-color: #6A0DAD !important; 
+    background-color: #6A0DAD !important;
     border-color: #5B009A !important;
     color: white !important;
 }
