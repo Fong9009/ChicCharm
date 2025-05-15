@@ -20,7 +20,7 @@
     display: flex;
     justify-content: center; /* Center the content horizontally */
 }
-.customer-card-h4 {
+.customer-card-h5 {
     font-size: 48px;
     font-weight: bold;
     color: white;
@@ -58,8 +58,8 @@
     display: flex;
     justify-content: center; /* Center the content horizontally */
 }
-.admin-card-h4 {
-    font-size: 48px;
+.admin-card-h5 {
+    font-size: 24px;
     font-weight: bold;
     color: white;
 }
@@ -96,7 +96,7 @@
     display: flex;
     justify-content: center; /* Center the content horizontally */
 }
-.contractor-card-h4 {
+.contractor-card-h5 {
     font-size: 48px;
     font-weight: bold;
     color: white;
@@ -133,7 +133,7 @@
     display: flex;
     justify-content: center; /* Center the content horizontally */
 }
-.contact-card-h4 {
+.contact-card-h5 {
     font-size: 48px;
     font-weight: bold;
     color: white;
@@ -171,7 +171,7 @@
     display: flex;
     justify-content: center;
 }
-.booking-card-h4 {
+.booking-card-h5 {
     font-size: 48px;
     font-weight: bold;
     color: white;
@@ -209,7 +209,7 @@
     display: flex;
     justify-content: center; /* Center the content horizontally */
 }
-.payment-card-h4 {
+.payment-card-h5 {
     font-size: 48px;
     font-weight: bold;
     color: white;
@@ -247,7 +247,7 @@
     display: flex;
     justify-content: center;
 }
-.service-card-h4 {
+.service-card-h5 {
     font-size: 48px;
     font-weight: bold;
     color: white;
@@ -406,8 +406,8 @@
 }
 
 /* Text Styles */
-[class*="-card-h4"] {
-    font-size: 48px;
+[class*="-card-h5"] {
+    font-size: 30px;
     font-weight: bold;
     color: white;
     margin: 0;
@@ -421,7 +421,7 @@
 }
 
 [class*="-card-count"] {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: bold;
     color: white;
     margin: 0;

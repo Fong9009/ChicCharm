@@ -90,8 +90,6 @@ $this->Html->script('custom', ['block' => true]);
                     <th><?= $this->Paginator->sort('first_name') ?></th>
                     <th><?= $this->Paginator->sort('last_name') ?></th>
                     <th><?= $this->Paginator->sort('email') ?></th>
-                    <th><?= $this->Paginator->sort('created') ?></th>
-                    <th><?= $this->Paginator->sort('modified') ?></th>
                     <th class="actions"><?= __('Actions') ?></th>
                 </tr>
             </thead>
@@ -101,8 +99,6 @@ $this->Html->script('custom', ['block' => true]);
                     <td><?= h($stylist->first_name) ?></td>
                     <td><?= h($stylist->last_name) ?></td>
                     <td><?= h($stylist->email) ?></td>
-                    <td><?= h($stylist->created) ?></td>
-                    <td><?= h($stylist->modified) ?></td>
                     <td class="actions">
                         <?= $this->Html->link(__('View'), ['controller' => 'Stylists', 'action' => 'view', $stylist->id], ['class' => 'button']) ?>
                         <?= $this->Form->postLink(

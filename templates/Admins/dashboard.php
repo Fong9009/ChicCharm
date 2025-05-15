@@ -23,9 +23,27 @@ $identity = $this->request->getAttribute('identity');
         <div class="row">
             <div class="col-lg-3  mb-4">
                 <div class="card h-100">
-                    <div class="card-header admin-card-header d-flex justify-content-between align-items-center">
+                    <div class="card-header payment-card-header d-flex justify-content-between align-items-center flex-wrap">
                         <div>
-                            <h4 class="admin-card-h4">Profile</h4>
+                            <h5 class="payment-card-h5">Web Editor</h5>
+                        </div>
+                        <i class="material-icons admin-icon">settings</i>
+                    </div>
+                    <div class="card-body payment-card-body"></div>
+                    <div class="card-footer payment-card-footer">
+                        <?= $this->Html->link(
+                            '<span class="fs-5">View Website Editor</span><i class="material-icons">visibility</i>',
+                            ['controller' => 'ContentBlocks', 'action' => 'index'],
+                            ['class' => 'payment-button', 'escape' => false]
+                        ) ?>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3  mb-4">
+                <div class="card h-100">
+                    <div class="card-header admin-card-header d-flex justify-content-between align-items-center flex-wrap">
+                        <div>
+                            <h5 class="admin-card-h5">Profile</h5>
                         </div>
                         <i class="material-icons admin-icon">engineering</i>
                     </div>
@@ -39,37 +57,91 @@ $identity = $this->request->getAttribute('identity');
                     </div>
                 </div>
             </div>
-            <div class="col-lg-3  mb-4">
-                <div class="card h-100">
-                    <div class="card-header payment-card-header d-flex justify-content-between align-items-center">
-                        <div>
-                            <h4 class="payment-card-h4">Web</h4>
-                        </div>
-                        <i class="material-icons admin-icon">settings</i>
-                    </div>
-                    <div class="card-body payment-card-body"></div>
-                    <div class="card-footer payment-card-footer">
-                        <?= $this->Html->link(
-                            '<span class="fs-5">View Content Blocks</span><i class="material-icons">visibility</i>',
-                            ['controller' => 'ContentBlocks', 'action' => 'index'],
-                            ['class' => 'payment-button', 'escape' => false]
-                        ) ?>
-                    </div>
-                </div>
-            </div>
         </div>
         <div>
             <h2 class="welcome-text"> Quick Access</h2>
         </div>
         <hr class="flex-grow-1 mx-auto" style="border: none; height: 3px; background-color: #050505;"/>
-        <!-- First Row: Customers and Admins -->
+        <!-- First Row: Bookings, Payments, Messages and Customers -->
         <div class="row">
-            <!-- Customers Card -->
-            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+            <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
                 <div class="card h-100">
-                    <div class="card-header customer-card-header d-flex justify-content-between align-items-center">
+                    <div class="card-header booking-card-header d-flex justify-content-between align-items-center flex-wrap">
                         <div>
-                            <h4 class="customer-card-h4">Customers</h4>
+                            <h5 class="booking-card-h5">Bookings</h5>
+                        </div>
+                        <i class="material-icons booking-icon">event</i>
+                    </div>
+                    <div class="card-body booking-card-body">
+                        <h3 class="booking-card-h3">Total Active Bookings</h3>
+                        <div class="total-value-container">
+                            <p class="booking-card-count"><?= h($bookingCount) ?></p>
+                        </div>
+                    </div>
+                    <div class="card-footer booking-card-footer">
+                        <?= $this->Html->link(
+                            '<span class="fs-5">View Booking Lists</span><i class="material-icons">visibility</i>',
+                            ['controller' => 'Bookings', 'action' => 'index'],
+                            ['class' => 'booking-button', 'escape' => false]
+                        ) ?>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
+                <div class="card h-100">
+                    <div class="card-header payment-card-header d-flex justify-content-between align-items-center flex-wrap">
+                        <div>
+                            <h5 class="payment-card-h5">Payments</h5>
+                        </div>
+                        <i class="material-icons service-icon">payments</i>
+                    </div>
+                    <div class="card-body payment-card-body">
+                        <h3 class="service-card-h3">Total Payments</h3>
+                        <div class="total-value-container">
+                            <p class="service-card-count"><?= h($paymentCount) ?></p>
+                        </div>
+                    </div>
+                    <div class="card-footer payment-card-footer">
+                        <?= $this->Html->link(
+                            '<span class="fs-5">View Payment Lists</span><i class="material-icons">visibility</i>',
+                            ['controller' => 'Payments', 'action' => 'adminIndex'],
+                            ['class' => 'payment-button', 'escape' => false]
+                        ) ?>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
+                <div class="card h-100">
+                    <div class="card-header contact-card-header d-flex justify-content-between align-items-center flex-wrap">
+                        <div>
+                            <h5 class="contact-card-h5">Messages</h5>
+                        </div>
+                        <i class="material-icons contact-icon">chat</i>
+                    </div>
+                    <div class="card-body contact-card-body">
+                        <h3 class="contact-card-h3">Total Messages</h3>
+                        <div class="total-value-container">
+                            <p class="contact-card-count"><?= h($contactCount) ?></p>
+                        </div>
+                    </div>
+                    <div class="card-footer contact-card-footer">
+                        <?= $this->Html->link(
+                            '<span class="fs-5">View Contact Lists</span><i class="material-icons">visibility</i>',
+                            ['controller' => 'Contacts', 'action' => 'index'],
+                            ['class' => 'contact-button', 'escape' => false]
+                        ) ?>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customers Card -->
+            <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
+                <div class="card h-100">
+                    <div class="card-header customer-card-header d-flex justify-content-between align-items-center flex-wrap">
+                        <div>
+                            <h5 class="customer-card-h5">Customers</h5>
                         </div>
                         <i class="material-icons customer-icon">person</i>
                     </div>
@@ -88,13 +160,14 @@ $identity = $this->request->getAttribute('identity');
                     </div>
                 </div>
             </div>
-
+        </div>
+        <div class="row">
             <!-- Admins Card -->
-            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+            <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
                 <div class="card h-100">
-                    <div class="card-header admin-card-header d-flex justify-content-between align-items-center">
+                    <div class="card-header admin-card-header d-flex justify-content-between align-items-center flex-wrap">
                         <div>
-                            <h4 class="admin-card-h4">Admins</h4>
+                            <h5 class="admin-card-h5">Admins</h5>
                         </div>
                         <i class="material-icons admin-icon">engineering</i>
                     </div>
@@ -115,11 +188,11 @@ $identity = $this->request->getAttribute('identity');
             </div>
 
             <!-- Stylists Card -->
-            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+            <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
                 <div class="card h-100">
-                    <div class="card-header contractor-card-header d-flex justify-content-between align-items-center">
+                    <div class="card-header contractor-card-header d-flex justify-content-between align-items-center flex-wrap">
                         <div>
-                            <h4 class="contractor-card-h4">Stylists</h4>
+                            <h5 class="contractor-card-h5">Stylists</h5>
                         </div>
                         <i class="material-icons contractor-icon">group</i>
                     </div>
@@ -138,66 +211,12 @@ $identity = $this->request->getAttribute('identity');
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Second Row: Stylists and Contacts -->
-        <div class="row">
-            <!-- Contacts Card -->
-            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
-                <div class="card h-100">
-                    <div class="card-header contact-card-header d-flex justify-content-between align-items-center">
-                        <div>
-                            <h4 class="contact-card-h4">Messages</h4>
-                        </div>
-                        <i class="material-icons contact-icon">chat</i>
-                    </div>
-                    <div class="card-body contact-card-body">
-                        <h3 class="contact-card-h3">Total Messages</h3>
-                        <div class="total-value-container">
-                            <p class="contact-card-count"><?= h($contactCount) ?></p>
-                        </div>
-                    </div>
-                    <div class="card-footer contact-card-footer">
-                        <?= $this->Html->link(
-                            '<span class="fs-5">View Contact Lists</span><i class="material-icons">visibility</i>',
-                            ['controller' => 'Contacts', 'action' => 'index'],
-                            ['class' => 'contact-button', 'escape' => false]
-                        ) ?>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Bookings Card -->
-            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
-                <div class="card h-100">
-                    <div class="card-header booking-card-header d-flex justify-content-between align-items-center">
-                        <div>
-                            <h4 class="booking-card-h4">Active Bookings</h4>
-                        </div>
-                        <i class="material-icons booking-icon">event</i>
-                    </div>
-                    <div class="card-body booking-card-body">
-                        <h3 class="booking-card-h3">Total Active Bookings</h3>
-                        <div class="total-value-container">
-                            <p class="booking-card-count"><?= h($bookingCount) ?></p>
-                        </div>
-                    </div>
-                    <div class="card-footer booking-card-footer">
-                        <?= $this->Html->link(
-                            '<span class="fs-5">View Booking Lists</span><i class="material-icons">visibility</i>',
-                            ['controller' => 'Bookings', 'action' => 'index'],
-                            ['class' => 'booking-button', 'escape' => false]
-                        ) ?>
-                    </div>
-                </div>
-            </div>
-
             <!-- Services Card -->
-            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+            <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
                 <div class="card h-100">
-                    <div class="card-header service-card-header d-flex justify-content-between align-items-center">
+                    <div class="card-header service-card-header d-flex justify-content-between align-items-center flex-wrap">
                         <div>
-                            <h4 class="service-card-h4">Services</h4>
+                            <h5 class="service-card-h5">Services</h5>
                         </div>
                         <i class="material-icons service-icon">settings</i>
                     </div>
@@ -212,32 +231,6 @@ $identity = $this->request->getAttribute('identity');
                             '<span class="fs-5">View Service Lists</span><i class="material-icons">visibility</i>',
                             ['controller' => 'Services', 'action' => 'index'],
                             ['class' => 'service-button', 'escape' => false]
-                        ) ?>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Third Row: Payment -->
-        <div class="row">
-            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
-                <div class="card h-100">
-                    <div class="card-header payment-card-header d-flex justify-content-between align-items-center">
-                        <div>
-                            <h4 class="payment-card-h4">Payments</h4>
-                        </div>
-                        <i class="material-icons service-icon">payments</i>
-                    </div>
-                    <div class="card-body payment-card-body">
-                        <h3 class="service-card-h3">Total Payments</h3>
-                        <div class="total-value-container">
-                            <p class="service-card-count"><?= h($paymentCount) ?></p>
-                        </div>
-                    </div>
-                    <div class="card-footer payment-card-footer">
-                        <?= $this->Html->link(
-                            '<span class="fs-5">View Payment Lists</span><i class="material-icons">visibility</i>',
-                            ['controller' => 'Payments', 'action' => 'adminIndex'],
-                            ['class' => 'payment-button', 'escape' => false]
                         ) ?>
                     </div>
                 </div>
