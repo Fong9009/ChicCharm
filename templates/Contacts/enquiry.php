@@ -17,19 +17,19 @@
                 <hr class="my-3">
                 <p>
                     <strong><i class="material-icons align-middle me-2">location_on</i>Address:</strong><br>
-                    123 Beauty Lane, Styleville<br>
+                    <?= $this->ContentBlock->text('contact-address'); ?><br>
                 </p>
                 <p>
                     <strong><i class="material-icons align-middle me-2">phone</i>Phone:</strong><br>
-                    (03) 9000 0000
+                    <?= $this->ContentBlock->text('contact-phone'); ?>
                 </p>
                 <p>
                     <strong><i class="material-icons align-middle me-2">email</i>Email:</strong><br>
-                    <a href="mailto:enquiries@example.com">contact@chiccharm.com</a>
+                    <a href="mailto:enquiries@example.com"><?= $this->ContentBlock->text('contact-email'); ?></a>
                 </p>
                 <p>
                     <strong><i class="material-icons align-middle me-2">schedule</i>Business Hours:</strong><br>
-                    Monday - Sunday: 9:00 AM - 5:00 PM<br>
+                    <?= $this->ContentBlock->text('contact-business-hours'); ?><br>
                 </p>
             </div>
             <div class="col-md-1 d-none d-md-flex justify-content-center">

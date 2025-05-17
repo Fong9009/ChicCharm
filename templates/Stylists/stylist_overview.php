@@ -26,7 +26,7 @@ if ($identity) {
         <div class="col-lg-8 mt-5 text-center">
             <h1 class="fw-bold text-white"><?= $this->ContentBlock->text('stylist-page-title'); ?></h1>
             <h2 class="text-white"> <?= $this->ContentBlock->text('stylist-page-desc'); ?></h2>
-            <h3 class="text-white">Made your choice?</h3>
+            <h3 class="text-white">Got someone in mind?</h3>
             <a> <?= $this->Html->link($bookingButton, $link, ['class' => 'btn btn-primary btn-xl', 'onclick' => 'handleBookingClick(event)', 'style' =>"background-color: orange"]) ?></a>
         </div>
     </div>

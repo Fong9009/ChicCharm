@@ -26,8 +26,6 @@ if ($identity) {
         <div class="col-12 mt-5 text-center">
             <h1 class="fw-bold text-white"><?= $this->ContentBlock->text('service-page-title'); ?></h1>
             <h2 class="fw-bold text-white"> <?= $this->ContentBlock->text('service-page-description'); ?></h2>
-            <h3 class="text-white">Made your choice?</h3>
-            <a> <?= $this->Html->link($bookingButton, $link, ['class' => 'btn btn-primary btn-xl', 'onclick' => 'handleBookingClick(event)', 'style' =>"background-color: orange"]) ?></a>
         </div>
     </div>
     <div class="row p-2 justify-content-center">
@@ -80,12 +78,12 @@ if ($identity) {
                     <p><strong>Cost:</strong> $<?= h($service->service_cost) ?></p>
                 </div>
                 <div class="card-footer" style="background-color: orange">
-                    <?= $this->Html->link('View Service', ['controller' => 'Services', 'action' => 'serviceView', $service->id], ['class' => 'btn btn-primary w-100 mb-2', 'style' =>"background-color: orange"]) ?>
+                    <?= $this->Html->link('View Service', ['controller' => 'Services', 'action' => 'serviceView', $service->id], ['class' => 'btn btn-primary w-100 mb-2', 'style' =>"background-color: grey; border-color: grey;"]) ?>
                     <?php
                         $bookingLinkParams = $link; // Use the $link determined at the top of the file
                         $bookingLinkParams['?'] = ['service_id' => $service->id];
                     ?>
-                    <?= $this->Html->link('Book This Service', $bookingLinkParams, ['class' => 'btn btn-success w-100', 'style' => "background-color: #28a745; border-color: #28a745;"]) ?>
+                    <?= $this->Html->link('Book This Service', $bookingLinkParams, ['class' => 'btn btn-success w-100', 'style' => "background-color: #5D3FD3; border-color: #5D3FD3;"]) ?>
                 </div>
             </div>
         </div>

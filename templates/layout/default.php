@@ -368,7 +368,7 @@ $isPublicPage = $this->request->getParam('controller') === 'Contacts' && $this->
             <div class="col-md-3">
                 <h5 class="text-light fw-bold">Support</h5>
                 <ul class="list-unstyled">
-                    <li><i class="bi bi-telephone-fill"></i> 03 7012 8324</li>
+                    <li><i class="bi bi-telephone-fill"></i> <?= $this->ContentBlock->text('contact-phone'); ?></li>
                 </ul>
                 <ul class="list-unstyled">
                     <li><a href="<?= $this->Url->build('/contacts/enquiry') ?>" class="text-secondary">Contact us</a></li>

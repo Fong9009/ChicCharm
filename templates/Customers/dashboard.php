@@ -21,45 +21,7 @@ $this->layout = 'default';
                     </div>
                     <?= $this->Flash->render() ?>
                     <div class="card-body">
-                        <div class="row mb-4 p-1">
-                            <div class="w-100" style="height: 2px; background-color: #6c757d;"></div>
-                        </div>
-                        <!--Profile Picture and Summary-->
-                        <div class="row">
-                            <div class="col-lg-4 col-md-12 col-sm-12 mb-4">
-                                <div class="card h-100">
-                                    <div class="card-body text-center">
-                                        <?php if (!empty($customer->profile_picture)) : ?>
-                                            <img src="<?= $this->Url->image('profile/' . $customer->profile_picture) ?>"
-                                                 alt="Profile Picture"
-                                                 class="profile-picture img-fluid rounded mx-auto d-block">
-                                        <?php else : ?>
-                                            <img src="<?= $this->Url->image('profile/blank-profile.png') ?>"
-                                                 alt="Profile Picture"
-                                                 class="profile-picture img-fluid rounded mx-auto d-block">
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <div class="col-lg-8 col-md-12 mb-4 col-sm-12">
-                                <div class="card h-100">
-                                    <div class="card-header d-flex justify-content-between align-items-center customer-card-header" style="background-color:#D7CCC8">
-                                        <h3 class="card-title">Profile Summary</h3>
-                                        <?= $this->Html->link(
-                                            'Edit Profile <i class="material-icons view-icon small-icon">edit</i>',
-                                            ['action' => 'edit', $customer->id],
-                                            ['class' => 'btn btn-primary', 'escape' => false]
-                                        ) ?>
-                                    </div>
-                                    <div class="card-body">
-                                        <p><strong>Name:</strong> <?= h($customer->first_name) ?> <?= h($customer->last_name) ?></p>
-                                        <p><strong>Email:</strong> <?= h($customer->email) ?></p>
-                                        <p><strong>Member Since:</strong> <?= $customer->created->format('F Y') ?></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
                 <!--Current Bookings-->
@@ -67,7 +29,7 @@ $this->layout = 'default';
                     <div class="col-12 mb-4">
                         <div class="card">
                             <div class="bookings-header" style="background-color:#D7CCC8">
-                                <h3 class="card-title">Current Bookings</h3>
+                                <h3 class="fw-bold">Current Bookings</h3>
                                 <div class="header-actions">
                                     <?= $this->Html->link(
                                         '<i class="material-icons">add</i> Make a Booking',
@@ -115,7 +77,7 @@ $this->layout = 'default';
                                                                             }
                                                                         }
                                                                     }
-                                                                    
+
                                                                     $baseStatusText = strtoupper(h($booking->status));
 
                                                                     if ($booking->status === 'active') {
@@ -123,7 +85,7 @@ $this->layout = 'default';
                                                                     } elseif ($booking->status === 'Confirmed - Payment Due') {
                                                                         $dashStatusClass = 'payment-due';
                                                                     } elseif ($booking->status === 'Confirmed - Paid') {
-                                                                        $dashStatusClass = 'paid'; 
+                                                                        $dashStatusClass = 'paid';
                                                                     } else {
                                                                         $dashStatusClass = '';
                                                                     }
@@ -217,12 +179,12 @@ $this->layout = 'default';
                                                                     ?>
                                                                 <?php endif; // End invoice link check ?>
 
-                                                                <?php 
+                                                                <?php
                                                                 if ($booking->status === 'Confirmed - Paid'): ?>
                                                                     <p class="text-muted small mt-1 mb-0 align-self-center">This booking is paid. Contact store for changes.</p>
                                                                 <?php endif; ?>
 
-                                                                <?php 
+                                                                <?php
                                                                 if (!in_array($booking->status, ['Confirmed - Paid'])):
                                                                 ?>
                                                                     <?php
@@ -314,7 +276,7 @@ $this->layout = 'default';
                     <div class="col-12 mb-4">
                         <div class="card">
                             <div class="bookings-header" style="background-color:#D7CCC8">
-                                <h3 class="card-title">Past Bookings</h3>
+                                <h3 class="fw-bold">Past Bookings</h3>
                                 <div class="header-actions">
                                     <?= $this->Html->link(
                                         '<i class="material-icons">history</i> View All Past Bookings',
@@ -348,10 +310,10 @@ $this->layout = 'default';
                                                                 <div class="status-badge">
                                                                      <?php
                                                                         $dashPastStatusClass = '';
-                                                                        $dashPastDisplayText = strtoupper(h($booking->status)); 
+                                                                        $dashPastDisplayText = strtoupper(h($booking->status));
 
                                                                         if ($booking->status === 'cancelled') {
-                                                                            $dashPastStatusClass = 'cancelled'; 
+                                                                            $dashPastStatusClass = 'cancelled';
                                                                             // Check for admin-cancelled paid bookings
                                                                             if ($booking->latest_payment_history && $booking->latest_payment_history->payment_status === 'Refunded - Admin Processed') {
                                                                                 $dashPastDisplayText = 'CANCELLED (REFUND PROCESSED)';
@@ -443,6 +405,53 @@ $this->layout = 'default';
                                         <p>You have no past or recently cancelled bookings to display here.</p>
                                     </div>
                                 <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card h-100 mb-4">
+                    <div class="card-header d-flex justify-content-between customer-card-header" style="background-color:#D7CCC8">
+                        <h3 class="fw-bold">Your Profile, <?= h($customer->first_name) ?>!</h3>
+                    </div>
+                    <?= $this->Flash->render() ?>
+                    <div class="card-body">
+                        <div class="row mb-4 p-1">
+                            <div class="w-100" style="height: 2px; background-color: #6c757d;"></div>
+                        </div>
+                        <!--Profile Picture and Summary-->
+                        <div class="row">
+                            <div class="col-lg-4 col-md-12 col-sm-12 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <?php if (!empty($customer->profile_picture)) : ?>
+                                            <img src="<?= $this->Url->image('profile/' . $customer->profile_picture) ?>"
+                                                 alt="Profile Picture"
+                                                 class="profile-picture img-fluid rounded mx-auto d-block">
+                                        <?php else : ?>
+                                            <img src="<?= $this->Url->image('profile/blank-profile.png') ?>"
+                                                 alt="Profile Picture"
+                                                 class="profile-picture img-fluid rounded mx-auto d-block">
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-8 col-md-12 mb-4 col-sm-12">
+                                <div class="card h-100">
+                                    <div class="card-header d-flex justify-content-between align-items-center customer-card-header" style="background-color:#D7CCC8">
+                                        <h3 class="card-title">Profile Summary</h3>
+                                        <?= $this->Html->link(
+                                            'Edit Profile <i class="material-icons view-icon small-icon">edit</i>',
+                                            ['action' => 'edit', $customer->id],
+                                            ['class' => 'btn btn-primary', 'escape' => false]
+                                        ) ?>
+                                    </div>
+                                    <div class="card-body">
+                                        <p><strong>Name:</strong> <?= h($customer->first_name) ?> <?= h($customer->last_name) ?></p>
+                                        <p><strong>Email:</strong> <?= h($customer->email) ?></p>
+                                        <p><strong>Member Since:</strong> <?= $customer->created->format('F Y') ?></p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
