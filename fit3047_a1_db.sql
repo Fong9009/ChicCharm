@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: May 17, 2025 at 12:00 PM
--- Server version: 9.3.0
--- PHP Version: 8.4.6
+-- Host: 127.0.0.1
+-- Generation Time: May 17, 2025 at 03:17 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `fit3047_a1_db`
+-- Database: `cake_project_v2`
 --
 
 -- --------------------------------------------------------
@@ -28,17 +28,17 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `admins` (
-  `id` int NOT NULL,
-  `first_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `last_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `nonce` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `id` int(11) NOT NULL,
+  `first_name` varchar(255) NOT NULL,
+  `last_name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `nonce` varchar(255) DEFAULT NULL,
   `nonce_expiry` datetime DEFAULT NULL,
-  `created` datetime DEFAULT CURRENT_TIMESTAMP,
-  `modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `type` varchar(50) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'admin',
-  `profile_picture` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL
+  `created` datetime DEFAULT current_timestamp(),
+  `modified` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `type` varchar(50) NOT NULL DEFAULT 'admin',
+  `profile_picture` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -57,15 +57,15 @@ INSERT INTO `admins` (`id`, `first_name`, `last_name`, `email`, `password`, `non
 --
 
 CREATE TABLE `bookings` (
-  `id` int NOT NULL,
-  `booking_name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `id` int(11) NOT NULL,
+  `booking_name` varchar(255) DEFAULT NULL,
   `booking_date` date NOT NULL,
   `total_cost` decimal(10,2) NOT NULL,
   `remaining_cost` decimal(10,2) NOT NULL,
-  `refund_due_amount` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Amount of refund due to customer after an admin edit, pending manual processing.',
-  `customer_id` int DEFAULT NULL,
-  `status` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `notes` text COLLATE utf8mb4_general_ci,
+  `refund_due_amount` decimal(10,2) NOT NULL DEFAULT 0.00 COMMENT 'Amount of refund due to customer after an admin edit, pending manual processing.',
+  `customer_id` int(11) DEFAULT NULL,
+  `status` varchar(50) DEFAULT NULL,
+  `notes` text DEFAULT NULL,
   `overall_start_time` time DEFAULT NULL,
   `overall_end_time` time DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -77,13 +77,13 @@ CREATE TABLE `bookings` (
 --
 
 CREATE TABLE `bookings_services` (
-  `id` int NOT NULL,
-  `booking_id` int NOT NULL,
-  `service_id` int NOT NULL,
+  `id` int(11) NOT NULL,
+  `booking_id` int(11) NOT NULL,
+  `service_id` int(11) NOT NULL,
   `service_cost` decimal(10,2) DEFAULT NULL COMMENT 'Cost of this specific service at time of booking',
-  `created` datetime DEFAULT CURRENT_TIMESTAMP,
-  `modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `stylist_id` int DEFAULT NULL,
+  `created` datetime DEFAULT current_timestamp(),
+  `modified` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `stylist_id` int(11) DEFAULT NULL,
   `start_time` time DEFAULT NULL COMMENT 'Start time specific to this service within the booking',
   `end_time` time DEFAULT NULL COMMENT 'End time specific to this service within the booking'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -95,11 +95,11 @@ CREATE TABLE `bookings_services` (
 --
 
 CREATE TABLE `bookings_stylists` (
-  `id` int NOT NULL,
+  `id` int(11) NOT NULL,
   `stylist_date` date NOT NULL,
   `selected_cost` decimal(10,2) NOT NULL,
-  `booking_id` int NOT NULL,
-  `stylist_id` int NOT NULL
+  `booking_id` int(11) NOT NULL,
+  `stylist_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -109,17 +109,17 @@ CREATE TABLE `bookings_stylists` (
 --
 
 CREATE TABLE `contacts` (
-  `id` int NOT NULL,
-  `first_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `last_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `phone_number` varchar(10) COLLATE utf8mb4_general_ci NOT NULL,
-  `message` text COLLATE utf8mb4_general_ci NOT NULL,
-  `replied` tinyint(1) DEFAULT '0',
-  `is_archived` tinyint(1) NOT NULL DEFAULT '0',
-  `created` datetime DEFAULT CURRENT_TIMESTAMP,
-  `modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `preferred_contact_method` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL
+  `id` int(11) NOT NULL,
+  `first_name` varchar(255) NOT NULL,
+  `last_name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `phone_number` varchar(10) NOT NULL,
+  `message` text NOT NULL,
+  `replied` tinyint(1) DEFAULT 0,
+  `is_archived` tinyint(1) NOT NULL DEFAULT 0,
+  `created` datetime DEFAULT current_timestamp(),
+  `modified` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `preferred_contact_method` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -185,15 +185,15 @@ INSERT INTO `contacts` (`id`, `first_name`, `last_name`, `email`, `phone_number`
 --
 
 CREATE TABLE `content_blocks` (
-  `id` int NOT NULL,
-  `parent` varchar(128) COLLATE utf8mb4_general_ci NOT NULL,
-  `slug` varchar(128) COLLATE utf8mb4_general_ci NOT NULL,
-  `label` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `description` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `type` varchar(32) COLLATE utf8mb4_general_ci NOT NULL,
-  `value` text COLLATE utf8mb4_general_ci,
-  `previous_value` text COLLATE utf8mb4_general_ci,
-  `modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id` int(11) NOT NULL,
+  `parent` varchar(128) NOT NULL,
+  `slug` varchar(128) NOT NULL,
+  `label` varchar(255) NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `type` varchar(32) NOT NULL,
+  `value` text DEFAULT NULL,
+  `previous_value` text DEFAULT NULL,
+  `modified` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -243,7 +243,25 @@ INSERT INTO `content_blocks` (`id`, `parent`, `slug`, `label`, `description`, `t
 (43, 'Service Page', 'service-page-stylist-title', 'Service Page Stylist Title', 'This is the title of the Service page for the Stylists', 'text', 'ChicCharm\'s Stylists For This Service', NULL, '2025-05-09 02:44:22'),
 (44, 'Service Page', 'service-page-stylist-description', 'Service page stylist Description', 'Second header', 'text', 'Here at ChicCharm we have stylists that can do this service', NULL, '2025-05-09 02:44:53'),
 (45, 'Stylist Page', 'stylist-page-title', 'Stylist Page Title', 'This is the Title for the public facing stylist page', 'text', 'The Team That Makes Up ChicCharm', NULL, '2025-05-09 03:40:28'),
-(46, 'Stylist Page', 'stylist-page-desc', 'Description for Public Stylist Page', 'This is the Description of the Public Stylist Page', 'text', 'ChicCharm would not be ChicCharm without its Stylists', NULL, '2025-05-09 03:43:01');
+(46, 'Stylist Page', 'stylist-page-desc', 'Description for Public Stylist Page', 'This is the Description of the Public Stylist Page', 'text', 'ChicCharm would not be ChicCharm without its Stylists', NULL, '2025-05-09 03:43:01'),
+(47, 'FAQ', 'faq-title', 'FAQ Title', 'This is the title for the FAQ Page', 'text', 'Frequently Asked Questions', NULL, '2025-05-11 10:56:30'),
+(48, 'FAQ', 'faq-preamble', 'FAQ Preamble', 'This is the smaller heading under the title', 'text', 'This is the place where you can find general questions that many ask and might answer yours.', NULL, '2025-05-11 10:57:40'),
+(49, 'FAQ', 'faq-question-title-1', 'FAQ Question Title 1', 'FAQ Question Title 1', 'text', 'How can I contact ChicCharm?', NULL, '2025-05-11 10:59:02'),
+(50, 'FAQ', 'faq-question-title-2', 'FAQ Question Title 2', 'FAQ Question Title 2', 'text', 'What services do you offer?', NULL, '2025-05-11 11:00:30'),
+(51, 'FAQ', 'faq-question-title-3', 'FAQ Question Title 3', 'FAQ Question Title 3', 'text', 'How to book an appointment?', NULL, '2025-05-11 11:01:07'),
+(52, 'FAQ', 'faq-question-title-4', 'FAQ Question Title 4', 'FAQ Question Title 4', 'text', 'How do I know which stylist is best fit for me?', NULL, '2025-05-11 11:02:32'),
+(53, 'FAQ', 'faq-question-title-5', 'FAQ Question Title 5', 'FAQ Question Title 5', 'text', 'How to register an account?', NULL, '2025-05-11 11:04:33'),
+(54, 'FAQ', 'faq-question-title-6', 'FAQ Question Title 6', 'FAQ Question Title 6', 'text', 'What payment methods are supported?', NULL, '2025-05-11 11:05:06'),
+(55, 'FAQ', 'faq-question-desc-1', 'FAQ Question Description 1', 'FAQ Question Description 1', 'text', 'We\'ve provided a contact form for you to fill in with essential information so that we can get in touch with you once we\'ve received your enquiry.', NULL, '2025-05-11 11:06:09'),
+(56, 'FAQ', 'faq-question-desc-2', 'FAQ Question Description 2', 'FAQ Question Description 2', 'text', 'ChicCharm is pleased to offer a comprehensive range of professional services, including hair styling, make-up application and dressmaking. If you need more info, check out our services page.', NULL, '2025-05-11 11:07:23'),
+(57, 'FAQ', 'faq-question-desc-3', 'FAQ Question Description 3', 'FAQ Question Description 3', 'text', 'To start the booking process, please click on the ‘Make a booking’ button, which you will find on the home page or personal page.', NULL, '2025-05-11 11:08:27'),
+(58, 'FAQ', 'faq-question-desc-4', 'FAQ Question Description 4', 'FAQ Question Description 4', 'text', 'Our stylist page will provide you with information about them and the skills they specialise in allowing you to make the best choice for your needs.', NULL, '2025-05-11 11:09:13'),
+(59, 'FAQ', 'faq-question-desc-5', 'FAQ Question Description 5', 'FAQ Question Description 5', 'text', 'If you click on the \'Login\' option in the top navigation bar, you will see a \'Sign up\' section under the orange login button. By clicking the \'Sign up\' button, you will be directed to the registration form, which will assist you in creating a personal account.', NULL, '2025-05-11 11:10:04'),
+(60, 'FAQ', 'faq-question-desc-6', 'FAQ Question Description 6', 'FAQ Question Description 6', 'text', 'Prior to your appointment, we will accept both credit and debit cards, as well as cash payment in person.', NULL, '2025-05-11 11:10:52'),
+(61, 'Contact', 'contact-address', 'ChicCharm\'s Address', 'Address of ChicCharm', 'text', '123 Beauty Lane, Styleville', NULL, '2025-05-17 12:30:18'),
+(62, 'Contact', 'contact-phone', 'ChicCharm\'s Phone Number', 'Phone Number of ChicCharm', 'text', '(03) 9000 0000', NULL, '2025-05-17 12:31:15'),
+(63, 'Contact', 'contact-email', 'ChicCharm\'s Email', 'Email of ChicCharm', 'text', 'contact@chiccharm.com', NULL, '2025-05-17 12:32:23'),
+(64, 'Contact', 'contact-business-hours', 'ChicCharm\'s Business Hours', 'The Time ChicCharm is open for', 'text', 'Monday - Sunday: 9:00 AM - 5:00 PM', NULL, '2025-05-17 12:33:10');
 
 -- --------------------------------------------------------
 
@@ -252,11 +270,11 @@ INSERT INTO `content_blocks` (`id`, `parent`, `slug`, `label`, `description`, `t
 --
 
 CREATE TABLE `content_blocks_phinxlog` (
-  `version` bigint NOT NULL,
-  `migration_name` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `version` bigint(20) NOT NULL,
+  `migration_name` varchar(100) DEFAULT NULL,
   `start_time` timestamp NULL DEFAULT NULL,
   `end_time` timestamp NULL DEFAULT NULL,
-  `breakpoint` tinyint(1) NOT NULL DEFAULT '0'
+  `breakpoint` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -273,18 +291,18 @@ INSERT INTO `content_blocks_phinxlog` (`version`, `migration_name`, `start_time`
 --
 
 CREATE TABLE `customers` (
-  `id` int NOT NULL,
-  `first_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `last_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `nonce` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `id` int(11) NOT NULL,
+  `first_name` varchar(255) NOT NULL,
+  `last_name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `nonce` varchar(255) DEFAULT NULL,
   `nonce_expiry` datetime DEFAULT NULL,
-  `created` datetime DEFAULT CURRENT_TIMESTAMP,
-  `modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `type` varchar(50) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'customer',
-  `profile_picture` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `is_active` tinyint(1) NOT NULL DEFAULT '1'
+  `created` datetime DEFAULT current_timestamp(),
+  `modified` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `type` varchar(50) NOT NULL DEFAULT 'customer',
+  `profile_picture` varchar(255) DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -305,42 +323,39 @@ INSERT INTO `customers` (`id`, `first_name`, `last_name`, `email`, `password`, `
 --
 
 CREATE TABLE `payment_histories` (
-  `id` int NOT NULL,
-  `booking_id` int DEFAULT NULL,
-  `customer_id` int DEFAULT NULL,
-  `paypal_transaction_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `invoice_pdf` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `paypal_payer_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `id` int(11) NOT NULL,
+  `booking_id` int(11) DEFAULT NULL,
+  `customer_id` int(11) DEFAULT NULL,
+  `paypal_transaction_id` varchar(255) DEFAULT NULL,
+  `invoice_pdf` varchar(255) DEFAULT NULL,
+  `paypal_payer_id` varchar(255) DEFAULT NULL,
   `payment_amount` decimal(10,2) NOT NULL,
-  `payment_currency` varchar(3) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'e.g., AUD, USD',
-  `payment_status` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'e.g., COMPLETED, PENDING, FAILED, REFUNDED',
-  `payment_method` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT 'paypal',
-  `payment_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `notes` text COLLATE utf8mb4_unicode_ci,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `payment_currency` varchar(3) NOT NULL COMMENT 'e.g., AUD, USD',
+  `payment_status` varchar(50) NOT NULL COMMENT 'e.g., COMPLETED, PENDING, FAILED, REFUNDED',
+  `payment_method` varchar(50) DEFAULT 'paypal',
+  `payment_date` timestamp NOT NULL DEFAULT current_timestamp(),
+  `notes` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
 --
 -- Table structure for table `paypal_webhook_events`
 --
 
 CREATE TABLE `paypal_webhook_events` (
-  `id` int NOT NULL,
-  `paypal_event_id` varchar(255) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'PayPal''s unique event ID',
-  `event_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'e.g., PAYMENT.CAPTURE.COMPLETED',
-  `resource_type` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'Type of the resource, e.g., "capture", "order"',
-  `resource_id` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'ID of the PayPal resource, e.g., capture ID or order ID',
-  `summary` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'A brief summary of the event from PayPal',
-  `status` varchar(50) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'received' COMMENT 'Internal processing status: received, processing, completed, failed',
-  `payload` text COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Full JSON payload from PayPal. Consider JSON type if your MySQL version supports it and you need to query its contents.',
-  `error_message` text COLLATE utf8mb4_general_ci COMMENT 'To store any error messages if processing fails',
-  `received_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp when the event was received by your system',
+  `id` int(11) NOT NULL,
+  `paypal_event_id` varchar(255) NOT NULL COMMENT 'PayPal''s unique event ID',
+  `event_name` varchar(255) NOT NULL COMMENT 'e.g., PAYMENT.CAPTURE.COMPLETED',
+  `resource_type` varchar(100) DEFAULT NULL COMMENT 'Type of the resource, e.g., "capture", "order"',
+  `resource_id` varchar(255) DEFAULT NULL COMMENT 'ID of the PayPal resource, e.g., capture ID or order ID',
+  `summary` varchar(255) DEFAULT NULL COMMENT 'A brief summary of the event from PayPal',
+  `status` varchar(50) NOT NULL DEFAULT 'received' COMMENT 'Internal processing status: received, processing, completed, failed',
+  `payload` text NOT NULL COMMENT 'Full JSON payload from PayPal. Consider JSON type if your MySQL version supports it and you need to query its contents.',
+  `error_message` text DEFAULT NULL COMMENT 'To store any error messages if processing fails',
+  `received_at` timestamp NULL DEFAULT current_timestamp() COMMENT 'Timestamp when the event was received by your system',
   `processed_at` timestamp NULL DEFAULT NULL COMMENT 'Timestamp when the event was processed by your system',
   `amount` decimal(10,2) DEFAULT NULL,
-  `currency` varchar(3) COLLATE utf8mb4_general_ci DEFAULT NULL
+  `currency` varchar(3) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -350,11 +365,11 @@ CREATE TABLE `paypal_webhook_events` (
 --
 
 CREATE TABLE `phinxlog` (
-  `version` bigint NOT NULL,
-  `migration_name` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `version` bigint(20) NOT NULL,
+  `migration_name` varchar(100) DEFAULT NULL,
   `start_time` timestamp NULL DEFAULT NULL,
   `end_time` timestamp NULL DEFAULT NULL,
-  `breakpoint` tinyint(1) NOT NULL DEFAULT '0'
+  `breakpoint` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -371,12 +386,12 @@ INSERT INTO `phinxlog` (`version`, `migration_name`, `start_time`, `end_time`, `
 --
 
 CREATE TABLE `services` (
-  `id` int NOT NULL,
-  `service_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `service_desc` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `id` int(11) NOT NULL,
+  `service_name` varchar(255) NOT NULL,
+  `service_desc` varchar(255) DEFAULT NULL,
   `service_cost` decimal(10,2) NOT NULL,
-  `duration_minutes` int NOT NULL DEFAULT '60',
-  `service_image` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL
+  `duration_minutes` int(11) NOT NULL DEFAULT 60,
+  `service_image` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -395,20 +410,20 @@ INSERT INTO `services` (`id`, `service_name`, `service_desc`, `service_cost`, `d
 --
 
 CREATE TABLE `stylists` (
-  `id` int NOT NULL,
-  `first_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `last_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `id` int(11) NOT NULL,
+  `first_name` varchar(255) NOT NULL,
+  `last_name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
   `nonce` datetime DEFAULT NULL,
   `nonce_expiry` datetime DEFAULT NULL,
-  `created` datetime DEFAULT CURRENT_TIMESTAMP,
-  `modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `type` varchar(50) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'stylist',
-  `profile_picture` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `stylist_motto` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `stylist_bio` varchar(1000) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `is_active` tinyint(1) NOT NULL DEFAULT '1'
+  `created` datetime DEFAULT current_timestamp(),
+  `modified` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `type` varchar(50) NOT NULL DEFAULT 'stylist',
+  `profile_picture` varchar(255) DEFAULT NULL,
+  `stylist_motto` varchar(100) DEFAULT NULL,
+  `stylist_bio` varchar(1000) DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -427,9 +442,9 @@ INSERT INTO `stylists` (`id`, `first_name`, `last_name`, `email`, `password`, `n
 --
 
 CREATE TABLE `stylists_services` (
-  `id` int NOT NULL,
-  `stylist_id` int NOT NULL,
-  `service_id` int NOT NULL
+  `id` int(11) NOT NULL,
+  `stylist_id` int(11) NOT NULL,
+  `service_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -567,73 +582,73 @@ ALTER TABLE `stylists_services`
 -- AUTO_INCREMENT for table `admins`
 --
 ALTER TABLE `admins`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=240;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `bookings_services`
 --
 ALTER TABLE `bookings_services`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=527;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `bookings_stylists`
 --
 ALTER TABLE `bookings_stylists`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=471;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `contacts`
 --
 ALTER TABLE `contacts`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- AUTO_INCREMENT for table `content_blocks`
 --
 ALTER TABLE `content_blocks`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 
 --
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- AUTO_INCREMENT for table `payment_histories`
 --
 ALTER TABLE `payment_histories`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=122;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=125;
 
 --
 -- AUTO_INCREMENT for table `paypal_webhook_events`
 --
 ALTER TABLE `paypal_webhook_events`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `services`
 --
 ALTER TABLE `services`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `stylists`
 --
 ALTER TABLE `stylists`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `stylists_services`
 --
 ALTER TABLE `stylists_services`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- Constraints for dumped tables
