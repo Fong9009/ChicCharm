@@ -41,6 +41,8 @@ class Booking extends Entity
         'customer_id' => true,
         'booking_name' => true,
         'booking_date' => true,
+        'overall_start_time' => true,
+        'overall_end_time' => true,
         'total_cost' => true,
         'remaining_cost' => true,
         'status' => true,

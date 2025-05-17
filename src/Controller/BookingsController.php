@@ -47,9 +47,7 @@ class BookingsController extends AppController
         $this->BookingsStylists = $this->getTableLocator()->get('BookingsStylists');
         $this->loadComponent('Recaptcha.Recaptcha');
         $this->loadComponent('Authentication.Authentication');
-        $this->Authentication->allowUnauthenticated(['guestbooking']);
-        // Allow unauthenticated access to the booking route
-        $this->Authentication->addUnauthenticatedActions(['booking']);
+        $this->Authentication->addUnauthenticatedActions(['guestbooking', 'viewPendingGuestBooking', 'booking']);
     }
 
     /**
@@ -101,49 +99,8 @@ class BookingsController extends AppController
             }
         }
 
-        // Automatically update booking statuses for past bookings
-        $now = new CakeDateTime();
-        $dateString = $now->format('Y-m-d');
-        $timeString = $now->format('H:i:s');
-
-        // Find active bookings where the date is today or earlier
-        $potentiallyFinishedBookings = $this->Bookings->find()
-            ->where([
-                'Bookings.status' => 'active',
-                'Bookings.booking_date <=' => $dateString,
-            ])
-            ->contain(['BookingsServices'])
-            ->all();
-
-        foreach ($potentiallyFinishedBookings as $booking) {
-            if (empty($booking->bookings_services)) {
-                // If an active booking somehow has no services, mark as finished if date is past
-                if ($booking->booking_date->format('Y-m-d') < $dateString) {
-                    $booking->status = 'finished';
-                     $this->Bookings->save($booking);
-                }
-                continue; // Skip bookings with no services for time checks
-            }
-
-            $latestEndTime = null;
-            foreach ($booking->bookings_services as $bs) {
-                if ($bs->end_time) {
-                    $currentServiceEndTime = FrozenTime::parse($bs->end_time->format('H:i:s'));
-                    if ($latestEndTime === null || $currentServiceEndTime > $latestEndTime) {
-                        $latestEndTime = $currentServiceEndTime;
-                    }
-                }
-            }
-
-            // Check if the booking date is past OR if it's today and the latest end time is past
-            if (
-                $booking->booking_date->format('Y-m-d') < $dateString ||
-                ($booking->booking_date->format('Y-m-d') == $dateString && $latestEndTime !== null && $latestEndTime->format('H:i:s') < $timeString)
-            ) {
-                $booking->status = 'finished';
-                $this->Bookings->save($booking);
-            }
-        }
+        // Call the comprehensive status update method
+        $this->updateBookingStatuses();
     }
 
     /**
@@ -434,10 +391,15 @@ class BookingsController extends AppController
         $originalTotalCost = $booking->total_cost;
         $originalRemainingCost = $booking->remaining_cost;
         $originalStatus = $booking->status;
+        $originalCustomerId = $booking->customer_id; 
+        $originalBookingName = $booking->booking_name; 
 
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
             $bookingId = $booking->id;
+
+            // Ensure the original customer_id is used
+            $data['customer_id'] = $originalCustomerId;
 
             if (isset($data['booking_date'])) {
                 $data['booking_date_formatted'] = $data['booking_date'];
@@ -447,24 +409,24 @@ class BookingsController extends AppController
                 return $this->redirect(['action' => 'edit', $bookingId]);
             }
 
-            // Get customer details and set booking name
-            if (isset($data['customer_id'])) {
-                try {
-                    $customer = $this->Bookings->Customers->get($data['customer_id']);
-                    $data['booking_name'] = 'Booking for ' . $customer->first_name . ' ' . $customer->last_name;
-                } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
-                    $this->Flash->error(__('Selected customer not found.'));
+            if ($booking->has('customer') && $booking->customer) {
+                $data['booking_name'] = 'Booking for ' . $booking->customer->first_name . ' ' . $booking->customer->last_name;
+            } else {
+                $data['booking_name'] = $originalBookingName;
+            }
 
+            if (isset($data['customer_id'])) { 
+                try {
+                    $customer = $this->Bookings->Customers->get($originalCustomerId);
+                } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
+                    $this->Flash->error(__('The original customer for this booking was not found.'));
                     return $this->redirect(['action' => 'edit', $bookingId]);
                 }
-            } else {
-                // Use existing customer if not provided in form (should usually be there)
-                if ($booking->customer_id) {
-                    $data['customer_id'] = $booking->customer_id;
-                    $data['booking_name'] = $booking->booking_name; // Keep existing name
+            } else { 
+                if ($originalCustomerId) { 
+                    $data['customer_id'] = $originalCustomerId; 
                 } else {
-                    $this->Flash->error(__('Customer ID is missing.'));
-
+                    $this->Flash->error(__('Customer ID is missing and could not be retained from the original booking.'));
                     return $this->redirect(['action' => 'edit', $bookingId]);
                 }
             }
@@ -494,14 +456,14 @@ class BookingsController extends AppController
                     //Refund the difference
                     $refund = $totalPreviousCost - $totalCost;
                     $data['remaining_cost'] = 0;
-                    $data['refund_due_amount'] = $refund; // Set refund_due_amount
+                    $data['refund_due_amount'] = $refund; 
                 } elseif ($totalCost > $totalPreviousCost) {
                     $data['remaining_cost'] = $totalCost - $totalPreviousCost;
-                    $data['refund_due_amount'] = 0; // Reset if now owes more
+                    $data['refund_due_amount'] = 0; 
                     $booking->status = 'Confirmed - Payment Due';
                 } else {
                     $data['remaining_cost'] = 0;
-                    $data['refund_due_amount'] = 0; // Reset if cost is same
+                    $data['refund_due_amount'] = 0; 
                     $this->Flash->success(__('Cost is the same, no change required'));
                 }
 
@@ -512,22 +474,22 @@ class BookingsController extends AppController
                 if ($totalCost < $paidSoFar) {
                     $refund = $paidSoFar - $totalCost;
                     $data['remaining_cost'] = 0;
-                    $data['refund_due_amount'] = $refund; // Set refund_due_amount
+                    $data['refund_due_amount'] = $refund; 
                     $booking->status = 'Confirmed - Paid';
                     $this->Flash->info(__('A refund of {0} is due to the customer as their new total is less than what they have already paid. Please process this manually via PayPal.', $numberHelper->currency($refund, 'AUD')));
                 } elseif ($totalCost > $paidSoFar) {
                     $data['remaining_cost'] = $totalCost - $paidSoFar;
-                    $data['refund_due_amount'] = 0; // Reset if still owes more or owes different amount
+                    $data['refund_due_amount'] = 0; 
                 } else {
                     $data['remaining_cost'] = 0;
-                    $data['refund_due_amount'] = 0; // Reset if paid exactly
+                    $data['refund_due_amount'] = 0; 
                     $booking->status = 'Confirmed - Paid';
                 }
             } else {
                 // For new or unconfirmed bookings
                 // If all else fails
                 $data['remaining_cost'] = $totalCost;
-                $data['refund_due_amount'] = 0; // Ensure it's 0 for new/active bookings
+                $data['refund_due_amount'] = 0; 
             }
 
             $data['total_cost'] = $totalCost;
@@ -554,7 +516,7 @@ class BookingsController extends AppController
                     'booking_date' => $data['booking_date_formatted'],
                     'total_cost' => $data['total_cost'],
                     'remaining_cost' => $data['remaining_cost'],
-                    'refund_due_amount' => $data['refund_due_amount'], // Add to patch data
+                    'refund_due_amount' => $data['refund_due_amount'], 
                     'notes' => $data['notes'],
                  ], ['associated' => []]);
 
@@ -661,8 +623,8 @@ class BookingsController extends AppController
                     $overallEndTime = max(array_column($allServicesTimes, 'end'));
                 }
                  // Update booking with potentially null times if no services selected
-                 $booking->start_time = $overallStartTime ? $overallStartTime->format('H:i:s') : null;
-                 $booking->end_time = $overallEndTime ? $overallEndTime->format('H:i:s') : null;
+                 $booking->overall_start_time = $overallStartTime ? $overallStartTime->format('H:i:s') : null;
+                 $booking->overall_end_time = $overallEndTime ? $overallEndTime->format('H:i:s') : null;
                  if (!$this->Bookings->save($booking)) {
                      throw new Exception('Failed to save overall times on booking update.');
                  }
@@ -886,9 +848,25 @@ class BookingsController extends AppController
         }
 
         $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
-        $customers = $this->Bookings->Customers->find('list', limit: 200)->all();
+        $customersArray = $this->Bookings->Customers->find('list', limit: 200)->all()->toArray();
+
+        if ($booking->has('customer') && $booking->customer->email === 'guest@chiccharm.com') {
+            $guestCustomerId = $booking->customer_id;
+            if (array_key_exists($guestCustomerId, $customersArray)) {
+                $parsedName = preg_replace('/^Booking for /i', '', $booking->booking_name);
+
+                if (!empty($parsedName) && $parsedName !== $booking->booking_name) {
+                    $customersArray[$guestCustomerId] = $customersArray[$guestCustomerId] . ' (' . h($parsedName) . ')';
+                } elseif (!empty($parsedName)) {
+                    $customersArray[$guestCustomerId] = $customersArray[$guestCustomerId] . ' (' . h($parsedName) . ')';
+                }
+            }
+        }
+
         $services = $this->fetchTable('Services')->find('all')->all();
-        $this->set(compact('booking', 'stylists', 'services', 'customers'));
+
+        $this->set(compact('booking', 'stylists', 'services'));
+        $this->set('customers', $customersArray);
     }
 
     public function editStatus($id = null)
@@ -1404,8 +1382,8 @@ class BookingsController extends AppController
 
                 // Patch and save the overall times to the main booking record
                 $booking = $this->Bookings->patchEntity($booking, [
-                    'start_time' => $overallStartTime ? $overallStartTime->format('H:i:s') : null,
-                    'end_time' => $overallEndTime ? $overallEndTime->format('H:i:s') : null
+                    'overall_start_time' => $overallStartTime ? $overallStartTime->format('H:i:s') : null,
+                    'overall_end_time' => $overallEndTime ? $overallEndTime->format('H:i:s') : null
                 ]);
                 if (!$this->Bookings->save($booking, ['checkRules' => false])) {
                      $this->Flash->warning('Booking saved, but failed to update overall times.');
@@ -1672,6 +1650,35 @@ class BookingsController extends AppController
                     }
                 }
 
+                // Calculate and Update Overall Booking Times for admin booking
+                $overallStartTime = null;
+                $overallEndTime = null;
+                if (!empty($allServicesTimes)) {
+                    $startTimestamps = array_map(function($t) { return $t['start']->getTimestamp(); }, $allServicesTimes);
+                    $endTimestamps = array_map(function($t) { return $t['end']->getTimestamp();}, $allServicesTimes);
+
+                    if (!empty($startTimestamps)) {
+                        $minStartTs = min($startTimestamps);
+                        $overallStartTime = (new DateTime())->setTimestamp($minStartTs);
+                    }
+                    if (!empty($endTimestamps)) {
+                        $maxEndTs = max($endTimestamps);
+                        $overallEndTime = (new DateTime())->setTimestamp($maxEndTs);
+                    }
+                }
+
+                // Patch and save the overall times to the main booking record
+                $booking = $this->Bookings->patchEntity($booking, [
+                    'overall_start_time' => $overallStartTime ? $overallStartTime->format('H:i:s') : null,
+                    'overall_end_time' => $overallEndTime ? $overallEndTime->format('H:i:s') : null
+                ]);
+                if (!$this->Bookings->save($booking, ['checkRules' => false])) {
+                     Log::error('[AdminBooking] Failed to save overall times. Errors: ' . json_encode($booking->getErrors()));
+                     // Decide if a flash message is needed here too, though the main success is below
+                } else {
+                     Log::debug('[AdminBooking] Successfully saved overall times.');
+                }
+
                 // Use a different success message for admin
                 $this->Flash->success(__(
                     'Booking for {0} has been saved successfully.',
@@ -1721,7 +1728,29 @@ class BookingsController extends AppController
             }
         }
 
+        $session = $this->request->getSession();
+        $pendingBookingData = $session->read('GuestBooking.pending_details');
         $bookingEntity = $this->Bookings->newEmptyEntity();
+
+        if ($pendingBookingData) {
+            if (isset($pendingBookingData['bookings_services_summary'])) {
+            }
+            $existingToken = $pendingBookingData['pending_booking_token'] ?? null;
+            unset($pendingBookingData['pending_booking_token']);
+            $bookingEntity = $this->Bookings->patchEntity($bookingEntity, $pendingBookingData, ['associated' => ['BookingsServices']]);
+            if (isset($pendingBookingData['booking_name'])) {
+                $bookingEntity->customer_name = preg_replace('/^Booking for /i', '', $pendingBookingData['booking_name']);
+            }
+            if (isset($pendingBookingData['email'])) {                      
+                $bookingEntity->email = $pendingBookingData['email'];               
+            }                                                                             
+            if (isset($pendingBookingData['phone_number'])) {                            
+                $bookingEntity->phone_number = $pendingBookingData['phone_number'];        
+            }   
+            if ($this->request->is('get') && isset($pendingBookingData['bookings_services_summary'])) {
+            }
+        }
+
 
         if ($this->request->is('post')) {
             if ($this->Recaptcha->verify()) {
@@ -1733,7 +1762,8 @@ class BookingsController extends AppController
                 if (empty($data['customer_name'])) {
                     $this->Flash->error(__('Please enter your name for the booking.'));
                     // Set $bookingEntity with current data for form repopulation
-                    $this->set('booking', $this->Bookings->patchEntity($bookingEntity, $data));
+                    $bookingEntity = $this->Bookings->patchEntity($bookingEntity, $data); 
+                    $this->set('booking', $bookingEntity);
                     $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
                     $services = $this->fetchTable('Services')->find('all')->all();
                     $this->set(compact('stylists', 'services'));
@@ -1885,28 +1915,51 @@ class BookingsController extends AppController
                 $data['bookings_services_summary'] = $enrichedBookingServices;
 
                 // Generate and add a unique token for the pending booking
-                $pendingBookingToken = bin2hex(random_bytes(16));
-                $data['pending_booking_token'] = $pendingBookingToken;
-
+                // If editing, reuse the existing token. Otherwise, generate a new one.
+                if ($existingToken) {
+                    $data['pending_booking_token'] = $existingToken;
+                } else {
+                    $data['pending_booking_token'] = bin2hex(random_bytes(16));
+                }
                 Log::debug('[GuestBooking] Data being written to session: ' . json_encode($data), ['scope' => ['guest_session']]);
 
                 $this->request->getSession()->write('GuestBooking.pending_details', $data);
 
                 // Redirect to the view pending booking page with the token
                 $this->Flash->success(__('Your booking details are summarized below. Please complete your payment to confirm.'));
-                return $this->redirect(['controller' => 'Bookings', 'action' => 'viewPendingGuestBooking', $pendingBookingToken]);
-
-            } else { // Recaptcha failed
-                $this->Flash->error(__('Please confirm that you are not a bot.'));
-                $this->set('booking', $this->Bookings->patchEntity($bookingEntity, $this->request->getData()));
+                return $this->redirect(['controller' => 'Bookings', 'action' => 'viewPendingGuestBooking', $data['pending_booking_token']]);
+            } else {
+                $this->Flash->error(__('Invalid reCAPTCHA. Please try again.'));
+                 // Repopulate form with submitted data
+                $bookingEntity = $this->Bookings->patchEntity($bookingEntity, $this->request->getData());
+                if (isset($pendingBookingData['bookings_services_summary'])) {
+                    // Attempt to carry over service selections if possible or if form can handle it
+                    $bookingEntity->set('bookings_services', $pendingBookingData['bookings_services_summary']);
+                }
+                 $this->set('booking', $bookingEntity);
             }
         }
 
-        $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
+        $this->set('booking', $bookingEntity); // Pass the entity (new or patched from session) to the view
+        $stylists = $this->Bookings->Stylists->find('list', ['limit' => 200])->all();
         $services = $this->fetchTable('Services')->find('all')->all();
-        $this->set('booking', $bookingEntity);
         $this->set(compact('stylists', 'services'));
-        $this->render('guestbooking');
+
+        // Pass pending booking data to the view for JavaScript pre-filling if editing
+        $pendingServicesJson = $session->check('GuestBooking.pending_details.bookings_services_summary') ? json_encode($session->read('GuestBooking.pending_details.bookings_services_summary')) : 'null';
+        $pendingBookingDateValue = $session->check('GuestBooking.pending_details.booking_date') ? $session->read('GuestBooking.pending_details.booking_date') : null;
+        // Ensure date is in Y-m-d format if it exists
+        if ($pendingBookingDateValue) {
+            try {
+                $pendingBookingDateValue = (new FrozenDate($pendingBookingDateValue))->format('Y-m-d');
+            } catch (Exception $e) {
+                Log::warning('[GuestBooking] Could not parse pending booking date for JS: ' . $pendingBookingDateValue);
+                $pendingBookingDateValue = null;
+            }
+        }
+        $pendingBookingDateJson = json_encode($pendingBookingDateValue);
+
+        $this->set(compact('pendingServicesJson', 'pendingBookingDateJson'));
     }
 
     /**
@@ -2454,19 +2507,53 @@ class BookingsController extends AppController
      */
     public function updateBookingStatuses()
     {
-        $now = new CakeDateTime();
+        $now = new FrozenTime(); 
+        $todayDate = $now->format('Y-m-d');
+        $currentTime = $now->format('H:i:s');
 
-        // Find all active bookings that have ended
-        $pastBookings = $this->Bookings->find()
+        $bookingsToFinish = $this->Bookings->find()
             ->where([
-                'status' => 'active',
-                'booking_date <=' => $now->format('Y-m-d'),
-                'end_time <' => $now->format('H:i:s'),
+                'Bookings.status NOT IN' => ['finished', 'cancelled'], 
+                'OR' => [
+                    // Condition for 'active' bookings on current day: end_time has passed
+                    [
+                        'Bookings.status' => 'active',
+                        'Bookings.booking_date' => $todayDate,
+                        'Bookings.overall_end_time <' => $currentTime,
+                    ],
+                    // Condition for 'active' bookings on past dates: booking_date has passed
+                    [
+                        'Bookings.status' => 'active',
+                        'Bookings.booking_date <' => $todayDate,
+                    ],
+                    // Condition for 'Confirmed - Paid' or 'Confirmed - Payment Due': booking_date has passed
+                    [
+                        'Bookings.status IN' => ['Confirmed - Paid', 'Confirmed - Payment Due'],
+                        'Bookings.booking_date <' => $todayDate,
+                    ]
+                ]
             ]);
 
-        foreach ($pastBookings as $booking) {
+        $updatedCount = 0;
+        $failedCount = 0;
+
+        foreach ($bookingsToFinish as $booking) {
+            $originalStatus = $booking->status;
             $booking->status = 'finished';
-            $this->Bookings->save($booking);
+            if ($this->Bookings->save($booking)) {
+                $updatedCount++;
+                Log::info("[UpdateBookingStatuses] Successfully updated booking ID {$booking->id} from '{$originalStatus}' to 'finished'.");
+            } else {
+                $failedCount++;
+                Log::error("[UpdateBookingStatuses] Failed to update booking ID {$booking->id} from '{$originalStatus}' to 'finished'. Errors: " . json_encode($booking->getErrors()));
+            }
+        }
+
+        if ($updatedCount > 0) {
+            Log::info("[UpdateBookingStatuses] Summary: Successfully updated {$updatedCount} bookings to 'finished'.");
+        }
+        if ($failedCount > 0) {
+            Log::warning("[UpdateBookingStatuses] Summary: Failed to update {$failedCount} bookings.");
         }
     }
 
@@ -3016,8 +3103,8 @@ class BookingsController extends AppController
                  }
 
                  $booking = $this->Bookings->patchEntity($booking, [
-                     'start_time' => $overallStartTime ? $overallStartTime->format('H:i:s') : null,
-                     'end_time' => $overallEndTime ? $overallEndTime->format('H:i:s') : null
+                     'overall_start_time' => $overallStartTime ? $overallStartTime->format('H:i:s') : null,
+                     'overall_end_time' => $overallEndTime ? $overallEndTime->format('H:i:s') : null
                  ]);
 
                  if (!$this->Bookings->save($booking)) {
@@ -3091,7 +3178,6 @@ class BookingsController extends AppController
             return $this->redirect(['controller' => 'Bookings', 'action' => 'guestbooking']);
         }
 
-        // If a token is passed in the URL, validate it against the token in the session
         if ($token !== null) {
             if (!isset($bookingData['pending_booking_token']) || $bookingData['pending_booking_token'] !== $token) {
                 $this->Flash->error(__('The booking link used is invalid or does not match your current pending booking. Please start a new booking if needed.'));
@@ -3101,7 +3187,17 @@ class BookingsController extends AppController
             return $this->redirect(['controller' => 'Bookings', 'action' => 'viewPendingGuestBooking', $bookingData['pending_booking_token']]);
         }
 
-        $this->set(compact('bookingData'));
+        $paymentAmount = number_format((float)($bookingData['total_cost'] ?? 0), 2, '.', '');
+        $currencyCode = 'AUD'; 
+        $clientId = Configure::read('PayPal.clientId');
+        $mode = Configure::read('PayPal.mode', 'sandbox');
+
+        $temporaryBookingIdForPayPal = $bookingData['pending_booking_token'] ?? 'temp_token_' . uniqid();
+
+        $finalSuccessUrl = \Cake\Routing\Router::url(['controller' => 'Payments', 'action' => 'successGuest', $temporaryBookingIdForPayPal], true);
+        $finalCancelUrl = \Cake\Routing\Router::url(['controller' => 'Payments', 'action' => 'cancelGuest', $temporaryBookingIdForPayPal], true);
+
+        $this->set(compact('bookingData', 'clientId', 'mode', 'paymentAmount', 'currencyCode', 'finalSuccessUrl', 'finalCancelUrl'));
     }
 
     /**
@@ -3121,7 +3217,7 @@ class BookingsController extends AppController
         }
 
         $this->request->allowMethod(['post']);
-        $booking = $this->Bookings->get($id, ['contain' => ['Customers']]); // Ensure Customer is loaded
+        $booking = $this->Bookings->get($id, ['contain' => ['Customers']]); 
 
         if ($booking->refund_due_amount > 0) {
             $booking->refund_due_amount = 0.00;

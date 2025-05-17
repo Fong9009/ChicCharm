@@ -83,7 +83,7 @@ $this->layout = 'default';
                             </div>
                             <div class="card-body">
                                 <?php if (!empty($activeBookings) && $activeBookings->count() > 0): ?>
-                                    <div class="row justify-content-center">
+                                    <div class="row justify-content-center scrollable-bookings-section">
                                         <?php foreach ($activeBookings as $booking): ?>
                                             <div class="col-12 col-xl-6">
                                                 <div class="card booking-card">
@@ -325,7 +325,7 @@ $this->layout = 'default';
                             </div>
                             <div class="card-body">
                                 <?php if (!empty($pastOrCancelledBookings) && $pastOrCancelledBookings->count() > 0): ?>
-                                    <div class="row justify-content-center">
+                                    <div class="row justify-content-center scrollable-bookings-section">
                                         <?php foreach ($pastOrCancelledBookings as $booking): ?>
                                             <div class="col-12 col-xl-6">
                                                 <div class="card booking-card <?= ($booking->status === 'cancelled') ? 'cancelled-card' : '' ?>">
@@ -427,7 +427,7 @@ $this->layout = 'default';
 
                                                              <div class="booking-actions d-flex flex-column flex-sm-row gap-2">
                                                                  <?= $this->Html->link(
-                                                                    'View/Pay',
+                                                                    'View Details',
                                                                     ['controller' => 'Bookings', 'action' => 'customerview', $booking->id],
                                                                     ['class' => 'view-btn']
                                                                 ) ?>

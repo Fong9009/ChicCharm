@@ -9,8 +9,13 @@
 
 // Add the JavaScript file
 $this->Html->script('booking', ['block' => 'script']);
+$preselected_service_id = $this->request->getQuery('service_id');
 ?>
 <script>
+    // Make pending booking data available to booking.js if editing
+    const pendingServicesData = <?= $pendingServicesJson ?>;
+    const pendingBookingDate = <?= $pendingBookingDateJson ?>;
+
     const apiUrl = '<?= $this->Url->build("/bookings/get-stylists-for-service/") ?>';
     const apiUrl2 = '<?= $this->Url->build("/bookings/get-available-time-slots") ?>';
     const apiUrl3 = '<?= $this->Url->build("/bookings/get-availability-count") ?>';
@@ -21,6 +26,7 @@ $this->Html->script('booking', ['block' => 'script']);
             <div class="bookings form content admin-border" id="booking-form">
                 <?= $this->Form->create($booking) ?>
                 <fieldset>
+                    <?= $this->Flash->render() ?>
                     <h2 class="text-center"><?= __('Guest Booking') ?></h2><br>
                     <div class="row">
                         <div>
@@ -86,7 +92,8 @@ $this->Html->script('booking', ['block' => 'script']);
                                                value="<?= $service->id ?>"
                                                id="service-<?= $service->id ?>"
                                                data-duration="<?= $service->duration_minutes ?>"
-                                               data-cost="<?= $service->service_cost ?>">
+                                               data-cost="<?= $service->service_cost ?>"
+                                               <?= $preselected_service_id == $service->id ? 'checked' : '' ?>>
                                         <label class="form-check-label" for="service-<?= $service->id ?>">
                                             <?= h($service->service_name) ?>
                                             (<?= h($service->duration_minutes) ?> mins) -
@@ -174,3 +181,16 @@ $this->Html->script('booking', ['block' => 'script']);
     </div>
 </div>
 </div>
+<?php $this->append('script'); ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    <?php if ($preselected_service_id): ?>
+    const preselectedCheckbox = document.getElementById('service-<?= $preselected_service_id ?>');
+    if (preselectedCheckbox && preselectedCheckbox.checked) {
+        const event = new Event('change', { bubbles: true });
+        preselectedCheckbox.dispatchEvent(event);
+    }
+    <?php endif; ?>
+});
+</script>
+<?php $this->end(); ?>

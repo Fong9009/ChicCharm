@@ -2,6 +2,12 @@
 /**
  * @var \App\View\AppView $this
  * @var array $bookingData
+ * @var string $clientId PayPal Client ID // Added for payment
+ * @var string $mode PayPal mode // Added for payment
+ * @var string $paymentAmount // Added for payment
+ * @var string $currencyCode // Added for payment
+ * @var string $finalSuccessUrl // Added for payment
+ * @var string $finalCancelUrl // Added for payment
  */
 ?>
 <div class="login-wrapper">
@@ -10,7 +16,7 @@
             <div class="col-md-8 col-lg-7">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="mb-0"><?= __('Pending Booking Details') ?></h3>
+                        <h3 class="mb-0"><?= __('Confirm Your Booking & Pay') ?></h3>
                     </div>
                     <div class="card-body">
                         <div class="booking-summary">
@@ -47,7 +53,29 @@
                             <?php endif; ?>
                         </div>
 
-                        <?php 
+                        <hr class="my-4">
+
+                        <h5 class="mb-3">Payment</h5>
+                        <p>Please complete your payment using PayPal to confirm your booking.</p>
+
+                        <div id="paypal-button-container" style="max-width: 400px; margin: 20px auto;"></div>
+
+                        <?php
+                        // Render the PayPal payment element using variables set in BookingsController
+                        echo $this->element('Bookings/paypal_payment', compact(
+                            'paymentAmount',
+                            'currencyCode',
+                            'finalSuccessUrl',
+                            'finalCancelUrl'
+                            // 'clientId' and 'mode' are typically handled within the paypal_payment element itself or via JS config
+                        ));
+                        ?>
+
+                        <p class="text-center text-muted small mt-3">
+                            You will be redirected to PayPal to complete your payment securely.
+                        </p>
+
+                        <?php
                         if (!empty($bookingData['pending_booking_token'])): 
                             $bookingViewUrl = $this->Url->build(['controller' => 'Bookings', 'action' => 'viewPendingGuestBooking', $bookingData['pending_booking_token']], ['fullBase' => true]);
                         ?>
@@ -56,33 +84,20 @@
                             <p><small><?= $this->Html->link($bookingViewUrl, $bookingViewUrl, ['target' => '_blank', 'rel' => 'noopener noreferrer']) ?></small></p>
                             <p class="text-muted"><small><?= __('You can use this link to return to this page and complete your payment, as long as your browser session is active or the booking has not expired.') ?></small></p>
                         </div>
-                        <?php else: ?>
-                        <?php 
-                            // Fallback or debugging: If somehow pending_booking_token is not set in bookingData for this view
-                            // This part is optional and mainly for graceful degradation or if old sessions exist without the token.
-                            // Log::warning('[ViewPendingGuestBooking] pending_booking_token was not found in bookingData when trying to generate a link.'); 
-                        ?>
                         <?php endif; ?>
-
-                        <div class="mt-4">
-                            <p class="text-muted">Please complete your payment to confirm this booking.</p>
-                        </div>
                     </div>
                     <div class="card-footer text-center">
                         <?= $this->Html->link(
-                            __('Proceed to Payment'),
-                            ['controller' => 'Payments', 'action' => 'processGuestPayment'],
-                            ['class' => 'btn btn-primary']
-                        ) ?>
-                        <?= $this->Html->link(
-                            __('Edit Booking'),
+                            __('Edit Booking Details'), // Changed from 'Edit Booking'
                             ['controller' => 'Bookings', 'action' => 'guestbooking'],
-                            ['class' => 'btn btn-secondary ms-2']
+                            ['class' => 'btn btn-outline-secondary btn-sm']
                         ) ?>
                         <?= $this->Html->link(
-                            __('Cancel Booking'),
-                            ['controller' => 'Auth', 'action' => 'guestcancel'],
-                            ['class' => 'btn btn-danger ms-2']
+                            __('Cancel Booking & Return to Form'), // Changed from 'Cancel Booking'
+                            // Assuming AuthController::guestcancel clears session and redirects
+                            // If not, this might need to go to a Bookings action that clears session and redirects to guestbooking form
+                            ['controller' => 'Auth', 'action' => 'guestcancel'], 
+                            ['class' => 'btn btn-outline-danger btn-sm ms-2', 'confirm' => __('Are you sure you want to cancel this pending booking?')]
                         ) ?>
                     </div>
                 </div>

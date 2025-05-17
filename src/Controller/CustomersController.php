@@ -106,8 +106,7 @@ class CustomersController extends AppController
             ->order([
                 'ABS(DATEDIFF(booking_date, CURDATE()))' => 'ASC',
                 'booking_date' => 'ASC'
-            ])
-            ->limit(3);
+            ]);
 
         $activeBookings = $activeBookingsQuery->all();
 
@@ -154,8 +153,7 @@ class CustomersController extends AppController
             ])
             ->order([
                 'Bookings.booking_date' => 'DESC'
-            ])
-            ->limit(3);
+            ]);
 
         // Process latest_payment_history for these bookings as well
         foreach ($pastOrCancelledBookings as $booking) {

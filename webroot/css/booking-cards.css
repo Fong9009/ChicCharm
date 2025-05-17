@@ -522,3 +522,10 @@
     text-transform: uppercase;
     display: inline-block;
 }
+
+/* Styles for scrollable booking sections in dashboards */
+.scrollable-bookings-section {
+    max-height: 400px; 
+    overflow-y: auto;
+    padding-right: 15px; 
+}

@@ -76,6 +76,11 @@ $titleDescription = 'Landing Page';
                             <i class="fas fa-sign-in-alt"></i><span>Login</span></a></li>
                         <li><a class="dropdown-item" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Customers', 'action' => 'registration']) ?>">
                             <i class="fas fa-user-plus"></i><span>Sign Up</span></a></li>
+                        <?php if (!empty($pendingGuestBookingToken)): ?>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Bookings', 'action' => 'viewPendingGuestBooking', $pendingGuestBookingToken]) ?>">
+                                <i class="fas fa-shopping-cart"></i><span>View Pending Booking</span></a></li>
+                        <?php endif; ?>
                     <?php endif; ?>
                 </ul>
             </div>
@@ -298,6 +303,13 @@ $titleDescription = 'Landing Page';
                     <li class="nav-item">
                         <a class="nav-link" href="<?= $this->Url->build('/contacts/enquiry') ?>">Contact Us</a>
                     </li>
+                    <?php if (!empty($pendingGuestBookingToken)): ?>
+                        <li class="nav-item">
+                            <a class="nav-link text-warning" href="<?= $this->Url->build(['controller' => 'Bookings', 'action' => 'viewPendingGuestBooking', $pendingGuestBookingToken]) ?>">
+                                <i class="fas fa-shopping-cart"></i> View Pending Booking
+                            </a>
+                        </li>
+                    <?php endif; ?>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= $this->Url->build('/auth/login') ?>">Login</a>
                     </li>
