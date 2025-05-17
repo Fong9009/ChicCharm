@@ -436,8 +436,8 @@ class PaymentsController extends AppController
                 'remaining_cost' => 0.00,
                 'status' => 'Confirmed - Paid',
                 'notes' => $bookingData['notes'] ?? null,
-                'start_time' => $bookingData['overall_start_time'] ?? null,
-                'end_time' => $bookingData['overall_end_time'] ?? null,
+                'overall_start_time' => $bookingData['overall_start_time'] ?? null,
+                'overall_end_time' => $bookingData['overall_end_time'] ?? null,
             ]);
 
             if (!$this->Bookings->save($newBooking)) {

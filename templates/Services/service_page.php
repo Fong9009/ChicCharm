@@ -53,7 +53,7 @@ if ($identity) {
 </div>
 
 
-<section class="px-5 mt-4">
+<section class="px-5 mt-4" style="margin-bottom: 120px; padding-bottom: 110px;">
     <?php
     $counter = 0;
     foreach ($services as $service):
@@ -80,7 +80,12 @@ if ($identity) {
                     <p><strong>Cost:</strong> $<?= h($service->service_cost) ?></p>
                 </div>
                 <div class="card-footer" style="background-color: orange">
-                    <?= $this->Html->link('View Service', ['controller' => 'Services', 'action' => 'serviceView', $service->id], ['class' => 'btn btn-primary w-100', 'style' =>"background-color: orange"]) ?>
+                    <?= $this->Html->link('View Service', ['controller' => 'Services', 'action' => 'serviceView', $service->id], ['class' => 'btn btn-primary w-100 mb-2', 'style' =>"background-color: orange"]) ?>
+                    <?php
+                        $bookingLinkParams = $link; // Use the $link determined at the top of the file
+                        $bookingLinkParams['?'] = ['service_id' => $service->id];
+                    ?>
+                    <?= $this->Html->link('Book This Service', $bookingLinkParams, ['class' => 'btn btn-success w-100', 'style' => "background-color: #28a745; border-color: #28a745;"]) ?>
                 </div>
             </div>
         </div>

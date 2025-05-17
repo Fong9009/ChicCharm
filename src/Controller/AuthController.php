@@ -46,7 +46,7 @@ class AuthController extends AppController
 
         // By default, CakePHP will (sensibly) default to preventing users from accessing any actions on a controller.
         // These actions, however, are typically required for users who have not yet logged in.
-        $this->Authentication->allowUnauthenticated(['login', 'forgetPassword', 'resetPassword']);
+        $this->Authentication->allowUnauthenticated(['login', 'forgetPassword', 'resetPassword', 'guestcancel', 'guesttransfer']);
 
         // Load both Admins and Customers tables
         $this->Admins = $this->fetchTable('Admins');
@@ -534,7 +534,11 @@ class AuthController extends AppController
         $response = $this->getResponse();
         $this->Authentication->getAuthenticationService()->clearIdentity($request, $response);
 
-        return $this->redirect(['controller' => 'Pages', 'action' => 'display']);
+        // Clear the pending guest booking details from the session
+        $this->request->getSession()->delete('GuestBooking.pending_details');
+
+        $this->Flash->info(__('Your pending booking has been cancelled.')); 
+        return $this->redirect(['controller' => 'Bookings', 'action' => 'guestbooking']); 
     }
 
 }

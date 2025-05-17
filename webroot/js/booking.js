@@ -79,56 +79,93 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
-    // Initialize state from potentially pre-checked boxes (edit mode)
     function initializeBookingState() {
         serviceSelections = [];
-        if (bookingDateInput && bookingDateInput.value) {
-            pageLoadedWithDate = true;
-        } else {
-            pageLoadedWithDate = false;
+        pageLoadedWithDate = false; 
+
+        if (typeof pendingBookingDate !== 'undefined' && pendingBookingDate) {
+            if (bookingDateInput) {
+                bookingDateInput.value = pendingBookingDate; 
+                pageLoadedWithDate = true;
+                console.log("[Init] Pending booking date loaded:", pendingBookingDate);
+            }
         }
 
-        serviceCheckboxes.forEach(checkbox => {
-            if (checkbox.checked) {
-                const serviceIdStr = checkbox.value;
-                const details = getServiceDetails(serviceIdStr);
-                if (details) {
-                    const serviceIdNum = parseInt(details.id, 10);
-                    if (isNaN(serviceIdNum)) {
-                        console.error("[Init] Invalid service ID encountered:", details.id);
-                        return;
-                    }
-                    serviceSelections.push({
-                        serviceId: serviceIdNum,
-                        name: details.name,
-                        duration: details.duration,
-                        cost: details.cost,
-                        selectedStylistId: details.initialStylistId ? parseInt(details.initialStylistId, 10) : null,
-                        initialStylistId: details.initialStylistId ? parseInt(details.initialStylistId, 10) : null,
-                        initialStartTime: details.initialStartTime || null,
-                        selectedStartTime: null, 
-                        availableSlots: []
-                    });
+        if (typeof pendingServicesData !== 'undefined' && pendingServicesData && Array.isArray(pendingServicesData)) {
+            console.log("[Init] Pending services data loaded:", pendingServicesData);
+            pendingServicesData.forEach(pendingService => {
+                const serviceIdNum = parseInt(pendingService.service_id, 10);
+                if (isNaN(serviceIdNum)) {
+                    console.error("[Init] Invalid service ID in pending data:", pendingService.service_id);
+                    return; 
                 }
-            }
-        });
-        // Initial UI setup based on loaded state
-        updateInputStates();
+
+                const checkbox = document.querySelector(`#service-${serviceIdNum}`);
+                if (checkbox) {
+                    checkbox.checked = true; 
+
+                    const details = getServiceDetails(serviceIdNum.toString()); 
+                    if (details) {
+                        serviceSelections.push({
+                            serviceId: serviceIdNum,
+                            name: pendingService.service_name || details.name, 
+                            duration: details.duration, 
+                            cost: parseFloat(pendingService.service_cost) || details.cost, 
+                            selectedStylistId: null, 
+                            initialStylistId: pendingService.stylist_id ? parseInt(pendingService.stylist_id, 10) : null,
+                            initialStartTime: pendingService.start_time_formatted ? pendingService.start_time_formatted.substring(0, 5) : null, // Expect H:i
+                            selectedStartTime: null,
+                            availableSlots: []
+                        });
+                        console.log("[Init] Added service from pending data:", serviceSelections[serviceSelections.length-1]);
+                    }
+                } else {
+                    console.warn("[Init] Checkbox not found for service ID:", serviceIdNum);
+                }
+            });
+        } else {
+            serviceCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    const serviceIdStr = checkbox.value;
+                    const details = getServiceDetails(serviceIdStr);
+                    if (details) {
+                        const serviceIdNum = parseInt(details.id, 10);
+                        if (isNaN(serviceIdNum)) {
+                            console.error("[Init] Invalid service ID encountered (fallback):", details.id);
+                            return;
+                        }
+                        serviceSelections.push({
+                            serviceId: serviceIdNum,
+                            name: details.name,
+                            duration: details.duration,
+                            cost: details.cost,
+                            selectedStylistId: details.initialStylistId ? parseInt(details.initialStylistId, 10) : null,
+                            initialStylistId: details.initialStylistId ? parseInt(details.initialStylistId, 10) : null,
+                            initialStartTime: details.initialStartTime || null,
+                            selectedStartTime: null, 
+                            availableSlots: []
+                        });
+                    }
+                }
+            });
+        }
+
+        updateInputStates(); 
         renderServiceStylistSelections().then(() => {
-            // Instead, directly populate stylists if date is present
-            if (bookingDateInput.value && !bookingDateInput.disabled) {
-                populateAllStylistDropdowns(bookingDateInput.value);
+            if (bookingDateInput && bookingDateInput.value && !bookingDateInput.disabled) {
+                 populateAllStylistDropdowns(bookingDateInput.value).then(() => {
+                    console.log("[Init] Stylists populated, attempting to fetch initial times if needed.");
+                    fetchInitialTimesForSelectedStylists(bookingDateInput.value);
+                });
             }
         });
         calculateAndUpdateSummary();
     }
 
-    // Update enable/disable state of inputs
     function updateInputStates() {
         const anyServiceCheckboxSelected = serviceSelections.length > 0;
 
-        // Enable date input if in edit mode with a date OR if a service checkbox is selected
-        if (bookingDateInput) { // Ensure bookingDateInput exists
+        if (bookingDateInput) { 
             if ((pageLoadedWithDate && bookingDateInput.value) || anyServiceCheckboxSelected) {
                 bookingDateInput.disabled = false;
             } else {
@@ -221,7 +258,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Render the service/stylist selection rows
     async function renderServiceStylistSelections() {
-        serviceStylistSelectionsContainer.innerHTML = '';
+        if (!serviceStylistSelectionsContainer) return;
+
+        serviceStylistSelectionsContainer.innerHTML = ''; 
+
+        const stylistFetchPromises = [];
 
         if (serviceSelections.length === 0) return;
 
@@ -231,7 +272,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- NEW HELPER: Creates DOM elements for a single service row --- 
     function createServiceRowElements(selection) {
         const container = document.createElement('div');
         container.className = 'service-stylist-selection mb-3 p-3 border rounded';
@@ -571,45 +611,47 @@ document.addEventListener('DOMContentLoaded', function() {
         const details = getServiceDetails(serviceId);
         if (!details) return;
 
+        const existingSelectionIndex = serviceSelections.findIndex(s => s.serviceId === serviceId);
+
         if (checkbox.checked) {
-            // 1. Add to state
-             const newSelection = {
-                 serviceId: serviceId,
-                 name: details.name,
-                 duration: details.duration,
-                 cost: details.cost,
-                 selectedStylistId: null,
-                 initialStylistId: null, 
-                 initialStartTime: null,
-                 selectedStartTime: null,
-                 availableSlots: []
-             };
-             serviceSelections.push(newSelection);
+            if (existingSelectionIndex === -1) { // Only add if not already present in state
+                 const newSelection = {
+                     serviceId: serviceId,
+                     name: details.name,
+                     duration: details.duration,
+                     cost: details.cost,
+                     selectedStylistId: null,
+                     initialStylistId: null, 
+                     initialStartTime: null,
+                     selectedStartTime: null,
+                     availableSlots: []
+                 };
+                 serviceSelections.push(newSelection);
 
-            // 2. Create and append the new DOM row
-            const newRowElement = createServiceRowElements(newSelection);
-            serviceStylistSelectionsContainer.appendChild(newRowElement);
-
-            // 3. If date is already selected, populate stylists for this new row
+                // Create and append the new DOM row only if it was newly added to state
+                const newRowElement = createServiceRowElements(newSelection);
+                serviceStylistSelectionsContainer.appendChild(newRowElement);
+            }
+            // Whether added or already existing, if date is selected, (re)populate stylists for all selected services.
+            // This ensures that if the event is from a pre-selected item, its stylist dropdown gets populated.
             if (bookingDateInput.value && !bookingDateInput.disabled) {
                 populateAllStylistDropdowns(bookingDateInput.value);
             }
 
-        } else {
-            // --- Service Removed ---
-            // 1. Remove from state
-            serviceSelections = serviceSelections.filter(s => s.serviceId !== serviceId);
+        } else { // Service Unchecked
+            if (existingSelectionIndex !== -1) { // Only remove if it was indeed in the state
+                serviceSelections.splice(existingSelectionIndex, 1); // Remove from state
 
-            // 2. Remove the corresponding DOM row
-            const rowToRemove = serviceStylistSelectionsContainer.querySelector(`.service-stylist-selection[data-service-id="${serviceId}"]`);
-            if (rowToRemove) {
-            rowToRemove.remove();
-            } else {
-            console.warn(`[ServiceChange] Could not find DOM row to remove for service ${serviceId}`);
+                // Remove the corresponding DOM row
+                const rowToRemove = serviceStylistSelectionsContainer.querySelector(`.service-stylist-selection[data-service-id="${serviceId}"]`);
+                if (rowToRemove) {
+                    rowToRemove.remove();
+                } else {
+                    console.warn(`[ServiceChange] Could not find DOM row to remove for service ${serviceId}`);
+                }
+                // Recalculate conflicts as a service has been removed
+                disableConflictingTimeSlots();
             }
-
-            // 3. Recalculate conflicts
-            disableConflictingTimeSlots();
         }
         updateInputStates();
         calculateAndUpdateSummary();

@@ -55,4 +55,27 @@ class AppController extends Controller
          */
         //$this->loadComponent('FormProtection');
     }
+
+    /**
+     * Called before the controller action.
+     *
+     * @param \Cake\Event\EventInterface $event An Event instance
+     * @return \Cake\Http\Response|null|void
+     * @link https://book.cakephp.org/5/en/controllers.html#request-life-cycle-callbacks
+     */
+    public function beforeFilter(EventInterface $event)
+    {
+        parent::beforeFilter($event);
+        // Check for pending guest booking in session
+        $session = $this->request->getSession();
+        $pendingGuestBookingToken = null;
+        if ($session->check('GuestBooking.pending_details.pending_booking_token')) {
+            $pendingGuestBookingToken = $session->read('GuestBooking.pending_details.pending_booking_token');
+        }
+        $this->set('pendingGuestBookingToken', $pendingGuestBookingToken);
+
+        // Pass user identity to all views for navbar, etc.
+        $currentUser = $this->Authentication->getIdentity();
+        $this->set('currentUser', $currentUser);
+    }
 }

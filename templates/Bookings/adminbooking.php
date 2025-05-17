@@ -9,6 +9,7 @@
 
 // Add the JavaScript file
 $this->Html->script('booking', ['block' => 'script']);
+$preselected_service_id = $this->request->getQuery('service_id');
 ?>
 <?= $this->Html->css('/utility/indexes/indexes.css') ?>
 <?= $this->Html->css('https://fonts.googleapis.com/icon?family=Material+Icons') ?>
@@ -87,7 +88,8 @@ $this->Html->script('booking', ['block' => 'script']);
                                                value="<?= $service->id ?>"
                                                id="service-<?= $service->id ?>"
                                                data-duration="<?= $service->duration_minutes ?>"
-                                               data-cost="<?= $service->service_cost ?>">
+                                               data-cost="<?= $service->service_cost ?>"
+                                               <?= $preselected_service_id == $service->id ? 'checked' : '' ?>>
                                         <label class="form-check-label" for="service-<?= $service->id ?>">
                                             <?= h($service->service_name) ?>
                                             (<?= h($service->duration_minutes) ?> mins) -
@@ -168,7 +170,17 @@ $this->Html->script('booking', ['block' => 'script']);
     </div>
 </div>
 </div>
-<?php // Remove Flatpickr JS ?>
-<?php // <?= $this->Html->script('https://cdn.jsdelivr.net/npm/flatpickr') ?>
 
-<?php // Script block for Flatpickr initialization was already removed ?>
+<?php $this->append('script'); ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    <?php if ($preselected_service_id): ?>
+    const preselectedCheckbox = document.getElementById('service-<?= $preselected_service_id ?>');
+    if (preselectedCheckbox && preselectedCheckbox.checked) {
+        const event = new Event('change', { bubbles: true });
+        preselectedCheckbox.dispatchEvent(event);
+    }
+    <?php endif; ?>
+});
+</script>
+<?php $this->end(); ?>

@@ -73,12 +73,22 @@ $appLocale = Configure::read('App.defaultLocale');
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Auth', 'action' => 'logout']) ?>" onclick="return confirmLogout()">
                                 <i class="fas fa-sign-out-alt"></i><span>Logout</span></a></li>
+                        <?php elseif ($identity->get('type') === 'stylist') : ?>
+                            <li><a class="dropdown-item" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Stylists', 'action' => 'dashboard']) ?>">
+                                    <i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
+                            <li><a class="dropdown-item" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Auth', 'action' => 'logout']) ?>" onclick="return confirmLogout()">
+                                    <i class="fas fa-sign-out-alt"></i><span>Logout</span></a></li>
                         <?php endif; ?>
                     <?php else : ?>
                         <li><a class="dropdown-item" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Auth', 'action' => 'login']) ?>">
                             <i class="fas fa-sign-in-alt"></i><span>Login</span></a></li>
                         <li><a class="dropdown-item" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Customers', 'action' => 'registration']) ?>">
                             <i class="fas fa-user-plus"></i><span>Sign Up</span></a></li>
+                        <?php if (!empty($pendingGuestBookingToken)): ?>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="<?= $this->Url->build(['controller' => 'Bookings', 'action' => 'viewPendingGuestBooking', $pendingGuestBookingToken]) ?>">
+                                <i class="fas fa-shopping-cart"></i><span>View Pending Booking</span></a></li>
+                        <?php endif; ?>
                     <?php endif; ?>
                 </ul>
             </div>
@@ -226,18 +236,67 @@ $appLocale = Configure::read('App.defaultLocale');
                                    'action' => 'dashboard']) ?>">Dashboard
                             </a>
                         </li>
+                    <?php } elseif ($identity->get('type') === 'stylist') {
+                        // Customer Navigation ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= $this->Url->build(['plugin' => false,
-                                'controller' => 'Customers', 'action' => 'edit', $identity->get('id')]) ?>">My Profile
+                            <a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Services', 'action' => 'servicePage']) ?>">Services</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Stylists', 'action' => 'stylistOverview']) ?>">Stylists</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               href="<?= $this->Url->build([
+                                   'controller' => 'Stylists',
+                                   'action' => 'dashboard']) ?>">Dashboard
                             </a>
                         </li>
-                    <?php }
-                    // Logout button for both admin and customer ?>
+                    <?php } else {
+                    // Customer Navigation ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= $this->Url->build(['plugin' => false,
-                            'controller' => 'Auth', 'action' => 'logout']) ?>" onclick="return confirmLogout()">Logout
+                        <a class="nav-link" href="<?= $this->Url->build('/#about') ?>">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Services', 'action' => 'servicePage']) ?>">Services</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= $this->Url->build(['plugin' => false, 'controller' => 'Stylists', 'action' => 'stylistOverview']) ?>">Stylists</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           href="<?= $this->Url->build([
+                               'controller' => 'Bookings',
+                               'action' => 'guestbooking']) ?>">Make a Booking
                         </a>
                     </li>
+                    <?php if ($this->request->getSession()->check('GuestBooking.pending_details')): ?>
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               href="<?= $this->Url->build([
+                                   'controller' => 'Bookings',
+                                   'action' => 'viewPendingGuestBooking']) ?>">View Pending Booking
+                            </a>
+                        </li>
+                    <?php endif; ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= $this->Url->build(['plugin' => false,
+                            'controller' => 'Auth', 'action' => 'logout']) ?>" onclick="return confirmLogout()">Finish as Guest
+                        </a>
+                    </li>
+                    <?php }
+                    // Logout button for both admin and customer ?>
+                    <?php
+                    $identityType = $identity->get('type');
+                    if (isset($identityType) && in_array($identityType, ['admin', 'customer', 'stylist'])): ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= $this->Url->build(['plugin' => false,
+                                'controller' => 'Auth', 'action' => 'logout']) ?>" onclick="return confirmLogout()">Logout
+                            </a>
+                        </li>
+                    <?php endif; ?>
                 <?php } else {
                     // Public Navigation ?>
                     <li class="nav-item">
@@ -252,6 +311,13 @@ $appLocale = Configure::read('App.defaultLocale');
                     <li class="nav-item">
                         <a class="nav-link" href="<?= $this->Url->build('/contacts/enquiry') ?>">Contact Us</a>
                     </li>
+                    <?php if (!empty($pendingGuestBookingToken)): ?>
+                        <li class="nav-item">
+                            <a class="nav-link text-warning" href="<?= $this->Url->build(['controller' => 'Bookings', 'action' => 'viewPendingGuestBooking', $pendingGuestBookingToken]) ?>">
+                                <i class="fas fa-shopping-cart"></i> View Pending Booking
+                            </a>
+                        </li>
+                    <?php endif; ?>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= $this->Url->build('/auth/login') ?>">Login</a>
                     </li>

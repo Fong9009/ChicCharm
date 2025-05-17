@@ -113,6 +113,7 @@ $this->Html->script('booking', ['block' => 'script']);
                                     'class' => 'form-control',
                                     'required' => true,
                                     'error' => ['class' => 'invalid-feedback'],
+                                    'disabled' => true,
                                 ]) ?>
                             </div>
                             <br>
