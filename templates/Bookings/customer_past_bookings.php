@@ -183,7 +183,14 @@
                                             <?php endforeach; ?>
                                             </tbody>
                                         </table>
+                                        <?php if ($bookings->isEmpty()) : ?>
+                                            <div class="text-center" style="font-style: italic;">
+                                                <br>
+                                                <p>You have no past bookings.</p>
+                                            </div>
+                                        <?php endif; ?>
                                     </div>
+                                    <?php if (!$bookings->isEmpty()) : ?>
                                         <div class="paginator">
                                             <ul class="pagination">
                                                 <?= $this->Paginator->first('<< ' . __('first')) ?>
@@ -194,6 +201,7 @@
                                             </ul>
                                             <p><?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} record(s) out of {{count}} total')) ?></p>
                                         </div>
+                                    <?php endif; ?>
                             </div>
                         </div>
                     </div>

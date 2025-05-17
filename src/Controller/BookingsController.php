@@ -268,7 +268,7 @@ class BookingsController extends AppController
                 return $q->where(['BookingsStylists.stylist_id' => $stylist->id]);
             })
             ->where([
-                'Bookings.status IN' => ['finished', 'cancelled','Confirmed - Paid'],
+                'Bookings.status IN' => ['finished', 'Confirmed - Payment Due', 'Confirmed - Paid'],
                 'Bookings.booking_date >=' => $today
             ])
             ->orderBy([
@@ -391,8 +391,8 @@ class BookingsController extends AppController
         $originalTotalCost = $booking->total_cost;
         $originalRemainingCost = $booking->remaining_cost;
         $originalStatus = $booking->status;
-        $originalCustomerId = $booking->customer_id; 
-        $originalBookingName = $booking->booking_name; 
+        $originalCustomerId = $booking->customer_id;
+        $originalBookingName = $booking->booking_name;
 
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
@@ -415,16 +415,16 @@ class BookingsController extends AppController
                 $data['booking_name'] = $originalBookingName;
             }
 
-            if (isset($data['customer_id'])) { 
+            if (isset($data['customer_id'])) {
                 try {
                     $customer = $this->Bookings->Customers->get($originalCustomerId);
                 } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
                     $this->Flash->error(__('The original customer for this booking was not found.'));
                     return $this->redirect(['action' => 'edit', $bookingId]);
                 }
-            } else { 
-                if ($originalCustomerId) { 
-                    $data['customer_id'] = $originalCustomerId; 
+            } else {
+                if ($originalCustomerId) {
+                    $data['customer_id'] = $originalCustomerId;
                 } else {
                     $this->Flash->error(__('Customer ID is missing and could not be retained from the original booking.'));
                     return $this->redirect(['action' => 'edit', $bookingId]);
@@ -456,14 +456,14 @@ class BookingsController extends AppController
                     //Refund the difference
                     $refund = $totalPreviousCost - $totalCost;
                     $data['remaining_cost'] = 0;
-                    $data['refund_due_amount'] = $refund; 
+                    $data['refund_due_amount'] = $refund;
                 } elseif ($totalCost > $totalPreviousCost) {
                     $data['remaining_cost'] = $totalCost - $totalPreviousCost;
-                    $data['refund_due_amount'] = 0; 
+                    $data['refund_due_amount'] = 0;
                     $booking->status = 'Confirmed - Payment Due';
                 } else {
                     $data['remaining_cost'] = 0;
-                    $data['refund_due_amount'] = 0; 
+                    $data['refund_due_amount'] = 0;
                     $this->Flash->success(__('Cost is the same, no change required'));
                 }
 
@@ -474,22 +474,22 @@ class BookingsController extends AppController
                 if ($totalCost < $paidSoFar) {
                     $refund = $paidSoFar - $totalCost;
                     $data['remaining_cost'] = 0;
-                    $data['refund_due_amount'] = $refund; 
+                    $data['refund_due_amount'] = $refund;
                     $booking->status = 'Confirmed - Paid';
                     $this->Flash->info(__('A refund of {0} is due to the customer as their new total is less than what they have already paid. Please process this manually via PayPal.', $numberHelper->currency($refund, 'AUD')));
                 } elseif ($totalCost > $paidSoFar) {
                     $data['remaining_cost'] = $totalCost - $paidSoFar;
-                    $data['refund_due_amount'] = 0; 
+                    $data['refund_due_amount'] = 0;
                 } else {
                     $data['remaining_cost'] = 0;
-                    $data['refund_due_amount'] = 0; 
+                    $data['refund_due_amount'] = 0;
                     $booking->status = 'Confirmed - Paid';
                 }
             } else {
                 // For new or unconfirmed bookings
                 // If all else fails
                 $data['remaining_cost'] = $totalCost;
-                $data['refund_due_amount'] = 0; 
+                $data['refund_due_amount'] = 0;
             }
 
             $data['total_cost'] = $totalCost;
@@ -516,7 +516,7 @@ class BookingsController extends AppController
                     'booking_date' => $data['booking_date_formatted'],
                     'total_cost' => $data['total_cost'],
                     'remaining_cost' => $data['remaining_cost'],
-                    'refund_due_amount' => $data['refund_due_amount'], 
+                    'refund_due_amount' => $data['refund_due_amount'],
                     'notes' => $data['notes'],
                  ], ['associated' => []]);
 
@@ -1741,12 +1741,12 @@ class BookingsController extends AppController
             if (isset($pendingBookingData['booking_name'])) {
                 $bookingEntity->customer_name = preg_replace('/^Booking for /i', '', $pendingBookingData['booking_name']);
             }
-            if (isset($pendingBookingData['email'])) {                      
-                $bookingEntity->email = $pendingBookingData['email'];               
-            }                                                                             
-            if (isset($pendingBookingData['phone_number'])) {                            
-                $bookingEntity->phone_number = $pendingBookingData['phone_number'];        
-            }   
+            if (isset($pendingBookingData['email'])) {
+                $bookingEntity->email = $pendingBookingData['email'];
+            }
+            if (isset($pendingBookingData['phone_number'])) {
+                $bookingEntity->phone_number = $pendingBookingData['phone_number'];
+            }
             if ($this->request->is('get') && isset($pendingBookingData['bookings_services_summary'])) {
             }
         }
@@ -1762,7 +1762,7 @@ class BookingsController extends AppController
                 if (empty($data['customer_name'])) {
                     $this->Flash->error(__('Please enter your name for the booking.'));
                     // Set $bookingEntity with current data for form repopulation
-                    $bookingEntity = $this->Bookings->patchEntity($bookingEntity, $data); 
+                    $bookingEntity = $this->Bookings->patchEntity($bookingEntity, $data);
                     $this->set('booking', $bookingEntity);
                     $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
                     $services = $this->fetchTable('Services')->find('all')->all();
@@ -2057,7 +2057,7 @@ class BookingsController extends AppController
                 return $q->where(['BookingsServices.stylist_id' => $stylist->id]);
             })
             ->where([
-                'Bookings.status' => 'Confirmed - Paid',
+                'Bookings.status IN' => ['finished','cancelled', 'Confirmed - Payment Due', 'Confirmed - Paid'],
                 'Bookings.booking_date <' => $today
             ])
             ->orderBy(['Bookings.booking_date' => 'DESC']);
@@ -2507,13 +2507,13 @@ class BookingsController extends AppController
      */
     public function updateBookingStatuses()
     {
-        $now = new FrozenTime(); 
+        $now = new FrozenTime();
         $todayDate = $now->format('Y-m-d');
         $currentTime = $now->format('H:i:s');
 
         $bookingsToFinish = $this->Bookings->find()
             ->where([
-                'Bookings.status NOT IN' => ['finished', 'cancelled'], 
+                'Bookings.status NOT IN' => ['finished', 'cancelled'],
                 'OR' => [
                     // Condition for 'active' bookings on current day: end_time has passed
                     [
@@ -3188,7 +3188,7 @@ class BookingsController extends AppController
         }
 
         $paymentAmount = number_format((float)($bookingData['total_cost'] ?? 0), 2, '.', '');
-        $currencyCode = 'AUD'; 
+        $currencyCode = 'AUD';
         $clientId = Configure::read('PayPal.clientId');
         $mode = Configure::read('PayPal.mode', 'sandbox');
 
@@ -3217,7 +3217,7 @@ class BookingsController extends AppController
         }
 
         $this->request->allowMethod(['post']);
-        $booking = $this->Bookings->get($id, ['contain' => ['Customers']]); 
+        $booking = $this->Bookings->get($id, ['contain' => ['Customers']]);
 
         if ($booking->refund_due_amount > 0) {
             $booking->refund_due_amount = 0.00;

@@ -529,8 +529,8 @@ class StylistsController extends AppController
                 return $q->where(['BookingsStylists.stylist_id' => $stylist->id]);
             })
             ->where([
-                'Bookings.status' => 'Confirmed - Paid',
-                'Bookings.booking_date >=' => $today
+                'Bookings.status IN' => ['finished', 'Confirmed - Payment Due', 'Confirmed - Paid'],
+                'Bookings.booking_date >=' => $today,
             ])
             ->orderBy(['Bookings.booking_date' => 'DESC'])
             ->limit(3);
@@ -549,8 +549,8 @@ class StylistsController extends AppController
                 return $q->where(['BookingsServices.stylist_id' => $stylist->id]);
             })
             ->where([
-                'Bookings.status IN' => ['finished', 'cancelled','Confirmed - Paid'],
-                'Bookings.booking_date <' => $today
+                'Bookings.status IN' => ['finished', 'cancelled','Confirmed - Paid','Confirmed - Payment Due'],
+                'Bookings.booking_date <' => $today,
             ])
             ->orderBy(['Bookings.booking_date' => 'DESC'])
             ->limit(3);
