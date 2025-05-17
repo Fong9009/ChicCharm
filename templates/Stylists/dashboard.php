@@ -21,47 +21,6 @@ $this->layout = 'default';
                     </div>
                     <?= $this->Flash->render() ?>
                     <div class="card-body">
-                        <div class="row mb-4 p-1">
-                            <div class="w-100" style="height: 2px; background-color: #6c757d;"></div>
-                        </div>
-                        <!--Profile Picture and Summary-->
-                        <div class="row">
-                            <div class="col-lg-4 col-md-12 col-sm-12 mb-4">
-                                <div class="card h-100">
-                                    <div class="card-body text-center">
-                                        <?php if (!empty($stylist->profile_picture)) : ?>
-                                            <img src="<?= $this->Url->image('profile/' . $stylist->profile_picture) ?>"
-                                                 alt="Profile Picture"
-                                                 class="profile-picture img-fluid rounded mx-auto d-block">
-                                        <?php else : ?>
-                                            <img src="<?= $this->Url->image('profile/blank-profile.png') ?>"
-                                                 alt="Profile Picture"
-                                                 class="profile-picture img-fluid rounded mx-auto d-block">
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-8 col-md-12 mb-4 col-sm-12">
-                                <div class="card h-100">
-                                    <div class="card-header d-flex justify-content-between align-items-center customer-card-header" style="background-color:#D7CCC8">
-                                        <h3 class="card-title">Profile Summary</h3>
-                                        <?= $this->Html->link(
-                                            'Edit Profile <i class="material-icons view-icon small-icon">edit</i>',
-                                            ['action' => 'stylistedit', $stylist->id],
-                                            ['class' => 'btn btn-primary', 'escape' => false]
-                                        ) ?>
-                                    </div>
-                                    <div class="card-body">
-                                        <p><strong>Name:</strong> <?= h($stylist->first_name) ?> <?= h($stylist->last_name) ?></p>
-                                        <p><strong>Email:</strong> <?= h($stylist->email) ?></p>
-                                        <p><strong>Member Since:</strong> <?= $stylist->created->format('F Y') ?></p>
-                                        <p><strong>Motto:</strong> <?= h($stylist->stylist_motto) ?></p>
-                                        <p><strong>Bio:</strong> <?= h($stylist->stylist_bio) ?></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
                 <!--Current Bookings-->
@@ -69,7 +28,7 @@ $this->layout = 'default';
                     <div class="col-12 mb-4">
                         <div class="card">
                             <div class="bookings-header" style="background-color:#D7CCC8">
-                                <h3 class="card-title">Current Bookings</h3>
+                                <h3 class="fw-bold">Current Bookings</h3>
                                 <div class="header-actions">
                                     <?= $this->Html->link(
                                         '<i class="material-icons">visibility</i> View All Bookings',
@@ -170,7 +129,7 @@ $this->layout = 'default';
                                     </div>
                                 <?php else: ?>
                                     <div class="text-center">
-                                        <p>You have no current bookings.</p>
+                                        <p>No one has booked you yet.</p>
                                     </div>
                                 <?php endif; ?>
                             </div>
@@ -182,7 +141,7 @@ $this->layout = 'default';
                     <div class="col-12 mb-4">
                         <div class="card">
                             <div class="bookings-header" style="background-color:#D7CCC8">
-                                <h3 class="card-title">Past Bookings</h3>
+                                <h3 class="fw-bold">Past Bookings</h3>
                                 <div class="header-actions">
                                     <?= $this->Html->link(
                                         '<i class="material-icons">history</i> View All Past Bookings',
@@ -293,6 +252,55 @@ $this->layout = 'default';
                                         <p>You have no recently cancelled bookings.</p>
                                     </div>
                                 <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card h-100 mb-4">
+                    <div class="card-header d-flex justify-content-between customer-card-header" style="background-color:#D7CCC8">
+                        <h2 class="fw-bold">Your Profile, <?= h( $stylist->first_name) ?>!</h2>
+                    </div>
+                    <?= $this->Flash->render() ?>
+                    <div class="card-body">
+                        <div class="row mb-4 p-1">
+                            <div class="w-100" style="height: 2px; background-color: #6c757d;"></div>
+                        </div>
+                        <!--Profile Picture and Summary-->
+                        <div class="row">
+                            <div class="col-lg-4 col-md-12 col-sm-12 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <?php if (!empty($stylist->profile_picture)) : ?>
+                                            <img src="<?= $this->Url->image('profile/' . $stylist->profile_picture) ?>"
+                                                 alt="Profile Picture"
+                                                 class="profile-picture img-fluid rounded mx-auto d-block">
+                                        <?php else : ?>
+                                            <img src="<?= $this->Url->image('profile/blank-profile.png') ?>"
+                                                 alt="Profile Picture"
+                                                 class="profile-picture img-fluid rounded mx-auto d-block">
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-8 col-md-12 mb-4 col-sm-12">
+                                <div class="card h-100">
+                                    <div class="card-header d-flex justify-content-between align-items-center customer-card-header" style="background-color:#D7CCC8">
+                                        <h3 class="card-title">Profile Summary</h3>
+                                        <?= $this->Html->link(
+                                            'Edit Profile <i class="material-icons view-icon small-icon">edit</i>',
+                                            ['action' => 'stylistedit', $stylist->id],
+                                            ['class' => 'btn btn-primary', 'escape' => false]
+                                        ) ?>
+                                    </div>
+                                    <div class="card-body">
+                                        <p><strong>Name:</strong> <?= h($stylist->first_name) ?> <?= h($stylist->last_name) ?></p>
+                                        <p><strong>Email:</strong> <?= h($stylist->email) ?></p>
+                                        <p><strong>Member Since:</strong> <?= $stylist->created->format('F Y') ?></p>
+                                        <p><strong>Motto:</strong> <?= h($stylist->stylist_motto) ?></p>
+                                        <p><strong>Bio:</strong> <?= h($stylist->stylist_bio) ?></p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
