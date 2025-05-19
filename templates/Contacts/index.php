@@ -61,6 +61,7 @@ $this->Html->css('custom', ['block' => true]);
                             <th><?= $this->Paginator->sort('email') ?></th>
                             <th><?= $this->Paginator->sort('phone_number') ?></th>
                             <th><?= $this->Paginator->sort('message') ?></th>
+                            <th><?= $this->Paginator->sort('preferred_contact_method') ?></th>
                             <th><?= $this->Paginator->sort('created', 'Sent At') ?></th>
                             <th><?= $this->Paginator->sort('replied') ?></th>
                             <th class="actions"><?= __('Actions') ?></th>
@@ -73,6 +74,7 @@ $this->Html->css('custom', ['block' => true]);
                             <td><?= h($contact->last_name) ?></td>
                             <td><?= h($contact->email) ?></td>
                             <td><?= h($contact->phone_number) ?></td>
+                            <td><?= h($contact->preferred_contact_method) ?></td>
                             <td><?= h($contact->message) ?></td>
                             <td><?= h($contact->created) ?></td>
                             <td><?= $contact->replied ? __('Yes') : __('No') ?></td>
