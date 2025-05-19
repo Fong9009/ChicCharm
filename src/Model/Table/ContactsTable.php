@@ -109,6 +109,14 @@ class ContactsTable extends Table
             ->boolean('replied')
             ->allowEmptyString('replied');
 
+        $validator
+            ->scalar('email')
+            ->scalar('phone_number')
+            ->scalar('sms')
+            ->inList('pref_reply_method',['Email','Phone','SMS'],
+                'Please select a preferred contact method.');
+
+
         return $validator;
     }
 }

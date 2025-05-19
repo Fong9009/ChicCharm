@@ -36,5 +36,6 @@ class Contact extends Entity
         'message' => true,
         'replied' => true,
         'is_archived' => true,
+        'preferred_contact_method' => true,
     ];
 }
