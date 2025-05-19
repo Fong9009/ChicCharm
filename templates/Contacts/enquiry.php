@@ -83,6 +83,22 @@
                             'error' => ['class' => 'invalid-feedback']
                         ]) ?>
                     </div>
+                    <div class="row">
+                        <div class="col-md-12" style="margin-bottom: 16px;">
+                            <?= $this->Form->control('preferred_contact_method', [
+                                'label' => 'Preferred Contact Method',
+                                'options' => [
+                                    'email' => 'Email',
+                                    'phone' => 'Phone',
+                                    'sms' => 'SMS'
+                                ],
+                                'class' => 'form-control',
+                                'required' => true,
+                                'error' => ['class' => 'invalid-feedback']
+                            ]) ?>
+                        </div>
+                    </div>
+
                 </div>
                 <?= $this->Form->control('message', [
                     'label' => 'Message',
