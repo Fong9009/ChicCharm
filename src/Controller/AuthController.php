@@ -238,9 +238,18 @@ class AuthController extends AppController
 
         if ($this->request->is('post')) {
             $data = $this->request->getData();
-            $user = $this->Users->findByNonce($token)->first();
 
-            if ($user) {
+            $user = $this->Customers->find()->where(['nonce' => $token])->first();
+
+            if (!$user) {
+                $user = $this->Admins->find()->where(['nonce' => $token])->first();
+            }
+
+            if (!$user) {
+                $user = $this->Stylists->find()->where(['nonce' => $token])->first();
+            }
+
+                if ($user) {
                 // Check if nonce is expired
                 if ($user->nonce_expiry < new \DateTime()) {
                     $this->Flash->error(__('Password reset link has expired. Please request a new one.'));
@@ -537,8 +546,8 @@ class AuthController extends AppController
         // Clear the pending guest booking details from the session
         $this->request->getSession()->delete('GuestBooking.pending_details');
 
-        $this->Flash->info(__('Your pending booking has been cancelled.')); 
-        return $this->redirect(['controller' => 'Bookings', 'action' => 'guestbooking']); 
+        $this->Flash->info(__('Your pending booking has been cancelled.'));
+        return $this->redirect(['controller' => 'Bookings', 'action' => 'guestbooking']);
     }
 
 }
