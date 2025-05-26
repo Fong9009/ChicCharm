@@ -1891,10 +1891,9 @@ class BookingsController extends AppController
 
                     $serviceNameMap = [];
                     if (!empty($serviceIds)) {
-                        $serviceNameMap = $this->Services->find('list', [
-                            'keyField' => 'id',
-                            'valueField' => 'service_name'
-                        ])->where(['id IN' => $serviceIds])->toArray();
+                        $this->Services->find('list', keyField: 'id', valueField: 'service_name')
+                            ->where(['id IN' => $serviceIds])
+                            ->toArray();
                     }
 
                     $stylistNameMap = [];
