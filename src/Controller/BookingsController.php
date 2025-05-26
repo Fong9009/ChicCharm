@@ -1898,10 +1898,13 @@ class BookingsController extends AppController
 
                     $stylistNameMap = [];
                     if (!empty($stylistIds)) {
-                        $stylistNameMap = $this->Stylists->find('list', [
-                            'keyField' => 'id',
-                            'valueField' => function($stylist) { return $stylist->first_name . ' ' . $stylist->last_name; }
-                        ])->where(['id IN' => $stylistIds])->toArray();
+                        $stylistNameMap = $this->Stylists->find(
+                            'list',
+                            keyField: 'id',
+                            valueField: function($stylist) {
+                                return $stylist->first_name . ' ' . $stylist->last_name;
+                            }
+                        )->where(['id IN' => $stylistIds])->toArray();
                     }
 
                     foreach ($data['bookings_services'] as $bs) {
@@ -1939,8 +1942,8 @@ class BookingsController extends AppController
             }
         }
 
-        $this->set('booking', $bookingEntity); // Pass the entity (new or patched from session) to the view
-        $stylists = $this->Bookings->Stylists->find('list', ['limit' => 200])->all();
+        $this->set('booking', $bookingEntity); // Pass the entity (new or patched from session) to the view$stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
+        $stylists = $this->Bookings->Stylists->find('list', limit: 200)->all();
         $services = $this->fetchTable('Services')->find('all')->all();
         $this->set(compact('stylists', 'services'));
 
