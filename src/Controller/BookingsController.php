@@ -9,7 +9,6 @@ use App\Model\Table\StylistsTable;
 use Cake\Event\EventInterface;
 use Cake\Http\Response;
 use Cake\I18n\DateTime as CakeDateTime;
-use Cake\I18n\FrozenTime;
 use Cake\I18n\FrozenDate;
 use Cake\Log\Log;
 use Cake\View\Exception\MissingTemplateException;
@@ -738,7 +737,7 @@ class BookingsController extends AppController
                             'payment_currency' => 'AUD',
                             'payment_status' => 'Pending - Admin Processing',
                             'payment_method' => 'Admin Adjustment',
-                            'payment_date' => FrozenTime::now(),
+                            'payment_date' => CakeDateTime::now(),
                             'notes' => 'Additional charge due to booking modification by admin. Original Total: ' . $numberHelper->currency($emailDetails['original_total'], 'AUD') . ', Paid So Far: ' . $numberHelper->currency($emailDetails['paid_so_far'] ?? 0, 'AUD') . ', New Total: ' . $numberHelper->currency($emailDetails['new_total'], 'AUD') . '.'
                         ]);
                     } elseif ($emailDetails['type'] === 'refund_due') {
@@ -749,7 +748,7 @@ class BookingsController extends AppController
                             'payment_currency' => 'AUD',
                             'payment_status' => 'Refunded - Admin Processed',
                             'payment_method' => 'Admin Adjustment',
-                            'payment_date' => FrozenTime::now(),
+                            'payment_date' => CakeDateTime::now(),
                             'notes' => 'Refund due to booking modification by admin. Original Total: ' . $numberHelper->currency($emailDetails['original_total'], 'AUD') . ', Paid So Far: ' . $numberHelper->currency($emailDetails['paid_so_far'] ?? $emailDetails['original_total'], 'AUD') . ', New Total: ' . $numberHelper->currency($emailDetails['new_total'], 'AUD') . '. Refund Amount: ' . $numberHelper->currency($emailDetails['amount'], 'AUD') . '.'
                         ]);
                     }
@@ -1002,7 +1001,7 @@ class BookingsController extends AppController
                     'payment_currency' => 'AUD',
                     'payment_status' => 'Refunded - Admin Processed',
                     'payment_method' => 'Admin Cancellation',
-                    'payment_date' => FrozenTime::now(),
+                    'payment_date' => CakeDateTime::now(),
                     'notes' => 'Full refund due to admin cancellation of a previously paid booking.'
                 ]);
                 if (!$paymentHistoriesTable->save($refundPaymentHistory)) {
@@ -1243,7 +1242,7 @@ class BookingsController extends AppController
                     'payment_currency' => 'AUD',
                     'payment_status' => 'Pending',
                     'payment_method' => null,
-                    'payment_date' => FrozenTime::now(),
+                    'payment_date' => CakeDateTime::now(),
                     'notes' => 'Placeholder record created on booking confirmation.'
                 ]);
                 if (!$paymentHistoriesTable->save($placeholderPayment)) {
@@ -1538,7 +1537,7 @@ class BookingsController extends AppController
                     'payment_currency' => 'AUD',
                     'payment_status' => 'Pending',
                     'payment_method' => null,
-                    'payment_date' => FrozenTime::now(),
+                    'payment_date' => CakeDateTime::now(),
                     'notes' => 'Placeholder record created on booking by admin.'
                 ]);
                 if (!$paymentHistoriesTable->save($placeholderPayment)) {
@@ -2403,7 +2402,7 @@ class BookingsController extends AppController
             foreach ($availableSlotsHi as $slotHi) {
                 $this->log("  Formatting loop: Processing slot '{$slotHi}'", 'debug');
                 try {
-                    $timeObj = FrozenTime::createFromFormat('H:i', $slotHi);
+                    $timeObj = CakeDateTime::createFromFormat('H:i', $slotHi);
                     if ($timeObj) {
                         $this->log("    -> Parsed successfully.", 'debug');
                         $formattedSlots[] = [
@@ -2509,7 +2508,7 @@ class BookingsController extends AppController
      */
     public function updateBookingStatuses()
     {
-        $now = new FrozenTime();
+        $now = new CakeDateTime();
         $todayDate = $now->format('Y-m-d');
         $currentTime = $now->format('H:i:s');
 
@@ -2902,8 +2901,8 @@ class BookingsController extends AppController
             $bookingDate = $booking->booking_date;
             $startTime = $earliestService->start_time;
             $bookingDateTimeStr = $bookingDate->format('Y-m-d') . ' ' . $startTime;
-            $bookingDateTime = new FrozenTime($bookingDateTimeStr);
-            $now = new FrozenTime();
+            $bookingDateTime = new CakeDateTime($bookingDateTimeStr);
+            $now = new CakeDateTime();
             $minEditTime = $now->addHours(3);
 
             if ($bookingDateTime <= $minEditTime) {
