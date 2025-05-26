@@ -466,6 +466,16 @@ class AuthController extends AppController
     {
         $this->request->allowMethod(['get', 'post']);
         $result = $this->Authentication->getResult();
+        $user = $this->Authentication->getIdentity();
+        if($user) {
+            if ($user->type === 'guest') {
+                $request = $this->getRequest();
+                $response = $this->getResponse();
+                $this->Authentication->getAuthenticationService()->clearIdentity($request, $response);
+                $this->request->getSession()->delete('GuestBooking.pending_details');
+                $fallbackLocation = ['controller' => 'Auth', 'action' => 'login'];
+            }
+        }
 
         // Only show the message if not logged in and coming from booking
         if (!$result->isValid() && $this->request->getQuery('redirect') === 'booking') {

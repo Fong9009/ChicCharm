@@ -275,7 +275,7 @@ $titleDescription = 'Landing Page';
                     <?php endif; ?>
                     <li class="nav-item">
                         <a class="nav-link" href="<?= $this->Url->build(['plugin' => false,
-                            'controller' => 'Auth', 'action' => 'logout']) ?>" onclick="return confirmLogout()">Finish as Guest
+                            'controller' => 'Auth', 'action' => 'login']) ?>">Login
                         </a>
                     </li>
                     <?php }
