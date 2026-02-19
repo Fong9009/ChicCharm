@@ -44,5 +44,9 @@ RUN composer run-script post-install-cmd --no-interaction || true
 # Allow .htaccess
 RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
 
+# Railway uses PORT; entrypoint makes Apache listen on it
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 EXPOSE 80
-CMD ["apache2-foreground"]
+ENTRYPOINT ["docker-entrypoint.sh"]
