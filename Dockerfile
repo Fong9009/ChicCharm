@@ -1,6 +1,9 @@
 # Use PHP 8.4 (lock file deps don't support 8.5 yet)
 FROM php:8.4-apache
 
+# Only one MPM must be loaded (prefork is required for mod_php)
+RUN a2dismod mpm_event mpm_worker 2>/dev/null || true && a2enmod mpm_prefork
+
 # Install system deps for intl, gd
 RUN apt-get update && apt-get install -y \
     libicu-dev \
