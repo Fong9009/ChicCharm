@@ -1,0 +1,13 @@
+.git
+.github
+.gitignore
+vendor
+node_modules
+*.md
+.env
+.env.*
+!.env.example
+tests
+logs
+tmp
+.DS_Store
